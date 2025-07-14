@@ -202,115 +202,87 @@ export default function AutomationBasic() {
     const selectedAccountData = mockAccounts.find(acc => acc.id === selectedAccount)
     
     return (
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden w-full mx-auto">
-        {/* Progress indicator */}
-        <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-1"></div>
-        
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div className="text-base font-medium text-gray-900">Instagram post and keyword</div>
-            </div>
-            <MoreHorizontal className="w-5 h-5 text-gray-400" />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Compact Header */}
+        <div className="bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Instagram className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-medium">Live Preview</span>
           </div>
         </div>
         
-        {/* Account info */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-gray-600" />
+        {/* Preview Content */}
+        <div className="p-4 space-y-3">
+          {/* Account & Post */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-gray-600" />
             </div>
             <div>
-              <div className="text-base font-medium text-gray-900">
-                {selectedAccountData?.name || 'Select an account'}
+              <div className="text-sm font-medium text-gray-900">
+                {selectedAccountData?.name || 'Select account'}
               </div>
-              <div className="text-sm text-gray-500">
-                {selectedAccountData?.followers || 'No account selected'}
+              <div className="text-xs text-gray-500">
+                {selectedPostData?.title || 'Select post'}
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Post preview */}
-        <div className="p-6">
+          
+          {/* Post Image */}
           {selectedPostData ? (
-            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden">
+            <div className="aspect-square bg-gray-100 rounded-lg relative overflow-hidden">
               <img
                 src={selectedPostData.thumbnail}
                 alt={selectedPostData.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
+              <div className="absolute top-2 right-2 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs">
                 {selectedPostData.type}
               </div>
             </div>
           ) : (
-            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6">
+            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
               <div className="text-center">
-                <Camera className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-                <div className="text-base text-gray-500">Select a post</div>
+                <Camera className="w-8 h-8 text-gray-400 mx-auto mb-1" />
+                <div className="text-xs text-gray-500">No post selected</div>
               </div>
             </div>
           )}
           
-          {/* Post actions */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-5">
-              <Heart className="w-6 h-6 text-gray-600 hover:text-red-500 cursor-pointer" />
-              <MessageCircle className="w-6 h-6 text-gray-600 hover:text-blue-500 cursor-pointer" />
-              <Send className="w-6 h-6 text-gray-600 hover:text-green-500 cursor-pointer" />
-            </div>
-            <Bookmark className="w-6 h-6 text-gray-600 hover:text-yellow-500 cursor-pointer" />
-          </div>
-          
-          {/* Post caption */}
-          {selectedPostData && (
-            <div className="text-sm text-gray-900 mb-4">
-              <span className="font-semibold">{selectedAccountData?.name}</span>
-              <span className="ml-1">{selectedPostData.caption}</span>
-            </div>
-          )}
-          
-          {/* Comments */}
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-600" />
+          {/* Sample Comment */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <div className="flex items-start gap-2">
+              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                <User className="w-3 h-3 text-gray-600" />
               </div>
               <div className="flex-1">
-                <div className="text-sm">
-                  <span className="font-semibold">username</span>
+                <div className="text-xs">
+                  <span className="font-medium">user123</span>
                   <span className="ml-1 text-gray-700">{previewComment}</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">Reply</div>
               </div>
             </div>
-            
-            {/* Automation trigger indicator */}
-            {willTriggerAutomation() && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-600">Automation triggered</span>
+          </div>
+          
+          {/* Automation Response */}
+          {willTriggerAutomation() && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Bot className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-blue-600">Auto-response</span>
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs">
+                  <div className="font-medium text-gray-700">Reply:</div>
+                  <div className="text-gray-600 bg-white p-2 rounded text-xs">{commentReply}</div>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-gray-700">
-                    <div className="font-semibold">Public Reply:</div>
-                    <div className="mt-1 p-2 bg-white rounded border">{commentReply}</div>
-                  </div>
-                  <div className="text-sm text-gray-700">
-                    <div className="font-semibold">DM Message:</div>
-                    <div className="mt-1 p-2 bg-white rounded border">{dmMessage}</div>
-                  </div>
+                <div className="text-xs">
+                  <div className="font-medium text-gray-700">DM:</div>
+                  <div className="text-gray-600 bg-white p-2 rounded text-xs">{dmMessage}</div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -340,220 +312,191 @@ export default function AutomationBasic() {
       {/* Main Content */}
       <div className="flex min-h-screen">
         {/* Left Form Panel */}
-        <div className="w-1/2 p-6 space-y-6 overflow-y-auto">
-          {/* Social Account Selection */}
-          <CustomDropdown
-            label="Social account"
-            value={selectedAccount}
-            onChange={setSelectedAccount}
-            placeholder="Select an option"
-            options={mockAccounts.map(acc => ({
-              value: acc.id,
-              label: acc.name,
-              description: acc.followers,
-              icon: <Instagram className="w-4 h-4" />
-            }))}
-          />
-
-          {/* Content Type Selection */}
-          <CustomDropdown
-            label="Content type"
-            value={selectedContentType}
-            onChange={setSelectedContentType}
-            placeholder="Select content type"
-            options={contentTypes.map(type => ({
-              value: type.id,
-              label: type.name,
-              description: type.description,
-              icon: type.icon
-            }))}
-          />
-
-          {/* Post Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select a post or reel
-            </label>
+        <div className="w-1/2 p-6 space-y-4 overflow-y-auto">
+          {/* Account and Post Selection */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+            <h3 className="font-semibold text-gray-900">Setup</h3>
             
-            {selectedAccount ? (
-              <div className="space-y-3">
-                {mockPosts.map((post) => (
-                  <div
-                    key={post.id}
-                    onClick={() => setSelectedPost(post.id)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedPost === post.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 bg-white hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={post.thumbnail}
-                        alt={post.title}
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-gray-900">{post.title}</span>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            post.type === 'reel' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                          }`}>
-                            {post.type}
-                          </span>
+            <div className="grid grid-cols-2 gap-4">
+              <CustomDropdown
+                label="Social account"
+                value={selectedAccount}
+                onChange={setSelectedAccount}
+                placeholder="Select account"
+                options={mockAccounts.map(acc => ({
+                  value: acc.id,
+                  label: acc.name,
+                  description: acc.followers,
+                  icon: <Instagram className="w-4 h-4" />
+                }))}
+              />
+
+              <CustomDropdown
+                label="Content type"
+                value={selectedContentType}
+                onChange={setSelectedContentType}
+                placeholder="Select type"
+                options={contentTypes.map(type => ({
+                  value: type.id,
+                  label: type.name,
+                  description: type.description,
+                  icon: type.icon
+                }))}
+              />
+            </div>
+
+            {selectedAccount && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select post</label>
+                <div className="space-y-2">
+                  {mockPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => setSelectedPost(post.id)}
+                      className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                        selectedPost === post.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 bg-white hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={post.thumbnail}
+                          alt={post.title}
+                          className="w-8 h-8 rounded object-cover"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">{post.title}</span>
+                            <span className={`px-1.5 py-0.5 text-xs rounded ${
+                              post.type === 'reel' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {post.type}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">{post.engagement}</div>
                         </div>
-                        <div className="text-sm text-gray-500">{post.date} • {post.engagement}</div>
+                        {selectedPost === post.id && (
+                          <CheckCircle className="w-4 h-4 text-blue-500" />
+                        )}
                       </div>
-                      {selectedPost === post.id && (
-                        <CheckCircle className="w-5 h-5 text-blue-500" />
-                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-4 border border-gray-300 rounded-lg bg-blue-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Eye className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-blue-900">Select a social account first</div>
-                    <div className="text-xs text-blue-700">
-                      Choose a social account to see available posts
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Keywords */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Keyword</label>
-            <p className="text-sm text-gray-600 mb-3">
-              When a user includes this keyword in a comment it will trigger a reply to their comment and a DM.
-            </p>
+          {/* Automation Settings */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+            <h3 className="font-semibold text-gray-900">Automation</h3>
             
-            <div className="flex gap-2 mb-3">
-              <input
-                type="text"
-                value={newKeyword}
-                onChange={(e) => setNewKeyword(e.target.value)}
-                placeholder="Enter keyword"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-              />
-              <button
-                onClick={addKeyword}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Add
-              </button>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword) => (
-                <span
-                  key={keyword}
-                  className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Keywords</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={newKeyword}
+                  onChange={(e) => setNewKeyword(e.target.value)}
+                  placeholder="Enter keyword"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+                />
+                <button
+                  onClick={addKeyword}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                 >
-                  {keyword}
-                  <button
-                    onClick={() => removeKeyword(keyword)}
-                    className="text-gray-400 hover:text-gray-600"
+                  Add
+                </button>
+              </div>
+              
+              <div className="flex flex-wrap gap-1">
+                {keywords.map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    {keyword}
+                    <button
+                      onClick={() => removeKeyword(keyword)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Reply Message */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Comment reply message
-            </label>
-            <textarea
-              value={commentReply}
-              onChange={(e) => setCommentReply(e.target.value)}
-              placeholder="Enter your public comment reply..."
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Comment reply</label>
+              <textarea
+                value={commentReply}
+                onChange={(e) => setCommentReply(e.target.value)}
+                placeholder="Enter your public comment reply..."
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-          {/* DM Message */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Direct message
-            </label>
-            <textarea
-              value={dmMessage}
-              onChange={(e) => setDmMessage(e.target.value)}
-              placeholder="Enter your private DM message..."
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Direct message</label>
+              <textarea
+                value={dmMessage}
+                onChange={(e) => setDmMessage(e.target.value)}
+                placeholder="Enter your private DM message..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-          {/* Advanced Settings */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Advanced Settings</h3>
-            
-            <CustomDropdown
-              label="AI Personality"
-              value={aiPersonality}
-              onChange={setAiPersonality}
-              placeholder="Select personality"
-              options={aiPersonalities.map(personality => ({
-                value: personality.id,
-                label: personality.name,
-                description: personality.description,
-                icon: <Brain className="w-4 h-4" />
-              }))}
-            />
+            <div className="grid grid-cols-3 gap-3">
+              <CustomDropdown
+                label="AI Style"
+                value={aiPersonality}
+                onChange={setAiPersonality}
+                placeholder="Select"
+                options={aiPersonalities.map(personality => ({
+                  value: personality.id,
+                  label: personality.name,
+                  description: personality.description,
+                  icon: <Brain className="w-4 h-4" />
+                }))}
+              />
 
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Max replies per day
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max/day</label>
                 <input
                   type="number"
                   value={maxRepliesPerDay}
                   onChange={(e) => setMaxRepliesPerDay(parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cooldown (minutes)
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cooldown</label>
                 <input
                   type="number"
                   value={cooldownPeriod}
                   onChange={(e) => setCooldownPeriod(parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6">
+          <div className="flex justify-end gap-3">
             <button
               onClick={() => setPreviewComment('Amazing content! info please!')}
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
             >
               Test Preview
             </button>
             <button
               onClick={() => {
                 if (canSaveAutomation()) {
-                  // Navigate to next step - you can implement navigation logic here
                   console.log('Continuing to next step...', {
                     selectedAccount,
                     selectedPost,
@@ -565,11 +508,10 @@ export default function AutomationBasic() {
                     maxRepliesPerDay,
                     cooldownPeriod
                   })
-                  // Example: router.push('/automation/schedule') or setCurrentStep(2)
                 }
               }}
               disabled={!canSaveAutomation()}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
                 canSaveAutomation()
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
