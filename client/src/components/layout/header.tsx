@@ -28,14 +28,14 @@ export function Header({ className, onCreateClick }: HeaderProps) {
   }
 
   return (
-    <header className={cn("h-28 bg-white/98 backdrop-blur-xl border-b border-gray-200/60 flex items-center justify-between px-10 shadow-lg flex-shrink-0", className)}>
+    <header className={cn("h-32 bg-white/98 backdrop-blur-xl border-b border-gray-200/60 flex items-center justify-between px-10 shadow-lg flex-shrink-0", className)}>
       {/* Left Section */}
       <div className="flex items-center space-x-8">
         <div className="flex flex-col space-y-3">
           {/* Trial Badge */}
-          <div className="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-2.5 rounded-2xl border border-blue-200/60 shadow-sm">
+          <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-blue-700 tracking-wide">TRIAL ENDS IN 25 DAYS</span>
+            <span className="text-sm font-semibold text-blue-700/50 tracking-wide">TRIAL ENDS IN 25 DAYS</span>
           </div>
           
           {/* Welcome Message */}
