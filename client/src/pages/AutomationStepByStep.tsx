@@ -28,7 +28,9 @@ import {
   Brain,
   Shield,
   BarChart3,
-  Globe
+  Globe,
+  FileText,
+  MessageSquare
 } from 'lucide-react'
 
 export default function AutomationStepByStep() {
@@ -36,6 +38,7 @@ export default function AutomationStepByStep() {
   
   // Step flow state
   const [currentStep, setCurrentStep] = useState(1)
+  const [selectedPlatform, setSelectedPlatform] = useState('')
   const [selectedAccount, setSelectedAccount] = useState('')
   const [contentType, setContentType] = useState('')
   const [automationType, setAutomationType] = useState('')
@@ -64,29 +67,54 @@ export default function AutomationStepByStep() {
   const [aiPersonality, setAiPersonality] = useState('professional')
   const [activeHours, setActiveHours] = useState({ start: '09:00', end: '18:00' })
   
-  const contentTypes = [
-    { 
-      id: 'post', 
-      name: 'Post', 
-      icon: <Camera className="w-5 h-5" />, 
-      description: 'Regular Instagram posts',
-      color: 'bg-blue-500'
-    },
-    { 
-      id: 'reel', 
-      name: 'Reel', 
-      icon: <PlayCircle className="w-5 h-5" />, 
-      description: 'Instagram Reels',
-      color: 'bg-purple-500'
-    },
-    { 
-      id: 'story', 
-      name: 'Story', 
-      icon: <Eye className="w-5 h-5" />, 
-      description: 'Instagram Stories',
-      color: 'bg-green-500'
-    }
+  const platforms = [
+    { id: 'instagram', name: 'Instagram', icon: <Instagram className="w-5 h-5" />, color: 'bg-pink-500' },
+    { id: 'youtube', name: 'YouTube', icon: <Youtube className="w-5 h-5" />, color: 'bg-red-600' },
+    { id: 'tiktok', name: 'TikTok', icon: <PlayCircle className="w-5 h-5" />, color: 'bg-black' },
+    { id: 'twitter', name: 'Twitter', icon: <Twitter className="w-5 h-5" />, color: 'bg-blue-400' },
+    { id: 'facebook', name: 'Facebook', icon: <Facebook className="w-5 h-5" />, color: 'bg-blue-600' },
+    { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, color: 'bg-blue-700' }
   ]
+
+  const getContentTypesByPlatform = (platform) => {
+    switch (platform) {
+      case 'instagram':
+        return [
+          { id: 'post', name: 'Post', icon: <Camera className="w-5 h-5" />, description: 'Regular Instagram posts', color: 'bg-blue-500' },
+          { id: 'reel', name: 'Reel', icon: <PlayCircle className="w-5 h-5" />, description: 'Instagram Reels', color: 'bg-purple-500' },
+          { id: 'story', name: 'Story', icon: <Eye className="w-5 h-5" />, description: 'Instagram Stories', color: 'bg-green-500' }
+        ]
+      case 'youtube':
+        return [
+          { id: 'video', name: 'Video', icon: <PlayCircle className="w-5 h-5" />, description: 'YouTube Videos', color: 'bg-red-500' },
+          { id: 'short', name: 'Short', icon: <Camera className="w-5 h-5" />, description: 'YouTube Shorts', color: 'bg-orange-500' },
+          { id: 'live', name: 'Live Stream', icon: <Eye className="w-5 h-5" />, description: 'YouTube Live Streams', color: 'bg-red-600' }
+        ]
+      case 'tiktok':
+        return [
+          { id: 'video', name: 'Video', icon: <PlayCircle className="w-5 h-5" />, description: 'TikTok Videos', color: 'bg-gray-800' },
+          { id: 'live', name: 'Live', icon: <Eye className="w-5 h-5" />, description: 'TikTok Live', color: 'bg-gray-600' }
+        ]
+      case 'twitter':
+        return [
+          { id: 'tweet', name: 'Tweet', icon: <MessageCircle className="w-5 h-5" />, description: 'Twitter Posts', color: 'bg-blue-400' },
+          { id: 'thread', name: 'Thread', icon: <MessageSquare className="w-5 h-5" />, description: 'Twitter Threads', color: 'bg-blue-500' }
+        ]
+      case 'facebook':
+        return [
+          { id: 'post', name: 'Post', icon: <Camera className="w-5 h-5" />, description: 'Facebook Posts', color: 'bg-blue-600' },
+          { id: 'story', name: 'Story', icon: <Eye className="w-5 h-5" />, description: 'Facebook Stories', color: 'bg-blue-500' },
+          { id: 'reel', name: 'Reel', icon: <PlayCircle className="w-5 h-5" />, description: 'Facebook Reels', color: 'bg-blue-700' }
+        ]
+      case 'linkedin':
+        return [
+          { id: 'post', name: 'Post', icon: <Camera className="w-5 h-5" />, description: 'LinkedIn Posts', color: 'bg-blue-700' },
+          { id: 'article', name: 'Article', icon: <FileText className="w-5 h-5" />, description: 'LinkedIn Articles', color: 'bg-blue-600' }
+        ]
+      default:
+        return []
+    }
+  }
 
   const automationTypes = [
     { 
@@ -149,12 +177,13 @@ export default function AutomationStepByStep() {
   ]
 
   const steps = [
-    { id: 1, title: 'Account & Content Type', description: 'Choose your account and content type' },
-    { id: 2, title: 'Automation Type', description: 'Select automation method' },
-    { id: 3, title: 'Content Selection', description: 'Choose specific posts (optional)' },
-    { id: 4, title: 'Configuration', description: 'Set up your automation rules' },
-    { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
-    { id: 6, title: 'Review & Activate', description: 'Review and activate your automation' }
+    { id: 1, title: 'Select Platform', description: 'Choose your social media platform' },
+    { id: 2, title: 'Select Account', description: 'Select your social media account' },
+    { id: 3, title: 'Content Type', description: 'Choose content type for automation' },
+    { id: 4, title: 'Automation Type', description: 'Select automation method' },
+    { id: 5, title: 'Configuration', description: 'Set up your automation rules' },
+    { id: 6, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
+    { id: 7, title: 'Review & Activate', description: 'Review and activate your automation' }
   ]
 
   const addKeyword = () => {
@@ -201,16 +230,18 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedAccount && contentType
+        return selectedPlatform
       case 2:
-        return automationType
+        return selectedAccount
       case 3:
-        return true // Post selection is optional
+        return contentType
       case 4:
-        return getCurrentKeywords().length > 0
+        return automationType
       case 5:
-        return true // Advanced settings are optional
+        return getCurrentKeywords().length > 0
       case 6:
+        return true // Advanced settings are optional
+      case 7:
         return true
       default:
         return false
@@ -218,7 +249,11 @@ export default function AutomationStepByStep() {
   }
 
   const handleNext = () => {
-    if (canProceedToNext() && currentStep < 6) {
+    if (canProceedToNext() && currentStep < 7) {
+      // Reset content type when platform changes
+      if (currentStep === 1) {
+        setContentType('')
+      }
       setCurrentStep(currentStep + 1)
     }
   }
@@ -254,6 +289,39 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Platform</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {platforms.map(platform => (
+                  <button
+                    key={platform.id}
+                    onClick={() => setSelectedPlatform(platform.id)}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      selectedPlatform === platform.id 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${platform.color} text-white`}>
+                        {platform.icon}
+                      </div>
+                      <span className="font-medium">{platform.name}</span>
+                      {selectedPlatform === platform.id && (
+                        <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+
+      case 2:
+        const contentTypes = getContentTypesByPlatform(selectedPlatform)
+        return (
+          <div className="space-y-6">
+            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Account</h3>
               <div className="space-y-3">
                 {mockAccounts.map(account => (
@@ -281,39 +349,41 @@ export default function AutomationStepByStep() {
               </div>
             </div>
             
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
-              <div className="grid grid-cols-1 gap-3">
-                {contentTypes.map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => setContentType(type.id)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
-                      contentType === type.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${type.color} text-white`}>
-                        {type.icon}
+            {selectedPlatform && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {contentTypes.map(type => (
+                    <button
+                      key={type.id}
+                      onClick={() => setContentType(type.id)}
+                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        contentType === type.id 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-lg ${type.color} text-white`}>
+                          {type.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-lg">{type.name}</div>
+                          <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+                        </div>
+                        {contentType === type.id && (
+                          <CheckCircle className="w-6 h-6 text-blue-500" />
+                        )}
                       </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-lg">{type.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{type.description}</div>
-                      </div>
-                      {contentType === type.id && (
-                        <CheckCircle className="w-6 h-6 text-blue-500" />
-                      )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )
 
-      case 2:
+      case 3:
         return (
           <div className="space-y-6">
             <div>
@@ -348,7 +418,7 @@ export default function AutomationStepByStep() {
           </div>
         )
 
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <div>
@@ -392,14 +462,14 @@ export default function AutomationStepByStep() {
           </div>
         )
 
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             {renderAutomationSpecificConfig()}
           </div>
         )
 
-      case 5:
+      case 6:
         return (
           <div className="space-y-6">
             <div>
@@ -469,7 +539,7 @@ export default function AutomationStepByStep() {
           </div>
         )
 
-      case 6:
+      case 7:
         return (
           <div className="space-y-6">
             <div>
@@ -820,8 +890,8 @@ export default function AutomationStepByStep() {
           </div>
           
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Content Type:</span>
-            <span className="font-medium capitalize">{contentType || 'Not selected'}</span>
+            <span className="text-gray-600">Platform:</span>
+            <span className="font-medium capitalize">{selectedPlatform || 'Not selected'}</span>
           </div>
           
           {maxRepliesPerDay && (
@@ -896,7 +966,7 @@ export default function AutomationStepByStep() {
                   Step {currentStep} of {steps.length}
                 </div>
                 
-                {currentStep < 6 ? (
+                {currentStep < 7 ? (
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
