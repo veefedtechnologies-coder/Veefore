@@ -14,7 +14,7 @@ const createOptions = [
     label: 'Post',
     description: 'Create a new social media post',
     action: 'post',
-    color: 'text-blue-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50'
   },
   {
@@ -22,7 +22,7 @@ const createOptions = [
     label: 'Content with AI',
     description: 'Generate content using AI assistance',
     action: 'ai-content',
-    color: 'text-purple-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50'
   },
   {
@@ -30,7 +30,7 @@ const createOptions = [
     label: 'DM automation',
     description: 'Set up automated direct messages',
     action: 'dm-automation',
-    color: 'text-emerald-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50'
   },
   {
@@ -38,7 +38,7 @@ const createOptions = [
     label: 'Ad',
     description: 'Create advertising campaigns',
     action: 'ad',
-    color: 'text-orange-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50',
     hasSubmenu: true
   },
@@ -47,10 +47,10 @@ const createOptions = [
     label: 'Automated boost',
     description: 'Boost your content automatically',
     action: 'automated-boost',
-    color: 'text-indigo-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50',
     badge: 'New',
-    badgeColor: 'bg-gradient-to-r from-purple-500 to-indigo-600',
+    badgeColor: 'bg-purple-500',
     hasSubmenu: true
   },
   {
@@ -58,10 +58,10 @@ const createOptions = [
     label: 'Hootbio',
     description: 'Create bio link pages',
     action: 'hootbio',
-    color: 'text-teal-600',
+    color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50',
     badge: 'Upgrade',
-    badgeColor: 'bg-gradient-to-r from-emerald-500 to-teal-600'
+    badgeColor: 'bg-teal-500'
   }
 ]
 
