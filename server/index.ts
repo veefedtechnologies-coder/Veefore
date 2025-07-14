@@ -231,10 +231,10 @@ app.use((req, res, next) => {
   // Start the background scheduler service
   startSchedulerService(storage);
   
-  // TEMPORARILY DISABLED: Start the automatic Instagram sync service
-  console.log('[AUTO SYNC] AUTO-SYNC SERVICE TEMPORARILY DISABLED FOR DEBUGGING');
-  // const autoSyncService = new AutoSyncService(storage);
-  // autoSyncService.start();
+  // Start the automatic Instagram sync service
+  console.log('[AUTO SYNC] Starting automatic Instagram sync service...');
+  const autoSyncService = new AutoSyncService(storage);
+  autoSyncService.start();
   
   const server = await registerRoutes(app, storage, upload);
 

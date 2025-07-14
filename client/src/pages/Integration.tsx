@@ -249,6 +249,33 @@ export default function Integration() {
     }
   })
 
+  // Refresh/sync social account data mutation
+  const refreshMutation = useMutation({
+    mutationFn: async (platform: string) => {
+      if (platform === 'instagram') {
+        return apiRequest('/api/instagram/force-sync', {
+          method: 'POST',
+          body: JSON.stringify({ workspaceId: currentWorkspace?.id })
+        })
+      }
+      throw new Error('Platform not supported for refresh')
+    },
+    onSuccess: (data: any, platform: string) => {
+      toast({
+        title: "Data refreshed successfully",
+        description: `${platformConfig[platform as keyof typeof platformConfig].name} data has been updated with latest information.`
+      })
+      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+    },
+    onError: (error: any, platform: string) => {
+      toast({
+        title: "Refresh failed",
+        description: `Failed to refresh ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
+        variant: "destructive"
+      })
+    }
+  })
+
   const isAccountConnected = (platform: string) => {
     return connectedAccounts?.some((account: SocialAccount) => account.platform === platform) || false
   }
@@ -349,11 +376,11 @@ export default function Integration() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => refetch()}
-                  disabled={isLoading}
+                  onClick={() => refreshMutation.mutate(platform)}
+                  disabled={refreshMutation.isPending}
                   className="flex-1"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
                 <Button
