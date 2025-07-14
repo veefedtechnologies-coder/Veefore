@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus } from 'lucide-react'
+import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateDropdown } from './create-dropdown'
 import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
@@ -14,6 +14,7 @@ const sidebarItems = [
   { icon: Plus, label: 'Create', key: 'create', isCreateButton: true },
   { icon: MessageSquare, label: 'Inbox 2.0', key: 'inbox', url: '/inbox' },
   { icon: BarChart3, label: 'Analytics', key: 'analytics', url: '/analytics' },
+  { icon: Zap, label: 'Automation', key: 'automation', url: '/automation' },
   { icon: Link, label: 'Integration', key: 'integration', url: '/integration' },
   { icon: Users, label: 'Workspaces', key: 'workspaces', url: '/workspaces' },
   { icon: Globe, label: 'Landing', key: 'landing', url: '/landing' },
@@ -43,6 +44,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
     if (loc === '/veegpt') return 'veegpt'
     if (loc === '/inbox') return 'inbox'
     if (loc === '/analytics') return 'analytics'
+    if (loc === '/automation') return 'automation'
     if (loc === '/integration') return 'integration'
     if (loc === '/workspaces') return 'workspaces'
     if (loc === '/landing') return 'landing'
