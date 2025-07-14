@@ -15,8 +15,7 @@ const createOptions = [
     description: 'Create a new social media post',
     action: 'post',
     color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    hoverColor: 'hover:bg-blue-100'
+    hoverColor: 'hover:bg-gray-50'
   },
   {
     icon: Sparkles,
@@ -24,8 +23,7 @@ const createOptions = [
     description: 'Generate content using AI assistance',
     action: 'ai-content',
     color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    hoverColor: 'hover:bg-purple-100'
+    hoverColor: 'hover:bg-gray-50'
   },
   {
     icon: MessageSquareText,
@@ -33,8 +31,7 @@ const createOptions = [
     description: 'Set up automated direct messages',
     action: 'dm-automation',
     color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50',
-    hoverColor: 'hover:bg-emerald-100'
+    hoverColor: 'hover:bg-gray-50'
   },
   {
     icon: Megaphone,
@@ -42,8 +39,7 @@ const createOptions = [
     description: 'Create advertising campaigns',
     action: 'ad',
     color: 'text-orange-600',
-    bgColor: 'bg-orange-50',
-    hoverColor: 'hover:bg-orange-100',
+    hoverColor: 'hover:bg-gray-50',
     hasSubmenu: true
   },
   {
@@ -52,8 +48,7 @@ const createOptions = [
     description: 'Boost your content automatically',
     action: 'automated-boost',
     color: 'text-indigo-600',
-    bgColor: 'bg-indigo-50',
-    hoverColor: 'hover:bg-indigo-100',
+    hoverColor: 'hover:bg-gray-50',
     badge: 'New',
     badgeColor: 'bg-gradient-to-r from-purple-500 to-indigo-600',
     hasSubmenu: true
@@ -64,8 +59,7 @@ const createOptions = [
     description: 'Create bio link pages',
     action: 'hootbio',
     color: 'text-teal-600',
-    bgColor: 'bg-teal-50',
-    hoverColor: 'hover:bg-teal-100',
+    hoverColor: 'hover:bg-gray-50',
     badge: 'Upgrade',
     badgeColor: 'bg-gradient-to-r from-emerald-500 to-teal-600'
   }
@@ -107,8 +101,7 @@ export function CreateDropdown({ isOpen, onClose, onOptionSelect }: CreateDropdo
                 {/* Icon */}
                 <div className={cn(
                   "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300",
-                  option.bgColor,
-                  "group-hover:scale-105 group-hover:shadow-lg"
+                  "group-hover:scale-105"
                 )}>
                   <option.icon className={cn("w-4 h-4", option.color)} />
                 </div>
