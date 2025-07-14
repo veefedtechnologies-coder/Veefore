@@ -28,7 +28,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import Profile from './pages/Profile'
 import Integration from './pages/Integration'
-import AutomationTest from './pages/AutomationTest'
+import AutomationBasic from './pages/AutomationBasic'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -498,9 +498,9 @@ function App() {
           </Route>
 
           <Route path="/automation">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
+            <div className="min-h-screen bg-gray-50 flex relative">
+              {/* Sidebar */}
+              <div className="w-24 bg-white border-r border-gray-200 shadow-sm">
                 <Sidebar 
                   className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
@@ -509,7 +509,7 @@ function App() {
               </div>
 
               {/* Main Content Area - Full width without header */}
-              <div className="flex-1 h-screen overflow-hidden">
+              <div className="flex-1 min-h-screen">
                 {/* Create Dropdown */}
                 {isCreateDropdownOpen && (
                   <CreateDropdown
@@ -520,8 +520,8 @@ function App() {
                 )}
 
                 {/* Main Content - Full width automation page */}
-                <main className="h-full overflow-y-auto">
-                  <AutomationTest />
+                <main className="w-full">
+                  <AutomationBasic />
                 </main>
               </div>
             </div>
