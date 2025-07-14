@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ export function SocialAccounts() {
   // Fetch real social accounts data
   const { data: socialAccounts, isLoading } = useQuery({
     queryKey: ['/api/social-accounts'],
+    queryFn: () => apiRequest('/api/social-accounts'),
     refetchInterval: 30000, // Refetch every 30 seconds
   })
 

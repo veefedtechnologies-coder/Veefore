@@ -1,5 +1,6 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Info, TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye } from 'lucide-react'
@@ -8,12 +9,14 @@ export function PerformanceScore() {
   // Fetch real dashboard analytics data
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
+    queryFn: () => apiRequest('/api/dashboard/analytics'),
     refetchInterval: 30000, // Refetch every 30 seconds
   })
 
   // Fetch real social accounts data  
   const { data: socialAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
+    queryFn: () => apiRequest('/api/social-accounts'),
     refetchInterval: 30000,
   })
 
@@ -168,8 +171,15 @@ export function PerformanceScore() {
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <h4 className="text-lg font-bold text-gray-900 mb-6">Performance Breakdown</h4>
           
-          {/* Real Platform Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Real Platform Cards Grid - Dynamic Full Width */}
+          <div className={`grid gap-4 mb-8 ${
+            connectedPlatforms.length === 1 ? 'grid-cols-1' :
+            connectedPlatforms.length === 2 ? 'grid-cols-2' :
+            connectedPlatforms.length === 3 ? 'grid-cols-3' :
+            connectedPlatforms.length === 4 ? 'grid-cols-2 lg:grid-cols-4' :
+            connectedPlatforms.length === 5 ? 'grid-cols-2 lg:grid-cols-5' :
+            'grid-cols-2 lg:grid-cols-6'
+          }`}>
             {connectedPlatforms.map((platform) => (
               <div key={platform.name} className="bg-gray-50 rounded-xl p-4 text-center hover:bg-gray-100 transition-colors duration-200">
                 <div className="w-10 h-10 rounded-full bg-white mx-auto mb-3 flex items-center justify-center text-lg shadow-sm">
