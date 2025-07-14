@@ -49,8 +49,6 @@ const createOptions = [
     action: 'automated-boost',
     color: 'text-slate-500',
     hoverColor: 'hover:bg-gray-50',
-    badge: 'New',
-    badgeColor: 'bg-purple-500',
     hasSubmenu: true
   },
   {
@@ -59,9 +57,7 @@ const createOptions = [
     description: 'Create bio link pages',
     action: 'hootbio',
     color: 'text-slate-500',
-    hoverColor: 'hover:bg-gray-50',
-    badge: 'Upgrade',
-    badgeColor: 'bg-teal-500'
+    hoverColor: 'hover:bg-gray-50'
   }
 ]
 
