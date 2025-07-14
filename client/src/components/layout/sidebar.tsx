@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link } from 'lucide-react'
+import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateDropdown } from './create-dropdown'
 import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
@@ -12,6 +12,7 @@ const sidebarItems = [
   { icon: Home, label: 'Home', key: 'home', url: '/' },
   { icon: Calendar, label: 'Plan', key: 'plan', url: '/plan' },
   { icon: Building2, label: 'VeeGPT', key: 'veegpt', url: '/veegpt' },
+  { icon: Plus, label: 'Create', key: 'create', isCreateButton: true },
   { icon: MessageSquare, label: 'Inbox 2.0', key: 'inbox', url: '/inbox' },
   { icon: BarChart3, label: 'Analytics', key: 'analytics', url: '/analytics' },
   { icon: Link, label: 'Integration', key: 'integration', url: '/integration' },
@@ -196,9 +197,9 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           <div
             key={item.label}
             onClick={(e) => {
-              if (item.key === 'create') {
+              if (item.isCreateButton) {
                 handleCreateClick(e)
-              } else {
+              } else if (item.url) {
                 setLocation(item.url)
               }
             }}
@@ -211,20 +212,33 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           >
             <div className={cn(
               "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 mb-1",
-              activeView === item.key 
-                ? "bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg border border-blue-200/50" 
-                : "hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
+              item.isCreateButton 
+                ? "bg-gradient-to-br from-teal-600 via-teal-700 to-cyan-800 shadow-lg" 
+                : activeView === item.key 
+                  ? "bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg border border-blue-200/50" 
+                  : "hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
             )}>
               <item.icon className={cn(
                 "w-5 h-5 transition-all duration-300",
-                activeView === item.key ? "scale-110" : "group-hover:scale-105"
+                item.isCreateButton 
+                  ? "text-white" 
+                  : activeView === item.key 
+                    ? "scale-110" 
+                    : "group-hover:scale-105"
               )} />
+              {item.isCreateButton && dropdownOpen && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-full animate-pulse"></div>
+              )}
             </div>
             
             {/* Icon Label */}
             <span className={cn(
               "text-xs font-medium transition-all duration-300",
-              activeView === item.key ? "text-blue-600 font-semibold" : "text-gray-600"
+              item.isCreateButton 
+                ? "text-gray-600" 
+                : activeView === item.key 
+                  ? "text-blue-600 font-semibold" 
+                  : "text-gray-600"
             )}>
               {item.label}
             </span>
@@ -241,19 +255,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
 
       {/* Bottom Items */}
       <div className="flex flex-col space-y-4 mt-auto">
-        {/* Create Button */}
-        <div 
-          className="flex flex-col items-center cursor-pointer py-2 hover:scale-105 transition-all duration-300"
-          onClick={() => setIsCreateDropdownOpen && setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-        >
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-600 via-teal-700 to-cyan-800 flex items-center justify-center hover-lift shadow-lg mb-1 relative">
-            <Edit3 className="w-5 h-5 text-white" />
-            {isCreateDropdownOpen && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-full animate-pulse"></div>
-            )}
-          </div>
-          <span className="text-xs font-medium text-gray-600">Create</span>
-        </div>
+
 
         <div className="flex flex-col items-center cursor-pointer text-gray-500 hover:text-blue-600 transition-all duration-300 group py-2">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 hover:shadow-md transition-all duration-300 mb-1">
@@ -295,6 +297,12 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
         </div>
       </div>
       
+      {/* Create Dropdown */}
+      <CreateDropdown 
+        isOpen={dropdownOpen}
+        onClose={() => setDropdownOpen(false)}
+        onOptionSelect={handleCreateOptionSelect}
+      />
 
     </div>
   )
