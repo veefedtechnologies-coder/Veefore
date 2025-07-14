@@ -36,8 +36,8 @@ export default function AutomationStepByStep() {
   
   // Step flow state
   const [currentStep, setCurrentStep] = useState(1)
-  const [selectedPlatform, setSelectedPlatform] = useState('')
   const [selectedAccount, setSelectedAccount] = useState('')
+  const [contentType, setContentType] = useState('')
   const [automationType, setAutomationType] = useState('')
   const [selectedPost, setSelectedPost] = useState('')
   
@@ -56,17 +56,7 @@ export default function AutomationStepByStep() {
   const [commentKeywords, setCommentKeywords] = useState([])
   const [publicReply, setPublicReply] = useState('')
   
-  // Follow automation
-  const [followTargetAccounts, setFollowTargetAccounts] = useState([])
-  const [followersPerDay, setFollowersPerDay] = useState(50)
-  
-  // Like automation
-  const [likeTargetHashtags, setLikeTargetHashtags] = useState([])
-  const [likesPerHour, setLikesPerHour] = useState(20)
-  
-  // Story automation
-  const [storyKeywords, setStoryKeywords] = useState([])
-  const [storyReplyMessage, setStoryReplyMessage] = useState('')
+
   
   // Advanced settings (shown for all types)
   const [maxRepliesPerDay, setMaxRepliesPerDay] = useState(50)
@@ -74,12 +64,28 @@ export default function AutomationStepByStep() {
   const [aiPersonality, setAiPersonality] = useState('professional')
   const [activeHours, setActiveHours] = useState({ start: '09:00', end: '18:00' })
   
-  const platforms = [
-    { id: 'Instagram', name: 'Instagram', icon: <Instagram className="w-5 h-5" />, color: 'bg-pink-500' },
-    { id: 'Facebook', name: 'Facebook', icon: <Facebook className="w-5 h-5" />, color: 'bg-blue-600' },
-    { id: 'Twitter', name: 'Twitter', icon: <Twitter className="w-5 h-5" />, color: 'bg-blue-400' },
-    { id: 'LinkedIn', name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, color: 'bg-blue-700' },
-    { id: 'Youtube', name: 'YouTube', icon: <Youtube className="w-5 h-5" />, color: 'bg-red-600' }
+  const contentTypes = [
+    { 
+      id: 'post', 
+      name: 'Post', 
+      icon: <Camera className="w-5 h-5" />, 
+      description: 'Regular Instagram posts',
+      color: 'bg-blue-500'
+    },
+    { 
+      id: 'reel', 
+      name: 'Reel', 
+      icon: <PlayCircle className="w-5 h-5" />, 
+      description: 'Instagram Reels',
+      color: 'bg-purple-500'
+    },
+    { 
+      id: 'story', 
+      name: 'Story', 
+      icon: <Eye className="w-5 h-5" />, 
+      description: 'Instagram Stories',
+      color: 'bg-green-500'
+    }
   ]
 
   const automationTypes = [
@@ -103,27 +109,6 @@ export default function AutomationStepByStep() {
       icon: <MessageCircle className="w-5 h-5" />, 
       description: 'Reply to comments publicly only',
       color: 'bg-green-500'
-    },
-    { 
-      id: 'auto_follow', 
-      name: 'Auto Follow', 
-      icon: <UserPlus className="w-5 h-5" />, 
-      description: 'Automatically follow targeted accounts',
-      color: 'bg-orange-500'
-    },
-    { 
-      id: 'auto_like', 
-      name: 'Auto Like', 
-      icon: <Heart className="w-5 h-5" />, 
-      description: 'Like posts with specific hashtags',
-      color: 'bg-pink-500'
-    },
-    { 
-      id: 'story_automation', 
-      name: 'Story Automation', 
-      icon: <PlayCircle className="w-5 h-5" />, 
-      description: 'Auto-reply to story mentions and views',
-      color: 'bg-indigo-500'
     }
   ]
 
@@ -164,8 +149,8 @@ export default function AutomationStepByStep() {
   ]
 
   const steps = [
-    { id: 1, title: 'Platform & Account', description: 'Choose your platform and account' },
-    { id: 2, title: 'Automation Type', description: 'Select what type of automation you want' },
+    { id: 1, title: 'Account & Content Type', description: 'Choose your account and content type' },
+    { id: 2, title: 'Automation Type', description: 'Select automation method' },
     { id: 3, title: 'Content Selection', description: 'Choose specific posts (optional)' },
     { id: 4, title: 'Configuration', description: 'Set up your automation rules' },
     { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
@@ -196,8 +181,6 @@ export default function AutomationStepByStep() {
         return keywords
       case 'dm_only':
         return dmKeywords
-      case 'story_automation':
-        return storyKeywords
       default:
         return keywords
     }
@@ -210,8 +193,6 @@ export default function AutomationStepByStep() {
         return setKeywords
       case 'dm_only':
         return setDmKeywords
-      case 'story_automation':
-        return setStoryKeywords
       default:
         return setKeywords
     }
@@ -220,7 +201,7 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedPlatform && selectedAccount
+        return selectedAccount && contentType
       case 2:
         return automationType
       case 3:
@@ -250,8 +231,8 @@ export default function AutomationStepByStep() {
 
   const handleFinish = () => {
     const automationConfig = {
-      selectedPlatform,
       selectedAccount,
+      contentType,
       automationType,
       selectedPost,
       keywords: getCurrentKeywords(),
@@ -273,30 +254,6 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Platform</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {platforms.map(platform => (
-                  <button
-                    key={platform.id}
-                    onClick={() => setSelectedPlatform(platform.id)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      selectedPlatform === platform.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${platform.color} text-white`}>
-                        {platform.icon}
-                      </div>
-                      <span className="font-medium">{platform.name}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Account</h3>
               <div className="space-y-3">
                 {mockAccounts.map(account => (
@@ -317,6 +274,36 @@ export default function AutomationStepByStep() {
                       </div>
                       {selectedAccount === account.id && (
                         <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
+              <div className="grid grid-cols-1 gap-3">
+                {contentTypes.map(type => (
+                  <button
+                    key={type.id}
+                    onClick={() => setContentType(type.id)}
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      contentType === type.id 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-lg ${type.color} text-white`}>
+                        {type.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-lg">{type.name}</div>
+                        <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+                      </div>
+                      {contentType === type.id && (
+                        <CheckCircle className="w-6 h-6 text-blue-500" />
                       )}
                     </div>
                   </button>
@@ -491,12 +478,12 @@ export default function AutomationStepByStep() {
               <div className="bg-gray-50 rounded-lg p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-sm text-gray-600">Platform:</span>
-                    <div className="font-medium">{selectedPlatform}</div>
-                  </div>
-                  <div>
                     <span className="text-sm text-gray-600">Account:</span>
                     <div className="font-medium">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600">Content Type:</span>
+                    <div className="font-medium capitalize">{contentType || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm text-gray-600">Automation Type:</span>
@@ -699,162 +686,7 @@ export default function AutomationStepByStep() {
           </>
         )
 
-      case 'auto_follow':
-        return (
-          <>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Auto Follow Configuration</h3>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Target Accounts</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {followTargetAccounts.map((account, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
-                      {account}
-                      <button
-                        onClick={() => setFollowTargetAccounts(followTargetAccounts.filter((_, i) => i !== index))}
-                        className="text-orange-600 hover:text-orange-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Add target account (e.g., @username)"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const account = e.target.value.trim()
-                      if (account && !followTargetAccounts.includes(account)) {
-                        setFollowTargetAccounts([...followTargetAccounts, account])
-                        e.target.value = ''
-                      }
-                    }
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Follows per Day</label>
-                <input
-                  type="number"
-                  value={followersPerDay}
-                  onChange={(e) => setFollowersPerDay(Number(e.target.value))}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  min="1"
-                  max="200"
-                />
-              </div>
-            </div>
-          </>
-        )
-
-      case 'auto_like':
-        return (
-          <>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Auto Like Configuration</h3>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Target Hashtags</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {likeTargetHashtags.map((hashtag, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm">
-                      {hashtag}
-                      <button
-                        onClick={() => setLikeTargetHashtags(likeTargetHashtags.filter((_, i) => i !== index))}
-                        className="text-pink-600 hover:text-pink-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Add hashtag (e.g., #fitness)"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const hashtag = e.target.value.trim()
-                      if (hashtag && !likeTargetHashtags.includes(hashtag)) {
-                        setLikeTargetHashtags([...likeTargetHashtags, hashtag])
-                        e.target.value = ''
-                      }
-                    }
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Likes per Hour</label>
-                <input
-                  type="number"
-                  value={likesPerHour}
-                  onChange={(e) => setLikesPerHour(Number(e.target.value))}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  min="1"
-                  max="100"
-                />
-              </div>
-            </div>
-          </>
-        )
-
-      case 'story_automation':
-        return (
-          <>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Story Automation Configuration</h3>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Story Keywords</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {storyKeywords.map((keyword, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(keyword)}
-                        className="text-indigo-600 hover:text-indigo-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    placeholder="Add keyword..."
-                    className="flex-1 p-3 border border-gray-300 rounded-lg"
-                  />
-                  <button
-                    onClick={addKeyword}
-                    className="px-4 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Story Reply Message</label>
-                <textarea
-                  value={storyReplyMessage}
-                  onChange={(e) => setStoryReplyMessage(e.target.value)}
-                  placeholder="Thanks for watching my story! 📩"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  rows="3"
-                />
-              </div>
-            </div>
-          </>
-        )
 
       default:
         return (
@@ -988,8 +820,8 @@ export default function AutomationStepByStep() {
           </div>
           
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Platform:</span>
-            <span className="font-medium">{selectedPlatform || 'Not selected'}</span>
+            <span className="text-gray-600">Content Type:</span>
+            <span className="font-medium capitalize">{contentType || 'Not selected'}</span>
           </div>
           
           {maxRepliesPerDay && (
