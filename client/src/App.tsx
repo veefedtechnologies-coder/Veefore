@@ -508,13 +508,8 @@ function App() {
                 />
               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
+              {/* Main Content Area - Full width without header */}
+              <div className="flex-1 h-screen overflow-hidden">
                 {/* Create Dropdown */}
                 {isCreateDropdownOpen && (
                   <CreateDropdown
@@ -524,8 +519,8 @@ function App() {
                   />
                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
+                {/* Main Content - Full width automation page */}
+                <main className="h-full overflow-y-auto">
                   <Automation />
                 </main>
               </div>
