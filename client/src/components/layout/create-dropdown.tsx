@@ -74,6 +74,8 @@ const createOptions = [
 export function CreateDropdown({ isOpen, onClose, onOptionSelect }: CreateDropdownProps) {
   console.log('CreateDropdown rendered, isOpen:', isOpen)
   
+  if (!isOpen) return null
+  
   return (
     <>
       {/* Backdrop */}

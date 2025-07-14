@@ -79,6 +79,23 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
     console.log('Create button clicked, new state will be:', !dropdownOpen)
   }
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownOpen) {
+        setDropdownOpen(false)
+      }
+    }
+
+    if (dropdownOpen) {
+      document.addEventListener('click', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [dropdownOpen])
+
   const handleCreateOptionSelect = (option: string) => {
     setDropdownOpen(false)
     console.log('Selected create option:', option)
