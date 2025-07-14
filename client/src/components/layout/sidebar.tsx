@@ -11,7 +11,6 @@ import { useUser } from '@/hooks/useUser'
 const sidebarItems = [
   { icon: Home, label: 'Home', key: 'home', url: '/' },
   { icon: Calendar, label: 'Plan', key: 'plan', url: '/plan' },
-  { icon: Building2, label: 'VeeGPT', key: 'veegpt', url: '/veegpt' },
   { icon: Plus, label: 'Create', key: 'create', isCreateButton: true },
   { icon: MessageSquare, label: 'Inbox 2.0', key: 'inbox', url: '/inbox' },
   { icon: BarChart3, label: 'Analytics', key: 'analytics', url: '/analytics' },
@@ -103,7 +102,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
   }
 
   return (
-    <div className={cn("w-24 sidebar-gradient flex flex-col items-center py-6 min-h-full relative", className)}>
+    <div className={cn("w-24 bg-gray-100 flex flex-col items-center py-6 min-h-full relative", className)}>
       {/* VeeGPT Logo */}
       <div 
         className={cn(
@@ -212,19 +211,13 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           >
             <div className={cn(
               "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 mb-1",
-              item.isCreateButton 
-                ? "bg-gradient-to-br from-teal-600 via-teal-700 to-cyan-800 shadow-lg" 
-                : activeView === item.key 
-                  ? "bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg border border-blue-200/50" 
-                  : "hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
+              activeView === item.key 
+                ? "bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg border border-blue-200/50" 
+                : "hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
             )}>
               <item.icon className={cn(
                 "w-5 h-5 transition-all duration-300",
-                item.isCreateButton 
-                  ? "text-white" 
-                  : activeView === item.key 
-                    ? "scale-110" 
-                    : "group-hover:scale-105"
+                activeView === item.key ? "scale-110" : "group-hover:scale-105"
               )} />
               {item.isCreateButton && dropdownOpen && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-full animate-pulse"></div>
@@ -234,11 +227,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
             {/* Icon Label */}
             <span className={cn(
               "text-xs font-medium transition-all duration-300",
-              item.isCreateButton 
-                ? "text-gray-600" 
-                : activeView === item.key 
-                  ? "text-blue-600 font-semibold" 
-                  : "text-gray-600"
+              activeView === item.key ? "text-blue-600 font-semibold" : "text-gray-600"
             )}>
               {item.label}
             </span>
