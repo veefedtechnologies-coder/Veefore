@@ -74,13 +74,13 @@ export function CreateDropdown({ isOpen, onClose, onOptionSelect }: CreateDropdo
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-40 bg-black/20" 
+        className="fixed inset-0 z-40 bg-black/5 transition-opacity duration-200" 
         onClick={onClose}
       />
       
       {/* Dropdown */}
       <div 
-        className="fixed left-28 top-40 z-50 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200/60 overflow-hidden create-dropdown" 
+        className="fixed left-28 top-40 z-50 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200/60 overflow-hidden create-dropdown transform transition-all duration-200 ease-out" 
         style={{ 
           background: 'white',
           border: '2px solid #e5e7eb'
