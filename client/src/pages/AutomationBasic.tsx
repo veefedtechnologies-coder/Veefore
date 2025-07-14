@@ -89,9 +89,33 @@ export default function AutomationBasic() {
   ]
   
   const mockPosts = [
-    { id: 'post1', title: 'New Product Launch', type: 'post', date: '2 hours ago', engagement: '45 likes, 12 comments' },
-    { id: 'post2', title: 'Behind the Scenes', type: 'reel', date: '1 day ago', engagement: '89 likes, 23 comments' },
-    { id: 'post3', title: 'Customer Testimonial', type: 'post', date: '3 days ago', engagement: '67 likes, 8 comments' }
+    { 
+      id: 'post1', 
+      title: 'New Product Launch', 
+      type: 'post', 
+      date: '2 hours ago', 
+      engagement: '45 likes, 12 comments',
+      thumbnail: 'https://via.placeholder.com/150x150/3B82F6/FFFFFF?text=Post+1',
+      caption: 'Exciting news! Our new product is finally here. What do you think? 🚀'
+    },
+    { 
+      id: 'post2', 
+      title: 'Behind the Scenes', 
+      type: 'reel', 
+      date: '1 day ago', 
+      engagement: '89 likes, 23 comments',
+      thumbnail: 'https://via.placeholder.com/150x150/EF4444/FFFFFF?text=Reel+1',
+      caption: 'Take a look behind the scenes of our latest project! 🎬'
+    },
+    { 
+      id: 'post3', 
+      title: 'Customer Testimonial', 
+      type: 'post', 
+      date: '3 days ago', 
+      engagement: '67 likes, 8 comments',
+      thumbnail: 'https://via.placeholder.com/150x150/10B981/FFFFFF?text=Post+2',
+      caption: 'Amazing feedback from our customers! Thank you for your support 💙'
+    }
   ]
   
   const aiPersonalities = [
@@ -172,89 +196,125 @@ export default function AutomationBasic() {
     )
   }
 
-  // Instagram Preview Component
-  const InstagramPreview = () => (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden max-w-sm mx-auto">
-      {/* Progress indicator */}
-      <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-1"></div>
-      
-      {/* Header */}
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+  // Instagram Preview Component  
+  const InstagramPreview = () => {
+    const selectedPostData = mockPosts.find(post => post.id === selectedPost)
+    const selectedAccountData = mockAccounts.find(acc => acc.id === selectedAccount)
+    
+    return (
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden w-full mx-auto">
+        {/* Progress indicator */}
+        <div className="bg-gradient-to-r from-pink-500 to-purple-600 h-1"></div>
+        
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-base font-medium text-gray-900">Instagram post and keyword</div>
             </div>
-            <div className="text-sm font-medium text-gray-900">Instagram post and keyword</div>
-          </div>
-          <MoreHorizontal className="w-4 h-4 text-gray-400" />
-        </div>
-      </div>
-      
-      {/* Account info */}
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-600" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-gray-900">Your account</div>
-            <div className="text-xs text-gray-500">Connected</div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Post preview */}
-      <div className="p-4">
-        <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-          <div className="text-center">
-            <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <div className="text-sm text-gray-500">Post preview</div>
+            <MoreHorizontal className="w-5 h-5 text-gray-400" />
           </div>
         </div>
         
-        {/* Post actions */}
-        <div className="flex items-center justify-between mb-3">
+        {/* Account info */}
+        <div className="p-6 border-b border-gray-100">
           <div className="flex items-center gap-4">
-            <Heart className="w-5 h-5 text-gray-600" />
-            <MessageCircle className="w-5 h-5 text-gray-600" />
-            <Send className="w-5 h-5 text-gray-600" />
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <div className="text-base font-medium text-gray-900">
+                {selectedAccountData?.name || 'Select an account'}
+              </div>
+              <div className="text-sm text-gray-500">
+                {selectedAccountData?.followers || 'No account selected'}
+              </div>
+            </div>
           </div>
-          <Bookmark className="w-5 h-5 text-gray-600" />
         </div>
         
-        {/* Comments */}
-        <div className="space-y-3">
-          <div className="flex items-start gap-2">
-            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-              <User className="w-3 h-3 text-gray-600" />
-            </div>
-            <div className="flex-1">
-              <div className="text-sm">
-                <span className="font-medium">username</span>
-                <span className="ml-1 text-gray-700">{previewComment}</span>
+        {/* Post preview */}
+        <div className="p-6">
+          {selectedPostData ? (
+            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden">
+              <img
+                src={selectedPostData.thumbnail}
+                alt={selectedPostData.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
+                {selectedPostData.type}
               </div>
-              <div className="text-xs text-gray-500 mt-1">Reply</div>
             </div>
-          </div>
-          
-          {/* Automation trigger indicator */}
-          {willTriggerAutomation() && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Bot className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-600">Automation triggered</span>
-              </div>
-              <div className="text-sm text-gray-700">
-                <div className="font-medium">Reply: {commentReply}</div>
-                <div className="text-xs text-gray-500 mt-1">DM will be sent automatically</div>
+          ) : (
+            <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6">
+              <div className="text-center">
+                <Camera className="w-16 h-16 text-gray-400 mx-auto mb-3" />
+                <div className="text-base text-gray-500">Select a post</div>
               </div>
             </div>
           )}
+          
+          {/* Post actions */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-5">
+              <Heart className="w-6 h-6 text-gray-600 hover:text-red-500 cursor-pointer" />
+              <MessageCircle className="w-6 h-6 text-gray-600 hover:text-blue-500 cursor-pointer" />
+              <Send className="w-6 h-6 text-gray-600 hover:text-green-500 cursor-pointer" />
+            </div>
+            <Bookmark className="w-6 h-6 text-gray-600 hover:text-yellow-500 cursor-pointer" />
+          </div>
+          
+          {/* Post caption */}
+          {selectedPostData && (
+            <div className="text-sm text-gray-900 mb-4">
+              <span className="font-semibold">{selectedAccountData?.name}</span>
+              <span className="ml-1">{selectedPostData.caption}</span>
+            </div>
+          )}
+          
+          {/* Comments */}
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm">
+                  <span className="font-semibold">username</span>
+                  <span className="ml-1 text-gray-700">{previewComment}</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Reply</div>
+              </div>
+            </div>
+            
+            {/* Automation trigger indicator */}
+            {willTriggerAutomation() && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-600">Automation triggered</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm text-gray-700">
+                    <div className="font-semibold">Public Reply:</div>
+                    <div className="mt-1 p-2 bg-white rounded border">{commentReply}</div>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    <div className="font-semibold">DM Message:</div>
+                    <div className="mt-1 p-2 bg-white rounded border">{dmMessage}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -278,9 +338,9 @@ export default function AutomationBasic() {
       </div>
 
       {/* Main Content */}
-      <div className="flex">
+      <div className="flex min-h-screen">
         {/* Left Form Panel */}
-        <div className="w-1/2 p-6 space-y-6">
+        <div className="w-1/2 p-6 space-y-6 overflow-y-auto">
           {/* Social Account Selection */}
           <CustomDropdown
             label="Social account"
@@ -312,20 +372,44 @@ export default function AutomationBasic() {
           {/* Post Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select a scheduled post or reel
+              Select a post or reel
             </label>
             
-            {selectedPost ? (
-              <div className="p-4 border border-gray-300 rounded-lg bg-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <Image className="w-6 h-6 text-gray-400" />
+            {selectedAccount ? (
+              <div className="space-y-3">
+                {mockPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    onClick={() => setSelectedPost(post.id)}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                      selectedPost === post.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 bg-white hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={post.thumbnail}
+                        alt={post.title}
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-900">{post.title}</span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            post.type === 'reel' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                          }`}>
+                            {post.type}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-500">{post.date} • {post.engagement}</div>
+                      </div>
+                      {selectedPost === post.id && (
+                        <CheckCircle className="w-5 h-5 text-blue-500" />
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium text-gray-900">Selected Post</div>
-                    <div className="text-sm text-gray-500">Ready for automation</div>
-                  </div>
-                </div>
+                ))}
               </div>
             ) : (
               <div className="p-4 border border-gray-300 rounded-lg bg-blue-50">
@@ -334,9 +418,9 @@ export default function AutomationBasic() {
                     <Eye className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-blue-900">No scheduled posts</div>
+                    <div className="text-sm font-medium text-blue-900">Select a social account first</div>
                     <div className="text-xs text-blue-700">
-                      There are no posts scheduled for the social account you've selected
+                      Choose a social account to see available posts
                     </div>
                   </div>
                 </div>
@@ -467,6 +551,23 @@ export default function AutomationBasic() {
               Test Preview
             </button>
             <button
+              onClick={() => {
+                if (canSaveAutomation()) {
+                  // Navigate to next step - you can implement navigation logic here
+                  console.log('Continuing to next step...', {
+                    selectedAccount,
+                    selectedPost,
+                    selectedContentType,
+                    keywords,
+                    commentReply,
+                    dmMessage,
+                    aiPersonality,
+                    maxRepliesPerDay,
+                    cooldownPeriod
+                  })
+                  // Example: router.push('/automation/schedule') or setCurrentStep(2)
+                }
+              }}
               disabled={!canSaveAutomation()}
               className={`px-6 py-3 rounded-lg font-medium transition-colors ${
                 canSaveAutomation()
@@ -480,8 +581,10 @@ export default function AutomationBasic() {
         </div>
 
         {/* Right Preview Panel */}
-        <div className="w-1/2 bg-gray-100 p-6 flex items-center justify-center">
-          <InstagramPreview />
+        <div className="w-1/2 bg-gray-100 p-6 flex items-start justify-center sticky top-0 h-screen overflow-y-auto">
+          <div className="w-full max-w-lg pt-8">
+            <InstagramPreview />
+          </div>
         </div>
       </div>
     </div>
