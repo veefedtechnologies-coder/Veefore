@@ -260,7 +260,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
       </nav>
 
       {/* Bottom Items */}
-      <div className="flex flex-col space-y-4 mt-auto">
+      <div className="flex flex-col space-y-4 mt-auto bg-gray-100 pb-2">
 
 
         <div className="flex flex-col items-center cursor-pointer text-gray-500 hover:text-blue-600 transition-all duration-300 group py-2">
