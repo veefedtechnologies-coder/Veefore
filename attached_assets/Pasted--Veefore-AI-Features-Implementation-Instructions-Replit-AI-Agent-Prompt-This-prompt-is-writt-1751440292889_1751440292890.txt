@@ -1,0 +1,149 @@
+🚀Veefore – AI Features & Implementation Instructions (Replit AI Agent Prompt)
+
+This prompt is written for Replit AI Agent to implement all features, designs, and functionalities described below for the Veefore app. No mock data or placeholder components are allowed. All data must be real, integrated with live APIs where required.
+
+🌟 Overview
+
+Veefore is an AI-powered content intelligence and automation platform for creators and brands. This prompt includes:
+
+Social platform analysis tools
+
+Viral content prediction
+
+AI-driven content generation
+
+Workspace & credit-based structure
+
+Affiliate & referral engines
+
+Space-themed UI with 3D effects
+
+Real-time analytics dashboards
+
+Add-ons such as A/B testing, ROI calculators, emotion detection, fixed post system, and more
+
+All features below are to be implemented in full functional production-grade format, with exact logic, secure API integration, real-time data, and consistent user experience across devices.
+
+🧠 Core AI Features 
+
+Creative Brief Generator
+
+✅ What it DoesThis AI-powered feature generates structured creative briefs for campaigns, posts, or reels — including tone, target audience, platforms, formats, and deadlines.
+
+🌐 Feasibility:Highly feasible with current LLMs (like GPT-4, Gemini, Claude). Many brands already use similar features via Notion AI or Copy.ai.
+
+🔧 Tools & APIs Required:
+
+OpenAI GPT-4 / Gemini Pro / Claude (for brief generation)
+
+LangChain / PromptFlow (for structured AI workflow)
+
+MongoDB (store user campaigns)
+
+Optional: Notion API (to export briefs)
+
+🧩 Implementation Strategy:
+
+Add a form asking: audience, goals, platforms, style, etc.
+
+Prompt your LLM with structured output (Markdown/JSON brief).
+
+Store brief in user’s workspace project.
+
+Add “Export” option (PDF/Notion/email).
+
+Credit deduction per generation.
+
+Function: Generate structured content plans from user goals.
+
+Backend Route: POST /api/brief
+
+AI API: OpenAI GPT-4 (or Gemini Pro/claude)
+
+Frontend: Cosmic-themed form for inputs like tone, platform, audience. Output as glowing animated content card.
+
+DB: Save brief, goals, persona, generatedAt, userId, workspaceId
+
+Multi-Language Content Repurposing
+
+✅ What it DoesAutomatically rewrites captions, post content, or reels in multiple languages optimized for tone, cultural nuance, and social trends.
+
+🌐 Feasibility:Very feasible. AI translation + tone tuning works well using OpenAI, DeepL, or Google Cloud Translation.
+
+🔧 Tools & APIs Required:
+
+OpenAI GPT-4 Turbo (multi-language rewriting)
+
+Google Cloud Translation API or DeepL
+
+LanguageDetector or FastText (detect source language)
+
+Your MongoDB database for storing multilingual content
+
+🧩 Implementation Strategy:
+
+User uploads or selects content → asks for repurposing.
+
+Detect source language, then prompt AI to rewrite in target.
+
+Localize tone and idioms for region (e.g., Spanish-MX vs. ES).
+
+Show real-time preview and allow user edits.
+
+Add bulk mode for agencies and credits per repurposed post.
+
+What it does: AI translates + localizes captions, hashtags, and even voiceovers for reels/videos.
+
+Use case: Helps creators expand to international audiences effortlessly.
+
+Add-on: Text-to-speech in native accents with AI dubbing.
+
+Function: Translate and culturally adapt existing content.
+
+APIs: Google Translate + OpenAI
+
+UI: Source panel → Target panel with preview & tweak
+
+Usage: Converts 1 post using 3 credits
+
+Competitor Analysis Engine
+
+What it DoesAnalyzes competitors’ public Instagram or YouTube content to highlight trends, viral posts, hashtags, formats, posting times, etc.
+
+🌐 Feasibility:Moderately feasible. Instagram has strict API access, but public data scraping (via Puppeteer/SerpAPI) and YouTube Data API make this possible.
+
+🔧 Tools & APIs Required:
+
+YouTube Data API (for competitor channels)
+
+SerpAPI or ScrapeNinja (Instagram public data)
+
+MongoDB or PostgreSQL (store scraped data)
+
+LLM (GPT-4) to summarize and visualize trends
+
+Chart.js or Recharts (display insights)
+
+🧩 Implementation Strategy:
+
+Ask user to enter competitor usernames.
+
+Use API/scraper to fetch recent public posts.
+
+Analyze metrics: likes/comments, hashtags, format, captions.
+
+Run AI summarization: “Top performing format: Reels with 20–30s, humor + trending audio.”
+
+Display in orbital UI + recommendations for user content.
+
+Function: User enters competitor handle → AI scrapes & analyzes their top-performing content.
+
+Output: Trend patterns, best time to post, content types that work, engagement style.
+
+Bonus: Suggests how to outperform them.
+
+Function: Monitor and compare public data of competitor handles.
+
+Frontend: Type username → Shows growth rate, content performance
+
+Backend: /api/competitor with public scraper or APIs like SocialBlade

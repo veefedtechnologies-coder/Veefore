@@ -1,0 +1,38 @@
+# Node modules
+node_modules
+npm-debug.log*
+
+# Development files
+.env.local
+.env.development
+
+# Build artifacts
+dist
+
+# Git
+.git
+.gitignore
+README.md
+
+# IDE
+.vscode
+.idea
+
+# Replit specific
+.replit*
+.config
+.nix
+
+# Development artifacts
+*.log
+*.lock
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
