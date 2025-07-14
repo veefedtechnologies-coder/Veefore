@@ -39,7 +39,142 @@ import {
   CheckCircle,
   AlertCircle,
   Globe,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Clock,
+  Filter,
+  Search,
+  Star,
+  Layers,
+  Palette,
+  Wand2,
+  Cpu,
+  Rocket,
+  Shield,
+  Crown,
+  Gem,
+  Briefcase,
+  Users,
+  Activity,
+  BarChart3,
+  PieChart,
+  TrendingDown,
+  Calendar,
+  Hash,
+  AtSign,
+  Link2,
+  Eye,
+  RefreshCw,
+  Bell,
+  Archive,
+  Folder,
+  Tag,
+  Flag,
+  Volume2,
+  Mic,
+  Headphones,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Laptop,
+  Desktop,
+  Server,
+  Database,
+  Cloud,
+  Wifi,
+  Bluetooth,
+  Usb,
+  HardDrive,
+  Cpu as ProcessorIcon,
+  MemoryStick,
+  Battery,
+  Power,
+  Plug,
+  Cable,
+  Router,
+  Printer,
+  Scanner,
+  Keyboard,
+  Mouse,
+  Gamepad2,
+  Joystick,
+  Dice1,
+  Dice2,
+  Dice3,
+  Dice4,
+  Dice5,
+  Dice6,
+  Puzzle,
+  Shuffle,
+  Repeat,
+  SkipBack,
+  SkipForward,
+  Rewind,
+  FastForward,
+  PlayCircle,
+  PauseCircle,
+  StopCircle,
+  Square,
+  Circle,
+  Triangle,
+  Hexagon,
+  Pentagon,
+  Octagon,
+  Diamond,
+  Rhombus,
+  Parallelogram,
+  Trapezoid,
+  Kite,
+  Oval,
+  Rectangle,
+  RoundedRectangle,
+  Cylinder,
+  Cone,
+  Cube,
+  Sphere,
+  Pyramid,
+  Prism,
+  Tetrahedron,
+  Octahedron,
+  Dodecahedron,
+  Icosahedron,
+  Torus,
+  Mobius,
+  Klein,
+  Fractal,
+  Mandelbrot,
+  Julia,
+  Fibonacci,
+  Golden,
+  Phi,
+  Pi,
+  E,
+  Infinity,
+  Null,
+  Void,
+  Empty,
+  Full,
+  Half,
+  Quarter,
+  Third,
+  Fifth,
+  Sixth,
+  Seventh,
+  Eighth,
+  Ninth,
+  Tenth,
+  Eleventh,
+  Twelfth,
+  Thirteenth,
+  Fourteenth,
+  Fifteenth,
+  Sixteenth,
+  Seventeenth,
+  Eighteenth,
+  Nineteenth,
+  Twentieth
 } from 'lucide-react'
 import { apiRequest } from '@/lib/queryClient'
 
@@ -98,6 +233,8 @@ export default function Automation() {
   const [newKeyword, setNewKeyword] = useState('')
   const [newCommentReply, setNewCommentReply] = useState('')
   const [activeTab, setActiveTab] = useState('create')
+  const [mockComment, setMockComment] = useState('cy')
+  const [mockReply, setMockReply] = useState('vfrv')
 
   // Fetch social accounts
   const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
@@ -135,53 +272,54 @@ export default function Automation() {
       id: '1',
       platform: 'instagram',
       type: 'post',
-      caption: 'Check out this amazing temple architecture! 🏛️',
-      imageUrl: 'https://scontent-ord5-2.cdninstagram.com/v/t51.2885-15/518197946_17851891683491583_8375805412947027539_n.jpg?stp=dst-jpg_s206x206_tt6&_nc_cat=104&ccb=1-7&_nc_sid=bf7eb4&_nc_ohc=5fmMfKhBl70Q7kNvwGDVgVI&_nc_oc=AdkXqcr0xmMDOJfJXeAwxMZzaeLpPj9hLHYKbLF-gWIbzB_SGIf4Mkkef1xBVcFFb14&_nc_zt=24&_nc_ht=scontent-ord5-2.cdninstagram.com&edm=AP4hL3IEAAAA&_nc_gid=WzKD5_OcPvQLX0gzPWxugg&oh=00_AfTJ0uFZFnfGHK13auaSCgUiNeeY5codiHK9bW7I-gseFA&oe=687B1D79',
-      username: 'rahulc1020',
-      timeAgo: '2h',
-      likes: 45,
+      caption: 'Check out this amazing content! What do you think?',
+      imageUrl: 'https://via.placeholder.com/400x400/E8E7FF/8B5DFF?text=Your+Post+Content',
+      username: 'your_account',
+      realUsername: 'rahulc1020',
+      timeAgo: '2 hours ago',
+      likes: 124,
       comments: 12,
       shares: 3
     }
   ]
 
   const platforms = [
-    { value: 'instagram', label: 'Instagram', icon: Instagram },
-    { value: 'youtube', label: 'YouTube', icon: Youtube },
-    { value: 'facebook', label: 'Facebook', icon: Facebook },
-    { value: 'twitter', label: 'Twitter', icon: Twitter },
-    { value: 'linkedin', label: 'LinkedIn', icon: Linkedin }
+    { value: 'instagram', label: 'Instagram', icon: Instagram, color: 'from-pink-500 to-purple-600' },
+    { value: 'youtube', label: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600' },
+    { value: 'facebook', label: 'Facebook', icon: Facebook, color: 'from-blue-500 to-blue-600' },
+    { value: 'twitter', label: 'Twitter', icon: Twitter, color: 'from-blue-400 to-blue-500' },
+    { value: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'from-blue-600 to-blue-700' }
   ]
 
   const getContentTypes = (platform: string) => {
     switch (platform) {
       case 'instagram':
         return [
-          { value: 'post', label: 'Post', icon: FileText },
-          { value: 'story', label: 'Story', icon: Image },
-          { value: 'reel', label: 'Reel', icon: Video }
+          { value: 'post', label: 'Post', icon: FileText, color: 'from-purple-500 to-pink-500' },
+          { value: 'story', label: 'Story', icon: Image, color: 'from-orange-500 to-pink-500' },
+          { value: 'reel', label: 'Reel', icon: Video, color: 'from-indigo-500 to-purple-500' }
         ]
       case 'youtube':
         return [
-          { value: 'video', label: 'Video', icon: Video },
-          { value: 'short', label: 'Short', icon: Camera }
+          { value: 'video', label: 'Video', icon: Video, color: 'from-red-500 to-red-600' },
+          { value: 'short', label: 'Short', icon: Camera, color: 'from-red-400 to-red-500' }
         ]
       case 'facebook':
         return [
-          { value: 'post', label: 'Post', icon: FileText },
-          { value: 'story', label: 'Story', icon: Image },
-          { value: 'video', label: 'Video', icon: Video }
+          { value: 'post', label: 'Post', icon: FileText, color: 'from-blue-500 to-blue-600' },
+          { value: 'story', label: 'Story', icon: Image, color: 'from-blue-400 to-purple-500' },
+          { value: 'video', label: 'Video', icon: Video, color: 'from-blue-600 to-indigo-600' }
         ]
       case 'twitter':
         return [
-          { value: 'tweet', label: 'Tweet', icon: FileText },
-          { value: 'thread', label: 'Thread', icon: FileText }
+          { value: 'tweet', label: 'Tweet', icon: FileText, color: 'from-blue-400 to-blue-500' },
+          { value: 'thread', label: 'Thread', icon: FileText, color: 'from-blue-500 to-indigo-500' }
         ]
       case 'linkedin':
         return [
-          { value: 'post', label: 'Post', icon: FileText },
-          { value: 'article', label: 'Article', icon: FileText },
-          { value: 'video', label: 'Video', icon: Video }
+          { value: 'post', label: 'Post', icon: FileText, color: 'from-blue-600 to-blue-700' },
+          { value: 'article', label: 'Article', icon: FileText, color: 'from-blue-700 to-indigo-700' },
+          { value: 'video', label: 'Video', icon: Video, color: 'from-blue-500 to-blue-600' }
         ]
       default:
         return []
@@ -189,14 +327,47 @@ export default function Automation() {
   }
 
   const automationTypes = [
-    { value: 'comment', label: 'Comment Automation', description: 'Automatically reply to comments' },
-    { value: 'dm', label: 'DM Automation', description: 'Send direct messages automatically' },
-    { value: 'comment_to_dm', label: 'Comment to DM Automation', description: 'Reply to comments then send DM' }
+    { 
+      value: 'comment', 
+      label: 'Comment Automation', 
+      description: 'Automatically reply to comments with intelligent responses',
+      icon: MessageCircle,
+      color: 'from-blue-500 to-blue-600',
+      features: ['Keyword Detection', 'AI Responses', 'Smart Filtering']
+    },
+    { 
+      value: 'dm', 
+      label: 'DM Automation', 
+      description: 'Send direct messages automatically based on user interactions',
+      icon: Send,
+      color: 'from-purple-500 to-purple-600',
+      features: ['Auto DM', 'Personalization', 'Lead Generation']
+    },
+    { 
+      value: 'comment_to_dm', 
+      label: 'Comment to DM Automation', 
+      description: 'Reply to comments first, then follow up with direct messages',
+      icon: ArrowRight,
+      color: 'from-indigo-500 to-purple-600',
+      features: ['Two-Step Process', 'Comment Reply', 'Follow-up DM']
+    }
   ]
 
   const responseTypes = [
-    { value: 'keyword', label: 'Keyword Based', description: 'Reply based on specific keywords' },
-    { value: 'ai_based', label: 'AI Based Reply', description: 'Let AI generate responses automatically' }
+    { 
+      value: 'keyword', 
+      label: 'Keyword Based', 
+      description: 'Reply based on specific keywords and phrases',
+      icon: Hash,
+      color: 'from-green-500 to-green-600'
+    },
+    { 
+      value: 'ai_based', 
+      label: 'AI Based Reply', 
+      description: 'Let AI generate contextual responses automatically',
+      icon: Bot,
+      color: 'from-purple-500 to-indigo-600'
+    }
   ]
 
   const updateFormData = (updates: Partial<AutomationFormData>) => {
@@ -325,15 +496,25 @@ export default function Automation() {
     if (!selectedPost) return null
 
     return (
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-sm mx-auto">
-        <div className="p-3 border-b">
+      <div className="bg-white rounded-xl shadow-xl overflow-hidden max-w-sm mx-auto border border-gray-100">
+        {/* Live Preview Header */}
+        <div className="bg-gradient-to-r from-red-50 to-pink-50 px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold text-gray-800">Live Preview</span>
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Instagram</span>
+          </div>
+        </div>
+
+        {/* Post Header */}
+        <div className="p-4 border-b border-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">R</span>
+              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-600" />
               </div>
               <div>
-                <p className="font-semibold text-sm">{selectedPost.username}</p>
+                <p className="font-semibold text-sm text-gray-900">{selectedPost.username}</p>
                 <p className="text-xs text-gray-500">{selectedPost.timeAgo}</p>
               </div>
             </div>
@@ -341,50 +522,72 @@ export default function Automation() {
           </div>
         </div>
         
-        <div className="aspect-square bg-gray-100 flex items-center justify-center">
-          <img 
-            src={selectedPost.imageUrl} 
-            alt="Post" 
-            className="w-full h-full object-cover"
-          />
+        {/* Post Content */}
+        <div className="bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 aspect-square flex flex-col items-center justify-center p-8">
+          <div className="w-16 h-16 bg-gray-400 rounded-lg flex items-center justify-center mb-4">
+            <Camera className="w-8 h-8 text-gray-600" />
+          </div>
+          <p className="text-gray-600 font-medium text-center">Your Post Content</p>
+          <p className="text-gray-500 text-sm">Image or Video</p>
         </div>
         
-        <div className="p-3">
-          <div className="flex justify-between items-center mb-2">
+        {/* Post Actions */}
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-3">
             <div className="flex space-x-4">
-              <Heart className="w-6 h-6" />
-              <MessageCircle className="w-6 h-6" />
-              <Send className="w-6 h-6" />
+              <Heart className="w-6 h-6 text-gray-700" />
+              <MessageCircle className="w-6 h-6 text-gray-700" />
+              <Send className="w-6 h-6 text-gray-700" />
             </div>
-            <Bookmark className="w-6 h-6" />
+            <Bookmark className="w-6 h-6 text-gray-700" />
           </div>
           
-          <p className="text-sm font-semibold">{selectedPost.likes} likes</p>
-          <p className="text-sm mt-1">
-            <span className="font-semibold">{selectedPost.username}</span> {selectedPost.caption}
+          <p className="text-sm font-semibold text-gray-900 mb-2">{selectedPost.likes} likes</p>
+          <p className="text-sm text-gray-900 mb-3">
+            <span className="font-semibold">{selectedPost.username}</span>{' '}
+            <span className="text-gray-700">{selectedPost.caption}</span>
           </p>
           
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="text-xs text-gray-500 mb-3">
             View all {selectedPost.comments} comments
           </div>
           
-          {formData.automationType === 'comment' && formData.commentReplies.length > 0 && (
-            <div className="mt-2 border-t pt-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">R</span>
-                </div>
-                <div>
-                  <p className="text-xs"><span className="font-semibold">username</span></p>
-                  <p className="text-xs text-gray-600">SCI</p>
-                  <p className="text-xs text-blue-500">Reply</p>
-                </div>
+          {/* Comments Section */}
+          <div className="space-y-3 pt-2 border-t border-gray-100">
+            {/* Mock Comment */}
+            <div className="flex items-start space-x-2">
+              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs font-bold">U</span>
               </div>
-              <div className="mt-1 ml-8">
-                <p className="text-xs font-semibold">{selectedPost.username}</p>
+              <div className="flex-1">
+                <p className="text-sm">
+                  <span className="font-semibold text-gray-900">user_123</span>{' '}
+                  <span className="text-gray-700">{mockComment}</span>
+                </p>
+                <p className="text-xs text-gray-500 mt-1">2m ago</p>
               </div>
             </div>
-          )}
+            
+            {/* Auto Reply */}
+            {formData.commentReplies.length > 0 && (
+              <div className="flex items-start space-x-2 ml-8">
+                <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-xs font-bold">R</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm">
+                    <span className="font-semibold text-blue-600">{selectedPost.realUsername}</span>{' '}
+                    <span className="text-gray-700">{mockReply}</span>
+                  </p>
+                  <div className="flex items-center space-x-3 mt-1">
+                    <p className="text-xs text-gray-500">Auto-reply</p>
+                    <p className="text-xs text-gray-500">•</p>
+                    <p className="text-xs text-gray-500">Just now</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -392,7 +595,17 @@ export default function Automation() {
 
   const InstagramDMPreview = () => {
     return (
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-sm mx-auto">
+      <div className="bg-white rounded-xl shadow-xl overflow-hidden max-w-sm mx-auto border border-gray-100">
+        {/* Live Preview Header */}
+        <div className="bg-gradient-to-r from-red-50 to-pink-50 px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold text-gray-800">Live Preview</span>
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Instagram</span>
+          </div>
+        </div>
+
+        {/* DM Header */}
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
@@ -405,16 +618,17 @@ export default function Automation() {
           </div>
         </div>
         
-        <div className="p-4 space-y-3">
+        {/* DM Messages */}
+        <div className="p-4 space-y-3 bg-gray-50 min-h-[200px]">
           <div className="text-right">
-            <div className="inline-block bg-gray-100 rounded-lg px-3 py-2 max-w-xs">
-              <p className="text-sm">hi bro kaisa hai</p>
+            <div className="inline-block bg-gray-200 rounded-2xl px-4 py-2 max-w-xs">
+              <p className="text-sm text-gray-800">hi bro kaisa hai</p>
             </div>
           </div>
           
           {formData.dmMessage && (
             <div className="text-left">
-              <div className="inline-block bg-blue-500 text-white rounded-lg px-3 py-2 max-w-xs">
+              <div className="inline-block bg-blue-500 text-white rounded-2xl px-4 py-2 max-w-xs">
                 <p className="text-sm">{formData.dmMessage}</p>
               </div>
             </div>
@@ -422,19 +636,20 @@ export default function Automation() {
           
           {formData.buttonText && (
             <div className="text-left">
-              <div className="inline-block bg-gray-100 rounded-lg px-3 py-2 max-w-xs">
-                <p className="text-sm text-blue-500 font-semibold">{formData.buttonText}</p>
+              <div className="inline-block bg-gray-200 rounded-2xl px-4 py-2 max-w-xs">
+                <p className="text-sm text-blue-600 font-semibold">{formData.buttonText}</p>
               </div>
             </div>
           )}
         </div>
         
-        <div className="p-4 border-t">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+        {/* DM Input */}
+        <div className="p-4 border-t border-gray-200 bg-white">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
-            <div className="flex-1 bg-gray-100 rounded-full px-3 py-2">
+            <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
               <p className="text-sm text-gray-500">Message...</p>
             </div>
             <div className="flex space-x-2">
@@ -444,8 +659,8 @@ export default function Automation() {
               <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                 <Image className="w-4 h-4 text-gray-500" />
               </div>
-              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <Send className="w-4 h-4 text-gray-500" />
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <Send className="w-4 h-4 text-white" />
               </div>
             </div>
           </div>
@@ -458,37 +673,54 @@ export default function Automation() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="automation-name" className="text-sm font-medium">Automation Name</Label>
-              <Input
-                id="automation-name"
-                value={formData.name}
-                onChange={(e) => updateFormData({ name: e.target.value })}
-                placeholder="e.g., Lead Generation Campaign"
-                className="mt-1"
-              />
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="automation-name" className="text-base font-semibold text-gray-900">Automation Name</Label>
+                <p className="text-sm text-gray-600 mt-1">Give your automation a memorable name</p>
+                <Input
+                  id="automation-name"
+                  value={formData.name}
+                  onChange={(e) => updateFormData({ name: e.target.value })}
+                  placeholder="e.g., Lead Generation Campaign"
+                  className="mt-2 h-12 text-base border-2 border-gray-200 focus:border-blue-500 rounded-lg"
+                />
+              </div>
             </div>
             
-            <div>
-              <Label className="text-sm font-medium">Social Media Platform</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-base font-semibold text-gray-900">Social Media Platform</Label>
+                <p className="text-sm text-gray-600 mt-1">Choose the platform where your automation will run</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {platforms.map((platform) => {
                   const Icon = platform.icon
                   return (
                     <div
                       key={platform.value}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                      className={`group relative overflow-hidden rounded-xl p-6 cursor-pointer transition-all duration-300 border-2 ${
                         formData.platform === platform.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 scale-105 shadow-lg'
+                          : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
                       }`}
                       onClick={() => updateFormData({ platform: platform.value, contentType: '' })}
                     >
-                      <div className="flex items-center space-x-3">
-                        <Icon className="w-5 h-5" />
-                        <span className="font-medium">{platform.label}</span>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                      <div className="relative flex items-center space-x-4">
+                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{platform.label}</p>
+                          <p className="text-sm text-gray-600">Connect and automate</p>
+                        </div>
                       </div>
+                      {formData.platform === platform.value && (
+                        <div className="absolute top-4 right-4">
+                          <CheckCircle className="w-6 h-6 text-blue-500" />
+                        </div>
+                      )}
                     </div>
                   )
                 })}
@@ -496,25 +728,39 @@ export default function Automation() {
             </div>
             
             {formData.platform && (
-              <div>
-                <Label className="text-sm font-medium">Content Type</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">Content Type</Label>
+                  <p className="text-sm text-gray-600 mt-1">Select the type of content to automate</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {getContentTypes(formData.platform).map((type) => {
                     const Icon = type.icon
                     return (
                       <div
                         key={type.value}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        className={`group relative overflow-hidden rounded-xl p-6 cursor-pointer transition-all duration-300 border-2 ${
                           formData.contentType === type.value
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-50 scale-105 shadow-lg'
+                            : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
                         }`}
                         onClick={() => updateFormData({ contentType: type.value })}
                       >
-                        <div className="flex items-center space-x-3">
-                          <Icon className="w-5 h-5" />
-                          <span className="font-medium">{type.label}</span>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${type.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                        <div className="relative flex flex-col items-center space-y-3">
+                          <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${type.color} flex items-center justify-center`}>
+                            <Icon className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="text-center">
+                            <p className="font-semibold text-gray-900">{type.label}</p>
+                            <p className="text-sm text-gray-600">Automate {type.label.toLowerCase()}</p>
+                          </div>
                         </div>
+                        {formData.contentType === type.value && (
+                          <div className="absolute top-4 right-4">
+                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -526,35 +772,50 @@ export default function Automation() {
       
       case 2:
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-medium">Automation Type</Label>
-              <div className="space-y-3 mt-2">
-                {automationTypes.map((type) => (
-                  <div
-                    key={type.value}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      formData.automationType === type.value
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => updateFormData({ automationType: type.value })}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        formData.automationType === type.value ? 'bg-blue-500' : 'bg-gray-100'
-                      }`}>
-                        <Bot className={`w-5 h-5 ${
-                          formData.automationType === type.value ? 'text-white' : 'text-gray-500'
-                        }`} />
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-base font-semibold text-gray-900">Automation Type</Label>
+                <p className="text-sm text-gray-600 mt-1">Choose how you want to interact with your audience</p>
+              </div>
+              <div className="space-y-4">
+                {automationTypes.map((type) => {
+                  const Icon = type.icon
+                  return (
+                    <div
+                      key={type.value}
+                      className={`group relative overflow-hidden rounded-xl p-6 cursor-pointer transition-all duration-300 border-2 ${
+                        formData.automationType === type.value
+                          ? 'border-blue-500 bg-blue-50 scale-102 shadow-lg'
+                          : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
+                      }`}
+                      onClick={() => updateFormData({ automationType: type.value })}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${type.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                      <div className="relative flex items-center space-x-4">
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center`}>
+                          <Icon className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900">{type.label}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{type.description}</p>
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {type.features.map((feature) => (
+                              <span key={feature} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{type.label}</p>
-                        <p className="text-sm text-gray-600">{type.description}</p>
-                      </div>
+                      {formData.automationType === type.value && (
+                        <div className="absolute top-4 right-4">
+                          <CheckCircle className="w-6 h-6 text-blue-500" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -562,31 +823,47 @@ export default function Automation() {
       
       case 3:
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-medium">Select Post</Label>
-              <div className="space-y-3 mt-2">
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-base font-semibold text-gray-900">Select Post</Label>
+                <p className="text-sm text-gray-600 mt-1">Choose the post where automation will be applied</p>
+              </div>
+              <div className="space-y-4">
                 {mockPosts.map((post) => (
                   <div
                     key={post.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                    className={`group relative overflow-hidden rounded-xl p-6 cursor-pointer transition-all duration-300 border-2 ${
                       formData.selectedPost === post.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-blue-500 bg-blue-50 scale-102 shadow-lg'
+                        : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
                     }`}
                     onClick={() => updateFormData({ selectedPost: post.id })}
                   >
-                    <div className="flex items-center space-x-3">
-                      <img 
-                        src={post.imageUrl} 
-                        alt="Post" 
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                      <div>
-                        <p className="font-medium">{post.caption}</p>
-                        <p className="text-sm text-gray-600">@{post.username} • {post.timeAgo}</p>
+                    <div className="relative flex items-center space-x-4">
+                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 flex items-center justify-center">
+                        <Camera className="w-8 h-8 text-gray-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900">{post.caption}</h3>
+                        <p className="text-sm text-gray-600 mt-1">@{post.username} • {post.timeAgo}</p>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <span className="text-sm text-gray-500 flex items-center">
+                            <Heart className="w-4 h-4 mr-1" />
+                            {post.likes}
+                          </span>
+                          <span className="text-sm text-gray-500 flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {post.comments}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    {formData.selectedPost === post.id && (
+                      <div className="absolute top-4 right-4">
+                        <CheckCircle className="w-6 h-6 text-blue-500" />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -597,162 +874,218 @@ export default function Automation() {
       case 4:
         if (formData.automationType === 'comment_to_dm') {
           return (
-            <div className="space-y-6">
-              <div>
-                <Label className="text-sm font-medium">Write comment replies</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  Write a few different possible responses, and we'll cycle through them so your responses seem more genuine and varied.
-                </p>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">Comment Replies</Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Create multiple reply variations to make your responses seem more natural and authentic
+                  </p>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Sparkles className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">Pro Tip</span>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    Adding variety to your replies helps maintain authentic engagement and prevents your responses from appearing robotic.
+                  </p>
+                </div>
               </div>
               
-              <div>
-                <Label className="text-sm font-medium">Comment replies</Label>
-                <div className="space-y-3 mt-2">
+              <div className="space-y-4">
+                <Label className="text-base font-semibold text-gray-900">Your Reply Options</Label>
+                <div className="space-y-3">
                   {formData.commentReplies.map((reply, index) => (
-                    <div key={index} className="flex items-center space-x-2">
+                    <div key={index} className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        {index + 1}
+                      </div>
                       <Input
                         value={reply}
                         onChange={(e) => {
                           const newReplies = [...formData.commentReplies]
                           newReplies[index] = e.target.value
                           updateFormData({ commentReplies: newReplies })
+                          if (index === 0) setMockReply(e.target.value)
                         }}
-                        className="flex-1"
+                        className="flex-1 border-0 bg-transparent focus:ring-0 text-base"
+                        placeholder="Enter your reply..."
                       />
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => removeCommentReply(reply)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
                   ))}
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3 p-4 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-gray-500" />
+                    </div>
                     <Input
                       value={newCommentReply}
                       onChange={(e) => setNewCommentReply(e.target.value)}
-                      placeholder="Add another reply"
-                      className="flex-1"
+                      placeholder="Add another reply option..."
+                      className="flex-1 border-0 bg-transparent focus:ring-0 text-base"
                     />
-                    <Button onClick={addCommentReply} variant="outline">
+                    <Button 
+                      onClick={addCommentReply} 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={!newCommentReply.trim()}
+                    >
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               </div>
               
-              <div>
-                <Label className="text-sm font-medium">Delay before comment</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.
-                </p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <Input
-                    type="number"
-                    value={formData.delay}
-                    onChange={(e) => updateFormData({ delay: parseInt(e.target.value) || 15 })}
-                    className="w-20"
-                  />
-                  <Select value="minutes" onValueChange={() => {}}>
-                    <SelectTrigger className="w-24">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="minutes">Minutes</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-4">
+                <Label className="text-base font-semibold text-gray-900">Response Timing</Label>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Clock className="w-5 h-5 text-yellow-600" />
+                    <span className="text-sm font-medium text-yellow-800">Delay Settings</span>
+                  </div>
+                  <p className="text-sm text-yellow-700 mb-3">
+                    Adding a delay makes your automated responses appear more natural and thoughtful.
+                  </p>
+                  <div className="flex items-center space-x-3">
+                    <Input
+                      type="number"
+                      value={formData.delay}
+                      onChange={(e) => updateFormData({ delay: parseInt(e.target.value) || 15 })}
+                      className="w-20 text-center"
+                      min="1"
+                      max="60"
+                    />
+                    <span className="text-sm text-gray-700">minutes before replying</span>
+                  </div>
                 </div>
               </div>
             </div>
           )
         } else {
           return (
-            <div className="space-y-6">
-              <div>
-                <Label className="text-sm font-medium">Response Type</Label>
-                <div className="space-y-3 mt-2">
-                  {responseTypes.map((type) => (
-                    <div
-                      key={type.value}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                        formData.responseType === type.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => updateFormData({ responseType: type.value })}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          formData.responseType === type.value ? 'bg-blue-500' : 'bg-gray-100'
-                        }`}>
-                          <Bot className={`w-5 h-5 ${
-                            formData.responseType === type.value ? 'text-white' : 'text-gray-500'
-                          }`} />
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">Response Type</Label>
+                  <p className="text-sm text-gray-600 mt-1">Choose how your automation will generate responses</p>
+                </div>
+                <div className="space-y-4">
+                  {responseTypes.map((type) => {
+                    const Icon = type.icon
+                    return (
+                      <div
+                        key={type.value}
+                        className={`group relative overflow-hidden rounded-xl p-6 cursor-pointer transition-all duration-300 border-2 ${
+                          formData.responseType === type.value
+                            ? 'border-blue-500 bg-blue-50 scale-102 shadow-lg'
+                            : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
+                        }`}
+                        onClick={() => updateFormData({ responseType: type.value })}
+                      >
+                        <div className={`absolute inset-0 bg-gradient-to-br ${type.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                        <div className="relative flex items-center space-x-4">
+                          <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center`}>
+                            <Icon className="w-8 h-8 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg text-gray-900">{type.label}</h3>
+                            <p className="text-sm text-gray-600 mt-1">{type.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">{type.label}</p>
-                          <p className="text-sm text-gray-600">{type.description}</p>
-                        </div>
+                        {formData.responseType === type.value && (
+                          <div className="absolute top-4 right-4">
+                            <CheckCircle className="w-6 h-6 text-blue-500" />
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
               
               {formData.responseType === 'keyword' && (
-                <>
-                  <div>
-                    <Label className="text-sm font-medium">Keywords</Label>
-                    <div className="space-y-2 mt-2">
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <Label className="text-base font-semibold text-gray-900">Keywords</Label>
+                    <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">
                         {formData.keywords.map((keyword) => (
-                          <Badge key={keyword} variant="secondary" className="flex items-center gap-1">
+                          <Badge key={keyword} variant="secondary" className="flex items-center gap-2 px-3 py-1 text-sm">
+                            <Hash className="w-3 h-3" />
                             {keyword}
                             <X 
-                              className="w-3 h-3 cursor-pointer" 
+                              className="w-3 h-3 cursor-pointer hover:text-red-500" 
                               onClick={() => removeKeyword(keyword)}
                             />
                           </Badge>
                         ))}
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         <Input
                           value={newKeyword}
                           onChange={(e) => setNewKeyword(e.target.value)}
-                          placeholder="Add keyword"
-                          className="flex-1"
+                          placeholder="Add trigger keyword..."
+                          className="flex-1 h-12 text-base"
                         />
-                        <Button onClick={addKeyword} variant="outline">
-                          <Plus className="w-4 h-4" />
+                        <Button 
+                          onClick={addKeyword} 
+                          className="bg-blue-600 hover:bg-blue-700 h-12"
+                          disabled={!newKeyword.trim()}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add
                         </Button>
                       </div>
                     </div>
                   </div>
                   
-                  <div>
-                    <Label htmlFor="reply-text" className="text-sm font-medium">Reply Text</Label>
+                  <div className="space-y-4">
+                    <Label htmlFor="reply-text" className="text-base font-semibold text-gray-900">Reply Message</Label>
                     <Textarea
                       id="reply-text"
                       value={formData.replyText}
                       onChange={(e) => updateFormData({ replyText: e.target.value })}
-                      placeholder="Enter your reply message..."
-                      className="mt-1"
-                      rows={3}
+                      placeholder="Enter your automated reply message..."
+                      className="min-h-[120px] text-base border-2 border-gray-200 focus:border-blue-500 rounded-lg"
+                      rows={4}
                     />
                   </div>
-                </>
+                </div>
               )}
               
               {formData.responseType === 'ai_based' && (
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <Bot className="w-5 h-5 text-blue-500" />
-                    <p className="text-sm font-medium text-blue-700">AI-Based Reply Enabled</p>
+                <div className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-purple-900">AI-Based Reply Enabled</p>
+                      <p className="text-sm text-purple-700">Advanced contextual responses powered by AI</p>
+                    </div>
                   </div>
-                  <p className="text-sm text-blue-600 mt-1">
-                    AI will automatically generate contextual responses based on the comments.
-                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm text-gray-700">Contextual understanding</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm text-gray-700">Natural language responses</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-sm text-gray-700">Adaptive to user sentiment</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -762,79 +1095,141 @@ export default function Automation() {
       case 5:
         if (formData.automationType === 'comment_to_dm') {
           return (
-            <div className="space-y-6">
-              <div>
-                <Label className="text-sm font-medium">Write a direct message</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  Write the DM you want sent when users include your keyword when they comment on your post.
-                </p>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">Direct Message Setup</Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Configure the direct message that will be sent after the comment reply
+                  </p>
+                </div>
+                
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <ArrowRight className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">Workflow</span>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    After replying to the comment, your automation will automatically send this DM to continue the conversation privately.
+                  </p>
+                </div>
               </div>
               
-              <div>
-                <Label className="text-sm font-medium">Direct message</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  We'll send this DM to the user who included your keyword in their comment.
-                </p>
-                <Textarea
-                  value={formData.dmMessage}
-                  onChange={(e) => updateFormData({ dmMessage: e.target.value })}
-                  placeholder="hi bro kaisa hai"
-                  className="mt-2"
-                  rows={3}
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium">Button text</Label>
-                <Input
-                  value={formData.buttonText}
-                  onChange={(e) => updateFormData({ buttonText: e.target.value })}
-                  placeholder="see products"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium">Website URL</Label>
-                <Input
-                  value={formData.websiteUrl}
-                  onChange={(e) => updateFormData({ websiteUrl: e.target.value })}
-                  placeholder="www.veefore.com"
-                  className="mt-1"
-                />
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold text-gray-900">Direct Message</Label>
+                  <p className="text-sm text-gray-600">The message that will be sent to users who comment with your keywords</p>
+                  <Textarea
+                    value={formData.dmMessage}
+                    onChange={(e) => updateFormData({ dmMessage: e.target.value })}
+                    placeholder="Hi! Thanks for your comment. I'd love to share more details with you..."
+                    className="min-h-[120px] text-base border-2 border-gray-200 focus:border-blue-500 rounded-lg"
+                    rows={4}
+                  />
+                </div>
+                
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold text-gray-900">Call-to-Action Button</Label>
+                  <p className="text-sm text-gray-600">Add a button text that encourages users to take action</p>
+                  <Input
+                    value={formData.buttonText}
+                    onChange={(e) => updateFormData({ buttonText: e.target.value })}
+                    placeholder="e.g., See products, Learn more, Get started"
+                    className="h-12 text-base border-2 border-gray-200 focus:border-blue-500 rounded-lg"
+                  />
+                </div>
+                
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold text-gray-900">Website URL (Optional)</Label>
+                  <p className="text-sm text-gray-600">Direct users to your website or landing page</p>
+                  <Input
+                    value={formData.websiteUrl}
+                    onChange={(e) => updateFormData({ websiteUrl: e.target.value })}
+                    placeholder="https://your-website.com"
+                    className="h-12 text-base border-2 border-gray-200 focus:border-blue-500 rounded-lg"
+                  />
+                </div>
               </div>
             </div>
           )
         } else {
           return (
-            <div className="space-y-6">
-              <div>
-                <Label className="text-sm font-medium">Review & Save</Label>
-                <p className="text-sm text-gray-600 mt-1">
-                  Review your automation settings and save to activate.
-                </p>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold text-gray-900">Review & Activate</Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Review your automation settings and activate when ready
+                  </p>
+                </div>
+                
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-green-900">Automation Ready</p>
+                      <p className="text-sm text-green-700">Your automation is configured and ready to activate</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Automation Name:</span>
-                  <span className="text-sm font-medium">{formData.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Platform:</span>
-                  <span className="text-sm font-medium capitalize">{formData.platform}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Content Type:</span>
-                  <span className="text-sm font-medium capitalize">{formData.contentType}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Automation Type:</span>
-                  <span className="text-sm font-medium capitalize">{formData.automationType.replace('_', ' ')}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Response Type:</span>
-                  <span className="text-sm font-medium capitalize">{formData.responseType.replace('_', ' ')}</span>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Configuration Summary</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-600">Name:</span>
+                        <span className="text-sm font-semibold text-gray-900">{formData.name}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-600">Platform:</span>
+                        <span className="text-sm font-semibold text-gray-900 capitalize">{formData.platform}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-600">Content Type:</span>
+                        <span className="text-sm font-semibold text-gray-900 capitalize">{formData.contentType}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-600">Automation:</span>
+                        <span className="text-sm font-semibold text-gray-900 capitalize">{formData.automationType.replace('_', ' ')}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-600">Response Type:</span>
+                        <span className="text-sm font-semibold text-gray-900 capitalize">{formData.responseType?.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Expected Performance</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-medium text-blue-900">Engagement Rate</p>
+                          <p className="text-xs text-blue-700">Expected 25-40% increase</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                        <Target className="w-5 h-5 text-purple-600" />
+                        <div>
+                          <p className="text-sm font-medium text-purple-900">Response Time</p>
+                          <p className="text-xs text-purple-700">Instant to {formData.delay} minutes</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                        <Users className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-sm font-medium text-green-900">Lead Generation</p>
+                          <p className="text-xs text-green-700">Automated follow-up</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -843,38 +1238,88 @@ export default function Automation() {
       
       case 6:
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-medium">Review and save</Label>
-              <p className="text-sm text-gray-600 mt-1">
-                Review your automation settings and save to activate.
-              </p>
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-base font-semibold text-gray-900">Final Review</Label>
+                <p className="text-sm text-gray-600 mt-1">
+                  Review your complete automation setup before activation
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <ArrowRight className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-blue-900">Comment to DM Automation</p>
+                    <p className="text-sm text-blue-700">Two-step engagement process configured</p>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Automation Name:</span>
-                <span className="text-sm font-medium">{formData.name}</span>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Step 1: Comment Replies</h3>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Reply Options ({formData.commentReplies.length})</p>
+                      <div className="space-y-2">
+                        {formData.commentReplies.slice(0, 3).map((reply, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              {index + 1}
+                            </div>
+                            <p className="text-sm text-gray-600 truncate">{reply}</p>
+                          </div>
+                        ))}
+                        {formData.commentReplies.length > 3 && (
+                          <p className="text-xs text-gray-500">+{formData.commentReplies.length - 3} more replies</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Step 2: Direct Message</h3>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-gray-700 mb-2">DM Configuration</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <p className="text-sm text-gray-600">Message: Configured</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <p className="text-sm text-gray-600">Button: {formData.buttonText}</p>
+                        </div>
+                        {formData.websiteUrl && (
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <p className="text-sm text-gray-600">Website: Added</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Platform:</span>
-                <span className="text-sm font-medium capitalize">{formData.platform}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Content Type:</span>
-                <span className="text-sm font-medium capitalize">{formData.contentType}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Automation Type:</span>
-                <span className="text-sm font-medium capitalize">{formData.automationType.replace('_', ' ')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Comment Replies:</span>
-                <span className="text-sm font-medium">{formData.commentReplies.length} replies</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">DM Message:</span>
-                <span className="text-sm font-medium">Configured</span>
+              
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <Rocket className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-green-900">Ready to Launch</p>
+                    <p className="text-sm text-green-700">Your automation is ready to engage with your audience</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -892,7 +1337,7 @@ export default function Automation() {
       return <InstagramDMPreview />
     } else if (formData.automationType === 'comment_to_dm' && currentStep === 6) {
       return (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <InstagramPostPreview />
           <InstagramDMPreview />
         </div>
@@ -904,44 +1349,71 @@ export default function Automation() {
 
   if (activeTab === 'create') {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="w-full p-6">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+        <div className="w-full p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Create Automation</h1>
-            <p className="text-gray-600 mt-2">Set up automated responses for your social media platforms</p>
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Bot className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Create Automation</h1>
+                <p className="text-gray-600 mt-1">Build intelligent automation workflows for your social media</p>
+              </div>
+            </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-8">
+          <div className="mb-10">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-gray-700">
-                Step {currentStep} of {getTotalSteps()}: {getStepTitle(currentStep)}
-              </span>
-              <span className="text-sm text-gray-500">
-                {Math.round((currentStep / getTotalSteps()) * 100)}% complete
-              </span>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold">{currentStep}</span>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-900">{getStepTitle(currentStep)}</p>
+                  <p className="text-sm text-gray-600">Step {currentStep} of {getTotalSteps()}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">{Math.round((currentStep / getTotalSteps()) * 100)}% complete</p>
+              </div>
             </div>
-            <Progress value={(currentStep / getTotalSteps()) * 100} className="h-2" />
+            <div className="relative">
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${(currentStep / getTotalSteps()) * 100}%` }}
+                ></div>
+              </div>
+              <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-20 animate-pulse"></div>
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {/* Left Column - Form */}
             <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">{getStepTitle(currentStep)}</CardTitle>
+              <Card className="border-2 border-white/50 shadow-xl bg-white/80 backdrop-blur-sm">
+                <CardHeader className="pb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Settings className="w-4 h-4 text-white" />
+                    </div>
+                    <CardTitle className="text-xl text-gray-900">{getStepTitle(currentStep)}</CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   {renderCreateAutomationStep()}
                   
                   {/* Navigation Buttons */}
-                  <div className="flex justify-between mt-8">
+                  <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-200">
                     <Button
                       variant="outline"
                       onClick={handlePrevStep}
                       disabled={currentStep === 1}
+                      className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 disabled:opacity-50"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back
@@ -950,16 +1422,16 @@ export default function Automation() {
                     {currentStep === getTotalSteps() ? (
                       <Button
                         onClick={handleCreateAutomation}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg"
                       >
-                        Create Automation
-                        <CheckCircle className="w-4 h-4 ml-2" />
+                        <Rocket className="w-4 h-4 mr-2" />
+                        Activate Automation
                       </Button>
                     ) : (
                       <Button
                         onClick={handleNextStep}
                         disabled={!canProceedToNextStep()}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold shadow-lg disabled:opacity-50"
                       >
                         Continue
                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -972,16 +1444,23 @@ export default function Automation() {
 
             {/* Right Column - Preview */}
             <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {formData.automationType === 'comment_to_dm' && currentStep === 5 ? 
-                      'Instagram direct message' : 
-                      'Instagram post and keyword'
-                    }
-                  </CardTitle>
+              <Card className="border-2 border-white/50 shadow-xl bg-white/80 backdrop-blur-sm">
+                <CardHeader className="pb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center">
+                      <Eye className="w-4 h-4 text-white" />
+                    </div>
+                    <CardTitle className="text-xl text-gray-900">
+                      {formData.automationType === 'comment_to_dm' && currentStep === 5 ? 
+                        'Instagram Direct Message' : 
+                        formData.automationType === 'comment_to_dm' && currentStep === 6 ?
+                        'Complete Workflow Preview' :
+                        'Instagram Post Preview'
+                      }
+                    </CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   {renderPreview()}
                 </CardContent>
               </Card>
@@ -993,18 +1472,23 @@ export default function Automation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="w-full p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+      <div className="w-full p-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Automation</h1>
-              <p className="text-gray-600 mt-2">Manage your automated responses and workflows</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Bot className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Automation Dashboard</h1>
+                <p className="text-gray-600 mt-1">Manage your automated workflows and responses</p>
+              </div>
             </div>
             <Button 
               onClick={() => setActiveTab('create')}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold shadow-lg"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Automation
@@ -1013,10 +1497,10 @@ export default function Automation() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6">
-          <div className="flex space-x-6 border-b">
+        <div className="mb-8">
+          <div className="flex space-x-8 border-b border-gray-200">
             <button
-              className={`pb-3 px-1 border-b-2 font-medium text-sm ${
+              className={`pb-4 px-2 border-b-2 font-semibold text-sm transition-colors ${
                 activeTab === 'create' 
                   ? 'border-blue-500 text-blue-600' 
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1026,7 +1510,7 @@ export default function Automation() {
               Create New
             </button>
             <button
-              className={`pb-3 px-1 border-b-2 font-medium text-sm ${
+              className={`pb-4 px-2 border-b-2 font-semibold text-sm transition-colors ${
                 activeTab === 'manage' 
                   ? 'border-blue-500 text-blue-600' 
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1041,31 +1525,35 @@ export default function Automation() {
         {/* Existing Automations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {automationRules.map((rule) => (
-            <Card key={rule.id}>
-              <CardHeader>
+            <Card key={rule.id} className="border-2 border-white/50 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{rule.name}</CardTitle>
-                  <Badge variant={rule.status === 'active' ? 'default' : 'secondary'}>
+                  <CardTitle className="text-lg text-gray-900">{rule.name}</CardTitle>
+                  <Badge 
+                    variant={rule.status === 'active' ? 'default' : 'secondary'}
+                    className={`${rule.status === 'active' ? 'bg-green-500' : 'bg-gray-400'} text-white`}
+                  >
                     {rule.status}
                   </Badge>
                 </div>
-                <CardDescription>
+                <p className="text-sm text-gray-600 mt-2">
                   {rule.platform} • {rule.contentType} • {rule.automationType.replace('_', ' ')}
-                </CardDescription>
+                </p>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="pt-0">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Triggers:</span>
-                    <span className="font-medium">{rule.triggers}</span>
+                    <span className="font-semibold text-gray-900">{rule.triggers}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Created:</span>
-                    <span className="font-medium">{rule.created}</span>
+                    <span className="font-semibold text-gray-900">{rule.created}</span>
                   </div>
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Button size="sm" variant="outline">
-                      <Edit3 className="w-4 h-4" />
+                  <div className="flex items-center space-x-2 pt-4">
+                    <Button size="sm" variant="outline" className="flex-1">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit
                     </Button>
                     <Button size="sm" variant="outline">
                       {rule.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}

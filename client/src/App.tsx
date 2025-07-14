@@ -28,7 +28,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import Profile from './pages/Profile'
 import Integration from './pages/Integration'
-import Automation from './pages/Automation'
+import AutomationTest from './pages/AutomationTest'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -521,7 +521,7 @@ function App() {
 
                 {/* Main Content - Full width automation page */}
                 <main className="h-full overflow-y-auto">
-                  <Automation />
+                  <AutomationTest />
                 </main>
               </div>
             </div>
