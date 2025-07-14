@@ -35,7 +35,7 @@ export function Header({ className, onCreateClick }: HeaderProps) {
           {/* Trial Badge */}
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-blue-700/50 tracking-wide">TRIAL ENDS IN 25 DAYS</span>
+            <span className="text-sm font-semibold tracking-wide text-[#1e63e5]">TRIAL ENDS IN 25 DAYS</span>
           </div>
           
           {/* Welcome Message */}
