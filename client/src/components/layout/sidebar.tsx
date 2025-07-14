@@ -119,7 +119,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
   }
 
   return (
-    <div className={cn("w-24 bg-gray-100 flex flex-col items-center py-6 min-h-full relative", className)}>
+    <div className={cn("w-24 bg-white flex flex-col items-center py-6 min-h-full relative", className)}>
       {/* VeeGPT Logo */}
       <div 
         className={cn(
@@ -208,7 +208,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex flex-col space-y-4 flex-1 bg-gray-100">
+      <nav className="flex flex-col space-y-4 flex-1 bg-white">
         {sidebarItems.map((item, index) => (
           <div
             key={item.label}
@@ -260,7 +260,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
       </nav>
 
       {/* Bottom Items */}
-      <div className="flex flex-col space-y-4 mt-auto bg-gray-100 pt-2 pb-2">
+      <div className="flex flex-col space-y-4 mt-auto bg-white pt-2 pb-2">
 
 
         <div className="flex flex-col items-center cursor-pointer text-gray-500 hover:text-blue-600 transition-all duration-300 group py-2">
