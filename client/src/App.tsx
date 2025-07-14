@@ -124,9 +124,9 @@ function App() {
         ) : (
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
             {/* Sidebar - Fixed height with independent scrolling */}
-            <div className="h-screen overflow-y-auto">
+            <div className="h-screen overflow-y-auto bg-white">
               <Sidebar 
-                className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                className="w-24 bg-white h-full"
                 isCreateDropdownOpen={isCreateDropdownOpen}
                 setIsCreateDropdownOpen={setIsCreateDropdownOpen}
               />
