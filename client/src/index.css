@@ -565,6 +565,29 @@ body {
   scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
 }
 
+/* Thin external scrollbar for sidebar */
+.sidebar-scroll-container::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.sidebar-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f8f9fa;
+}
+
 /* Enhanced hover effects */
 .hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
