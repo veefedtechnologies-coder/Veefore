@@ -914,8 +914,14 @@ export default function AutomationStepByStep() {
                     <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-600">Content Type:</span>
-                    <div className="text-lg font-semibold text-gray-900 capitalize">{contentType || 'Not selected'}</div>
+                    <span className="text-sm font-medium text-gray-600">Selected Post:</span>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {selectedPost ? (
+                        <span>{mockPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {mockPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                      ) : (
+                        'Not selected'
+                      )}
+                    </div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Automation Type:</span>
@@ -958,8 +964,14 @@ export default function AutomationStepByStep() {
                     <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-600">Content Type:</span>
-                    <div className="text-lg font-semibold text-gray-900 capitalize">{contentType || 'Not selected'}</div>
+                    <span className="text-sm font-medium text-gray-600">Selected Post:</span>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {selectedPost ? (
+                        <span>{mockPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {mockPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                      ) : (
+                        'Not selected'
+                      )}
+                    </div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Automation Type:</span>
