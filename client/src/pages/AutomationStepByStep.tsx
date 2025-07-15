@@ -946,134 +946,239 @@ export default function AutomationStepByStep() {
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
     
+    // Get current automation message based on type
+    const getCurrentMessage = () => {
+      switch (automationType) {
+        case 'comment_dm':
+          return dmMessage || 'Thanks for your comment! Check your DMs 📩'
+        case 'dm_only':
+          return dmAutoReply || 'Thanks for reaching out! Here\'s the info you need 💫'
+        case 'comment_only':
+          return publicReply || 'Thanks for your interest! Here\'s what you\'re looking for ✨'
+        default:
+          return 'Your automated response will appear here...'
+      }
+    }
+    
     return (
-      <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-6 sticky top-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
-        <h3 className="text-lg font-bold mb-6 flex items-center gap-3 text-gray-800">
-          <div className="p-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl shadow-lg">
-            <Eye className="w-5 h-5 text-white" />
-          </div>
-          Live {platformName} Preview
-        </h3>
-        
-        {/* Instagram Post Interface */}
-        <div className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-          {/* Post Header */}
-          <div className="flex items-center gap-3 p-4">
-            <img 
-              src={selectedAccountData?.avatar || 'https://picsum.photos/40/40?random=default'} 
-              alt="Profile" 
-              className="w-10 h-10 rounded-full" 
-            />
-            <div className="flex-1">
-              <div className="font-semibold text-sm">{selectedAccountData?.name || '@your_account'}</div>
-              <div className="text-xs text-gray-500">2 hours ago</div>
+      <div className="sticky top-4">
+        {/* Preview Header */}
+        <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-4 rounded-t-3xl">
+          <div className="flex items-center gap-3 text-white">
+            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <Eye className="w-4 h-4" />
             </div>
-            <MoreHorizontal className="w-5 h-5 text-gray-400" />
-          </div>
-          
-          {/* Post Image */}
-          <div className="aspect-square bg-gray-100 flex items-center justify-center">
-            {selectedPostData ? (
-              <img src={selectedPostData.image} alt="Post" className="w-full h-full object-cover" />
-            ) : (
-              <Camera className="w-12 h-12 text-gray-400" />
-            )}
-          </div>
-          
-          {/* Post Actions */}
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-4">
-                <Heart className="w-6 h-6" />
-                <MessageCircle className="w-6 h-6" />
-                <Send className="w-6 h-6" />
-              </div>
-              <Bookmark className="w-6 h-6" />
+            <div>
+              <h3 className="font-bold">Live Preview</h3>
+              <p className="text-sm opacity-90">Real-time automation preview</p>
             </div>
-            
-            <div className="text-sm font-semibold mb-2">
-              {selectedPostData ? `${selectedPostData.likes} likes` : '124 likes'}
-            </div>
-            
-            <div className="text-sm mb-3">
-              <span className="font-semibold">{selectedAccountData?.name || '@your_account'}</span>{' '}
-              {selectedPostData?.caption || 'Your post caption goes here...'}
-            </div>
-            
-            {/* Comments Section */}
-            <div className="space-y-3 border-t pt-3">
-              {/* User Comment */}
-              <div className="flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <User className="w-3 h-3 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm">
-                    <span className="font-semibold">@user123</span>{' '}
-                    {previewComment}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">2m</div>
-                </div>
-              </div>
-              
-              {/* Bot Reply - Only show for relevant automation types */}
-              {(automationType === 'comment_dm' || automationType === 'comment_only') && commentReply && (
-                <div className="flex items-start gap-2 ml-4">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                    <Bot className="w-3 h-3 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm">
-                      <span className="font-semibold">{selectedAccountData?.name || '@your_account'}</span>{' '}
-                      {automationType === 'comment_dm' ? commentReply : publicReply}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                      1m • Bot
-                      {automationType === 'comment_dm' && (
-                        <span className="text-blue-600">• DM sent</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* DM Preview for DM-only automation */}
-              {automationType === 'dm_only' && dmAutoReply && (
-                <div className="bg-blue-50 rounded-lg p-3 mt-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Send className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800">Auto DM Sent</span>
-                  </div>
-                  <div className="text-sm text-gray-700">{dmAutoReply}</div>
-                </div>
-              )}
+            <div className="ml-auto">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
         
-        {/* Automation Summary */}
-        <div className="mt-6 space-y-3">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Automation Type:</span>
-            <span className="font-medium">
-              {automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}
-            </span>
+        {/* Instagram Post Interface - Exact replica */}
+        <div className="bg-white border-l border-r border-gray-200 shadow-2xl">
+          {/* Post Header - Authentic Instagram style */}
+          <div className="flex items-center justify-between p-3 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <img 
+                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                  alt="Profile" 
+                  className="w-8 h-8 rounded-full border border-gray-200" 
+                />
+                {selectedAccount && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-gray-900">
+                  {selectedAccountData?.name || 'your_account'}
+                </div>
+                <div className="text-xs text-gray-500">2 hours ago • 📍 Location</div>
+              </div>
+            </div>
+            <MoreHorizontal className="w-6 h-6 text-gray-700" />
           </div>
           
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Active Keywords:</span>
-            <span className="font-medium">{currentKeywords.length}</span>
+          {/* Post Image with authentic aspect ratio */}
+          <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+            {selectedPostData ? (
+              <img 
+                src={selectedPostData.image} 
+                alt="Post" 
+                className="w-full h-full object-cover" 
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <Camera className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">Select a post to preview</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Multiple image indicator */}
+            {selectedPostData && (
+              <div className="absolute top-3 right-3">
+                <div className="bg-black/20 backdrop-blur-sm rounded-full p-1">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+                    <div className="w-2 h-2 bg-white/30 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Platform:</span>
-            <span className="font-medium capitalize">{selectedAccountData?.platform || 'Not selected'}</span>
+          {/* Post Actions - Authentic Instagram style */}
+          <div className="p-3">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-4">
+                <Heart className="w-6 h-6 text-gray-700 hover:text-red-500 transition-colors cursor-pointer" />
+                <MessageCircle className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
+                <Send className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
+              </div>
+              <Bookmark className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
+            </div>
+            
+            {/* Likes count */}
+            <div className="text-sm font-semibold text-gray-900 mb-2">
+              {selectedPostData ? `${selectedPostData.likes.toLocaleString()} likes` : '1,247 likes'}
+            </div>
+            
+            {/* Caption */}
+            <div className="text-sm text-gray-900 mb-3">
+              <span className="font-semibold">{selectedAccountData?.name || 'your_account'}</span>{' '}
+              <span className="text-gray-900">
+                {selectedPostData?.caption || 'Your amazing post caption goes here! ✨ #automation #socialmedia #growth'}
+              </span>
+            </div>
+            
+            {/* View all comments */}
+            <button className="text-sm text-gray-500 mb-3 hover:text-gray-700">
+              View all 47 comments
+            </button>
+            
+            {/* Comments Section with Live Automation Preview */}
+            <div className="space-y-3">
+              {/* Sample User Comment */}
+              <div className="flex items-start gap-2">
+                <img 
+                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face&auto=format" 
+                  alt="User" 
+                  className="w-6 h-6 rounded-full" 
+                />
+                <div className="flex-1">
+                  <div className="text-sm text-gray-900">
+                    <span className="font-semibold">sarah_johnson</span>{' '}
+                    <span>{currentKeywords.length > 0 ? `${currentKeywords[0]} please!` : 'info please!'}</span>
+                  </div>
+                  <div className="flex items-center gap-4 mt-1">
+                    <span className="text-xs text-gray-500">2m</span>
+                    <button className="text-xs text-gray-500 font-medium">Reply</button>
+                    <Heart className="w-3 h-3 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Bot Reply Preview - Real-time updates */}
+              {automationType && getCurrentMessage() !== 'Your automated response will appear here...' && (
+                <div className="flex items-start gap-2 ml-6 animate-fadeIn">
+                  <div className="relative">
+                    <img 
+                      src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                      alt="Bot" 
+                      className="w-6 h-6 rounded-full border border-purple-200" 
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border border-white flex items-center justify-center">
+                      <Bot className="w-2 h-2 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-900">
+                      <span className="font-semibold">{selectedAccountData?.name || 'your_account'}</span>{' '}
+                      <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        {getCurrentMessage()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-xs text-gray-500">just now</span>
+                      <button className="text-xs text-gray-500 font-medium">Reply</button>
+                      <Heart className="w-3 h-3 text-gray-400" />
+                      <div className="flex items-center gap-1">
+                        <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-purple-600 font-medium">Auto-reply</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Another user comment */}
+              <div className="flex items-start gap-2">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face&auto=format" 
+                  alt="User" 
+                  className="w-6 h-6 rounded-full" 
+                />
+                <div className="flex-1">
+                  <div className="text-sm text-gray-900">
+                    <span className="font-semibold">mike_davis</span>{' '}
+                    <span>Great content! 🔥</span>
+                  </div>
+                  <div className="flex items-center gap-4 mt-1">
+                    <span className="text-xs text-gray-500">5m</span>
+                    <button className="text-xs text-gray-500 font-medium">Reply</button>
+                    <Heart className="w-3 h-3 text-red-500" />
+                    <span className="text-xs text-gray-500">3 likes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Add comment section */}
+            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
+              <img 
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format" 
+                alt="Your avatar" 
+                className="w-6 h-6 rounded-full" 
+              />
+              <div className="flex-1 text-sm text-gray-500">Add a comment...</div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg">❤️</span>
+                <span className="text-lg">🙌</span>
+                <span className="text-lg">🔥</span>
+                <Plus className="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
           </div>
-          
-          {maxRepliesPerDay && (
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Daily Limit:</span>
-              <span className="font-medium">{maxRepliesPerDay} replies</span>
+        </div>
+        
+        {/* Automation Status Indicator */}
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-b-3xl">
+          <div className="flex items-center justify-between text-white">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {automationType ? `${automationTypes.find(t => t.id === automationType)?.name} Active` : 'Select Automation Type'}
+              </span>
+            </div>
+            {currentKeywords.length > 0 && (
+              <div className="flex items-center gap-1">
+                <Hash className="w-3 h-3" />
+                <span className="text-xs">{currentKeywords.length} triggers</span>
+              </div>
+            )}
+          </div>
+          {automationType && (
+            <div className="mt-2 text-xs text-emerald-100">
+              Monitoring: {currentKeywords.join(', ') || 'All comments'}
             </div>
           )}
         </div>
