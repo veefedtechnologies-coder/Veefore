@@ -177,13 +177,12 @@ export default function AutomationStepByStep() {
   ]
 
   const steps = [
-    { id: 1, title: 'Select Platform', description: 'Choose your social media platform' },
-    { id: 2, title: 'Select Account', description: 'Select your social media account' },
-    { id: 3, title: 'Content Type', description: 'Choose content type for automation' },
-    { id: 4, title: 'Automation Type', description: 'Select automation method' },
-    { id: 5, title: 'Configuration', description: 'Set up your automation rules' },
-    { id: 6, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
-    { id: 7, title: 'Review & Activate', description: 'Review and activate your automation' }
+    { id: 1, title: 'Select Account', description: 'Choose your social media account' },
+    { id: 2, title: 'Content Type', description: 'Choose content type for automation' },
+    { id: 3, title: 'Automation Type', description: 'Select automation method' },
+    { id: 4, title: 'Configuration', description: 'Set up your automation rules' },
+    { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
+    { id: 6, title: 'Review & Activate', description: 'Review and activate your automation' }
   ]
 
   const addKeyword = () => {
@@ -230,18 +229,16 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedPlatform
-      case 2:
         return selectedAccount
-      case 3:
+      case 2:
         return contentType
-      case 4:
+      case 3:
         return automationType
-      case 5:
+      case 4:
         return getCurrentKeywords().length > 0
-      case 6:
+      case 5:
         return true // Advanced settings are optional
-      case 7:
+      case 6:
         return true
       default:
         return false
@@ -249,10 +246,15 @@ export default function AutomationStepByStep() {
   }
 
   const handleNext = () => {
-    if (canProceedToNext() && currentStep < 7) {
-      // Reset content type when platform changes
+    if (canProceedToNext() && currentStep < 6) {
+      // Reset content type when account changes and auto-set platform
       if (currentStep === 1) {
         setContentType('')
+        // Auto-set platform based on selected account
+        const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
+        if (selectedAccountData) {
+          setSelectedPlatform(selectedAccountData.platform.toLowerCase())
+        }
       }
       setCurrentStep(currentStep + 1)
     }
@@ -289,39 +291,6 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Platform</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {platforms.map(platform => (
-                  <button
-                    key={platform.id}
-                    onClick={() => setSelectedPlatform(platform.id)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      selectedPlatform === platform.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${platform.color} text-white`}>
-                        {platform.icon}
-                      </div>
-                      <span className="font-medium">{platform.name}</span>
-                      {selectedPlatform === platform.id && (
-                        <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-
-      case 2:
-        const contentTypes = getContentTypesByPlatform(selectedPlatform)
-        return (
-          <div className="space-y-6">
-            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Account</h3>
               <div className="space-y-3">
                 {mockAccounts.map(account => (
@@ -338,7 +307,7 @@ export default function AutomationStepByStep() {
                       <img src={account.avatar} alt={account.name} className="w-10 h-10 rounded-full" />
                       <div>
                         <div className="font-medium">{account.name}</div>
-                        <div className="text-sm text-gray-600">{account.followers}</div>
+                        <div className="text-sm text-gray-600">{account.followers} • {account.platform}</div>
                       </div>
                       {selectedAccount === account.id && (
                         <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
@@ -348,38 +317,45 @@ export default function AutomationStepByStep() {
                 ))}
               </div>
             </div>
-            
-            {selectedPlatform && (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  {contentTypes.map(type => (
-                    <button
-                      key={type.id}
-                      onClick={() => setContentType(type.id)}
-                      className={`p-4 rounded-lg border-2 transition-all text-left ${
-                        contentType === type.id 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-lg ${type.color} text-white`}>
-                          {type.icon}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-lg">{type.name}</div>
-                          <div className="text-sm text-gray-600 mt-1">{type.description}</div>
-                        </div>
-                        {contentType === type.id && (
-                          <CheckCircle className="w-6 h-6 text-blue-500" />
-                        )}
+          </div>
+        )
+
+      case 2:
+        const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
+        const accountPlatform = selectedAccountData?.platform.toLowerCase() || ''
+        const contentTypes = getContentTypesByPlatform(accountPlatform)
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
+              <p className="text-gray-600 mb-4">Choose the type of content for automation on {selectedAccountData?.platform}</p>
+              <div className="grid grid-cols-1 gap-3">
+                {contentTypes.map(type => (
+                  <button
+                    key={type.id}
+                    onClick={() => setContentType(type.id)}
+                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      contentType === type.id 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-lg ${type.color} text-white`}>
+                        {type.icon}
                       </div>
-                    </button>
-                  ))}
-                </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-lg">{type.name}</div>
+                        <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+                      </div>
+                      {contentType === type.id && (
+                        <CheckCircle className="w-6 h-6 text-blue-500" />
+                      )}
+                    </div>
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         )
 
@@ -771,12 +747,13 @@ export default function AutomationStepByStep() {
     const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
     const selectedPostData = mockPosts.find(p => p.id === selectedPost)
     const currentKeywords = getCurrentKeywords()
+    const platformName = selectedAccountData?.platform || 'Social Media'
     
     return (
       <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-4">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Eye className="w-5 h-5" />
-          Live Instagram Preview
+          Live {platformName} Preview
         </h3>
         
         {/* Instagram Post Interface */}
@@ -891,7 +868,7 @@ export default function AutomationStepByStep() {
           
           <div className="flex justify-between items-center text-sm">
             <span className="text-gray-600">Platform:</span>
-            <span className="font-medium capitalize">{selectedPlatform || 'Not selected'}</span>
+            <span className="font-medium capitalize">{selectedAccountData?.platform || 'Not selected'}</span>
           </div>
           
           {maxRepliesPerDay && (
@@ -966,7 +943,7 @@ export default function AutomationStepByStep() {
                   Step {currentStep} of {steps.length}
                 </div>
                 
-                {currentStep < 7 ? (
+                {currentStep < 6 ? (
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
