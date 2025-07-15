@@ -264,15 +264,15 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedAccount && contentType && selectedPost
+        return selectedAccount && contentType && selectedPost && automationType
       case 2:
-        return automationType
-      case 3:
         return getCurrentKeywords().length > 0 // Keywords required for configuration
-      case 4:
+      case 3:
         return true // Advanced settings are optional
-      case 5:
+      case 4:
         return true // Review step
+      case 5:
+        return true // Final step
       case 6:
         return true // Final step
       default:
@@ -422,6 +422,37 @@ export default function AutomationStepByStep() {
                       )}
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Select Automation Type (only shown when post is selected) */}
+            {selectedAccount && contentType && selectedPost && (
+              <div className="animate-fadeIn">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg shadow-md">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  Select Automation Type
+                </h3>
+                <div className="relative">
+                  <select
+                    value={automationType}
+                    onChange={(e) => setAutomationType(e.target.value)}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-orange-300 focus:border-orange-500 focus:outline-none transition-all duration-200 appearance-none text-gray-800 font-medium"
+                  >
+                    <option value="">Choose automation type...</option>
+                    {automationTypes.map(type => (
+                      <option key={type.id} value={type.id}>
+                        {type.name} - {type.description}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             )}
