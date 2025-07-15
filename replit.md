@@ -140,8 +140,11 @@ VeeFore is a comprehensive social media management platform that leverages AI to
   - ✅ **Independent Scrolling**: Implemented separate scrolling for main content area matching home page behavior
   - ✅ **Scrollable Layout**: Changed from min-h-screen to h-screen with overflow-y-auto for proper scrolling
   - ✅ **Bottom Padding**: Added pb-20 to prevent content cutoff at bottom of scrollable area
-  - **Technical Achievement**: Complete header modernization with proper scrolling architecture
-  - **User Experience**: Professional "Automation Studio" header with smooth independent scrolling like home page
+  - ✅ **DM Preview for Comment-to-DM**: Added DM preview section below Instagram post preview in steps 4 and 5, only for comment-to-DM automation
+  - ✅ **Conditional DM Display**: DM preview appears only when automation type is "comment_dm" and user is on advanced settings or review steps
+  - ✅ **Authentic DM Interface**: Created Instagram-style DM interface with message bubbles, profile pictures, and Auto-DM indicators
+  - **Technical Achievement**: Complete header modernization with proper scrolling architecture and conditional DM preview functionality
+  - **User Experience**: Professional "Automation Studio" header with smooth independent scrolling and accurate DM preview for comment-to-DM automations
 - July 15, 2025: **DYNAMIC COMMENT AND REPLY PREVIEW COMPLETE** - Made comment and reply display conditional and dynamic based on user input in automation flow
   - ✅ **Conditional Comment Display**: User comment only appears when keywords are entered (currentKeywords.length > 0)
   - ✅ **Conditional Reply Display**: Automated reply only shows when both keywords and replies are configured

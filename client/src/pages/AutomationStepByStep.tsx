@@ -1530,8 +1530,64 @@ export default function AutomationStepByStep() {
           </div>
         </div>
         
+        {/* DM Preview Section - Only show for comment to DM automation in steps 4 and 5 */}
+        {automationType === 'comment_dm' && (currentStep === 4 || currentStep === 5) && (
+          <div className="bg-white border-l border-r border-gray-200 shadow-2xl mt-4">
+            {/* DM Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 flex items-center gap-3 text-white">
+              <MessageCircle className="w-5 h-5" />
+              <div>
+                <div className="font-semibold text-sm">Private Message</div>
+                <div className="text-xs opacity-90">Sent automatically after comment reply</div>
+              </div>
+            </div>
+            
+            {/* DM Interface */}
+            <div className="p-4 bg-gray-50 min-h-[200px]">
+              <div className="flex items-start gap-3">
+                <img 
+                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm" 
+                />
+                <div className="flex-1">
+                  <div className="bg-white rounded-3xl px-4 py-3 shadow-sm max-w-xs">
+                    <div className="text-sm text-gray-900">
+                      {getDMMessage()}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="text-xs text-gray-500">
+                      {selectedAccountData?.name || 'your_account'}
+                    </div>
+                    <div className="text-xs text-gray-500">•</div>
+                    <div className="text-xs text-gray-500">now</div>
+                    <div className="flex items-center gap-1 ml-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-blue-600 font-medium">Auto-DM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Message input area */}
+              <div className="flex items-center gap-3 mt-6 bg-white rounded-full p-3 shadow-sm">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Camera className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 text-sm text-gray-400">
+                  Message...
+                </div>
+                <button className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-white">
+                    <path d="M2 12L22 2L18 22L12 14L2 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        
         {/* Automation Status Indicator */}
         <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-b-3xl">
           <div className="flex items-center justify-between text-white">
