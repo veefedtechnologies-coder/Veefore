@@ -30,7 +30,8 @@ import {
   BarChart3,
   Globe,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Settings
 } from 'lucide-react'
 
 export default function AutomationStepByStep() {
