@@ -290,38 +290,36 @@ export default function AutomationStepByStep() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                  <User className="w-6 h-6 text-white" />
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
+                  <User className="w-4 h-4 text-white" />
                 </div>
                 Select Account
               </h3>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3">
                 {mockAccounts.map(account => (
                   <button
                     key={account.id}
                     onClick={() => setSelectedAccount(account.id)}
-                    className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
+                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md ${
                       selectedAccount === account.id 
-                        ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-xl scale-[1.02]' 
-                        : 'border-gray-200 hover:border-blue-300 bg-white hover:bg-gray-50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md' 
+                        : 'border-gray-200 hover:border-blue-300 bg-white'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       <div className="relative">
-                        <img src={account.avatar} alt={account.name} className="w-14 h-14 rounded-full shadow-lg border-2 border-white" />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
+                        <img src={account.avatar} alt={account.name} className="w-10 h-10 rounded-full border-2 border-white shadow-sm" />
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border border-white rounded-full"></div>
                       </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-lg text-gray-800">{account.name}</div>
-                        <div className="text-sm text-gray-600 font-medium">{account.followers} • {account.platform}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 truncate">{account.name}</div>
+                        <div className="text-xs text-gray-600">{account.followers} • {account.platform}</div>
                       </div>
                       {selectedAccount === account.id && (
-                        <div className="p-2 bg-blue-500 rounded-full shadow-lg">
-                          <CheckCircle className="w-6 h-6 text-white" />
-                        </div>
+                        <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
                       )}
                     </div>
                   </button>
