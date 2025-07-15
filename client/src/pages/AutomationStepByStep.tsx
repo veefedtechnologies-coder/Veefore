@@ -1260,14 +1260,9 @@ export default function AutomationStepByStep() {
                 JUL 15, 08:31 PM
               </div>
               
-              {/* Message bubble with profile picture on left */}
-              <div className="flex items-start gap-2 mb-4">
-                <img 
-                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
-                  alt="Profile" 
-                  className="w-6 h-6 rounded-full border border-gray-200 flex-shrink-0" 
-                />
-                <div className="bg-gray-100 rounded-2xl rounded-tl-sm p-4 max-w-[280px]">
+              {/* Message bubble without profile picture */}
+              <div className="mb-2">
+                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-2">
                   <div className="text-sm text-gray-700">
                     {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                   </div>
@@ -1283,12 +1278,12 @@ export default function AutomationStepByStep() {
                 </div>
               </div>
               
-              {/* Single read indicator profile picture */}
-              <div className="flex items-center mb-4 ml-8">
+              {/* Profile picture positioned at bottom left of message bubble */}
+              <div className="flex items-center mb-4">
                 <img 
                   src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
-                  alt="Read by" 
-                  className="w-4 h-4 rounded-full" 
+                  alt="Profile" 
+                  className="w-6 h-6 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs font-bold" 
                 />
               </div>
               
