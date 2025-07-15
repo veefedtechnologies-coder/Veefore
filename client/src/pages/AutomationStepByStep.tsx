@@ -946,17 +946,29 @@ export default function AutomationStepByStep() {
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
     
-    // Get current automation message based on type
+    // Get current automation message based on type - for PUBLIC comment reply
     const getCurrentMessage = () => {
       switch (automationType) {
         case 'comment_dm':
-          return dmMessage || 'Thanks for your comment! Check your DMs 📩'
+          return commentReply || 'Thanks for your comment! Check your DMs 📩'
         case 'dm_only':
-          return dmAutoReply || 'Thanks for reaching out! Here\'s the info you need 💫'
+          return '' // No public comment for DM-only
         case 'comment_only':
           return publicReply || 'Thanks for your interest! Here\'s what you\'re looking for ✨'
         default:
           return 'Your automated response will appear here...'
+      }
+    }
+    
+    // Get DM message for DM preview
+    const getDMMessage = () => {
+      switch (automationType) {
+        case 'comment_dm':
+          return dmMessage || 'Here\'s the detailed info you requested! 💫'
+        case 'dm_only':
+          return dmAutoReply || 'Thanks for reaching out! Here\'s the info you need 💫'
+        default:
+          return ''
       }
     }
     
@@ -1159,6 +1171,51 @@ export default function AutomationStepByStep() {
             </div>
           </div>
         </div>
+        
+        {/* DM Preview Section - Only show for DM-related automations */}
+        {(automationType === 'comment_dm' || automationType === 'dm_only') && getDMMessage() && (
+          <div className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l border-r border-blue-200 shadow-lg">
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                  <Send className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm font-semibold text-blue-800">Private DM Preview</span>
+                <div className="ml-auto flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-blue-600">Auto-DM</span>
+                </div>
+              </div>
+              
+              {/* DM Interface */}
+              <div className="bg-white rounded-xl p-3 border border-blue-100 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <img 
+                    src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                    alt="Bot DM" 
+                    className="w-8 h-8 rounded-full border border-blue-200" 
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-semibold text-gray-900">{selectedAccountData?.name || 'your_account'}</span>
+                      <span className="text-xs text-gray-500">just now</span>
+                      <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                      <span className="text-xs text-blue-600 font-medium">Bot</span>
+                    </div>
+                    <div className="bg-blue-500 text-white p-3 rounded-2xl rounded-tl-md max-w-xs">
+                      <p className="text-sm">{getDMMessage()}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-xs text-gray-500">Delivered</span>
+                      <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                      <span className="text-xs text-gray-500">Read</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Automation Status Indicator */}
         <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-b-3xl">

@@ -132,6 +132,15 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 15, 2025: **INSTAGRAM PREVIEW LIVE UPDATES AND DM SEPARATION FIX COMPLETE** - Enhanced Instagram preview with authentic design and fixed DM/comment message separation logic
+  - ✅ **Authentic Instagram Post Replica**: Created exact Instagram post interface with real profile pictures, engagement buttons, comment sections, and proper typography
+  - ✅ **Live Real-time Updates**: Preview dynamically updates as user types keywords and messages, showing immediate visual feedback
+  - ✅ **DM/Comment Logic Fix**: Fixed critical bug where private DM messages appeared in public comment replies - now correctly separates public comments from private DMs
+  - ✅ **Separate DM Preview Section**: Added dedicated Instagram DM interface preview that appears below main post for DM-related automations
+  - ✅ **Beautiful Modern Styling**: Enhanced with gradient headers, status indicators, pulse animations, and professional Instagram-style layout
+  - ✅ **Automation Type Specific Display**: Preview intelligently shows relevant content based on selected automation type (comment-only, DM-only, or comment+DM)
+  - **Technical Achievement**: Complete Instagram preview transformation with real-time updates and proper message routing logic
+  - **User Experience**: Professional, realistic preview showing exactly how automation will work in production with separated public/private messaging
 - July 15, 2025: **AUTHENTICATION LANDING PAGE FLICKER FIX COMPLETE** - Fixed authentication loading state issue that caused brief landing page display for authenticated users on refresh/restart
   - ✅ **Enhanced Firebase Auth Hook**: Added better persistence detection and extended timeout to 3 seconds for improved auth state management
   - ✅ **Improved Loading State Logic**: Added localStorage check for existing Firebase authentication to prevent premature landing page display
