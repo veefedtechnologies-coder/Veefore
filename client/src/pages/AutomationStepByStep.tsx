@@ -1562,11 +1562,17 @@ export default function AutomationStepByStep() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-            Setup Social Media Automation
+        {/* Header Bar */}
+        <div className="bg-gray-50 border-b border-gray-200 px-6 py-4 mb-8 -mx-8 -mt-8 flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-gray-900">
+            DM automation
           </h1>
-          <p className="text-lg text-gray-600 font-medium">Follow the steps to configure your automation workflow</p>
+          <button 
+            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+            onClick={() => window.history.back()}
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
 
         {/* Progress Steps */}
