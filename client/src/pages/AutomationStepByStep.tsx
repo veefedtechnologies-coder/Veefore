@@ -1260,28 +1260,28 @@ export default function AutomationStepByStep() {
                 JUL 15, 08:31 PM
               </div>
               
-              {/* Message bubble with profile picture at bottom-left corner */}
-              <div className="relative mb-4">
-                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-2">
-                  <div className="text-sm text-gray-700">
-                    {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
-                  </div>
-                  
-                  {/* Button inside message bubble - white background */}
-                  {dmButtonText && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-center mt-3">
-                      <div className="text-sm font-medium text-gray-800">
-                        {dmButtonText}
-                      </div>
-                    </div>
-                  )}
+              {/* Message bubble */}
+              <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] mb-4">
+                <div className="text-sm text-gray-700">
+                  {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                 </div>
                 
-                {/* Profile picture positioned at bottom-left corner of message bubble */}
+                {/* Button inside message bubble - white background */}
+                {dmButtonText && (
+                  <div className="bg-white border border-gray-200 rounded-lg p-3 text-center mt-3">
+                    <div className="text-sm font-medium text-gray-800">
+                      {dmButtonText}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Profile picture positioned below message with proper spacing */}
+              <div className="flex items-center mb-4 ml-2">
                 <img 
                   src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
                   alt="Profile" 
-                  className="absolute -bottom-1 left-0 w-5 h-5 rounded-full border border-white" 
+                  className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold" 
                 />
               </div>
               
