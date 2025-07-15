@@ -1327,11 +1327,11 @@ export default function AutomationStepByStep() {
     const getCurrentMessage = () => {
       switch (automationType) {
         case 'comment_dm':
-          return commentReply || 'Thanks for your comment! Check your DMs 📩'
+          return commentReplies[0] || 'Thanks for your comment! Check your DMs 📩'
         case 'dm_only':
           return '' // No public comment for DM-only
         case 'comment_only':
-          return publicReply || 'Thanks for your interest! Here\'s what you\'re looking for ✨'
+          return commentReplies[0] || 'Thanks for your interest! Here\'s what you\'re looking for ✨'
         default:
           return 'Your automated response will appear here...'
       }
