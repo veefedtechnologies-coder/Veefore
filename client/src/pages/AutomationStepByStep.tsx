@@ -1465,7 +1465,7 @@ export default function AutomationStepByStep() {
                 />
                 <div className="flex-1">
                   <div className="text-sm text-gray-900">
-                    <span className="font-semibold">sarah_johnson</span>{' '}
+                    <span className="font-semibold">username</span>{' '}
                     <span>{currentKeywords.length > 0 ? `${currentKeywords[0]} please!` : 'info please!'}</span>
                   </div>
                   <div className="flex items-center gap-4 mt-1">
@@ -1508,27 +1508,6 @@ export default function AutomationStepByStep() {
                   </div>
                 </div>
               )}
-              
-              {/* Another user comment */}
-              <div className="flex items-start gap-2">
-                <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face&auto=format" 
-                  alt="User" 
-                  className="w-6 h-6 rounded-full" 
-                />
-                <div className="flex-1">
-                  <div className="text-sm text-gray-900">
-                    <span className="font-semibold">mike_davis</span>{' '}
-                    <span>Great content! 🔥</span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    <span className="text-xs text-gray-500">5m</span>
-                    <button className="text-xs text-gray-500 font-medium">Reply</button>
-                    <Heart className="w-3 h-3 text-red-500" />
-                    <span className="text-xs text-gray-500">3 likes</span>
-                  </div>
-                </div>
-              </div>
             </div>
             
             {/* Add comment section */}
