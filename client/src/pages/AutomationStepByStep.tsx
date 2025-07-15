@@ -1559,12 +1559,17 @@ export default function AutomationStepByStep() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Full Width Header Bar */}
-      <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 flex items-center justify-between w-full">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          DM automation
-        </h1>
+      <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 flex items-center justify-between w-full shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+            <Bot className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Automation Studio
+          </h1>
+        </div>
         <button 
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           onClick={() => window.history.back()}
@@ -1573,7 +1578,7 @@ export default function AutomationStepByStep() {
         </button>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6 pb-20">
 
         {/* Progress Steps */}
         <div className="mb-12">
