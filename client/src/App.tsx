@@ -138,7 +138,7 @@ function App() {
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
               <Sidebar 
-                className="w-24 bg-white h-full"
+                className="w-16 bg-white h-full"
                 isCreateDropdownOpen={isCreateDropdownOpen}
                 setIsCreateDropdownOpen={setIsCreateDropdownOpen}
               />
@@ -200,7 +200,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -265,7 +265,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -300,7 +300,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -335,7 +335,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -373,7 +373,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -408,7 +408,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -443,7 +443,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -478,7 +478,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -513,7 +513,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -543,7 +543,7 @@ function App() {
               {/* Sidebar - Fixed height with independent scrolling */}
               <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-16 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
