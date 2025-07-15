@@ -55,6 +55,11 @@ export default function AutomationStepByStep() {
   const [dmMessage, setDmMessage] = useState('')
   const [previewComment, setPreviewComment] = useState('Amazing content! info please!')
   
+  // Multiple comment replies and delay settings
+  const [commentReplies, setCommentReplies] = useState(['Message sent!', 'Found it? 😊', 'Sent just now! ⏰'])
+  const [commentDelay, setCommentDelay] = useState(15)
+  const [commentDelayUnit, setCommentDelayUnit] = useState('minutes')
+  
   // DM-only automation
   const [dmKeywords, setDmKeywords] = useState([])
   const [dmAutoReply, setDmAutoReply] = useState('')
@@ -319,6 +324,10 @@ export default function AutomationStepByStep() {
       case 1:
         return selectedAccount && contentType && selectedPost
       case 2:
+        // For comment_dm automation, require keywords and at least one comment reply
+        if (automationType === 'comment_dm') {
+          return automationType && getCurrentKeywords().length > 0 && commentReplies.some(reply => reply.trim().length > 0)
+        }
         return automationType && getCurrentKeywords().length > 0 // Automation type and keywords required for configuration
       case 3:
         // For comment_dm automation, step 3 is DM configuration - require DM message
@@ -1006,16 +1015,74 @@ export default function AutomationStepByStep() {
                 </div>
               </div>
 
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Comment replies</label>
+                <p className="text-sm text-gray-600 mb-4">Write a few different possible responses, and we'll cycle through them so your responses seem more genuine and varied.</p>
+                
+                <div className="space-y-3 mb-4">
+                  {commentReplies.map((reply, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
+                      <input
+                        type="text"
+                        value={reply}
+                        onChange={(e) => {
+                          const newReplies = [...commentReplies]
+                          newReplies[index] = e.target.value
+                          setCommentReplies(newReplies)
+                        }}
+                        placeholder="Enter comment reply..."
+                        className="flex-1 p-2 border-0 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => {
+                          const newReplies = commentReplies.filter((_, i) => i !== index)
+                          setCommentReplies(newReplies)
+                        }}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => setCommentReplies([...commentReplies, ''])}
+                  className="w-full p-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add another reply
+                </button>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Public Comment Reply</label>
-                <textarea
-                  value={commentReply}
-                  onChange={(e) => setCommentReply(e.target.value)}
-                  placeholder="Check your DMs for more info! 📩"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  rows="3"
-                />
-                <p className="text-xs text-gray-500 mt-2">This message will be posted as a public comment reply</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Delay before comment</label>
+                <p className="text-sm text-gray-600 mb-4">Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.</p>
+                
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={commentDelay}
+                      onChange={(e) => setCommentDelay(Number(e.target.value))}
+                      min="1"
+                      max="60"
+                      className="w-20 p-2 border border-gray-300 rounded-lg text-center"
+                    />
+                    <X className="w-4 h-4 text-gray-400" />
+                  </div>
+                  
+                  <select
+                    value={commentDelayUnit}
+                    onChange={(e) => setCommentDelayUnit(e.target.value)}
+                    className="p-2 border border-gray-300 rounded-lg bg-white"
+                  >
+                    <option value="minutes">Minutes</option>
+                    <option value="seconds">Seconds</option>
+                    <option value="hours">Hours</option>
+                  </select>
+                  <X className="w-4 h-4 text-gray-400" />
+                </div>
               </div>
             </div>
           </>
