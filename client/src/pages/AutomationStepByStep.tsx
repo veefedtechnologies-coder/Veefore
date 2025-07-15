@@ -1281,7 +1281,7 @@ export default function AutomationStepByStep() {
                 <img 
                   src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
                   alt="Profile" 
-                  className="absolute bottom-0 left-0 w-6 h-6 rounded-full border-2 border-white bg-white" 
+                  className="absolute bottom-0 left-0 w-8 h-8 rounded-full border-2 border-white bg-white" 
                 />
               </div>
               
