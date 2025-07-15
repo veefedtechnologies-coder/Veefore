@@ -481,57 +481,6 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Select Posts (Optional)</h3>
-              <p className="text-gray-600 mb-4">Choose specific posts to apply automation to, or leave empty to apply to all posts</p>
-              <div className="space-y-3">
-                {mockPosts.map(post => (
-                  <button
-                    key={post.id}
-                    onClick={() => setSelectedPost(selectedPost === post.id ? '' : post.id)}
-                    className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                      selectedPost === post.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <img src={post.image} alt={post.title} className="w-16 h-16 rounded-lg object-cover" />
-                      <div className="flex-1">
-                        <div className="font-medium">{post.title}</div>
-                        <div className="text-sm text-gray-600 mt-1">{post.caption}</div>
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
-                          <span className="flex items-center gap-1">
-                            <Heart className="w-3 h-3" />
-                            {post.likes}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
-                            {post.comments}
-                          </span>
-                        </div>
-                      </div>
-                      {selectedPost === post.id && (
-                        <CheckCircle className="w-5 h-5 text-blue-500" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            {renderAutomationSpecificConfig()}
-          </div>
-        )
-
-      case 6:
-        return (
-          <div className="space-y-6">
-            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Advanced Settings</h3>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -598,43 +547,136 @@ export default function AutomationStepByStep() {
           </div>
         )
 
-      case 7:
+      case 5:
+        const selectedAccountInfo = mockAccounts.find(a => a.id === selectedAccount)
+        const selectedPostInfo = mockPosts.find(p => p.id === selectedPost)
+        const selectedAutomationInfo = automationTypes.find(t => t.id === automationType)
+        
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Your Automation</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Review and Activate Automation</h3>
               
               <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <span className="text-sm text-gray-600">Account:</span>
-                    <div className="font-medium">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                    <h4 className="font-medium text-gray-700 mb-2">Selected Account</h4>
+                    <div className="flex items-center gap-3">
+                      <img src={selectedAccountInfo?.avatar} alt="" className="w-8 h-8 rounded-full" />
+                      <div>
+                        <div className="font-medium">{selectedAccountInfo?.username}</div>
+                        <div className="text-sm text-gray-500">{selectedAccountInfo?.platform}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">Content Type</h4>
+                    <div className="text-gray-900">{contentType || 'Not selected'}</div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">Selected Post</h4>
+                    {selectedPostInfo ? (
+                      <div className="flex items-center gap-3">
+                        <img src={selectedPostInfo.thumbnail} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                        <div>
+                          <div className="font-medium truncate">{selectedPostInfo.caption}</div>
+                          <div className="text-sm text-gray-500">{selectedPostInfo.likes} likes</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-gray-500">No post selected</div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">Automation Type</h4>
+                    <div className="text-gray-900">{selectedAutomationInfo?.name || 'Not selected'}</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">Keywords</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.map((keyword, index) => (
+                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">Response Messages</h4>
+                  <div className="space-y-2">
+                    {messages.map((message, index) => (
+                      <div key={index} className="p-3 bg-white rounded border text-sm">
+                        {message}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700">Max Replies/Day:</span>
+                    <div className="text-gray-900">{maxRepliesPerDay}</div>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-600">Content Type:</span>
-                    <div className="font-medium capitalize">{contentType || 'Not selected'}</div>
+                    <span className="font-medium text-gray-700">Cooldown:</span>
+                    <div className="text-gray-900">{cooldownPeriod} min</div>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-600">Automation Type:</span>
-                    <div className="font-medium">{automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}</div>
+                    <span className="font-medium text-gray-700">AI Personality:</span>
+                    <div className="text-gray-900">{aiPersonality}</div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700">Active Hours:</span>
+                    <div className="text-gray-900">{activeHours.start} - {activeHours.end}</div>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-600">Keywords:</span>
-                    <div className="font-medium">{getCurrentKeywords().length} keywords</div>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Daily Limit:</span>
-                    <div className="font-medium">{maxRepliesPerDay} replies</div>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">AI Personality:</span>
-                    <div className="font-medium capitalize">{aiPersonality}</div>
+                    <span className="font-medium text-gray-700">Active Days:</span>
+                    <div className="text-gray-900">{activeDays.filter(Boolean).length} days selected</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         )
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="p-8 bg-green-50 rounded-2xl border border-green-200">
+                <div className="p-4 bg-green-500 rounded-full inline-block mb-4">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-green-800 mb-2">Automation Created Successfully!</h3>
+                <p className="text-green-600 mb-6">Your automation is now active and ready to engage with your audience.</p>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="bg-white p-4 rounded-lg border border-green-200">
+                    <div className="font-medium text-green-800">Account</div>
+                    <div className="text-green-600">{mockAccounts.find(a => a.id === selectedAccount)?.username}</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border border-green-200">
+                    <div className="font-medium text-green-800">Automation Type</div>
+                    <div className="text-green-600">{automationTypes.find(t => t.id === automationType)?.name}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+
 
       default:
         return null
