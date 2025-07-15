@@ -565,50 +565,6 @@ body {
   scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
 }
 
-/* Thin external scrollbar for sidebar */
-.sidebar-external-container {
-  position: relative;
-  width: 100px; /* 96px (w-24) + 4px for scrollbar */
-  height: 100vh;
-  overflow: hidden;
-}
-
-.sidebar-thin-scroll {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 96px; /* Updated w-24 width */
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 0;
-}
-
-.sidebar-thin-scroll::-webkit-scrollbar {
-  width: 4px;
-  position: absolute;
-  right: -4px; /* Position scrollbar outside the 96px sidebar */
-}
-
-.sidebar-thin-scroll::-webkit-scrollbar-track {
-  background: #f8f9fa;
-  border-radius: 2px;
-}
-
-.sidebar-thin-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 2px;
-}
-
-.sidebar-thin-scroll::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
-.sidebar-thin-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db #f8f9fa;
-}
-
 /* Enhanced hover effects */
 .hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

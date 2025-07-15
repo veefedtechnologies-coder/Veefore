@@ -138,7 +138,7 @@ function App() {
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
               <Sidebar 
-                className="w-16 bg-white h-full"
+                className="w-24 bg-white h-full"
                 isCreateDropdownOpen={isCreateDropdownOpen}
                 setIsCreateDropdownOpen={setIsCreateDropdownOpen}
               />
@@ -197,15 +197,13 @@ function App() {
         <>
           <Route path="/plan">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - External scrollbar */}
-              <div className="sidebar-external-container">
-                <div className="sidebar-thin-scroll">
-                  <Sidebar 
-                    className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
-                    isCreateDropdownOpen={isCreateDropdownOpen}
-                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                  />
-                </div>
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
+                <Sidebar 
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  isCreateDropdownOpen={isCreateDropdownOpen}
+                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                />
               </div>
 
               {/* Main Content Area - Independent scrolling */}
@@ -264,15 +262,13 @@ function App() {
           
           <Route path="/create">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - External scrollbar */}
-              <div className="sidebar-external-container">
-                <div className="sidebar-thin-scroll">
-                  <Sidebar 
-                    className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
-                    isCreateDropdownOpen={isCreateDropdownOpen}
-                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                  />
-                </div>
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
+                <Sidebar 
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  isCreateDropdownOpen={isCreateDropdownOpen}
+                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                />
               </div>
 
               {/* Main Content Area - Independent scrolling */}
@@ -301,10 +297,10 @@ function App() {
           
           <Route path="/analytics">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -336,10 +332,10 @@ function App() {
           
           <Route path="/inbox">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -374,10 +370,10 @@ function App() {
           
           <Route path="/veegpt">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -409,10 +405,10 @@ function App() {
           
           <Route path="/workspaces">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -444,10 +440,10 @@ function App() {
 
           <Route path="/profile">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -479,10 +475,10 @@ function App() {
 
           <Route path="/integration">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -514,10 +510,10 @@ function App() {
 
           <Route path="/automation">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
@@ -544,10 +540,10 @@ function App() {
 
           <Route path="/integrations">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar Container - Thin scrollbar outside sidebar */}
-              <div className="w-18 h-screen overflow-y-auto pr-1 sidebar-thin-scroll">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
-                  className="w-full bg-white border-r border-gray-200 h-full shadow-sm"
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                 />
