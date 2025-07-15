@@ -178,12 +178,12 @@ export default function AutomationStepByStep() {
   ]
 
   const steps = [
-    { id: 1, title: 'Select account', description: 'Choose your account' },
-    { id: 2, title: 'Content type', description: 'Pick content type' },
-    { id: 3, title: 'Automation type', description: 'Select automation' },
-    { id: 4, title: 'Configuration', description: 'Set up rules' },
-    { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing' },
-    { id: 6, title: 'Review and save', description: 'Review and activate' }
+    { id: 1, title: 'Select Setup', description: 'Account, content & post' },
+    { id: 2, title: 'Automation type', description: 'Select automation' },
+    { id: 3, title: 'Configuration', description: 'Set up rules' },
+    { id: 4, title: 'Advanced Settings', description: 'Fine-tune timing' },
+    { id: 5, title: 'Review and save', description: 'Review and activate' },
+    { id: 6, title: 'Complete', description: 'Automation ready' }
   ]
 
   const addKeyword = () => {
@@ -230,17 +230,17 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedAccount
+        return selectedAccount && contentType && selectedPost
       case 2:
-        return contentType
-      case 3:
         return automationType
-      case 4:
-        return true // Post selection is optional
-      case 5:
+      case 3:
         return getCurrentKeywords().length > 0 // Keywords required for configuration
-      case 6:
+      case 4:
         return true // Advanced settings are optional
+      case 5:
+        return true // Review step
+      case 6:
+        return true // Final step
       default:
         return false
     }
@@ -290,42 +290,107 @@ export default function AutomationStepByStep() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {/* Step 1: Select Account */}
             <div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 Select Account
               </h3>
-              <div className="grid grid-cols-1 gap-3">
-                {mockAccounts.map(account => (
-                  <button
-                    key={account.id}
-                    onClick={() => setSelectedAccount(account.id)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md ${
-                      selectedAccount === account.id 
-                        ? 'border-blue-500 bg-blue-50 shadow-md' 
-                        : 'border-gray-200 hover:border-blue-300 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img src={account.avatar} alt={account.name} className="w-10 h-10 rounded-full border-2 border-white shadow-sm" />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border border-white rounded-full"></div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-800 truncate">{account.name}</div>
-                        <div className="text-xs text-gray-600">{account.followers} • {account.platform}</div>
-                      </div>
-                      {selectedAccount === account.id && (
-                        <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                      )}
-                    </div>
-                  </button>
-                ))}
+              <div className="relative">
+                <select
+                  value={selectedAccount}
+                  onChange={(e) => setSelectedAccount(e.target.value)}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 appearance-none text-gray-800 font-medium"
+                >
+                  <option value="">Choose your social media account...</option>
+                  {mockAccounts.map(account => (
+                    <option key={account.id} value={account.id}>
+                      {account.name} • {account.followers} • {account.platform}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
+
+            {/* Step 2: Select Content Type (only shown when account is selected) */}
+            {selectedAccount && (
+              <div className="animate-fadeIn">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-md">
+                    <FileText className="w-4 h-4 text-white" />
+                  </div>
+                  Select Content Type
+                </h3>
+                <div className="relative">
+                  <select
+                    value={contentType}
+                    onChange={(e) => setContentType(e.target.value)}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-all duration-200 appearance-none text-gray-800 font-medium"
+                  >
+                    <option value="">Choose content type for your automation...</option>
+                    {getContentTypesForPlatform(selectedAccount).map(type => (
+                      <option key={type.id} value={type.id}>
+                        {type.icon} {type.name} - {type.description}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Select Post (only shown when content type is selected) */}
+            {selectedAccount && contentType && (
+              <div className="animate-fadeIn">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg shadow-md">
+                    <Eye className="w-4 h-4 text-white" />
+                  </div>
+                  Select Post
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {mockPosts.filter(post => post.type === contentType).map(post => (
+                    <button
+                      key={post.id}
+                      onClick={() => setSelectedPost(post.id)}
+                      className={`relative p-3 rounded-xl border-2 transition-all duration-200 hover:shadow-lg ${
+                        selectedPost === post.id 
+                          ? 'border-emerald-500 bg-emerald-50 shadow-lg' 
+                          : 'border-gray-200 hover:border-emerald-300 bg-white'
+                      }`}
+                    >
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 flex items-center justify-center">
+                        <img src={post.thumbnail} alt={post.caption} className="w-full h-full object-cover rounded-lg" />
+                      </div>
+                      <div className="text-xs text-gray-600 font-medium truncate">{post.caption}</div>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Heart className="w-3 h-3 text-red-500" />
+                        <span className="text-xs text-gray-500">{post.likes}</span>
+                        <MessageCircle className="w-3 h-3 text-blue-500 ml-2" />
+                        <span className="text-xs text-gray-500">{post.comments}</span>
+                      </div>
+                      {selectedPost === post.id && (
+                        <div className="absolute -top-2 -right-2 p-1 bg-emerald-500 rounded-full shadow-lg">
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )
 
