@@ -1467,7 +1467,7 @@ export default function AutomationStepByStep() {
                   <div className="flex-1">
                     <div className="text-sm text-gray-900">
                       <span className="font-semibold">username</span>{' '}
-                      <span>{currentKeywords[0]} please!</span>
+                      <span>{currentKeywords[0]}</span>
                     </div>
                     <div className="flex items-center gap-4 mt-1">
                       <span className="text-xs text-gray-500">2m</span>
