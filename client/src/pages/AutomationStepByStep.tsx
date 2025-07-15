@@ -1260,27 +1260,36 @@ export default function AutomationStepByStep() {
                 JUL 15, 08:31 PM
               </div>
               
-              {/* Message bubble */}
-              <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 mb-4">
-                <div className="text-sm text-gray-700 mb-4">
-                  {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
-                </div>
-                
-                {/* Button inside message bubble */}
-                {dmButtonText && (
-                  <div className="bg-gray-300 rounded-lg p-3 text-center">
-                    <div className="text-sm font-medium text-gray-800">
-                      {dmButtonText}
-                    </div>
+              {/* Message bubble with profile picture */}
+              <div className="flex items-start gap-2 mb-4">
+                <img 
+                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                  alt="Profile" 
+                  className="w-6 h-6 rounded-full border border-gray-200 flex-shrink-0 mt-1" 
+                />
+                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px]">
+                  <div className="text-sm text-gray-700 mb-4">
+                    {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                   </div>
-                )}
+                  
+                  {/* Button inside message bubble - white background */}
+                  {dmButtonText && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                      <div className="text-sm font-medium text-gray-800">
+                        {dmButtonText}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
-              {/* Read indicator */}
-              <div className="flex items-center mb-4">
-                <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  R
-                </div>
+              {/* Read indicator with profile picture */}
+              <div className="flex items-center mb-4 ml-8">
+                <img 
+                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                  alt="Read by" 
+                  className="w-4 h-4 rounded-full border border-gray-300" 
+                />
               </div>
               
               {/* Message input area */}
