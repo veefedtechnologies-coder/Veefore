@@ -1263,13 +1263,13 @@ export default function AutomationStepByStep() {
               {/* Message bubble with profile picture at bottom-left corner */}
               <div className="relative mb-4">
                 <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
-                  <div className="text-sm text-gray-700">
+                  <div className="text-sm text-gray-400">
                     {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                   </div>
                   
                   {/* Button inside message bubble - white background */}
                   {dmButtonText && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-center mt-3">
+                    <div className="bg-white rounded-lg p-3 text-center mt-3">
                       <div className="text-sm font-medium text-gray-800">
                         {dmButtonText}
                       </div>
