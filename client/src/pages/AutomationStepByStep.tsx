@@ -289,28 +289,38 @@ export default function AutomationStepByStep() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Account</h3>
-              <div className="space-y-3">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                Select Account
+              </h3>
+              <div className="space-y-4">
                 {mockAccounts.map(account => (
                   <button
                     key={account.id}
                     onClick={() => setSelectedAccount(account.id)}
-                    className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                    className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
                       selectedAccount === account.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-xl scale-[1.02]' 
+                        : 'border-gray-200 hover:border-blue-300 bg-white hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <img src={account.avatar} alt={account.name} className="w-10 h-10 rounded-full" />
-                      <div>
-                        <div className="font-medium">{account.name}</div>
-                        <div className="text-sm text-gray-600">{account.followers} • {account.platform}</div>
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <img src={account.avatar} alt={account.name} className="w-14 h-14 rounded-full shadow-lg border-2 border-white" />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-lg text-gray-800">{account.name}</div>
+                        <div className="text-sm text-gray-600 font-medium">{account.followers} • {account.platform}</div>
                       </div>
                       {selectedAccount === account.id && (
-                        <CheckCircle className="w-5 h-5 text-blue-500 ml-auto" />
+                        <div className="p-2 bg-blue-500 rounded-full shadow-lg">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
                       )}
                     </div>
                   </button>
@@ -325,31 +335,38 @@ export default function AutomationStepByStep() {
         const accountPlatform = selectedAccountData?.platform.toLowerCase() || ''
         const contentTypes = getContentTypesByPlatform(accountPlatform)
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Content Type</h3>
-              <p className="text-gray-600 mb-4">Choose the type of content for automation on {selectedAccountData?.platform}</p>
-              <div className="grid grid-cols-1 gap-3">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+                Select Content Type
+              </h3>
+              <p className="text-lg text-gray-600 mb-6 font-medium">Choose the type of content for automation on {selectedAccountData?.platform}</p>
+              <div className="grid grid-cols-1 gap-4">
                 {contentTypes.map(type => (
                   <button
                     key={type.id}
                     onClick={() => setContentType(type.id)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
                       contentType === type.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl scale-[1.02]' 
+                        : 'border-gray-200 hover:border-purple-300 bg-white hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${type.color} text-white`}>
+                    <div className="flex items-center gap-5">
+                      <div className={`p-4 rounded-xl ${type.color} text-white shadow-lg transform transition-transform hover:scale-110`}>
                         {type.icon}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-lg">{type.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+                        <div className="font-bold text-xl text-gray-800">{type.name}</div>
+                        <div className="text-sm text-gray-600 mt-2 font-medium">{type.description}</div>
                       </div>
                       {contentType === type.id && (
-                        <CheckCircle className="w-6 h-6 text-blue-500" />
+                        <div className="p-2 bg-purple-500 rounded-full shadow-lg">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
                       )}
                     </div>
                   </button>
@@ -361,30 +378,37 @@ export default function AutomationStepByStep() {
 
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Automation Type</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg">
+                  <Settings className="w-6 h-6 text-white" />
+                </div>
+                Choose Automation Type
+              </h3>
               <div className="grid grid-cols-1 gap-4">
                 {automationTypes.map(type => (
                   <button
                     key={type.id}
                     onClick={() => setAutomationType(type.id)}
-                    className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
                       automationType === type.id 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-emerald-500 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-xl scale-[1.02]' 
+                        : 'border-gray-200 hover:border-emerald-300 bg-white hover:bg-gray-50'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${type.color} text-white`}>
+                    <div className="flex items-center gap-5">
+                      <div className={`p-4 rounded-xl ${type.color} text-white shadow-lg transform transition-transform hover:scale-110`}>
                         {type.icon}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-lg">{type.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+                        <div className="font-bold text-xl text-gray-800">{type.name}</div>
+                        <div className="text-sm text-gray-600 mt-2 font-medium">{type.description}</div>
                       </div>
                       {automationType === type.id && (
-                        <CheckCircle className="w-6 h-6 text-blue-500" />
+                        <div className="p-2 bg-emerald-500 rounded-full shadow-lg">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
                       )}
                     </div>
                   </button>
@@ -750,14 +774,16 @@ export default function AutomationStepByStep() {
     const platformName = selectedAccountData?.platform || 'Social Media'
     
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-4">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Eye className="w-5 h-5" />
+      <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-6 sticky top-4 shadow-2xl hover:shadow-3xl transition-all duration-300">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-3 text-gray-800">
+          <div className="p-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl shadow-lg">
+            <Eye className="w-5 h-5 text-white" />
+          </div>
           Live {platformName} Preview
         </h3>
         
         {/* Instagram Post Interface */}
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
           {/* Post Header */}
           <div className="flex items-center gap-3 p-4">
             <img 
@@ -883,41 +909,49 @@ export default function AutomationStepByStep() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Setup Social Media Automation</h1>
-          <p className="text-gray-600">Follow the steps to configure your automation workflow</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
+            Setup Social Media Automation
+          </h1>
+          <p className="text-lg text-gray-600 font-medium">Follow the steps to configure your automation workflow</p>
         </div>
 
         {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between max-w-4xl mx-auto">
+        <div className="mb-12">
+          <div className="flex items-center justify-between max-w-5xl mx-auto">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+                <div className="flex flex-col items-center group">
+                  <div className={`flex items-center justify-center w-14 h-14 rounded-full border-3 transition-all duration-300 shadow-lg ${
                     currentStep >= step.id 
-                      ? 'bg-blue-500 border-blue-500 text-white' 
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200' 
                       : currentStep === step.id
-                      ? 'bg-blue-500 border-blue-500 text-white'
-                      : 'border-gray-300 text-gray-400 bg-white'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200'
+                      : 'border-gray-300 text-gray-400 bg-white hover:border-gray-400 hover:shadow-md'
                   }`}>
                     {currentStep > step.id ? (
-                      <CheckCircle className="w-6 h-6" />
+                      <CheckCircle className="w-7 h-7" />
                     ) : (
-                      <span className="text-sm font-medium">{step.id}</span>
+                      <span className="text-sm font-bold">{step.id}</span>
                     )}
                   </div>
-                  <div className="mt-2 text-center">
-                    <div className="text-sm font-medium text-gray-900">{step.title}</div>
-                    <div className="text-xs text-gray-500">{step.description}</div>
+                  <div className="mt-3 text-center transition-all duration-300">
+                    <div className={`text-sm font-semibold ${
+                      currentStep >= step.id ? 'text-blue-700' : 'text-gray-700'
+                    }`}>{step.title}</div>
+                    <div className={`text-xs mt-1 ${
+                      currentStep >= step.id ? 'text-blue-600' : 'text-gray-500'
+                    }`}>{step.description}</div>
                   </div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-4 mt-[-20px] ${
-                    currentStep > step.id ? 'bg-blue-500' : 'bg-gray-200'
+                  <div className={`flex-1 h-1 mx-6 mt-[-25px] rounded-full transition-all duration-500 ${
+                    currentStep > step.id 
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-sm' 
+                      : 'bg-gray-200'
                   }`} />
                 )}
               </div>
@@ -928,21 +962,21 @@ export default function AutomationStepByStep() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 hover:shadow-2xl transition-all duration-300">
               {renderStepContent()}
               
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+              <div className="flex justify-between items-center mt-10 pt-8 border-t border-gray-200">
                 <button
                   onClick={handlePrevious}
                   disabled={currentStep === 1}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Previous
                 </button>
                 
-                <div className="text-sm text-gray-500">
+                <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-full text-sm font-semibold border border-blue-200">
                   Step {currentStep} of {steps.length}
                 </div>
                 
@@ -950,7 +984,7 @@ export default function AutomationStepByStep() {
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
-                    className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
                     Next
                     <ArrowRight className="w-4 h-4" />
@@ -958,7 +992,7 @@ export default function AutomationStepByStep() {
                 ) : (
                   <button
                     onClick={handleFinish}
-                    className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Activate Automation
