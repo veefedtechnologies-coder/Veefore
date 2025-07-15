@@ -1042,7 +1042,7 @@ export default function AutomationStepByStep() {
                 
                 <div className="space-y-3 mb-4">
                   {commentReplies.map((reply, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg">
+                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-white">
                       <input
                         type="text"
                         value={reply}
@@ -1052,7 +1052,7 @@ export default function AutomationStepByStep() {
                           setCommentReplies(newReplies)
                         }}
                         placeholder="Enter comment reply..."
-                        className="flex-1 p-2 border-0 focus:outline-none"
+                        className="flex-1 p-2 border-0 focus:outline-none bg-white"
                       />
                       <button
                         onClick={() => {
