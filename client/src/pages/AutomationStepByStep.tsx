@@ -186,6 +186,40 @@ export default function AutomationStepByStep() {
     { id: 6, title: 'Complete', description: 'Automation ready' }
   ]
 
+  // Function to get content types based on selected platform/account
+  const getContentTypesForPlatform = (accountId) => {
+    const account = mockAccounts.find(acc => acc.id === accountId)
+    if (!account) return []
+    
+    switch (account.platform.toLowerCase()) {
+      case 'instagram':
+        return [
+          { id: 'post', name: 'Post', description: 'Regular feed posts', icon: '📷' },
+          { id: 'reel', name: 'Reel', description: 'Short video content', icon: '🎬' },
+          { id: 'story', name: 'Story', description: '24h disappearing content', icon: '⭕' }
+        ]
+      case 'youtube':
+        return [
+          { id: 'video', name: 'Video', description: 'Long-form videos', icon: '📹' },
+          { id: 'short', name: 'Short', description: 'Vertical short videos', icon: '⚡' }
+        ]
+      case 'linkedin':
+        return [
+          { id: 'post', name: 'Post', description: 'Professional updates', icon: '💼' },
+          { id: 'article', name: 'Article', description: 'Long-form content', icon: '📄' }
+        ]
+      case 'twitter':
+        return [
+          { id: 'tweet', name: 'Tweet', description: 'Short messages', icon: '🐦' },
+          { id: 'thread', name: 'Thread', description: 'Connected tweets', icon: '🧵' }
+        ]
+      default:
+        return [
+          { id: 'post', name: 'Post', description: 'General content', icon: '📝' }
+        ]
+    }
+  }
+
   const addKeyword = () => {
     if (newKeyword.trim()) {
       const currentKeywords = getCurrentKeywords()
