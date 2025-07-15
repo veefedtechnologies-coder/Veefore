@@ -1252,59 +1252,66 @@ export default function AutomationStepByStep() {
             </div>
           </div>
           
-          {/* Instagram DM Preview - Only in DM configuration step */}
-          <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm">
-            <div className="flex items-center gap-2 p-3 border-b border-gray-100">
-              <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Instagram className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-sm font-medium text-gray-800">Instagram direct message</span>
-            </div>
-            
+          {/* Instagram DM Preview - Exact match to reference image */}
+          <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm max-w-sm mx-auto">
             <div className="p-4">
-              <div className="text-xs text-gray-500 text-right mb-3">
+              {/* Message timestamp */}
+              <div className="text-xs text-gray-500 text-center mb-4">
                 JUL 15, 08:31 PM
               </div>
               
-              <div className="space-y-3">
-                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
-                  <div className="text-sm text-gray-800">
-                    {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
-                  </div>
+              {/* Message bubble */}
+              <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 mb-4">
+                <div className="text-sm text-gray-700 mb-4">
+                  {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                 </div>
                 
+                {/* Button inside message bubble */}
                 {dmButtonText && (
-                  <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
-                    <div className="bg-white border border-gray-200 rounded-lg p-2 text-center">
-                      <div className="text-sm font-medium text-gray-800">
-                        {dmButtonText}
-                      </div>
+                  <div className="bg-gray-300 rounded-lg p-3 text-center">
+                    <div className="text-sm font-medium text-gray-800">
+                      {dmButtonText}
                     </div>
                   </div>
                 )}
-                
-                <div className="text-xs text-gray-400 uppercase tracking-wide">
+              </div>
+              
+              {/* Read indicator */}
+              <div className="flex items-center mb-4">
+                <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
                   R
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
+              {/* Message input area */}
+              <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Send className="w-4 h-4 text-white" />
+                  <Camera className="w-4 h-4 text-white" />
                 </div>
-                <div className="flex-1 text-sm text-gray-500">Message...</div>
+                <div className="flex-1 text-sm text-gray-500 bg-gray-100 rounded-full px-4 py-2">
+                  Message...
+                </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                    <User className="w-3 h-3 text-gray-600" />
+                  <div className="w-6 h-6 text-gray-500">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                      <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                      <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
                   </div>
-                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                    <Camera className="w-3 h-3 text-gray-600" />
+                  <div className="w-6 h-6 text-gray-500">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
                   </div>
-                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                    <Heart className="w-3 h-3 text-gray-600" />
+                  <div className="w-6 h-6 text-gray-500">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                   </div>
-                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                    <MoreHorizontal className="w-3 h-3 text-gray-600" />
+                  <div className="w-6 h-6 text-gray-500">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
                   </div>
                 </div>
               </div>
