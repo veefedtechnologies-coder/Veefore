@@ -429,52 +429,6 @@ export default function AutomationStepByStep() {
         )
 
       case 2:
-        const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
-        const accountPlatform = selectedAccountData?.platform.toLowerCase() || ''
-        const contentTypes = getContentTypesByPlatform(accountPlatform)
-        return (
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
-                Select Content Type
-              </h3>
-              <p className="text-lg text-gray-600 mb-6 font-medium">Choose the type of content for automation on {selectedAccountData?.platform}</p>
-              <div className="grid grid-cols-1 gap-4">
-                {contentTypes.map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => setContentType(type.id)}
-                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
-                      contentType === type.id 
-                        ? 'border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl scale-[1.02]' 
-                        : 'border-gray-200 hover:border-purple-300 bg-white hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-5">
-                      <div className={`p-4 rounded-xl ${type.color} text-white shadow-lg transform transition-transform hover:scale-110`}>
-                        {type.icon}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-xl text-gray-800">{type.name}</div>
-                        <div className="text-sm text-gray-600 mt-2 font-medium">{type.description}</div>
-                      </div>
-                      {contentType === type.id && (
-                        <div className="p-2 bg-purple-500 rounded-full shadow-lg">
-                          <CheckCircle className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-
-      case 3:
         return (
           <div className="space-y-8">
             <div>
@@ -513,6 +467,13 @@ export default function AutomationStepByStep() {
                 ))}
               </div>
             </div>
+          </div>
+        )
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            {renderAutomationSpecificConfig()}
           </div>
         )
 
