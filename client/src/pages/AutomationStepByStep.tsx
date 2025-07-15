@@ -1456,28 +1456,30 @@ export default function AutomationStepByStep() {
             
             {/* Comments Section with Live Automation Preview */}
             <div className="space-y-3">
-              {/* Sample User Comment */}
-              <div className="flex items-start gap-2">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face&auto=format" 
-                  alt="User" 
-                  className="w-6 h-6 rounded-full" 
-                />
-                <div className="flex-1">
-                  <div className="text-sm text-gray-900">
-                    <span className="font-semibold">username</span>{' '}
-                    <span>{currentKeywords.length > 0 ? `${currentKeywords[0]} please!` : 'info please!'}</span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    <span className="text-xs text-gray-500">2m</span>
-                    <button className="text-xs text-gray-500 font-medium">Reply</button>
-                    <Heart className="w-3 h-3 text-gray-400" />
+              {/* Sample User Comment - Only show when user has keywords */}
+              {currentKeywords.length > 0 && (
+                <div className="flex items-start gap-2">
+                  <img 
+                    src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face&auto=format" 
+                    alt="User" 
+                    className="w-6 h-6 rounded-full" 
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-900">
+                      <span className="font-semibold">username</span>{' '}
+                      <span>{currentKeywords[0]} please!</span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-xs text-gray-500">2m</span>
+                      <button className="text-xs text-gray-500 font-medium">Reply</button>
+                      <Heart className="w-3 h-3 text-gray-400" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               
-              {/* Bot Reply Preview - Real-time updates */}
-              {automationType && getCurrentMessage() !== 'Your automated response will appear here...' && (
+              {/* Bot Reply Preview - Only show when user has keywords AND replies */}
+              {currentKeywords.length > 0 && automationType && getCurrentMessage() !== 'Your automated response will appear here...' && (
                 <div className="flex items-start gap-2 ml-6 animate-fadeIn">
                   <div className="relative">
                     <img 

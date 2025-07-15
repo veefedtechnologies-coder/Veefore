@@ -132,6 +132,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 15, 2025: **CONDITIONAL COMMENT DISPLAY IMPLEMENTATION COMPLETE** - Made comment and reply display conditional based on user input in automation flow
+  - ✅ **Conditional Comment Display**: User comment only appears when keywords are entered (currentKeywords.length > 0)
+  - ✅ **Conditional Reply Display**: Automated reply only shows when both keywords and replies are configured
+  - ✅ **Clean Empty State**: Instagram preview shows clean post without comments when no keywords are set
+  - ✅ **Dynamic Preview Logic**: Real-time updates as user enters keywords and replies
+  - ✅ **Improved User Experience**: Preview accurately reflects what will actually happen based on user configuration
+  - **Technical Achievement**: Conditional rendering prevents showing placeholder content, ensuring preview matches actual automation behavior
+  - **User Benefit**: Users see exactly what their automation will do - no comments/replies shown until they configure them
 - July 15, 2025: **INSTAGRAM DM PREVIEW STYLING REFINEMENTS COMPLETE** - Enhanced DM preview interface with authentic Instagram styling improvements including grey placeholder text and borderless button design
   - ✅ **Grey Placeholder Text**: Changed message text from `text-gray-700` to `text-gray-400` for more subtle, authentic Instagram appearance
   - ✅ **Borderless Button**: Removed `border border-gray-200` from button styling, keeping clean white background to match Instagram interface
