@@ -84,6 +84,15 @@ function App() {
   if (loading || (user && userDataLoading)) {
     return <LoadingSpinner />
   }
+  
+  // If we have evidence of existing authentication but no user yet, show loading
+  const hasFirebaseAuth = Object.keys(localStorage).some(key => 
+    key.includes('firebase:authUser') && localStorage.getItem(key)
+  )
+  
+  if (hasFirebaseAuth && !user && loading) {
+    return <LoadingSpinner />
+  }
 
   const handleCreateOptionSelect = (option: string) => {
     setIsCreateDropdownOpen(false)
@@ -114,10 +123,12 @@ function App() {
 
       {/* Root route - Landing for unauthenticated, Dashboard for authenticated & onboarded, Signup for authenticated but not onboarded */}
       <Route path="/">
-        {!user ? (
+        {!user && !hasFirebaseAuth ? (
           <div className="min-h-screen">
             <Landing onNavigate={(page: string) => setLocation(`/${page}`)} />
           </div>
+        ) : !user && hasFirebaseAuth ? (
+          <LoadingSpinner />
         ) : userData && !userData.isOnboarded ? (
           <div className="min-h-screen">
             <SignUpIntegrated onNavigate={(page: string) => setLocation(`/${page}`)} />

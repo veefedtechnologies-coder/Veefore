@@ -14,6 +14,7 @@ export const useFirebaseAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true) // Always start with loading true
   const [isInitialized, setIsInitialized] = useState(false)
+  const [hasInitialCheck, setHasInitialCheck] = useState(false)
 
   useEffect(() => {
     console.log('useFirebaseAuth: Setting up Firebase auth listener')
@@ -29,7 +30,7 @@ export const useFirebaseAuth = () => {
       console.log('useFirebaseAuth: Timeout reached, stopping loading state')
       setLoading(false)
       setIsInitialized(true)
-    }, 2000) // 2 second timeout
+    }, 3000) // 3 second timeout for better auth persistence
     
     // Check if there's already a current user (for persistence)
     if (auth.currentUser) {
@@ -43,6 +44,7 @@ export const useFirebaseAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('useFirebaseAuth: Auth state changed:', user ? `User logged in: ${user.email}` : 'User logged out')
       setUser(user)
+      setHasInitialCheck(true)
       setLoading(false)
       setIsInitialized(true)
       clearTimeout(loadingTimeout)
