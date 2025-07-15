@@ -692,65 +692,6 @@ export default function AutomationStepByStep() {
                     />
                   </div>
                 </div>
-                
-                {/* Instagram DM Preview - Only in DM configuration step */}
-                <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm max-w-sm">
-                  <div className="flex items-center gap-2 p-3 border-b border-gray-100">
-                    <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <Instagram className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-800">Instagram direct message</span>
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="text-xs text-gray-500 text-right mb-3">
-                      JUL 15, 08:31 PM
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
-                        <div className="text-sm text-gray-800">
-                          {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
-                        </div>
-                      </div>
-                      
-                      {dmButtonText && (
-                        <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
-                          <div className="bg-white border border-gray-200 rounded-lg p-2 text-center">
-                            <div className="text-sm font-medium text-gray-800">
-                              {dmButtonText}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="text-xs text-gray-400 uppercase tracking-wide">
-                        R
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <Send className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex-1 text-sm text-gray-500">Message...</div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                          <User className="w-3 h-3 text-gray-600" />
-                        </div>
-                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                          <Camera className="w-3 h-3 text-gray-600" />
-                        </div>
-                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                          <Heart className="w-3 h-3 text-gray-600" />
-                        </div>
-                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
-                          <MoreHorizontal className="w-3 h-3 text-gray-600" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )
@@ -1290,6 +1231,88 @@ export default function AutomationStepByStep() {
     const selectedPostData = mockPosts.find(p => p.id === selectedPost)
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
+    
+    // For comment_dm automation in step 3 (DM configuration), show only DM preview
+    if (automationType === 'comment_dm' && currentStep === 3) {
+      return (
+        <div className="sticky top-4">
+          {/* Preview Header */}
+          <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-4 rounded-t-3xl">
+            <div className="flex items-center gap-3 text-white">
+              <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Send className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold">DM Preview</h3>
+                <p className="text-sm opacity-90">Instagram direct message interface</p>
+              </div>
+              <div className="ml-auto">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Instagram DM Preview - Only in DM configuration step */}
+          <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm">
+            <div className="flex items-center gap-2 p-3 border-b border-gray-100">
+              <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                <Instagram className="w-3 h-3 text-white" />
+              </div>
+              <span className="text-sm font-medium text-gray-800">Instagram direct message</span>
+            </div>
+            
+            <div className="p-4">
+              <div className="text-xs text-gray-500 text-right mb-3">
+                JUL 15, 08:31 PM
+              </div>
+              
+              <div className="space-y-3">
+                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
+                  <div className="text-sm text-gray-800">
+                    {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
+                  </div>
+                </div>
+                
+                {dmButtonText && (
+                  <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
+                    <div className="bg-white border border-gray-200 rounded-lg p-2 text-center">
+                      <div className="text-sm font-medium text-gray-800">
+                        {dmButtonText}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="text-xs text-gray-400 uppercase tracking-wide">
+                  R
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Send className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 text-sm text-gray-500">Message...</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                    <User className="w-3 h-3 text-gray-600" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                    <Camera className="w-3 h-3 text-gray-600" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                    <Heart className="w-3 h-3 text-gray-600" />
+                  </div>
+                  <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                    <MoreHorizontal className="w-3 h-3 text-gray-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
     
     // Get current automation message based on type - for PUBLIC comment reply
     const getCurrentMessage = () => {
