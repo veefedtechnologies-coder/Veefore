@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus, Zap } from 'lucide-react'
+import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus, Zap, Video } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateDropdown } from './create-dropdown'
 import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
@@ -12,6 +12,7 @@ const sidebarItems = [
   { icon: Home, label: 'Home', key: 'home', url: '/' },
   { icon: Calendar, label: 'Plan', key: 'plan', url: '/plan' },
   { icon: Plus, label: 'Create', key: 'create', isCreateButton: true },
+  { icon: Video, label: 'Video Gen', key: 'video-generator', url: '/video-generator' },
   { icon: MessageSquare, label: 'Inbox 2.0', key: 'inbox', url: '/inbox' },
   { icon: BarChart3, label: 'Analytics', key: 'analytics', url: '/analytics' },
   { icon: Zap, label: 'Automation', key: 'automation', url: '/automation' },
@@ -41,6 +42,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
     if (loc === '/') return 'home'
     if (loc === '/plan') return 'plan'
     if (loc === '/create') return 'create'
+    if (loc === '/video-generator') return 'video-generator'
     if (loc === '/veegpt') return 'veegpt'
     if (loc === '/inbox') return 'inbox'
     if (loc === '/analytics') return 'analytics'

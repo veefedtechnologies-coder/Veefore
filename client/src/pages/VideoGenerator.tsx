@@ -126,21 +126,24 @@ const VideoGenerator: React.FC = () => {
   ])
 
   // Fetch video jobs
-  const { data: videoJobs, isLoading: jobsLoading } = useQuery({
-    queryKey: ['/api/video-jobs'],
-    queryFn: () => apiRequest('/api/video-jobs'),
+  const { data: videoJobsData, isLoading: jobsLoading } = useQuery({
+    queryKey: ['/api/video/jobs'],
+    queryFn: () => apiRequest('/api/video/jobs'),
     refetchInterval: 5000 // Refetch every 5 seconds when generating
   })
 
+  // Ensure videoJobs is always an array
+  const videoJobs = Array.isArray(videoJobsData) ? videoJobsData : []
+
   // Generate video mutation
   const generateVideoMutation = useMutation({
-    mutationFn: (data: typeof formData) => apiRequest('/api/video-jobs/generate', { method: 'POST', body: data }),
+    mutationFn: (data: typeof formData) => apiRequest('/api/video/generate', { method: 'POST', body: data }),
     onSuccess: (data) => {
       toast({ title: 'Video generation started!', description: 'Your video is being created. This may take 5-10 minutes.' })
       setSelectedJob(data)
       setCurrentStep('generate')
       setIsGenerating(true)
-      queryClient.invalidateQueries({ queryKey: ['/api/video-jobs'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/video/jobs'] })
     },
     onError: (error: any) => {
       toast({ title: 'Generation failed', description: error.message || 'Failed to start video generation', variant: 'destructive' })
@@ -610,12 +613,12 @@ const VideoGenerator: React.FC = () => {
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
             {['input', 'generate', 'preview'].map((step, index) => (
-              <React.Fragment key={step}>
+              <div key={step} className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${
                   currentStep === step ? 'bg-purple-500' : 'bg-gray-300'
                 }`} />
                 {index < 2 && <div className="w-6 h-0.5 bg-gray-200" />}
-              </React.Fragment>
+              </div>
             ))}
           </div>
         </div>

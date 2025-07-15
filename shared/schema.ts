@@ -323,13 +323,55 @@ export const userPersonas = pgTable("user_personas", {
   hashtagStrategy: json("hashtag_strategy"), // Hashtag recommendations
   growthStrategy: text("growth_strategy"), // Long-term growth plan
   monthlyThemes: json("monthly_themes"), // Content calendar themes
-  // Performance Tracking
-  successMetrics: json("success_metrics"), // What metrics matter most
-  benchmarks: json("benchmarks"), // Target benchmarks for their niche
-  personalityScore: json("personality_score"), // AI personality analysis
-  confidenceScore: integer("confidence_score"), // How confident AI is in persona fit
-  lastUpdated: timestamp("last_updated").defaultNow(),
-  creditsUsed: integer("credits_used").default(7),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+// AI Video Generator Jobs
+export const videoJobs = pgTable("video_jobs", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  jobId: text("job_id").notNull().unique(), // Unique job identifier
+  status: text("status").default("draft"), // draft, generating, completed, failed
+  progress: integer("progress").default(0), // 0-100 percentage
+  
+  // Input Configuration
+  prompt: text("prompt").notNull(), // User's video idea/prompt
+  duration: integer("duration").default(30), // Video duration in seconds
+  visualStyle: text("visual_style").default("cinematic"), // cinematic, realistic, animated, etc.
+  motionEngine: text("motion_engine").default("auto"), // auto, runway, animatediff
+  
+  // Voice Settings
+  voiceSettings: json("voice_settings"), // { gender, language, accent, tone }
+  enableAvatar: boolean("enable_avatar").default(false),
+  avatarSettings: json("avatar_settings"), // Avatar configuration
+  
+  // Content Settings
+  enableMusic: boolean("enable_music").default(true),
+  enableSubtitles: boolean("enable_subtitles").default(true),
+  musicStyle: text("music_style").default("cinematic"),
+  
+  // Generated Content
+  script: json("script"), // Generated script with scenes
+  scenes: json("scenes"), // Scene data with images/videos
+  voiceFiles: json("voice_files"), // Generated voice files
+  avatarFiles: json("avatar_files"), // Generated avatar files
+  finalVideoUrl: text("final_video_url"), // URL to final video
+  
+  // Processing Steps
+  generationSteps: json("generation_steps"), // Step-by-step progress
+  currentStep: text("current_step"), // Current processing step
+  
+  // Metrics
+  creditsUsed: integer("credits_used").default(0),
+  processingTime: integer("processing_time"), // Time taken in seconds
+  videoSize: integer("video_size"), // Final video size in bytes
+  
+  // Metadata
+  errorMessage: text("error_message"), // Error details if failed
+  logs: json("logs"), // Processing logs
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -621,6 +663,11 @@ export const insertUserPersonaSchema = createInsertSchema(userPersonas);
 export const insertAffiliateApplicationSchema = createInsertSchema(affiliateApplications);
 export const insertSocialListeningSchema = createInsertSchema(socialListening);
 export const insertEmotionAnalysisSchema = createInsertSchema(emotionAnalyses);
+
+// Video Jobs types
+export const insertVideoJobSchema = createInsertSchema(videoJobs).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertVideoJob = z.infer<typeof insertVideoJobSchema>;
+export type VideoJob = typeof videoJobs.$inferSelect;
 
 export const content = pgTable("content", {
   id: serial("id").primaryKey(),
