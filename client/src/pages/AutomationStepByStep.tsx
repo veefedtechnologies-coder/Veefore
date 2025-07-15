@@ -235,11 +235,11 @@ export default function AutomationStepByStep() {
       case 3:
         return automationType
       case 4:
-        return getCurrentKeywords().length > 0
+        return true // Post selection is optional
       case 5:
-        return true // Advanced settings are optional
+        return getCurrentKeywords().length > 0 // Keywords required for configuration
       case 6:
-        return true
+        return true // Advanced settings are optional
       default:
         return false
     }
