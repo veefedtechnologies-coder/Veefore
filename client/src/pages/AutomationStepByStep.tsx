@@ -60,6 +60,10 @@ export default function AutomationStepByStep() {
   const [commentDelay, setCommentDelay] = useState(15)
   const [commentDelayUnit, setCommentDelayUnit] = useState('minutes')
   
+  // DM configuration fields
+  const [dmButtonText, setDmButtonText] = useState('See products')
+  const [dmWebsiteUrl, setDmWebsiteUrl] = useState('')
+  
   // DM-only automation
   const [dmKeywords, setDmKeywords] = useState([])
   const [dmAutoReply, setDmAutoReply] = useState('')
@@ -330,9 +334,9 @@ export default function AutomationStepByStep() {
         }
         return automationType && getCurrentKeywords().length > 0 // Automation type and keywords required for configuration
       case 3:
-        // For comment_dm automation, step 3 is DM configuration - require DM message
+        // For comment_dm automation, step 3 is DM configuration - require DM message and button text
         if (automationType === 'comment_dm') {
-          return dmMessage.trim().length > 0
+          return dmMessage.trim().length > 0 && dmButtonText.trim().length > 0
         }
         // For other automation types, step 3 is Advanced settings - optional
         return true
@@ -650,32 +654,108 @@ export default function AutomationStepByStep() {
           return (
             <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg">
-                    <MessageCircle className="w-6 h-6 text-white" />
-                  </div>
-                  DM Configuration
-                </h3>
-                <p className="text-lg text-gray-600 mb-8">Configure the private message that will be sent after commenting publicly.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Write a direct message</h3>
+                <p className="text-sm text-gray-600 mb-6">Write the DM you want sent when users include your keyword when they comment on your post.</p>
                 
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Private DM Message</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Direct message</label>
+                    <p className="text-sm text-gray-600 mb-3">We'll send this DM to the user who included your keyword in their comment.</p>
                     <textarea
                       value={dmMessage}
                       onChange={(e) => setDmMessage(e.target.value)}
-                      placeholder="Thanks for your interest! Here's more detailed information..."
-                      className="w-full p-4 border border-gray-300 rounded-lg text-gray-900"
-                      rows="6"
+                      placeholder="Enter your DM text here"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      rows="4"
                     />
-                    <p className="text-xs text-gray-500 mt-2">This message will be sent privately to users who trigger the automation</p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Button text</label>
+                    <input
+                      type="text"
+                      value={dmButtonText}
+                      onChange={(e) => setDmButtonText(e.target.value)}
+                      placeholder="Choose a short and clear button text"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
+                    <input
+                      type="text"
+                      value={dmWebsiteUrl}
+                      onChange={(e) => setDmWebsiteUrl(e.target.value)}
+                      placeholder="Enter the destination URL for your button"
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+                
+                {/* Instagram DM Preview - Only in DM configuration step */}
+                <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm max-w-sm">
+                  <div className="flex items-center gap-2 p-3 border-b border-gray-100">
+                    <div className="w-6 h-6 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <Instagram className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">Instagram direct message</span>
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="text-xs text-gray-500 text-right mb-3">
+                      JUL 15, 08:31 PM
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
+                        <div className="text-sm text-gray-800">
+                          {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
+                        </div>
+                      </div>
+                      
+                      {dmButtonText && (
+                        <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-3 max-w-[200px]">
+                          <div className="bg-white border border-gray-200 rounded-lg p-2 text-center">
+                            <div className="text-sm font-medium text-gray-800">
+                              {dmButtonText}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-xs text-gray-400 uppercase tracking-wide">
+                        R
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <Send className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 text-sm text-gray-500">Message...</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                          <User className="w-3 h-3 text-gray-600" />
+                        </div>
+                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                          <Camera className="w-3 h-3 text-gray-600" />
+                        </div>
+                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                          <Heart className="w-3 h-3 text-gray-600" />
+                        </div>
+                        <div className="w-5 h-5 bg-gray-200 rounded flex items-center justify-center">
+                          <MoreHorizontal className="w-3 h-3 text-gray-600" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )
         }
-        
+
         // For other automation types, step 3 is Advanced Settings
         return (
           <div className="space-y-6">
