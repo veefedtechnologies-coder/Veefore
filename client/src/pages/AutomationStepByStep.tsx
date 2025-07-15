@@ -1532,57 +1532,88 @@ export default function AutomationStepByStep() {
         
         {/* DM Preview Section - Only show for comment to DM automation in steps 4 and 5 */}
         {automationType === 'comment_dm' && (currentStep === 4 || currentStep === 5) && (
-          <div className="bg-white border-l border-r border-gray-200 shadow-2xl mt-4">
-            {/* DM Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 flex items-center gap-3 text-white">
-              <MessageCircle className="w-5 h-5" />
-              <div>
-                <div className="font-semibold text-sm">Private Message</div>
-                <div className="text-xs opacity-90">Sent automatically after comment reply</div>
+          <div className="sticky top-4 mt-4">
+            {/* Preview Header */}
+            <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-4 rounded-t-3xl">
+              <div className="flex items-center gap-3 text-white">
+                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Send className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold">DM Preview</h3>
+                  <p className="text-sm opacity-90">Instagram direct message interface</p>
+                </div>
+                <div className="ml-auto">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
               </div>
             </div>
             
-            {/* DM Interface */}
-            <div className="p-4 bg-gray-50 min-h-[200px]">
-              <div className="flex items-start gap-3">
-                <img 
-                  src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
-                  alt="Profile" 
-                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm" 
-                />
-                <div className="flex-1">
-                  <div className="bg-white rounded-3xl px-4 py-3 shadow-sm max-w-xs">
-                    <div className="text-sm text-gray-900">
-                      {getDMMessage()}
+            {/* Instagram DM Preview - Exact match to reference image */}
+            <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm max-w-sm mx-auto">
+              <div className="p-4">
+                {/* Message timestamp */}
+                <div className="text-xs text-gray-500 text-center mb-4">
+                  JUL 15, 08:31 PM
+                </div>
+                
+                {/* Message bubble with profile picture at bottom-left corner */}
+                <div className="relative mb-4">
+                  <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
+                    <div className="text-sm text-gray-400">
+                      {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
+                    </div>
+                    
+                    {/* Button inside message bubble - white background */}
+                    {dmButtonText && (
+                      <div className="bg-white rounded-lg p-3 text-center mt-3">
+                        <div className="text-sm font-medium text-gray-800">
+                          {dmButtonText}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Profile picture positioned at bottom-left corner overlapping the message bubble */}
+                  <img 
+                    src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
+                    alt="Profile" 
+                    className="absolute bottom-0 left-0 w-8 h-8 rounded-full border-2 border-white bg-white ml-[-11px] mr-[-11px] pl-[0px] pr-[0px] mt-[1px] mb-[1px]" 
+                  />
+                </div>
+                
+                {/* Message input area */}
+                <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <Camera className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1 text-sm text-gray-500 bg-gray-100 rounded-full px-4 py-2">
+                    Message...
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 text-gray-500">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                      </svg>
+                    </div>
+                    <div className="w-6 h-6 text-gray-500">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <div className="w-6 h-6 text-gray-500">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
+                    <div className="w-6 h-6 text-gray-500">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                      </svg>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="text-xs text-gray-500">
-                      {selectedAccountData?.name || 'your_account'}
-                    </div>
-                    <div className="text-xs text-gray-500">•</div>
-                    <div className="text-xs text-gray-500">now</div>
-                    <div className="flex items-center gap-1 ml-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-blue-600 font-medium">Auto-DM</span>
-                    </div>
-                  </div>
                 </div>
-              </div>
-              
-              {/* Message input area */}
-              <div className="flex items-center gap-3 mt-6 bg-white rounded-full p-3 shadow-sm">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Camera className="w-4 h-4 text-white" />
-                </div>
-                <div className="flex-1 text-sm text-gray-400">
-                  Message...
-                </div>
-                <button className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-white">
-                    <path d="M2 12L22 2L18 22L12 14L2 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
