@@ -67,6 +67,7 @@ export default function AutomationStepByStep() {
   const [cooldownPeriod, setCooldownPeriod] = useState(60)
   const [aiPersonality, setAiPersonality] = useState('professional')
   const [activeHours, setActiveHours] = useState({ start: '09:00', end: '18:00' })
+  const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false]) // Mon-Fri default
   
   const platforms = [
     { id: 'instagram', name: 'Instagram', icon: <Instagram className="w-5 h-5" />, color: 'bg-pink-500' },
@@ -179,11 +180,9 @@ export default function AutomationStepByStep() {
 
   const steps = [
     { id: 1, title: 'Select Setup', description: 'Account, content & post' },
-    { id: 2, title: 'Automation type', description: 'Select automation' },
-    { id: 3, title: 'Configuration', description: 'Set up rules' },
-    { id: 4, title: 'Advanced Settings', description: 'Fine-tune timing' },
-    { id: 5, title: 'Review and save', description: 'Review and activate' },
-    { id: 6, title: 'Complete', description: 'Automation ready' }
+    { id: 2, title: 'Automation Config', description: 'Choose & configure automation' },
+    { id: 3, title: 'Advanced Settings', description: 'Fine-tune timing' },
+    { id: 4, title: 'Review & Activate', description: 'Review and activate' }
   ]
 
   // Function to get content types based on selected platform/account
@@ -266,15 +265,11 @@ export default function AutomationStepByStep() {
       case 1:
         return selectedAccount && contentType && selectedPost
       case 2:
-        return automationType
+        return automationType && getCurrentKeywords().length > 0 // Automation type and keywords required for configuration
       case 3:
-        return getCurrentKeywords().length > 0 // Keywords required for configuration
-      case 4:
         return true // Advanced settings are optional
-      case 5:
+      case 4:
         return true // Review step
-      case 6:
-        return true // Final step
       default:
         return false
     }
@@ -431,6 +426,7 @@ export default function AutomationStepByStep() {
       case 2:
         return (
           <div className="space-y-8">
+            {/* Step 1: Choose Automation Type */}
             <div>
               <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg">
@@ -438,50 +434,54 @@ export default function AutomationStepByStep() {
                 </div>
                 Choose Automation Type
               </h3>
-              <div className="grid grid-cols-1 gap-4">
-                {automationTypes.map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => setAutomationType(type.id)}
-                    className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left transform hover:scale-[1.02] hover:shadow-lg ${
-                      automationType === type.id 
-                        ? 'border-emerald-500 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-xl scale-[1.02]' 
-                        : 'border-gray-200 hover:border-emerald-300 bg-white hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-5">
-                      <div className={`p-4 rounded-xl ${type.color} text-white shadow-lg transform transition-transform hover:scale-110`}>
-                        {type.icon}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-xl text-gray-800">{type.name}</div>
-                        <div className="text-sm text-gray-600 mt-2 font-medium">{type.description}</div>
-                      </div>
-                      {automationType === type.id && (
-                        <div className="p-2 bg-emerald-500 rounded-full shadow-lg">
-                          <CheckCircle className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
+              <div className="relative">
+                <select
+                  value={automationType}
+                  onChange={(e) => setAutomationType(e.target.value)}
+                  className="w-full p-4 pr-12 border-2 border-gray-300 rounded-xl bg-white text-gray-800 font-medium focus:border-emerald-500 focus:outline-none shadow-sm hover:border-emerald-400 transition-all duration-200"
+                >
+                  <option value="">Select automation type...</option>
+                  {automationTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.name} - {type.description}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
+
+            {/* Step 2: Configuration (appears after automation type selection) */}
+            {automationType && (
+              <div className="animate-fadeIn">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
+                      <Settings className="w-4 h-4 text-white" />
+                    </div>
+                    Configuration
+                  </h4>
+                  {renderAutomationSpecificConfig()}
+                </div>
+              </div>
+            )}
           </div>
         )
 
       case 3:
         return (
           <div className="space-y-6">
-            {renderAutomationSpecificConfig()}
-          </div>
-        )
-
-      case 4:
-        return (
-          <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Advanced Settings</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                  <Settings className="w-6 h-6 text-white" />
+                </div>
+                Advanced Settings
+              </h3>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
@@ -543,106 +543,69 @@ export default function AutomationStepByStep() {
                   />
                 </div>
               </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Active Days</label>
+                <div className="grid grid-cols-7 gap-2">
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
+                    <button
+                      key={day}
+                      onClick={() => {
+                        const newActiveDays = [...activeDays]
+                        newActiveDays[index] = !newActiveDays[index]
+                        setActiveDays(newActiveDays)
+                      }}
+                      className={`p-2 rounded-lg text-sm font-medium transition-all ${
+                        activeDays[index]
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )
 
-      case 5:
-        const selectedAccountInfo = mockAccounts.find(a => a.id === selectedAccount)
-        const selectedPostInfo = mockPosts.find(p => p.id === selectedPost)
-        const selectedAutomationInfo = automationTypes.find(t => t.id === automationType)
-        
+      case 4:
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Review and Activate Automation</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                Review & Activate
+              </h3>
               
-              <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Selected Account</h4>
-                    <div className="flex items-center gap-3">
-                      <img src={selectedAccountInfo?.avatar} alt="" className="w-8 h-8 rounded-full" />
-                      <div>
-                        <div className="font-medium">{selectedAccountInfo?.username}</div>
-                        <div className="text-sm text-gray-500">{selectedAccountInfo?.platform}</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Content Type</h4>
-                    <div className="text-gray-900">{contentType || 'Not selected'}</div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Selected Post</h4>
-                    {selectedPostInfo ? (
-                      <div className="flex items-center gap-3">
-                        <img src={selectedPostInfo.thumbnail} alt="" className="w-12 h-12 rounded-lg object-cover" />
-                        <div>
-                          <div className="font-medium truncate">{selectedPostInfo.caption}</div>
-                          <div className="text-sm text-gray-500">{selectedPostInfo.likes} likes</div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-gray-500">No post selected</div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Automation Type</h4>
-                    <div className="text-gray-900">{selectedAutomationInfo?.name || 'Not selected'}</div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Keywords</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {keywords.map((keyword, index) => (
-                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Response Messages</h4>
-                  <div className="space-y-2">
-                    {messages.map((message, index) => (
-                      <div key={index} className="p-3 bg-white rounded border text-sm">
-                        {message}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">Max Replies/Day:</span>
-                    <div className="text-gray-900">{maxRepliesPerDay}</div>
+                    <span className="text-sm font-medium text-gray-600">Account:</span>
+                    <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Cooldown:</span>
-                    <div className="text-gray-900">{cooldownPeriod} min</div>
+                    <span className="text-sm font-medium text-gray-600">Content Type:</span>
+                    <div className="text-lg font-semibold text-gray-900 capitalize">{contentType || 'Not selected'}</div>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">AI Personality:</span>
-                    <div className="text-gray-900">{aiPersonality}</div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">Active Hours:</span>
-                    <div className="text-gray-900">{activeHours.start} - {activeHours.end}</div>
+                    <span className="text-sm font-medium text-gray-600">Automation Type:</span>
+                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}</div>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Active Days:</span>
-                    <div className="text-gray-900">{activeDays.filter(Boolean).length} days selected</div>
+                    <span className="text-sm font-medium text-gray-600">Keywords:</span>
+                    <div className="text-lg font-semibold text-gray-900">{getCurrentKeywords().length} keywords</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Daily Limit:</span>
+                    <div className="text-lg font-semibold text-gray-900">{maxRepliesPerDay} replies</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">AI Personality:</span>
+                    <div className="text-lg font-semibold text-gray-900 capitalize">{aiPersonality}</div>
                   </div>
                 </div>
               </div>
@@ -650,31 +613,7 @@ export default function AutomationStepByStep() {
           </div>
         )
 
-      case 6:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="p-8 bg-green-50 rounded-2xl border border-green-200">
-                <div className="p-4 bg-green-500 rounded-full inline-block mb-4">
-                  <CheckCircle className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-green-800 mb-2">Automation Created Successfully!</h3>
-                <p className="text-green-600 mb-6">Your automation is now active and ready to engage with your audience.</p>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-white p-4 rounded-lg border border-green-200">
-                    <div className="font-medium text-green-800">Account</div>
-                    <div className="text-green-600">{mockAccounts.find(a => a.id === selectedAccount)?.username}</div>
-                  </div>
-                  <div className="bg-white p-4 rounded-lg border border-green-200">
-                    <div className="font-medium text-green-800">Automation Type</div>
-                    <div className="text-green-600">{automationTypes.find(t => t.id === automationType)?.name}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
+
 
 
 
@@ -1081,7 +1020,7 @@ export default function AutomationStepByStep() {
                   Step {currentStep} of {steps.length}
                 </div>
                 
-                {currentStep < 6 ? (
+                {currentStep < 4 ? (
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
