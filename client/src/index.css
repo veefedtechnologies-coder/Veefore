@@ -4,6 +4,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Modern Dropdown Animations */
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+}
+
+.dropdown-enter {
+  animation: dropdown-enter 200ms ease-out forwards;
+}
+
+.dropdown-exit {
+  animation: dropdown-exit 150ms ease-in forwards;
+}
+
 /* Fade in animation for progressive disclosure */
 @keyframes fadeIn {
   from {

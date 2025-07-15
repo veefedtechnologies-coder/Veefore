@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { 
   Instagram, 
   Bot, 
@@ -31,7 +31,10 @@ import {
   Globe,
   FileText,
   MessageSquare,
-  Settings
+  Settings,
+  ChevronDown,
+  Search,
+  Check
 } from 'lucide-react'
 
 export default function AutomationStepByStep() {
@@ -68,6 +71,37 @@ export default function AutomationStepByStep() {
   const [aiPersonality, setAiPersonality] = useState('professional')
   const [activeHours, setActiveHours] = useState({ start: '09:00', end: '18:00' })
   const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false]) // Mon-Fri default
+  
+  // Modern dropdown states
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
+  const [contentTypeDropdownOpen, setContentTypeDropdownOpen] = useState(false)
+  const [automationTypeDropdownOpen, setAutomationTypeDropdownOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  // Refs for dropdown management
+  const accountDropdownRef = useRef<HTMLDivElement>(null)
+  const contentTypeDropdownRef = useRef<HTMLDivElement>(null)
+  const automationTypeDropdownRef = useRef<HTMLDivElement>(null)
+  
+  // Handle click outside dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(event.target as Node)) {
+        setAccountDropdownOpen(false)
+      }
+      if (contentTypeDropdownRef.current && !contentTypeDropdownRef.current.contains(event.target as Node)) {
+        setContentTypeDropdownOpen(false)
+      }
+      if (automationTypeDropdownRef.current && !automationTypeDropdownRef.current.contains(event.target as Node)) {
+        setAutomationTypeDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
   
   const platforms = [
     { id: 'instagram', name: 'Instagram', icon: <Instagram className="w-5 h-5" />, color: 'bg-pink-500' },
@@ -328,24 +362,72 @@ export default function AutomationStepByStep() {
                 </div>
                 Select Account
               </h3>
-              <div className="relative">
-                <select
-                  value={selectedAccount}
-                  onChange={(e) => setSelectedAccount(e.target.value)}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 appearance-none text-gray-800 font-medium"
+              <div className="relative" ref={accountDropdownRef}>
+                <button
+                  onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
                 >
-                  <option value="">Choose your social media account...</option>
-                  {mockAccounts.map(account => (
-                    <option key={account.id} value={account.id}>
-                      {account.name} • {account.followers} • {account.platform}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                  <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
+                    {selectedAccount 
+                      ? mockAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + mockAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + mockAccounts.find(acc => acc.id === selectedAccount)?.platform
+                      : 'Choose your social media account...'
+                    }
+                  </span>
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${accountDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {accountDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                    <div className="p-3 border-b border-gray-100">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Search accounts..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="py-1">
+                      {mockAccounts
+                        .filter(account => 
+                          account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          account.platform.toLowerCase().includes(searchTerm.toLowerCase())
+                        )
+                        .map(account => (
+                          <button
+                            key={account.id}
+                            onClick={() => {
+                              setSelectedAccount(account.id)
+                              setAccountDropdownOpen(false)
+                              setSearchTerm('')
+                            }}
+                            className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors duration-150 flex items-center justify-between group"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-3 h-3 rounded-full ${account.platform === 'Instagram' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : account.platform === 'YouTube' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+                              <div>
+                                <div className="font-medium text-gray-900">{account.name}</div>
+                                <div className="text-sm text-gray-500">{account.followers} • {account.platform}</div>
+                              </div>
+                            </div>
+                            {selectedAccount === account.id && (
+                              <Check className="w-4 h-4 text-blue-600" />
+                            )}
+                          </button>
+                        ))
+                      }
+                      {mockAccounts.filter(account => 
+                        account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        account.platform.toLowerCase().includes(searchTerm.toLowerCase())
+                      ).length === 0 && (
+                        <div className="px-4 py-3 text-gray-500 text-sm">No accounts found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -358,24 +440,50 @@ export default function AutomationStepByStep() {
                   </div>
                   Select Content Type
                 </h3>
-                <div className="relative">
-                  <select
-                    value={contentType}
-                    onChange={(e) => setContentType(e.target.value)}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-all duration-200 appearance-none text-gray-800 font-medium"
+                <div className="relative" ref={contentTypeDropdownRef}>
+                  <button
+                    onClick={() => setContentTypeDropdownOpen(!contentTypeDropdownOpen)}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
+                    disabled={!selectedAccount}
                   >
-                    <option value="">Choose content type for your automation...</option>
-                    {getContentTypesForPlatform(selectedAccount).map(type => (
-                      <option key={type.id} value={type.id}>
-                        {type.icon} {type.name} - {type.description}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
+                    <span className={contentType ? 'text-gray-900' : 'text-gray-500'}>
+                      {contentType 
+                        ? getContentTypesForPlatform(selectedAccount).find(type => type.id === contentType)?.name + ' - ' + getContentTypesForPlatform(selectedAccount).find(type => type.id === contentType)?.description
+                        : 'Choose content type for your automation...'
+                      }
+                    </span>
+                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${contentTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {contentTypeDropdownOpen && selectedAccount && (
+                    <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                      <div className="py-1">
+                        {getContentTypesForPlatform(selectedAccount).map(type => (
+                          <button
+                            key={type.id}
+                            onClick={() => {
+                              setContentType(type.id)
+                              setContentTypeDropdownOpen(false)
+                            }}
+                            className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-colors duration-150 flex items-center justify-between group"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded-lg ${type.color} flex items-center justify-center text-white`}>
+                                {type.icon}
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900">{type.name}</div>
+                                <div className="text-sm text-gray-500">{type.description}</div>
+                              </div>
+                            </div>
+                            {contentType === type.id && (
+                              <Check className="w-4 h-4 text-purple-600" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -434,24 +542,49 @@ export default function AutomationStepByStep() {
                 </div>
                 Choose Automation Type
               </h3>
-              <div className="relative">
-                <select
-                  value={automationType}
-                  onChange={(e) => setAutomationType(e.target.value)}
-                  className="w-full p-4 pr-12 border-2 border-gray-300 rounded-xl bg-white text-gray-800 font-medium focus:border-emerald-500 focus:outline-none shadow-sm hover:border-emerald-400 transition-all duration-200"
+              <div className="relative" ref={automationTypeDropdownRef}>
+                <button
+                  onClick={() => setAutomationTypeDropdownOpen(!automationTypeDropdownOpen)}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
                 >
-                  <option value="">Select automation type...</option>
-                  {automationTypes.map(type => (
-                    <option key={type.id} value={type.id}>
-                      {type.name} - {type.description}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                  <span className={automationType ? 'text-gray-900' : 'text-gray-500'}>
+                    {automationType 
+                      ? automationTypes.find(type => type.id === automationType)?.name + ' - ' + automationTypes.find(type => type.id === automationType)?.description
+                      : 'Select automation type...'
+                    }
+                  </span>
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${automationTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {automationTypeDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                    <div className="py-1">
+                      {automationTypes.map(type => (
+                        <button
+                          key={type.id}
+                          onClick={() => {
+                            setAutomationType(type.id)
+                            setAutomationTypeDropdownOpen(false)
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors duration-150 flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-lg ${type.color} flex items-center justify-center text-white`}>
+                              {type.icon}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{type.name}</div>
+                              <div className="text-sm text-gray-500">{type.description}</div>
+                            </div>
+                          </div>
+                          {automationType === type.id && (
+                            <Check className="w-4 h-4 text-emerald-600" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
