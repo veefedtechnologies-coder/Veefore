@@ -177,12 +177,12 @@ export default function AutomationStepByStep() {
   ]
 
   const steps = [
-    { id: 1, title: 'Select Account', description: 'Choose your social media account' },
-    { id: 2, title: 'Content Type', description: 'Choose content type for automation' },
-    { id: 3, title: 'Automation Type', description: 'Select automation method' },
-    { id: 4, title: 'Configuration', description: 'Set up your automation rules' },
-    { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing and limits' },
-    { id: 6, title: 'Review & Activate', description: 'Review and activate your automation' }
+    { id: 1, title: 'Select account', description: 'Choose your account' },
+    { id: 2, title: 'Content type', description: 'Pick content type' },
+    { id: 3, title: 'Automation type', description: 'Select automation' },
+    { id: 4, title: 'Configuration', description: 'Set up rules' },
+    { id: 5, title: 'Advanced Settings', description: 'Fine-tune timing' },
+    { id: 6, title: 'Review and save', description: 'Review and activate' }
   ]
 
   const addKeyword = () => {
@@ -893,32 +893,35 @@ export default function AutomationStepByStep() {
 
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  currentStep >= step.id 
-                    ? 'bg-blue-500 border-blue-500 text-white' 
-                    : 'border-gray-300 text-gray-400'
-                }`}>
-                  {currentStep > step.id ? (
-                    <CheckCircle className="w-5 h-5" />
-                  ) : (
-                    <span className="text-sm font-medium">{step.id}</span>
-                  )}
+              <div key={step.id} className="flex items-center flex-1">
+                <div className="flex flex-col items-center">
+                  <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+                    currentStep >= step.id 
+                      ? 'bg-blue-500 border-blue-500 text-white' 
+                      : currentStep === step.id
+                      ? 'bg-blue-500 border-blue-500 text-white'
+                      : 'border-gray-300 text-gray-400 bg-white'
+                  }`}>
+                    {currentStep > step.id ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <span className="text-sm font-medium">{step.id}</span>
+                    )}
+                  </div>
+                  <div className="mt-2 text-center">
+                    <div className="text-sm font-medium text-gray-900">{step.title}</div>
+                    <div className="text-xs text-gray-500">{step.description}</div>
+                  </div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-full h-1 mx-4 ${
+                  <div className={`flex-1 h-0.5 mx-4 mt-[-20px] ${
                     currentStep > step.id ? 'bg-blue-500' : 'bg-gray-200'
                   }`} />
                 )}
               </div>
             ))}
-          </div>
-          
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold text-gray-900">{steps[currentStep - 1]?.title}</h2>
-            <p className="text-gray-600">{steps[currentStep - 1]?.description}</p>
           </div>
         </div>
 
