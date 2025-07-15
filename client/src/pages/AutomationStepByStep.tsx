@@ -1260,28 +1260,28 @@ export default function AutomationStepByStep() {
                 JUL 15, 08:31 PM
               </div>
               
-              {/* Message bubble */}
-              <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] mb-4">
-                <div className="text-sm text-gray-700">
-                  {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
+              {/* Message bubble with profile picture at bottom-left corner */}
+              <div className="relative mb-4">
+                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
+                  <div className="text-sm text-gray-700">
+                    {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
+                  </div>
+                  
+                  {/* Button inside message bubble - white background */}
+                  {dmButtonText && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-center mt-3">
+                      <div className="text-sm font-medium text-gray-800">
+                        {dmButtonText}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
-                {/* Button inside message bubble - white background */}
-                {dmButtonText && (
-                  <div className="bg-white border border-gray-200 rounded-lg p-3 text-center mt-3">
-                    <div className="text-sm font-medium text-gray-800">
-                      {dmButtonText}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Profile picture positioned below message with proper spacing */}
-              <div className="flex items-center mb-4 ml-2">
+                {/* Profile picture positioned at bottom-left corner overlapping the message bubble */}
                 <img 
                   src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
                   alt="Profile" 
-                  className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold" 
+                  className="absolute bottom-0 left-0 w-6 h-6 rounded-full border-2 border-white bg-white" 
                 />
               </div>
               
