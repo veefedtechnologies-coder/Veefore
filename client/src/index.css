@@ -568,7 +568,7 @@ body {
 /* Thin external scrollbar for sidebar */
 .sidebar-external-container {
   position: relative;
-  width: 76px; /* 72px (w-18) + 4px for scrollbar */
+  width: 92px; /* 88px (w-22) + 4px for scrollbar */
   height: 100vh;
   overflow: hidden;
 }
@@ -577,7 +577,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 72px; /* Original w-18 width */
+  width: 88px; /* Updated w-22 width */
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -587,7 +587,7 @@ body {
 .sidebar-thin-scroll::-webkit-scrollbar {
   width: 4px;
   position: absolute;
-  right: -4px; /* Position scrollbar outside the 72px sidebar */
+  right: -4px; /* Position scrollbar outside the 88px sidebar */
 }
 
 .sidebar-thin-scroll::-webkit-scrollbar-track {
