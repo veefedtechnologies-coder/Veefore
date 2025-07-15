@@ -509,9 +509,9 @@ function App() {
           </Route>
 
           <Route path="/automation">
-            <div className="min-h-screen bg-gray-50 flex relative">
-              {/* Sidebar */}
-              <div className="w-24 bg-white border-r border-gray-200 shadow-sm">
+            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
                 <Sidebar 
                   className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
                   isCreateDropdownOpen={isCreateDropdownOpen}
@@ -519,8 +519,8 @@ function App() {
                 />
               </div>
 
-              {/* Main Content Area - Full width without header */}
-              <div className="flex-1 min-h-screen">
+              {/* Main Content Area - Independent scrolling */}
+              <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 {/* Create Dropdown */}
                 {isCreateDropdownOpen && (
                   <CreateDropdown
@@ -530,8 +530,8 @@ function App() {
                   />
                 )}
 
-                {/* Main Content - Full width automation page */}
-                <main className="w-full">
+                {/* Main Content - Scrollable */}
+                <main className="flex-1 overflow-y-auto">
                   <AutomationStepByStep />
                 </main>
               </div>

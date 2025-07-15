@@ -1658,7 +1658,7 @@ export default function AutomationStepByStep() {
   }
 
   return (
-    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
       {/* Full Width Header Bar */}
       <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 flex items-center justify-between w-full shadow-sm">
         <div className="flex items-center gap-3">
