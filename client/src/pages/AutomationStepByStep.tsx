@@ -212,12 +212,32 @@ export default function AutomationStepByStep() {
     }
   ]
 
-  const steps = [
-    { id: 1, title: 'Select Setup', description: 'Account, content & post' },
-    { id: 2, title: 'Automation Config', description: 'Choose & configure automation' },
-    { id: 3, title: 'Advanced Settings', description: 'Fine-tune timing' },
-    { id: 4, title: 'Review & Activate', description: 'Review and activate' }
-  ]
+  // Dynamic steps based on automation type
+  const getSteps = () => {
+    const baseSteps = [
+      { id: 1, title: 'Select Setup', description: 'Account, content & post' },
+      { id: 2, title: 'Automation Config', description: 'Choose & configure automation' }
+    ]
+    
+    // For comment to DM, add separate comment and DM steps
+    if (automationType === 'comment_dm') {
+      return [
+        ...baseSteps,
+        { id: 3, title: 'DM Configuration', description: 'Setup private message' },
+        { id: 4, title: 'Advanced Settings', description: 'Fine-tune timing' },
+        { id: 5, title: 'Review & Activate', description: 'Review and activate' }
+      ]
+    }
+    
+    // For other types, keep original flow
+    return [
+      ...baseSteps,
+      { id: 3, title: 'Advanced Settings', description: 'Fine-tune timing' },
+      { id: 4, title: 'Review & Activate', description: 'Review and activate' }
+    ]
+  }
+  
+  const steps = getSteps()
 
   // Function to get content types based on selected platform/account
   const getContentTypesForPlatform = (accountId) => {
@@ -301,16 +321,26 @@ export default function AutomationStepByStep() {
       case 2:
         return automationType && getCurrentKeywords().length > 0 // Automation type and keywords required for configuration
       case 3:
-        return true // Advanced settings are optional
+        // For comment_dm automation, step 3 is DM configuration - require DM message
+        if (automationType === 'comment_dm') {
+          return dmMessage.trim().length > 0
+        }
+        // For other automation types, step 3 is Advanced settings - optional
+        return true
       case 4:
-        return true // Review step
+        // For comment_dm automation, step 4 is Advanced settings - optional
+        // For other automation types, step 4 is Review step - always allow
+        return true
+      case 5:
+        // Step 5 is only for comment_dm automation - Review step - always allow
+        return true
       default:
         return false
     }
   }
 
   const handleNext = () => {
-    if (canProceedToNext() && currentStep < 6) {
+    if (canProceedToNext() && currentStep < steps.length) {
       // Reset content type when account changes and auto-set platform
       if (currentStep === 1) {
         setContentType('')
@@ -606,6 +636,38 @@ export default function AutomationStepByStep() {
         )
 
       case 3:
+        // For comment_dm automation, step 3 is DM configuration
+        if (automationType === 'comment_dm') {
+          return (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg">
+                    <MessageCircle className="w-6 h-6 text-white" />
+                  </div>
+                  DM Configuration
+                </h3>
+                <p className="text-lg text-gray-600 mb-8">Configure the private message that will be sent after commenting publicly.</p>
+                
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Private DM Message</label>
+                    <textarea
+                      value={dmMessage}
+                      onChange={(e) => setDmMessage(e.target.value)}
+                      placeholder="Thanks for your interest! Here's more detailed information..."
+                      className="w-full p-4 border border-gray-300 rounded-lg text-gray-900"
+                      rows="6"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">This message will be sent privately to users who trigger the automation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+        
+        // For other automation types, step 3 is Advanced Settings
         return (
           <div className="space-y-6">
             <div>
@@ -704,6 +766,151 @@ export default function AutomationStepByStep() {
         )
 
       case 4:
+        // For comment_dm automation, step 4 is Advanced Settings
+        if (automationType === 'comment_dm') {
+          return (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                    <Settings className="w-6 h-6 text-white" />
+                  </div>
+                  Advanced Settings
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Max Replies per Day</label>
+                    <input
+                      type="number"
+                      value={maxRepliesPerDay}
+                      onChange={(e) => setMaxRepliesPerDay(Number(e.target.value))}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      min="1"
+                      max="500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cooldown Period (minutes)</label>
+                    <input
+                      type="number"
+                      value={cooldownPeriod}
+                      onChange={(e) => setCooldownPeriod(Number(e.target.value))}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      min="1"
+                      max="1440"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">AI Personality</label>
+                  <select
+                    value={aiPersonality}
+                    onChange={(e) => setAiPersonality(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  >
+                    <option value="professional">Professional</option>
+                    <option value="friendly">Friendly</option>
+                    <option value="casual">Casual</option>
+                    <option value="enthusiastic">Enthusiastic</option>
+                    <option value="witty">Witty</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Active Start Time</label>
+                    <input
+                      type="time"
+                      value={activeHours.start}
+                      onChange={(e) => setActiveHours({...activeHours, start: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Active End Time</label>
+                    <input
+                      type="time"
+                      value={activeHours.end}
+                      onChange={(e) => setActiveHours({...activeHours, end: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Active Days</label>
+                  <div className="grid grid-cols-7 gap-2">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
+                      <button
+                        key={day}
+                        onClick={() => {
+                          const newActiveDays = [...activeDays]
+                          newActiveDays[index] = !newActiveDays[index]
+                          setActiveDays(newActiveDays)
+                        }}
+                        className={`p-2 rounded-lg text-sm font-medium transition-all ${
+                          activeDays[index]
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+        
+        // For other automation types, step 4 is Review & Activate
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                Review & Activate
+              </h3>
+              
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Account:</span>
+                    <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Content Type:</span>
+                    <div className="text-lg font-semibold text-gray-900 capitalize">{contentType || 'Not selected'}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Automation Type:</span>
+                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Keywords:</span>
+                    <div className="text-lg font-semibold text-gray-900">{getCurrentKeywords().length} keywords</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Daily Limit:</span>
+                    <div className="text-lg font-semibold text-gray-900">{maxRepliesPerDay} replies</div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">AI Personality:</span>
+                    <div className="text-lg font-semibold text-gray-900 capitalize">{aiPersonality}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 5:
+        // Step 5 is only for comment_dm automation - Review & Activate
         return (
           <div className="space-y-6">
             <div>
@@ -763,7 +970,8 @@ export default function AutomationStepByStep() {
         return (
           <>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Comment → DM Configuration</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Comment Reply Configuration</h3>
+              <p className="text-sm text-gray-600 mb-6">Configure the public comment that will be posted when keywords are detected. DM settings will be configured in the next step.</p>
               
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Trigger Keywords</label>
@@ -798,7 +1006,7 @@ export default function AutomationStepByStep() {
                 </div>
               </div>
 
-              <div className="mb-6">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Public Comment Reply</label>
                 <textarea
                   value={commentReply}
@@ -807,17 +1015,7 @@ export default function AutomationStepByStep() {
                   className="w-full p-3 border border-gray-300 rounded-lg"
                   rows="3"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Private DM Message</label>
-                <textarea
-                  value={dmMessage}
-                  onChange={(e) => setDmMessage(e.target.value)}
-                  placeholder="Thanks for your interest! Here's more information..."
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  rows="4"
-                />
+                <p className="text-xs text-gray-500 mt-2">This message will be posted as a public comment reply</p>
               </div>
             </div>
           </>
@@ -1315,7 +1513,7 @@ export default function AutomationStepByStep() {
                   Step {currentStep} of {steps.length}
                 </div>
                 
-                {currentStep < 4 ? (
+                {currentStep < steps.length ? (
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
