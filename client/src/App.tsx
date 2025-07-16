@@ -405,8 +405,33 @@ function App() {
           </Route>
           
           <Route path="/video-generator">
-            {/* Standalone Cosmos Studio interface - NO VeeFore layout */}
-            <VideoGeneratorAdvanced />
+            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
+                <Sidebar 
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  isCreateDropdownOpen={isCreateDropdownOpen}
+                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                />
+              </div>
+
+              {/* Main Content Area - Cosmos Studio interface without VeeFore header */}
+              <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                {/* Create Dropdown */}
+                {isCreateDropdownOpen && (
+                  <CreateDropdown
+                    isOpen={isCreateDropdownOpen}
+                    onClose={() => setIsCreateDropdownOpen(false)}
+                    onOptionSelect={handleCreateOptionSelect}
+                  />
+                )}
+
+                {/* Cosmos Studio Interface - Full height */}
+                <main className="flex-1 overflow-hidden">
+                  <VideoGeneratorAdvanced />
+                </main>
+              </div>
+            </div>
           </Route>
           
           <Route path="/workspaces">
