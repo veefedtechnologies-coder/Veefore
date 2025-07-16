@@ -47,22 +47,53 @@ const VideoGeneratorAdvanced = () => {
   // Generated script state
   const [generatedScript, setGeneratedScript] = useState<GeneratedScript | null>(null);
   
-  // Advanced settings
+  // Advanced settings based on video-generator.md specifications
   const [settings, setSettings] = useState({
+    // Video Quality & Duration
     duration: 60,
     aspectRatio: '16:9',
     resolution: '1080p',
+    fps: 30,
+    
+    // Motion Engine (core feature from video-generator.md)
+    motionEngine: 'Auto', // Auto, Runway Gen-2, AnimateDiff + Interpolation
     visualStyle: 'cinematic',
+    
+    // Voice & Audio (comprehensive ElevenLabs integration)
     voiceGender: 'female',
+    voiceLanguage: 'English',
+    voiceAccent: 'American',
     voiceTone: 'professional',
+    voiceStability: 0.4,
+    voiceSimilarity: 0.75,
+    
+    // Background Audio
     backgroundMusic: true,
     musicGenre: 'corporate',
+    musicVolume: 0.3,
+    
+    // Avatar & Visual Features (Hedra integration)
     avatar: false,
     avatarStyle: 'realistic',
+    avatarPosition: 'corner', // corner, fullscreen, intro-only
+    
+    // Text & Captions
     language: 'en',
     captions: true,
+    captionStyle: 'modern',
+    onScreenText: true,
+    
+    // Effects & Transitions
     transitions: 'smooth',
-    colorScheme: 'vibrant'
+    colorScheme: 'vibrant',
+    zoomEffects: true,
+    fadeTransitions: true,
+    
+    // Advanced Features
+    enableWatermark: true,
+    enableLogo: false,
+    speedControl: 1.0, // 0.5x to 2.0x
+    enableColorGrading: true
   });
 
   // Sample projects
@@ -324,7 +355,45 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Voice & Audio */}
+              {/* Motion Engine (Core Feature from video-generator.md) */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Motion Engine</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Generation Method</label>
+                    <select
+                      value={settings.motionEngine}
+                      onChange={(e) => setSettings(prev => ({...prev, motionEngine: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="Auto">Auto (AI Decides) - Recommended</option>
+                      <option value="Runway Gen-2">Runway Gen-2 (Cinematic Quality)</option>
+                      <option value="AnimateDiff">AnimateDiff + Interpolation (Budget)</option>
+                    </select>
+                  </div>
+                  <div className="text-xs text-gray-600 bg-white/50 p-3 rounded-lg">
+                    {settings.motionEngine === 'Auto' && "AI analyzes scene complexity and credits to choose the best engine"}
+                    {settings.motionEngine === 'Runway Gen-2' && "Premium cinematic quality. 10-20 credits per scene"}
+                    {settings.motionEngine === 'AnimateDiff' && "Budget-friendly with smooth interpolation. 2-5 credits per scene"}
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Visual Style</label>
+                    <select
+                      value={settings.visualStyle}
+                      onChange={(e) => setSettings(prev => ({...prev, visualStyle: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="cinematic">Cinematic</option>
+                      <option value="realistic">Realistic</option>
+                      <option value="stylized">Stylized</option>
+                      <option value="anime">Anime</option>
+                      <option value="documentary">Documentary</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Voice & Audio (Enhanced ElevenLabs Integration) */}
               <div className="bg-[#ededed] rounded-xl p-6">
                 <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Voice & Audio</h3>
                 <div className="space-y-4">
@@ -337,6 +406,23 @@ const VideoGeneratorAdvanced = () => {
                     >
                       <option value="female">Female</option>
                       <option value="male">Male</option>
+                      <option value="neutral">Neutral</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Language & Accent</label>
+                    <select
+                      value={settings.voiceLanguage}
+                      onChange={(e) => setSettings(prev => ({...prev, voiceLanguage: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="English">English (American)</option>
+                      <option value="English-UK">English (British)</option>
+                      <option value="English-AU">English (Australian)</option>
+                      <option value="Hindi">Hindi (Indian)</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                      <option value="German">German</option>
                     </select>
                   </div>
                   <div>
@@ -364,14 +450,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Visual Features */}
+              {/* Avatar & Visual Features (Hedra Integration) */}
               <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Visual Features</h3>
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Avatar & Visual Features</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
                     <div>
                       <span className="text-[#141414] text-sm font-medium leading-normal block">AI Avatar</span>
-                      <span className="text-neutral-500 text-xs">Add virtual presenter</span>
+                      <span className="text-neutral-500 text-xs">Talking head with lip sync</span>
                     </div>
                     <input
                       type="checkbox"
@@ -380,10 +466,40 @@ const VideoGeneratorAdvanced = () => {
                       className="rounded"
                     />
                   </div>
+                  {settings.avatar && (
+                    <>
+                      <div>
+                        <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Avatar Style</label>
+                        <select
+                          value={settings.avatarStyle}
+                          onChange={(e) => setSettings(prev => ({...prev, avatarStyle: e.target.value}))}
+                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                        >
+                          <option value="realistic">Realistic</option>
+                          <option value="professional">Professional</option>
+                          <option value="casual">Casual</option>
+                          <option value="animated">Animated</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Avatar Position</label>
+                        <select
+                          value={settings.avatarPosition}
+                          onChange={(e) => setSettings(prev => ({...prev, avatarPosition: e.target.value}))}
+                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                        >
+                          <option value="corner">Corner Overlay</option>
+                          <option value="intro-only">Intro Only (5-10s)</option>
+                          <option value="fullscreen">Full Screen</option>
+                          <option value="cutins">Story Cut-ins</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
                     <div>
                       <span className="text-[#141414] text-sm font-medium leading-normal block">Auto Captions</span>
-                      <span className="text-neutral-500 text-xs">Generate subtitles</span>
+                      <span className="text-neutral-500 text-xs">AI-generated subtitles</span>
                     </div>
                     <input
                       type="checkbox"
@@ -392,45 +508,183 @@ const VideoGeneratorAdvanced = () => {
                       className="rounded"
                     />
                   </div>
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">On-Screen Text</span>
+                      <span className="text-neutral-500 text-xs">Key quotes & highlights</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.onScreenText}
+                      onChange={(e) => setSettings(prev => ({...prev, onScreenText: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Effects & Transitions */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Effects & Transitions</h3>
+                <div className="space-y-4">
                   <div>
-                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Visual Style</label>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Transition Style</label>
                     <select
-                      value={settings.visualStyle}
-                      onChange={(e) => setSettings(prev => ({...prev, visualStyle: e.target.value}))}
+                      value={settings.transitions}
+                      onChange={(e) => setSettings(prev => ({...prev, transitions: e.target.value}))}
                       className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
                     >
-                      <option value="cinematic">Cinematic</option>
-                      <option value="modern">Modern</option>
-                      <option value="minimalist">Minimalist</option>
-                      <option value="dynamic">Dynamic</option>
+                      <option value="smooth">Smooth Fade</option>
+                      <option value="crossfade">Cross Fade</option>
+                      <option value="slide">Slide Transition</option>
+                      <option value="wipe">Wipe Effect</option>
+                      <option value="zoom">Zoom Transition</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">Zoom Effects</span>
+                      <span className="text-neutral-500 text-xs">Dynamic camera movements</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.zoomEffects}
+                      onChange={(e) => setSettings(prev => ({...prev, zoomEffects: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">Color Grading</span>
+                      <span className="text-neutral-500 text-xs">Cinematic color correction</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.enableColorGrading}
+                      onChange={(e) => setSettings(prev => ({...prev, enableColorGrading: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Speed Control</label>
+                    <select
+                      value={settings.speedControl}
+                      onChange={(e) => setSettings(prev => ({...prev, speedControl: parseFloat(e.target.value)}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value={0.5}>0.5x (Slow Motion)</option>
+                      <option value={0.75}>0.75x (Slow)</option>
+                      <option value={1.0}>1.0x (Normal)</option>
+                      <option value={1.25}>1.25x (Fast)</option>
+                      <option value={1.5}>1.5x (Faster)</option>
+                      <option value={2.0}>2.0x (Time-lapse)</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Settings Preview */}
+              {/* Background Music & Audio Settings */}
               <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Preview Settings</h3>
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Background Music</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">Enable Music</span>
+                      <span className="text-neutral-500 text-xs">Add background soundtrack</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.backgroundMusic}
+                      onChange={(e) => setSettings(prev => ({...prev, backgroundMusic: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                  {settings.backgroundMusic && (
+                    <>
+                      <div>
+                        <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Music Genre</label>
+                        <select
+                          value={settings.musicGenre}
+                          onChange={(e) => setSettings(prev => ({...prev, musicGenre: e.target.value}))}
+                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                        >
+                          <option value="corporate">Corporate</option>
+                          <option value="cinematic">Cinematic</option>
+                          <option value="upbeat">Upbeat</option>
+                          <option value="ambient">Ambient</option>
+                          <option value="emotional">Emotional</option>
+                          <option value="tech">Tech/Electronic</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Music Volume</label>
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="0.8"
+                          step="0.1"
+                          value={settings.musicVolume}
+                          onChange={(e) => setSettings(prev => ({...prev, musicVolume: parseFloat(e.target.value)}))}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-neutral-500 mt-1">
+                          <span>Quiet</span>
+                          <span>{Math.round(settings.musicVolume * 100)}%</span>
+                          <span>Loud</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Credit Estimation & Cost Preview */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Cost Estimation</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Duration:</span>
-                    <span className="text-[#141414] font-medium">{settings.duration}s</span>
+                    <span className="text-neutral-500">Motion Engine:</span>
+                    <span className="text-[#141414] font-medium">{settings.motionEngine}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Quality:</span>
-                    <span className="text-[#141414] font-medium">{settings.resolution}</span>
+                    <span className="text-neutral-500">Est. Credits per Scene:</span>
+                    <span className="text-[#141414] font-medium">
+                      {settings.motionEngine === 'Runway Gen-2' ? '10-20' : 
+                       settings.motionEngine === 'AnimateDiff' ? '2-5' : 
+                       'Auto (varies)'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Ratio:</span>
-                    <span className="text-[#141414] font-medium">{settings.aspectRatio}</span>
+                    <span className="text-neutral-500">Estimated Scenes:</span>
+                    <span className="text-[#141414] font-medium">{Math.ceil(settings.duration / 10)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Style:</span>
-                    <span className="text-[#141414] font-medium">{settings.visualStyle}</span>
+                    <span className="text-neutral-500">Voice Generation:</span>
+                    <span className="text-[#141414] font-medium">5 credits</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-500">Voice:</span>
-                    <span className="text-[#141414] font-medium">{settings.voiceGender} {settings.voiceTone}</span>
+                  {settings.avatar && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-500">Avatar Lip Sync:</span>
+                      <span className="text-[#141414] font-medium">15 credits</span>
+                    </div>
+                  )}
+                  <hr className="border-gray-300" />
+                  <div className="flex justify-between font-semibold">
+                    <span className="text-[#141414]">Total Estimated:</span>
+                    <span className="text-[#141414]">
+                      {(() => {
+                        const scenes = Math.ceil(settings.duration / 10);
+                        const motionCost = settings.motionEngine === 'Runway Gen-2' ? scenes * 15 : 
+                                         settings.motionEngine === 'AnimateDiff' ? scenes * 3.5 : 
+                                         scenes * 8;
+                        const voiceCost = 5;
+                        const avatarCost = settings.avatar ? 15 : 0;
+                        return Math.ceil(motionCost + voiceCost + avatarCost);
+                      })()} credits
+                    </span>
+                  </div>
+                  <div className="text-xs text-neutral-500 mt-2">
+                    * Final cost may vary based on actual scene complexity and AI optimization
                   </div>
                 </div>
               </div>
