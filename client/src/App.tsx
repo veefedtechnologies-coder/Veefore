@@ -29,7 +29,7 @@ import { apiRequest } from '@/lib/queryClient'
 import Profile from './pages/Profile'
 import Integration from './pages/Integration'
 import AutomationStepByStep from './pages/AutomationStepByStep'
-import VideoGeneratorSimple from './pages/VideoGeneratorSimple'
+import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -433,7 +433,7 @@ function App() {
 
                 {/* Main Content - Scrollable */}
                 <main className="flex-1 overflow-y-auto p-6">
-                  <VideoGeneratorSimple />
+                  <VideoGeneratorAdvanced />
                 </main>
               </div>
             </div>
