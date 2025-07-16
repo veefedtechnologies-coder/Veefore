@@ -39,7 +39,7 @@ interface GeneratedScript {
 }
 
 const VideoGeneratorAdvanced = () => {
-  const [currentStep, setCurrentStep] = useState<'prompt' | 'script' | 'settings' | 'preview'>('prompt');
+  const [currentStep, setCurrentStep] = useState<'prompt' | 'settings' | 'script' | 'advanced' | 'preview'>('prompt');
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -205,7 +205,7 @@ const VideoGeneratorAdvanced = () => {
             {/* Generate button - exact match */}
             <div className="flex px-4 py-3 justify-center">
               <button
-                onClick={generateScript}
+                onClick={() => setCurrentStep('settings')}
                 disabled={!prompt.trim()}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-black text-neutral-50 text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50"
               >
@@ -234,6 +234,223 @@ const VideoGeneratorAdvanced = () => {
             <p className="text-[#141414] text-base font-normal leading-normal pb-3 pt-1 px-4">
               Need help getting started? Explore our tutorials or ask our AI assistant for guidance on crafting the perfect video prompt.
             </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSettingsStep = () => (
+    <div className="relative flex size-full min-h-screen flex-col bg-neutral-50" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
+      <div className="layout-container flex h-full grow flex-col">
+        {/* Header matching Cosmos Studio exactly */}
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3">
+          <div className="flex items-center gap-4 text-[#141414]">
+            <div className="size-4">
+              <Video className="w-4 h-4" />
+            </div>
+            <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">VeeFore Studio</h2>
+          </div>
+          <div className="flex flex-1 justify-end gap-8">
+            <div className="flex items-center gap-9">
+              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Dashboard</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Templates</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Tutorials</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Community</a>
+            </div>
+            <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#ededed] text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+              </svg>
+            </button>
+            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/a/ACg8ocJPrcoVstl69SDbEJG3VutOYCtG2q1O0L-jelhQ0JSevpHsGg=s96-c")'}}></div>
+          </div>
+        </header>
+
+        {/* Main content area matching exact layout */}
+        <div className="px-40 flex flex-1 justify-center py-5">
+          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+            {/* Main title */}
+            <h1 className="text-[#141414] tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
+              Configure Your Video Settings
+            </h1>
+            <p className="text-neutral-500 text-base font-normal leading-normal px-4 text-center pb-6">
+              Set your preferences before we generate your script and video
+            </p>
+            
+            {/* Settings Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+              {/* Duration & Quality */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Duration & Quality</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Video Duration</label>
+                    <select
+                      value={settings.duration}
+                      onChange={(e) => setSettings(prev => ({...prev, duration: parseInt(e.target.value)}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value={15}>15 seconds</option>
+                      <option value={30}>30 seconds</option>
+                      <option value={60}>1 minute</option>
+                      <option value={90}>1.5 minutes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Resolution</label>
+                    <select
+                      value={settings.resolution}
+                      onChange={(e) => setSettings(prev => ({...prev, resolution: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="720p">720p HD</option>
+                      <option value="1080p">1080p Full HD</option>
+                      <option value="4K">4K Ultra HD</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Aspect Ratio</label>
+                    <select
+                      value={settings.aspectRatio}
+                      onChange={(e) => setSettings(prev => ({...prev, aspectRatio: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="16:9">16:9 Landscape</option>
+                      <option value="9:16">9:16 Portrait</option>
+                      <option value="1:1">1:1 Square</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Voice & Audio */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Voice & Audio</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Voice Gender</label>
+                    <select
+                      value={settings.voiceGender}
+                      onChange={(e) => setSettings(prev => ({...prev, voiceGender: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Voice Tone</label>
+                    <select
+                      value={settings.voiceTone}
+                      onChange={(e) => setSettings(prev => ({...prev, voiceTone: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="professional">Professional</option>
+                      <option value="casual">Casual</option>
+                      <option value="energetic">Energetic</option>
+                      <option value="calm">Calm</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <span className="text-[#141414] text-sm font-medium leading-normal">Background Music</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.backgroundMusic}
+                      onChange={(e) => setSettings(prev => ({...prev, backgroundMusic: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Features */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Visual Features</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">AI Avatar</span>
+                      <span className="text-neutral-500 text-xs">Add virtual presenter</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.avatar}
+                      onChange={(e) => setSettings(prev => ({...prev, avatar: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
+                    <div>
+                      <span className="text-[#141414] text-sm font-medium leading-normal block">Auto Captions</span>
+                      <span className="text-neutral-500 text-xs">Generate subtitles</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.captions}
+                      onChange={(e) => setSettings(prev => ({...prev, captions: e.target.checked}))}
+                      className="rounded"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Visual Style</label>
+                    <select
+                      value={settings.visualStyle}
+                      onChange={(e) => setSettings(prev => ({...prev, visualStyle: e.target.value}))}
+                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                    >
+                      <option value="cinematic">Cinematic</option>
+                      <option value="modern">Modern</option>
+                      <option value="minimalist">Minimalist</option>
+                      <option value="dynamic">Dynamic</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Settings Preview */}
+              <div className="bg-[#ededed] rounded-xl p-6">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Preview Settings</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Duration:</span>
+                    <span className="text-[#141414] font-medium">{settings.duration}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Quality:</span>
+                    <span className="text-[#141414] font-medium">{settings.resolution}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Ratio:</span>
+                    <span className="text-[#141414] font-medium">{settings.aspectRatio}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Style:</span>
+                    <span className="text-[#141414] font-medium">{settings.visualStyle}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Voice:</span>
+                    <span className="text-[#141414] font-medium">{settings.voiceGender} {settings.voiceTone}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Continue button */}
+            <div className="flex px-4 py-6 justify-center gap-4">
+              <button
+                onClick={() => setCurrentStep('prompt')}
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-[#ededed] text-[#141414] text-base font-bold leading-normal tracking-[0.015em]"
+              >
+                <span className="truncate">Back</span>
+              </button>
+              <button
+                onClick={generateScript}
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-black text-neutral-50 text-base font-bold leading-normal tracking-[0.015em]"
+              >
+                <span className="truncate">Generate Script</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -356,9 +573,9 @@ const VideoGeneratorAdvanced = () => {
                   </Button>
                   <Button 
                     className="w-full bg-purple-600 hover:bg-purple-700"
-                    onClick={() => setCurrentStep('settings')}
+                    onClick={() => setCurrentStep('advanced')}
                   >
-                    Continue to Settings
+                    Continue to Advanced Settings
                   </Button>
                 </CardContent>
               </Card>
@@ -716,9 +933,11 @@ const VideoGeneratorAdvanced = () => {
   switch (currentStep) {
     case 'prompt':
       return renderPromptStep();
+    case 'settings':
+      return renderSettingsStep();
     case 'script':
       return renderScriptStep();
-    case 'settings':
+    case 'advanced':
       return renderAdvancedSettings();
     case 'preview':
       return renderPreview();
