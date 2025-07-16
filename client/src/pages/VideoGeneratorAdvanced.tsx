@@ -19,7 +19,14 @@ import {
   Sparkles,
   FileText,
   Clapperboard,
-  Wand2
+  Wand2,
+  DollarSign,
+  Zap,
+  Timer,
+  Monitor,
+  AspectRatio,
+  ArrowLeft,
+  Info
 } from 'lucide-react';
 
 interface ScriptScene {
@@ -272,48 +279,69 @@ const VideoGeneratorAdvanced = () => {
   );
 
   const renderSettingsStep = () => (
-    <div className="relative flex size-full min-h-screen flex-col bg-neutral-50" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
+    <div className="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-neutral-50 via-white to-neutral-100" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
       <div className="layout-container flex h-screen flex-col overflow-hidden">
-        {/* Header matching Cosmos Studio exactly */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3">
+        {/* Header with enhanced visual appeal */}
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3 bg-white/80 backdrop-blur-sm">
           <div className="flex items-center gap-4 text-[#141414]">
-            <div className="size-4">
-              <Video className="w-4 h-4" />
+            <div className="size-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
+              <Video className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">VeeFore Studio</h2>
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Dashboard</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Templates</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Tutorials</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Community</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Dashboard</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Templates</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Tutorials</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Community</a>
             </div>
-            <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#ededed] text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+            <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 transition-all duration-200 shadow-sm hover:shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
               </svg>
             </button>
-            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/a/ACg8ocJPrcoVstl69SDbEJG3VutOYCtG2q1O0L-jelhQ0JSevpHsGg=s96-c")'}}></div>
+            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-purple-200 shadow-lg" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/a/ACg8ocJPrcoVstl69SDbEJG3VutOYCtG2q1O0L-jelhQ0JSevpHsGg=s96-c")'}}></div>
           </div>
         </header>
 
-        {/* Main content area matching exact layout */}
+        {/* Main content area with enhanced visuals */}
         <div className="px-40 flex flex-1 justify-center py-5 overflow-y-auto">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            {/* Main title */}
-            <h1 className="text-[#141414] tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
-              Configure Your Video Settings
-            </h1>
-            <p className="text-neutral-500 text-base font-normal leading-normal px-4 text-center pb-6">
-              Set your preferences before we generate your script and video
-            </p>
+            {/* Enhanced title section with animations */}
+            <div className="text-center mb-8 animate-fade-in-up">
+              <div className="inline-flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
+                  <Settings className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-[#141414] tracking-light text-[32px] font-bold leading-tight bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Configure Your Video Settings
+                </h1>
+              </div>
+              <p className="text-neutral-500 text-base font-normal leading-normal max-w-2xl mx-auto">
+                Customize every aspect of your video creation with our advanced AI-powered settings. From motion engines to voice synthesis, create exactly what you envision.
+              </p>
+              
+              {/* Progress indicator */}
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="w-8 h-2 bg-purple-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">Step 2 of 4 - Video Configuration</p>
+            </div>
             
-            {/* Settings Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-              {/* Duration & Quality */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Duration & Quality</h3>
+            {/* Enhanced Settings Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 px-4 animate-fade-in-up">
+              {/* Duration & Quality - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Clock className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Duration & Quality</h3>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Video Duration</label>
@@ -355,9 +383,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Motion Engine (Core Feature from video-generator.md) */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Motion Engine</h3>
+              {/* Motion Engine - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Zap className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Motion Engine</h3>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Generation Method</label>
@@ -393,9 +426,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Voice & Audio (Enhanced ElevenLabs Integration) */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Voice & Audio</h3>
+              {/* Voice & Audio - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-emerald-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Mic className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Voice & Audio</h3>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Voice Gender</label>
@@ -450,9 +488,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Avatar & Visual Features (Hedra Integration) */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Avatar & Visual Features</h3>
+              {/* Avatar & Visual Features - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-md">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Avatar & Visual Features</h3>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
                     <div>
@@ -523,9 +566,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Advanced Effects & Transitions */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Effects & Transitions</h3>
+              {/* Advanced Effects & Transitions - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-orange-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Effects & Transitions</h3>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="text-[#141414] text-sm font-medium leading-normal block mb-2">Transition Style</label>
@@ -583,9 +631,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Background Music & Audio Settings */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Background Music</h3>
+              {/* Background Music & Audio Settings - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-pink-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Music className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Background Music</h3>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
                     <div>
@@ -638,9 +691,14 @@ const VideoGeneratorAdvanced = () => {
                 </div>
               </div>
 
-              {/* Credit Estimation & Cost Preview */}
-              <div className="bg-[#ededed] rounded-xl p-6">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Cost Estimation</h3>
+              {/* Credit Estimation & Cost Preview - Enhanced */}
+              <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-yellow-200 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md">
+                    <DollarSign className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Cost Estimation</h3>
+                </div>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Motion Engine:</span>
@@ -690,20 +748,33 @@ const VideoGeneratorAdvanced = () => {
               </div>
             </div>
             
-            {/* Continue button */}
-            <div className="flex px-4 py-6 justify-center gap-4">
+            {/* Modern Action Buttons with Floating Design */}
+            <div className="flex px-4 py-8 justify-center gap-6">
               <button
                 onClick={() => setCurrentStep('prompt')}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-[#ededed] text-[#141414] text-base font-bold leading-normal tracking-[0.015em]"
+                className="group flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-8 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-[#141414] text-base font-bold leading-normal tracking-[0.015em] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
                 <span className="truncate">Back</span>
               </button>
               <button
                 onClick={generateScript}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-black text-neutral-50 text-base font-bold leading-normal tracking-[0.015em]"
+                className="group flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-14 px-8 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white text-base font-bold leading-normal tracking-[0.015em] transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 animate-pulse-glow"
               >
+                <Wand2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-200" />
                 <span className="truncate">Generate Script</span>
+                <Sparkles className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform duration-200" />
               </button>
+            </div>
+            
+            {/* Floating Action Hint */}
+            <div className="flex justify-center pb-8">
+              <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 shadow-lg border border-gray-200">
+                <p className="text-sm text-gray-600 flex items-center gap-2">
+                  <Info className="w-4 h-4" />
+                  Configure your settings, then generate your AI script
+                </p>
+              </div>
             </div>
           </div>
         </div>
