@@ -131,17 +131,29 @@ Respond with JSON in this exact format:
       scenes.push({
         id: `scene_${i + 1}`,
         duration: sceneLength,
-        narration: `Scene ${i + 1}: This is a ${tone} segment about ${prompt}. The ${visualStyle} style creates engaging content that captures the viewer's attention.`,
+        narration: `Scene ${i + 1}: This is a ${tone} segment about ${prompt}. The ${visualStyle} style creates engaging content that captures the viewer's attention and delivers the message effectively.`,
+        voiceover: `Scene ${i + 1}: This is a ${tone} segment about ${prompt}. The ${visualStyle} style creates engaging content that captures the viewer's attention and delivers the message effectively.`,
         description: `${visualStyle} cinematography showing ${prompt} - Scene ${i + 1}. High quality, professional production with excellent lighting and composition.`,
+        visualStyle: visualStyle,
         emotion: i % 3 === 0 ? 'calm' : i % 3 === 1 ? 'energetic' : 'inspiring',
-        visualElements: ['cinematic lighting', 'professional composition', 'high quality']
+        visualElements: ['cinematic lighting', 'professional composition', 'high quality', `${visualStyle} aesthetic`]
       });
     }
 
+    // Generate a proper title based on the prompt
+    const capitalizedPrompt = prompt.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+
     return {
-      title: `${prompt} - AI Generated Video`,
+      title: `${capitalizedPrompt}: A ${tone.charAt(0).toUpperCase() + tone.slice(1)} Journey`,
       totalDuration: duration,
-      scenes: scenes
+      scenes: scenes,
+      description: `A ${duration}-second ${tone} video about ${prompt} featuring ${visualStyle} cinematography and professional narration.`,
+      style: visualStyle,
+      tone: tone,
+      hook: `Get ready to discover the fascinating world of ${prompt}. This ${tone} journey will captivate your audience from the very first second.`,
+      callToAction: `Like and subscribe for more amazing content about ${prompt}. What did you think of this ${tone} approach? Let us know in the comments below!`
     };
   }
 

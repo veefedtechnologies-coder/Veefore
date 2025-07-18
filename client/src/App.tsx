@@ -1,233 +1,96 @@
-import React, { useState, useEffect } from 'react'
-import { Route, Switch, useLocation } from 'wouter'
+import { Switch, Route } from 'wouter'
+import { useState, useEffect } from 'react'
+import { useFirebaseAuth } from './hooks/useFirebaseAuth'
+import { apiRequest } from './lib/queryClient'
+import { SignIn } from './pages/SignIn'
+import { SignUp } from './pages/SignUp'
+import { Landing } from './pages/Landing'
+import { Onboarding } from './pages/Onboarding'
 import { Sidebar } from './components/layout/sidebar'
 import { Header } from './components/layout/header'
 import { CreateDropdown } from './components/layout/create-dropdown'
-import { QuickActions } from './components/dashboard/quick-actions'
-import { PerformanceScore } from './components/dashboard/performance-score'
-import { Recommendations } from './components/dashboard/recommendations'
-import { GetStarted } from './components/dashboard/get-started'
-import { ScheduledPosts, Drafts } from './components/dashboard/scheduled-posts'
-import { Listening } from './components/dashboard/listening'
-import { SocialAccounts } from './components/dashboard/social-accounts'
-import { ScheduledPostsSection } from './components/dashboard/scheduled-posts-section'
-import { DraftsSection } from './components/dashboard/drafts-section'
-import { CalendarView } from './components/calendar/calendar-view'
 import { AnalyticsDashboard } from './components/analytics/analytics-dashboard'
 import { CreatePost } from './components/create/create-post'
-import VeeGPT from './pages/VeeGPT'
-import Landing from './pages/Landing'
-import SignUpIntegrated from './pages/SignUpIntegrated'
-import SignIn from './pages/SignIn'
-import ProfessionalOnboarding from './pages/ProfessionalOnboarding'
-import Workspaces from './pages/Workspaces'
+import { ProfessionalDashboard } from './components/dashboard/professional-dashboard'
+import { VeeGPT } from './pages/VeeGPT'
+import { VideoGeneratorTest } from './pages/VideoGeneratorTest'
+import { CalendarView } from './components/calendar/calendar-view'
+import { ScheduledPosts } from './components/dashboard/scheduled-posts'
+import { Drafts } from './components/dashboard/drafts-section'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
-import { useFirebaseAuth } from './hooks/useFirebaseAuth'
-import LoadingSpinner from './components/LoadingSpinner'
-import { useQuery } from '@tanstack/react-query'
-import { apiRequest } from '@/lib/queryClient'
-import Profile from './pages/Profile'
-import Integration from './pages/Integration'
-import AutomationStepByStep from './pages/AutomationStepByStep'
-import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/queryClient'
 
-function App() {
-  const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
+export default function App() {
   const { user, loading } = useFirebaseAuth()
-  const [location, setLocation] = useLocation()
+  const [userData, setUserData] = useState(null)
+  const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
 
-  console.log('App component rendering:', { location, user: !!user, loading })
-
-  // Fetch user data when authenticated
-  const { data: userData, isLoading: userDataLoading } = useQuery({
-    queryKey: ['/api/user'],
-    queryFn: () => apiRequest('/api/user'),
-    enabled: !!user && !loading,
-    retry: false
-  })
-  
-  // Authentication and onboarding guard logic
   useEffect(() => {
-    // Wait for both loading states to complete to prevent timing issues
-    if (!loading && !userDataLoading) {
-      console.log('Auth guard - User:', user?.email || 'Not authenticated', 'Location:', location)
-      console.log('User data:', userData)
-      
-      // If user is authenticated and fully onboarded, redirect from auth pages to home
-      if (user && userData && userData.isOnboarded) {
-        if (location === '/signin' || location === '/signup' || location === '/onboarding') {
-          console.log('Redirecting fully onboarded user to home page')
-          setLocation('/')
-        }
-      }
-      
-      // If user is authenticated but NOT onboarded, keep them on signup page
-      else if (user && userData && !userData.isOnboarded) {
-        if (location === '/signin' || location === '/onboarding') {
-          console.log('Redirecting authenticated but not onboarded user to signup page')
-          setLocation('/signup')
-        }
-        // Allow them to stay on /signup and root route
-      }
-      
-      // If user is definitively not authenticated (not loading), redirect from protected routes
-      else if (!user && !loading) {
-        if (location === '/onboarding') {
-          console.log('Redirecting unauthenticated user to root page')
-          setLocation('/')
-        }
-        // Allow unauthenticated users to access /signup and /signin
-      }
+    if (user) {
+      fetchUserData()
     }
-  }, [user, loading, userData, userDataLoading, location, setLocation])
+  }, [user])
 
-  // Show loading spinner while checking authentication and user data
-  if (loading || (user && userDataLoading)) {
-    return <LoadingSpinner />
-  }
-  
-  // If we have evidence of existing authentication but no user yet, show loading
-  const hasFirebaseAuth = Object.keys(localStorage).some(key => 
-    key.includes('firebase:authUser') && localStorage.getItem(key)
-  )
-  
-  if (hasFirebaseAuth && !user && loading) {
-    return <LoadingSpinner />
+  const fetchUserData = async () => {
+    try {
+      const response = await apiRequest('/api/user/profile')
+      setUserData(response)
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+    }
   }
 
   const handleCreateOptionSelect = (option: string) => {
     setIsCreateDropdownOpen(false)
-    console.log('Selected create option:', option)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
-    <Switch>
-      {/* Authentication pages - full screen without sidebar */}
-      <Route path="/signup">
-        <div className="min-h-screen">
-          <SignUpIntegrated onNavigate={(page: string) => setLocation(`/${page}`)} />
-        </div>
-      </Route>
-      
-      <Route path="/signin">
-        <div className="min-h-screen">
-          <SignIn onNavigate={(page: string) => setLocation(`/${page}`)} />
-        </div>
-      </Route>
-
-      {/* Onboarding page - full screen without sidebar */}
-      <Route path="/onboarding">
-        <div className="min-h-screen">
-          <ProfessionalOnboarding />
-        </div>
-      </Route>
-
-      {/* Root route - Landing for unauthenticated, Dashboard for authenticated & onboarded, Signup for authenticated but not onboarded */}
-      <Route path="/">
-        {!user && !hasFirebaseAuth ? (
-          <div className="min-h-screen">
-            <Landing onNavigate={(page: string) => setLocation(`/${page}`)} />
-          </div>
-        ) : !user && hasFirebaseAuth ? (
-          <LoadingSpinner />
-        ) : userData && !userData.isOnboarded ? (
-          <div className="min-h-screen">
-            <SignUpIntegrated onNavigate={(page: string) => setLocation(`/${page}`)} />
-          </div>
-        ) : (
-          <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-            {/* Sidebar - Fixed height with independent scrolling */}
-            <div className="h-screen overflow-y-auto bg-white">
-              <Sidebar 
-                className="w-24 bg-white h-full"
-                isCreateDropdownOpen={isCreateDropdownOpen}
-                setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-              />
-            </div>
-
-            {/* Main Content Area - Independent scrolling */}
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-              {/* Header */}
-              <Header 
-                onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-              />
-              
-              {/* Create Dropdown */}
-              {isCreateDropdownOpen && (
-                <CreateDropdown
-                  isOpen={isCreateDropdownOpen}
-                  onClose={() => setIsCreateDropdownOpen(false)}
-                  onOptionSelect={handleCreateOptionSelect}
-                />
-              )}
-
-              {/* Main Content - Scrollable */}
-              <main className="flex-1 overflow-y-auto p-6">
-                <>
-                  {/* Quick Actions - Top Section */}
-                  <div className="mb-8">
-                    <QuickActions />
-                  </div>
-                  
-                  {/* Main Dashboard Layout - Hootsuite Style */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
-                    {/* Left Column - Performance Score + Get Started + Scheduled Posts + Drafts */}
-                    <div className="space-y-6">
-                      <PerformanceScore />
-                      <GetStarted />
-                      <ScheduledPostsSection />
-                      <DraftsSection />
-                    </div>
-                    
-                    {/* Right Column - Recommendations + Social Accounts + Listening */}
-                    <div className="space-y-6">
-                      <Recommendations />
-                      <SocialAccounts />
-                      <Listening />
-                    </div>
-                  </div>
-                </>
-              </main>
-            </div>
-          </div>
-        )}
-      </Route>
-
-      {/* Protected routes with sidebar layout - only accessible when authenticated */}
-      {user && (
-        <>
-          <Route path="/plan">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-50">
+        <Switch>
+          <Route path="/signup">
+            <SignUp onNavigate={(page: string) => window.location.href = `/${page}`} />
+          </Route>
+          
+          <Route path="/signin">
+            <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+          </Route>
+          
+          <Route path="/onboarding">
+            <Onboarding />
+          </Route>
+          
+          <Route path="/">
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-6">
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
                     <Tabs defaultValue="calendar" className="w-full">
-                      <TabsList className="bg-white border border-gray-200">
+                      <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="calendar">Calendar</TabsTrigger>
                         <TabsTrigger value="drafts">Drafts</TabsTrigger>
                         <TabsTrigger value="content">Content</TabsTrigger>
@@ -255,358 +118,351 @@ function App() {
                         </div>
                       </TabsContent>
                     </Tabs>
-                  </div>
-                </main>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <Landing />
+            )}
+          </Route>
+          
+          <Route path="/plan">
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                  />
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <ProfessionalDashboard />
+                  </main>
+                </div>
+              </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/create">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <CreatePost />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <CreatePost />
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/analytics">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <AnalyticsDashboard />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <AnalyticsDashboard />
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/inbox">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <div className="text-center py-12">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Inbox 2.0</h3>
-                    <p className="text-gray-600">Manage your social media conversations here.</p>
-                  </div>
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Inbox 2.0</h3>
+                      <p className="text-gray-600">Manage your social media conversations here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/veegpt">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <VeeGPT />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <VeeGPT />
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/video-generator">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Cosmos Studio interface without VeeFore header */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Cosmos Studio Interface - Full height with scrolling */}
-                <main className="flex-1 overflow-y-auto">
-                  <VideoGeneratorAdvanced />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto">
+                    <VideoGeneratorTest />
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
           
           <Route path="/workspaces">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <Workspaces />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Workspaces</h3>
+                      <p className="text-gray-600">Manage your workspaces and team collaboration here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
-
+          
           <Route path="/profile">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <Profile />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Profile</h3>
+                      <p className="text-gray-600">Manage your profile settings here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
-
+          
           <Route path="/integration">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <Integration />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Integration</h3>
+                      <p className="text-gray-600">Connect your social media accounts here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
-
+          
           <Route path="/automation">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <AutomationStepByStep />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Automation</h3>
+                      <p className="text-gray-600">Set up automated workflows here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
-
+          
           <Route path="/integrations">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
-
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
+            {user && userData ? (
+              <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+                <div className="h-screen overflow-y-auto">
+                  <Sidebar 
+                    className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                    isCreateDropdownOpen={isCreateDropdownOpen}
+                    setIsCreateDropdownOpen={setIsCreateDropdownOpen}
                   />
-                )}
-
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <Integration />
-                </main>
+                </div>
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                  <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                  {isCreateDropdownOpen && (
+                    <CreateDropdown
+                      isOpen={isCreateDropdownOpen}
+                      onClose={() => setIsCreateDropdownOpen(false)}
+                      onOptionSelect={handleCreateOptionSelect}
+                    />
+                  )}
+                  <main className="flex-1 overflow-y-auto p-6">
+                    <div className="text-center py-12">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Integrations</h3>
+                      <p className="text-gray-600">Manage your app integrations here.</p>
+                    </div>
+                  </main>
+                </div>
               </div>
-            </div>
+            ) : (
+              <SignIn onNavigate={(page: string) => window.location.href = `/${page}`} />
+            )}
           </Route>
-        </>
-      )}
-    </Switch>
+        </Switch>
+      </div>
+    </QueryClientProvider>
   )
 }
-
-export default App
