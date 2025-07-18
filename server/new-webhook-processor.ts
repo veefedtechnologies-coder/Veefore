@@ -182,17 +182,17 @@ export class NewWebhookProcessor {
   private async executeCommentDMAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing Comment → DM automation for rule: ${rule.name}`);
 
-    // Step 1: Send comment reply (use first response)
-    const commentResponses = rule.commentReplies || [];
+    // Step 1: Send comment reply (use first response from user configuration)
+    const commentResponses = rule.commentReplies || rule.action?.responses || [];
     if (commentResponses.length > 0) {
-      const response = commentResponses[0]; // Use first response instead of random
+      const response = commentResponses[0]; // Use first response exactly as user configured
       await this.sendCommentReply(context.commentId, response, context.socialAccount);
     }
 
-    // Step 2: Send DM (use first response)
-    const dmResponses = rule.dmResponses || [];
+    // Step 2: Send DM (use first response from user configuration)
+    const dmResponses = rule.dmResponses || rule.action?.dmResponses || [];
     if (dmResponses.length > 0) {
-      const dmResponse = dmResponses[0]; // Use first response instead of random
+      const dmResponse = dmResponses[0]; // Use first response exactly as user configured
       await this.sendDirectMessage(context.userId, dmResponse, context.socialAccount);
     }
   }
@@ -203,9 +203,9 @@ export class NewWebhookProcessor {
   private async executeCommentOnlyAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing Comment Only automation for rule: ${rule.name}`);
 
-    const commentResponses = rule.commentReplies || [];
+    const commentResponses = rule.commentReplies || rule.action?.responses || [];
     if (commentResponses.length > 0) {
-      const response = commentResponses[0]; // Use first response instead of random
+      const response = commentResponses[0]; // Use first response exactly as user configured
       await this.sendCommentReply(context.commentId, response, context.socialAccount);
     }
   }
@@ -216,9 +216,9 @@ export class NewWebhookProcessor {
   private async executeDMOnlyAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing DM Only automation for rule: ${rule.name}`);
 
-    const dmResponses = rule.dmResponses || [];
+    const dmResponses = rule.dmResponses || rule.action?.dmResponses || [];
     if (dmResponses.length > 0) {
-      const dmResponse = dmResponses[0]; // Use first response instead of random
+      const dmResponse = dmResponses[0]; // Use first response exactly as user configured
       await this.sendDirectMessage(context.userId, dmResponse, context.socialAccount);
     }
   }
