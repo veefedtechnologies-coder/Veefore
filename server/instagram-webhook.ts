@@ -710,6 +710,12 @@ export class InstagramWebhookHandler {
             { username: value.from.username }
           );
 
+          // Check if we got a valid response
+          if (!commentResponse || commentResponse.trim() === '') {
+            console.log(`[WEBHOOK] ✗ No valid response generated for comment. Skipping automation.`);
+            continue;
+          }
+
           console.log(`[WEBHOOK] Comment reply generated: "${commentResponse}"`);
 
           // Send the automated comment reply

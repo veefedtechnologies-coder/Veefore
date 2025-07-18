@@ -375,19 +375,34 @@ export class InstagramAutomation {
       console.log(`[AI AUTOMATION] Generating response for rule type: ${rule.type}`);
       
       // First try to use pre-configured responses
-      const responses = rule.action.responses || rule.action.dmResponses || [];
-      if (responses.length > 0 && responses[0].trim() !== '') {
+      // For comment-to-DM rules, check dmResponses first, then responses
+      // For regular rules, check responses first, then dmResponses
+      let responses = [];
+      
+      if (rule.type === 'dm' && rule.action.dmResponses && rule.action.dmResponses.length > 0) {
+        responses = rule.action.dmResponses;
+        console.log(`[AUTOMATION] Using DM responses: ${JSON.stringify(responses)}`);
+      } else if (rule.action.responses && rule.action.responses.length > 0) {
+        responses = rule.action.responses;
+        console.log(`[AUTOMATION] Using action responses: ${JSON.stringify(responses)}`);
+      } else if (rule.action.dmResponses && rule.action.dmResponses.length > 0) {
+        responses = rule.action.dmResponses;
+        console.log(`[AUTOMATION] Using fallback DM responses: ${JSON.stringify(responses)}`);
+      }
+      
+      // Check if we have valid non-empty responses
+      const validResponses = responses.filter(r => r && r.trim() !== '');
+      if (validResponses.length > 0) {
         // Use pre-configured response
-        const response = responses[Math.floor(Math.random() * responses.length)];
-        console.log(`[AI AUTOMATION] Using pre-configured response: "${response}"`);
+        const response = validResponses[Math.floor(Math.random() * validResponses.length)];
+        console.log(`[AUTOMATION] Using pre-configured response: "${response}"`);
         return response;
       }
       
-      // If no pre-configured response, generate AI response
-      console.log(`[AI AUTOMATION] No pre-configured response, generating AI response`);
-      const aiResponse = await this.generateAIResponse(message, personality, responseLength, language);
-      console.log(`[AI AUTOMATION] AI response generated: "${aiResponse}"`);
-      return aiResponse;
+      // If no pre-configured response, return error - NO AI AUTOMATION
+      console.log(`[AUTOMATION] No pre-configured response found, responses: ${JSON.stringify(responses)}`);
+      console.log(`[AUTOMATION] ERROR: No valid pre-configured response available for this rule. AI automation is disabled.`);
+      return null;
       
     } catch (error) {
       console.error('[AI AUTOMATION] Response generation failed:', error);
