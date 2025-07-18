@@ -3,14 +3,62 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { authenticateJWT, AuthenticatedRequest } from './middleware/auth';
 import CompleteVideoGenerator from './services/complete-video-generator';
 import { SimpleVideoGenerator } from './services/simple-video-generator';
 import { WorkingVideoGenerator } from './services/working-video-generator';
 import { WebSocketServer, WebSocket } from 'ws';
 import { Server } from 'http';
+import { firebaseAdmin } from './firebase-admin';
 
 const router = express.Router();
+
+// Video-specific authentication middleware that matches main routes
+const requireAuth = async (req: any, res: any, next: any) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    let token;
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else {
+      token = authHeader; // Handle case where Bearer prefix is missing
+    }
+    
+    if (!token || token.trim() === '') {
+      return res.status(401).json({ error: 'Access token is required' });
+    }
+
+    // Verify Firebase token
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    const firebaseUid = decodedToken.uid;
+    
+    // Get storage from app locals
+    const storage = req.app.locals.storage;
+    if (!storage) {
+      console.error('[VIDEO AUTH] Storage not available in app locals');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    // Look up user by Firebase UID
+    const user = await storage.getUserByFirebaseUid(firebaseUid);
+    
+    if (!user) {
+      console.error('[VIDEO AUTH] User not found for Firebase UID:', firebaseUid);
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    console.log(`[VIDEO AUTH] User ${user.email} authenticated successfully`);
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('[VIDEO AUTH] Authentication failed:', error);
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+};
 
 // Configure multer for image uploads
 const storage = multer.diskStorage({
@@ -140,7 +188,7 @@ export function broadcastError(jobId: string, error: string) {
 }
 
 // Get user's video jobs
-router.get('/jobs', authenticateJWT, (req: AuthenticatedRequest, res) => {
+router.get('/jobs', requireAuth, (req: any, res) => {
   try {
     const userId = req.user.id;
     const userJobsList = Array.from(videoJobs.values()).filter(job => job.userId === userId);
@@ -152,7 +200,7 @@ router.get('/jobs', authenticateJWT, (req: AuthenticatedRequest, res) => {
 });
 
 // Upload image for video generation
-router.post('/upload-image', authenticateJWT, upload.single('image'), (req: AuthenticatedRequest, res) => {
+router.post('/upload-image', requireAuth, upload.single('image'), (req: any, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded' });
@@ -175,7 +223,7 @@ router.post('/upload-image', authenticateJWT, upload.single('image'), (req: Auth
 // Note: Script generation routes are defined below with proper ES module imports
 
 // Generate video with approved script
-router.post('/generate', authenticateJWT, (req: AuthenticatedRequest, res) => {
+router.post('/generate', requireAuth, (req: any, res) => {
   try {
     const userId = req.user.id;
     
@@ -239,7 +287,7 @@ router.post('/generate', authenticateJWT, (req: AuthenticatedRequest, res) => {
 });
 
 // Get specific video job
-router.get('/job/:jobId', authenticateJWT, (req: AuthenticatedRequest, res) => {
+router.get('/job/:jobId', requireAuth, (req: any, res) => {
   try {
     const { jobId } = req.params;
     const userId = req.user.id;
@@ -261,7 +309,7 @@ router.get('/job/:jobId', authenticateJWT, (req: AuthenticatedRequest, res) => {
 });
 
 // Delete video job
-router.delete('/job/:jobId', authenticateJWT, (req: AuthenticatedRequest, res) => {
+router.delete('/job/:jobId', requireAuth, (req: any, res) => {
   try {
     const { jobId } = req.params;
     const userId = req.user.id;
@@ -355,8 +403,24 @@ async function startCompleteVideoGeneration(jobId: string, job: any) {
 
 // Additional API endpoints for complete video generation workflow
 
+// Debug endpoint to test authentication
+router.post('/debug-auth', requireAuth, async (req: any, res) => {
+  try {
+    console.log('[VIDEO AUTH DEBUG] User:', req.user);
+    console.log('[VIDEO AUTH DEBUG] Headers:', req.headers.authorization);
+    res.json({ 
+      success: true, 
+      user: req.user,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[VIDEO AUTH DEBUG] Error:', error);
+    res.status(500).json({ error: 'Debug failed' });
+  }
+});
+
 // Generate or regenerate script with comprehensive OpenAI service
-router.post('/generate-script', authenticateJWT, async (req: AuthenticatedRequest, res) => {
+router.post('/generate-script', requireAuth, async (req: any, res) => {
   try {
     const { 
       prompt, 
@@ -412,7 +476,7 @@ router.post('/generate-script', authenticateJWT, async (req: AuthenticatedReques
 });
 
 // Regenerate specific scene in script
-router.post('/regenerate-scene', authenticateJWT, async (req: AuthenticatedRequest, res) => {
+router.post('/regenerate-scene', requireAuth, async (req: any, res) => {
   try {
     const { 
       originalPrompt, 
@@ -456,7 +520,7 @@ router.post('/regenerate-scene', authenticateJWT, async (req: AuthenticatedReque
 });
 
 // Get generation progress for a specific job (WebSocket alternative via polling)
-router.get('/job/:jobId/progress', authenticateJWT, (req: AuthenticatedRequest, res) => {
+router.get('/job/:jobId/progress', requireAuth, (req: any, res) => {
   try {
     const { jobId } = req.params;
     const userId = req.user.id;
