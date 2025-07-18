@@ -13343,7 +13343,7 @@ Create a detailed growth strategy in JSON format:
     try {
       console.log('[NEW WEBHOOK] Instagram webhook received');
       
-      const result = await newWebhookProcessor.processWebhookEvent(req.body);
+      const result = await newWebhookProcessor.processWebhook(req.body);
       res.json({ message: 'EVENT_RECEIVED', processed: result });
     } catch (error: any) {
       console.error('[NEW WEBHOOK] Processing error:', error);

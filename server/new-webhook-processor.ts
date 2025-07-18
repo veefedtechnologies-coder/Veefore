@@ -312,31 +312,11 @@ export class NewWebhookProcessor {
   private async findSocialAccountByPageId(pageId: string): Promise<any> {
     try {
       const allAccounts = await this.storage.getAllSocialAccounts();
-      console.log(`[NEW WEBHOOK] Looking for page ID: ${pageId}`);
-      console.log(`[NEW WEBHOOK] Available accounts:`, allAccounts.map(acc => ({ 
-        id: acc.id,
-        username: acc.username, 
-        platform: acc.platform,
-        workspaceId: acc.workspaceId,
-        accountId: acc.accountId,
-        pageId: acc.pageId,
-        instagramId: acc.instagramId
-      })));
-      
-      // Look for account with matching pageId or instagramId
-      const matchingAccount = allAccounts.find(account => 
+      return allAccounts.find(account => 
         account.platform === 'instagram' && 
-        account.isActive &&
-        (account.pageId === pageId || account.instagramId === pageId)
+        account.accountId === pageId &&
+        account.isActive
       );
-      
-      if (matchingAccount) {
-        console.log(`[NEW WEBHOOK] Found matching account: ${matchingAccount.username} (workspace: ${matchingAccount.workspaceId})`);
-        return matchingAccount;
-      }
-      
-      console.log(`[NEW WEBHOOK] No matching account found for page ID: ${pageId}`);
-      return null;
     } catch (error) {
       console.error(`[NEW WEBHOOK] Error finding social account:`, error);
       return null;
