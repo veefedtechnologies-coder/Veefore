@@ -132,6 +132,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 18, 2025: **WEBHOOK PROCESSOR FIELD MAPPING FIXED FOR USER-CONFIGURED RESPONSES** - Fixed webhook processor to properly access user-configured responses from both old and new database formats
+  - ✅ **Dual Field Support**: Added fallback logic `rule.commentReplies || rule.action?.responses` to handle both database formats
+  - ✅ **User Response Priority**: System now uses exact responses configured in UI automation rules interface
+  - ✅ **Database Format Compatibility**: Works with both legacy rules and new automation rules created through UI
+  - ✅ **Debug Logging Added**: Enhanced webhook processor with detailed logging to trace response selection
+  - ✅ **No More Hardcoded Responses**: System guaranteed to use user's predefined responses only
+  - **Technical Achievement**: Complete elimination of response field mapping issues - webhook processor now correctly accesses user-configured responses
+  - **User Experience**: New automation rules will use exact responses configured through automation interface
 - July 18, 2025: **AUTOMATION RESPONSE SELECTION FIXED - PREDICTABLE RESPONSES IMPLEMENTED** - Fixed automation system to use specific configured responses instead of random selection
   - ✅ **Random Selection Eliminated**: Removed Math.random() logic that was randomly selecting from response arrays
   - ✅ **First Response Selection**: System now consistently uses the first response (index 0) from configured arrays

@@ -181,18 +181,29 @@ export class NewWebhookProcessor {
    */
   private async executeCommentDMAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing Comment → DM automation for rule: ${rule.name}`);
+    console.log(`[NEW WEBHOOK DEBUG] Full rule object:`, JSON.stringify(rule, null, 2));
 
     // Step 1: Send comment reply (use first response from user configuration)
+    console.log(`[NEW WEBHOOK DEBUG] rule.commentReplies:`, rule.commentReplies);
+    console.log(`[NEW WEBHOOK DEBUG] rule.action?.responses:`, rule.action?.responses);
     const commentResponses = rule.commentReplies || rule.action?.responses || [];
+    console.log(`[NEW WEBHOOK DEBUG] Final commentResponses:`, commentResponses);
+    
     if (commentResponses.length > 0) {
       const response = commentResponses[0]; // Use first response exactly as user configured
+      console.log(`[NEW WEBHOOK DEBUG] Using comment response:`, response);
       await this.sendCommentReply(context.commentId, response, context.socialAccount);
     }
 
     // Step 2: Send DM (use first response from user configuration)
+    console.log(`[NEW WEBHOOK DEBUG] rule.dmResponses:`, rule.dmResponses);
+    console.log(`[NEW WEBHOOK DEBUG] rule.action?.dmResponses:`, rule.action?.dmResponses);
     const dmResponses = rule.dmResponses || rule.action?.dmResponses || [];
+    console.log(`[NEW WEBHOOK DEBUG] Final dmResponses:`, dmResponses);
+    
     if (dmResponses.length > 0) {
       const dmResponse = dmResponses[0]; // Use first response exactly as user configured
+      console.log(`[NEW WEBHOOK DEBUG] Using DM response:`, dmResponse);
       await this.sendDirectMessage(context.userId, dmResponse, context.socialAccount);
     }
   }
