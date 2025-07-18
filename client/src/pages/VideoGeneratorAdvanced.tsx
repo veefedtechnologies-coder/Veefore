@@ -137,7 +137,7 @@ const VideoGeneratorAdvanced = () => {
     onSuccess: (data) => {
       if (data.script) {
         setGeneratedScript(data.script);
-        setCurrentStep('settings');
+        setCurrentStep('script');
       }
     },
     onError: (error) => {
@@ -311,12 +311,18 @@ const VideoGeneratorAdvanced = () => {
             {/* Generate button - enhanced with modern styling */}
             <div className="flex px-4 py-3 justify-center">
               <button
-                onClick={generateScript}
-                disabled={!prompt.trim() || isGenerating}
+                onClick={() => {
+                  if (!prompt.trim()) {
+                    alert('Please enter a video prompt first');
+                    return;
+                  }
+                  setCurrentStep('settings');
+                }}
+                disabled={!prompt.trim()}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <span className="truncate">
-                  {isGenerating ? 'Generating Script...' : 'Generate Script'}
+                  Configure Settings
                 </span>
               </button>
             </div>
@@ -426,7 +432,7 @@ const VideoGeneratorAdvanced = () => {
                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
               </div>
-              <p className="text-sm text-gray-500 mt-2">Step 2 of 4 - Video Configuration</p>
+              <p className="text-sm text-gray-500 mt-2">Step 2 of 5 - Video Configuration</p>
             </div>
             
             {/* Enhanced Settings Cards Grid */}
