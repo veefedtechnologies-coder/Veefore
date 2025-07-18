@@ -183,14 +183,14 @@ export class NewWebhookProcessor {
     console.log(`[NEW WEBHOOK] Executing Comment → DM automation for rule: ${rule.name}`);
 
     // Step 1: Send comment reply
-    const commentResponses = rule.action.responses || [];
+    const commentResponses = rule.commentReplies || [];
     if (commentResponses.length > 0) {
       const randomResponse = commentResponses[Math.floor(Math.random() * commentResponses.length)];
       await this.sendCommentReply(context.commentId, randomResponse, context.socialAccount);
     }
 
     // Step 2: Send DM
-    const dmResponses = rule.action.dmResponses || [];
+    const dmResponses = rule.dmResponses || [];
     if (dmResponses.length > 0) {
       const randomDMResponse = dmResponses[Math.floor(Math.random() * dmResponses.length)];
       await this.sendDirectMessage(context.userId, randomDMResponse, context.socialAccount);
@@ -203,7 +203,7 @@ export class NewWebhookProcessor {
   private async executeCommentOnlyAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing Comment Only automation for rule: ${rule.name}`);
 
-    const commentResponses = rule.action.responses || [];
+    const commentResponses = rule.commentReplies || [];
     if (commentResponses.length > 0) {
       const randomResponse = commentResponses[Math.floor(Math.random() * commentResponses.length)];
       await this.sendCommentReply(context.commentId, randomResponse, context.socialAccount);
@@ -216,7 +216,7 @@ export class NewWebhookProcessor {
   private async executeDMOnlyAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing DM Only automation for rule: ${rule.name}`);
 
-    const dmResponses = rule.action.dmResponses || [];
+    const dmResponses = rule.dmResponses || [];
     if (dmResponses.length > 0) {
       const randomDMResponse = dmResponses[Math.floor(Math.random() * dmResponses.length)];
       await this.sendDirectMessage(context.userId, randomDMResponse, context.socialAccount);
