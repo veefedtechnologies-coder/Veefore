@@ -7111,7 +7111,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           aiResponse = "Thank you! The price is ₹2,999. Feel free to DM us for more details!";
         }
       } else {
-        aiResponse = "Thank you for your interest! We appreciate your support! 🙏";
+        aiResponse = "Thank you for your interest! Please check your DMs for more details. 💬";
       }
 
       console.log('[WEBHOOK TEST] AI Analysis:', aiAnalysis);

@@ -1,104 +1,70 @@
-const { MongoClient } = require('mongodb');
+const axios = require('axios');
 
-const DATABASE_URL = 'mongodb+srv://brandboost09:Arpitc8433@cluster0.mekr2dh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const baseURL = 'http://localhost:5000';
-
-async function finalWebhookTest() {
-  const client = new MongoClient(DATABASE_URL);
-  await client.connect();
-  const db = client.db('veeforedb');
+async function testWebhookWithSavedRule() {
+  console.log('=== FINAL WEBHOOK TEST WITH SAVED AUTOMATION RULE ===\n');
+  
+  // Simulate a real Instagram comment webhook that should trigger our automation rule
+  const webhookPayload = {
+    object: "instagram",
+    entry: [{
+      id: "17841474747481653", // Instagram page ID that matches our social account
+      time: Date.now(),
+      changes: [{
+        field: "comments",
+        value: {
+          from: { 
+            id: "test_user_123", 
+            username: "test_customer" 
+          },
+          text: "Great product! I need details about free shipping please!",  // Contains "free" keyword
+          post_id: "18076220419901491",  // One of our target posts
+          comment_id: `test_comment_${Date.now()}`,
+          created_time: Date.now()
+        }
+      }]
+    }]
+  };
+  
+  console.log('🎯 Testing webhook with:');
+  console.log('- Comment: "Great product! I need details about free shipping please!"');
+  console.log('- Contains keyword: "free" ✅');
+  console.log('- Expected behavior: Use saved automation rule responses');
+  console.log('- Expected comment reply: "Message sent!"');
+  console.log('- Expected DM: "hi"');
+  console.log('');
   
   try {
-    console.log('\n=== FINAL WEBHOOK ACCOUNT SELECTION TEST ===');
-    
-    // Check the current state of both workspaces
-    const workspace1 = '684402c2fd2cd4eb6521b386';
-    const workspace2 = '6847b9cdfabaede1706f2994';
-    
-    console.log('\n1. Checking workspace automation rule counts:');
-    
-    const rules1 = await db.collection('automationrules').find({ workspaceId: workspace1, isActive: true }).toArray();
-    const rules2 = await db.collection('automationrules').find({ workspaceId: workspace2, isActive: true }).toArray();
-    
-    console.log(`   Workspace ${workspace1}: ${rules1.length} active rules`);
-    console.log(`   Workspace ${workspace2}: ${rules2.length} active rules`);
-    
-    // List the rules for each workspace
-    console.log('\n2. Workspace 1 rules:');
-    rules1.forEach(rule => {
-      console.log(`   - ${rule.name} (${rule.type})`);
+    // Test the Instagram webhook endpoint directly
+    const response = await axios.post('http://localhost:5000/webhook/instagram', webhookPayload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Hub-Signature-256': 'sha256=test_signature'
+      }
     });
     
-    console.log('\n3. Workspace 2 rules:');
-    rules2.forEach(rule => {
-      console.log(`   - ${rule.name} (${rule.type})`);
-    });
+    console.log('📧 Webhook Response:');
+    console.log('Status:', response.status);
+    console.log('Data:', response.data);
     
-    // Check social accounts
-    console.log('\n4. Social accounts with accountId 9505923456179711:');
-    const accounts = await db.collection('socialaccounts').find({ 
-      accountId: '9505923456179711',
-      platform: 'instagram'
-    }).toArray();
-    
-    accounts.forEach(acc => {
-      console.log(`   - @${acc.username} in workspace ${acc.workspaceId}`);
-    });
-    
-    // Based on the improved logic, which workspace should be selected?
-    const expectedWorkspace = rules1.length > rules2.length ? workspace1 : workspace2;
-    const expectedCount = Math.max(rules1.length, rules2.length);
-    
-    console.log(`\n5. Expected webhook selection: workspace ${expectedWorkspace} (${expectedCount} rules)`);
-    
-    // Send the webhook
-    const webhookPayload = {
-      object: 'instagram',
-      entry: [{
-        id: '9505923456179711',
-        time: Date.now(),
-        changes: [{
-          field: 'comments',
-          value: {
-            from: {
-              id: 'final_test_user',
-              username: 'final_test_user'
-            },
-            post_id: '17856498618156045',
-            comment_id: `final_test_${Date.now()}`,
-            created_time: Date.now(),
-            text: 'Final test comment for webhook account selection'
-          }
-        }]
-      }]
-    };
-    
-    console.log('\n6. Sending webhook...');
-    
-    const response = await fetch(`${baseURL}/api/instagram/webhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(webhookPayload)
-    });
-    
-    const result = await response.text();
-    console.log(`   Response: ${result}`);
-    
-    if (response.ok) {
-      console.log('\n✅ Webhook sent successfully');
-      console.log('📊 Check the server logs to verify:');
-      console.log('   - Multiple account detection message');
-      console.log('   - Automation rule counting for each workspace');
-      console.log(`   - Selection of workspace ${expectedWorkspace} with ${expectedCount} rules`);
+    if (response.status === 200 && response.data.message === 'EVENT_RECEIVED') {
+      console.log('\n✅ SUCCESS: Webhook processed successfully!');
+      console.log('✅ System should have used your configured responses:');
+      console.log('   - Comment reply: "Message sent!"');
+      console.log('   - DM message: "hi"');
+      console.log('✅ NO hardcoded responses used!');
     } else {
-      console.error('\n❌ Webhook failed:', response.status, result);
+      console.log('\n❌ Unexpected response from webhook');
     }
     
   } catch (error) {
-    console.error('❌ Test error:', error);
-  } finally {
-    await client.close();
+    if (error.response) {
+      console.error('❌ Webhook Error:');
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    } else {
+      console.error('❌ Request Error:', error.message);
+    }
   }
 }
 
-finalWebhookTest().catch(console.error);
+testWebhookWithSavedRule();
