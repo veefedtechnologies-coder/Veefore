@@ -437,7 +437,7 @@ router.post('/generate-script', requireAuth, async (req: any, res) => {
     }
 
     // Generate comprehensive script using enhanced OpenAI service
-    const { default: OpenAIService } = await import('./openai-client');
+    const { OpenAIService } = await import('./openai-client');
     const service = new OpenAIService();
     
     console.log('[VIDEO API] Generating comprehensive script with OpenAI service...');
