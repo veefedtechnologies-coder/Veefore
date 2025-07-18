@@ -13,18 +13,15 @@ export interface FrontendAutomationRule {
   type: 'comment_dm' | 'dm_only' | 'comment_only';
   isActive: boolean;
   
-  // Frontend structure - exactly matching your interface
-  triggers: {
-    aiMode: 'contextual' | 'keyword';
-    keywords: string[];
-    hashtags: string[];
-    mentions: boolean;
-    newFollowers: boolean;
-    postInteraction: boolean;
-  };
+  // Direct fields from frontend
+  keywords: string[];
+  targetMediaIds?: string[];
   
-  // Pre-defined responses (NO AI automation)
-  responses: string[];
+  // Response configuration as nested object
+  responses: {
+    responses: string[];        // Comment responses
+    dmResponses?: string[];     // DM responses
+  };
   
   // Additional frontend fields
   aiPersonality?: string;
@@ -38,12 +35,6 @@ export interface FrontendAutomationRule {
     end: string;
     days: string[];
   };
-  
-  // Post-specific targeting
-  targetPosts?: string[];
-  
-  // DM-specific responses
-  dmResponses?: string[];
   
   // Timestamps
   createdAt?: Date;
@@ -88,16 +79,16 @@ export class NewAutomationSystem {
       type: frontendRule.type,
       isActive: frontendRule.isActive,
       
-      // Extract keywords from frontend triggers
-      keywords: frontendRule.triggers.keywords || [],
+      // Extract keywords directly from frontend (new format)
+      keywords: frontendRule.keywords || [],
       
       // Extract target posts if provided
-      targetMediaIds: frontendRule.targetPosts || [],
+      targetMediaIds: frontendRule.targetMediaIds || [],
       
-      // Configure responses
+      // Configure responses from nested responses object
       action: {
-        responses: frontendRule.responses || [],
-        dmResponses: frontendRule.dmResponses || []
+        responses: frontendRule.responses?.responses || [],
+        dmResponses: frontendRule.responses?.dmResponses || []
       },
       
       createdAt: new Date(),
