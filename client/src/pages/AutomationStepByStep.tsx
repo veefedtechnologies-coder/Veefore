@@ -292,8 +292,8 @@ export default function AutomationStepByStep() {
       title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
       type: post.type === 'reel' ? 'reel' : 'post',
       image: post.mediaUrl || post.thumbnailUrl || 'https://picsum.photos/300/300?random=1',
-      likes: post.likes || 0,
-      comments: post.comments || 0,
+      likes: post.engagement?.likes || 0,
+      comments: post.engagement?.comments || 0,
       caption: post.caption || 'Instagram post content'
     };
   }) : []
