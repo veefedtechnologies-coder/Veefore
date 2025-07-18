@@ -611,8 +611,24 @@ export default function AutomationStepByStep() {
                           : 'border-gray-200 hover:border-emerald-300 bg-white'
                       }`}
                     >
-                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 flex items-center justify-center">
-                        <img src={post.image} alt={post.caption} className="w-full h-full object-cover rounded-lg" />
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 overflow-hidden">
+                        {post.thumbnailUrl ? (
+                          <img 
+                            src={post.thumbnailUrl} 
+                            alt={post.caption || post.title} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback to mediaUrl if thumbnailUrl fails
+                              if (post.mediaUrl && e.currentTarget.src !== post.mediaUrl) {
+                                e.currentTarget.src = post.mediaUrl;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Camera className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <h4 className="font-medium text-gray-900 text-sm truncate">{post.title}</h4>
@@ -621,11 +637,11 @@ export default function AutomationStepByStep() {
                           <div className="flex items-center gap-2">
                             <span className="flex items-center gap-1">
                               <Heart className="w-3 h-3" />
-                              {post.likes}
+                              {post.engagement?.likes || 0}
                             </span>
                             <span className="flex items-center gap-1">
                               <MessageCircle className="w-3 h-3" />
-                              {post.comments}
+                              {post.engagement?.comments || 0}
                             </span>
                           </div>
                         </div>
@@ -1490,9 +1506,15 @@ export default function AutomationStepByStep() {
           <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
             {selectedPostData ? (
               <img 
-                src={selectedPostData.image} 
+                src={selectedPostData.thumbnailUrl || selectedPostData.mediaUrl} 
                 alt="Post" 
-                className="w-full h-full object-cover" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to mediaUrl if thumbnailUrl fails
+                  if (selectedPostData.mediaUrl && e.currentTarget.src !== selectedPostData.mediaUrl) {
+                    e.currentTarget.src = selectedPostData.mediaUrl;
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -1504,7 +1526,7 @@ export default function AutomationStepByStep() {
             )}
             
             {/* Multiple image indicator */}
-            {selectedPostData && (
+            {selectedPostData && selectedPostData.type === 'carousel' && (
               <div className="absolute top-3 right-3">
                 <div className="bg-black/20 backdrop-blur-sm rounded-full p-1">
                   <div className="flex gap-1">
@@ -1530,7 +1552,7 @@ export default function AutomationStepByStep() {
             
             {/* Likes count */}
             <div className="text-sm font-semibold text-gray-900 mb-2">
-              {selectedPostData ? `${selectedPostData.likes.toLocaleString()} likes` : '1,247 likes'}
+              {selectedPostData ? `${(selectedPostData.engagement?.likes || 0).toLocaleString()} likes` : '1,247 likes'}
             </div>
             
             {/* Caption */}

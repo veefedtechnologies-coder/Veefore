@@ -2445,31 +2445,43 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         console.log('[CONTENT API] Successfully fetched', posts.length, 'Instagram posts');
 
         // Transform Instagram media to content format with proper thumbnails and captions
-        const content = posts.map((post: any) => ({
-          id: post.id,
-          title: post.caption ? (post.caption.length > 60 ? post.caption.substring(0, 60) + '...' : post.caption) : 'Instagram Content',
-          caption: post.caption || '',
-          platform: 'instagram',
-          type: post.media_type?.toLowerCase() === 'video' ? 'video' : 
-                post.media_type?.toLowerCase() === 'carousel_album' ? 'carousel' : 'post',
-          status: 'published',
-          publishedAt: post.timestamp,
-          createdAt: post.timestamp,
-          mediaUrl: post.media_url,
-          thumbnailUrl: post.media_url, // Use media URL as thumbnail
-          permalink: post.permalink,
-          engagement: {
-            likes: post.like_count || 0,
-            comments: post.comments_count || 0,
-            shares: 0,
-            reach: Math.round((post.like_count + post.comments_count) * 12.5)
-          },
-          performance: {
-            impressions: Math.round((post.like_count + post.comments_count) * 15),
-            engagementRate: (instagramAccount.followersCount || 0) > 0 ? 
-              ((post.like_count + post.comments_count) / (instagramAccount.followersCount || 1) * 100).toFixed(1) : '0.0'
-          }
-        }));
+        const content = posts.map((post: any) => {
+          console.log('[CONTENT API] Processing post:', {
+            id: post.id,
+            media_url: post.media_url,
+            thumbnail_url: post.thumbnail_url,
+            caption: post.caption ? post.caption.substring(0, 100) + '...' : 'No caption',
+            likes: post.like_count,
+            comments: post.comments_count,
+            media_type: post.media_type
+          });
+          
+          return {
+            id: post.id,
+            title: post.caption ? (post.caption.length > 60 ? post.caption.substring(0, 60) + '...' : post.caption) : 'Instagram Content',
+            caption: post.caption || '',
+            platform: 'instagram',
+            type: post.media_type?.toLowerCase() === 'video' ? 'video' : 
+                  post.media_type?.toLowerCase() === 'carousel_album' ? 'carousel' : 'post',
+            status: 'published',
+            publishedAt: post.timestamp,
+            createdAt: post.timestamp,
+            mediaUrl: post.media_url || post.thumbnail_url,
+            thumbnailUrl: post.thumbnail_url || post.media_url, // Use thumbnail_url first, fallback to media_url
+            permalink: post.permalink,
+            engagement: {
+              likes: post.like_count || 0,
+              comments: post.comments_count || 0,
+              shares: 0,
+              reach: Math.round((post.like_count + post.comments_count) * 12.5)
+            },
+            performance: {
+              impressions: Math.round((post.like_count + post.comments_count) * 15),
+              engagementRate: (instagramAccount.followersCount || 0) > 0 ? 
+                ((post.like_count + post.comments_count) / (instagramAccount.followersCount || 1) * 100).toFixed(1) : '0.0'
+            }
+          };
+        });
 
         console.log('[CONTENT API] Returning', content.length, 'published content items');
         res.json(content);
