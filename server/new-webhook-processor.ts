@@ -283,7 +283,11 @@ export class NewWebhookProcessor {
         console.log(`[NEW WEBHOOK] ✅ DM sent successfully: ${data.message_id}`);
       } else {
         const error = await response.json();
-        console.error(`[NEW WEBHOOK] ❌ DM failed:`, error);
+        if (error.error?.error_subcode === 2534022) {
+          console.log(`[NEW WEBHOOK] ⚠️ DM blocked by Instagram 24-hour window: User ${userId} hasn't interacted recently`);
+        } else {
+          console.error(`[NEW WEBHOOK] ❌ DM failed:`, error);
+        }
       }
     } catch (error) {
       console.error(`[NEW WEBHOOK] ❌ Error sending DM:`, error);
