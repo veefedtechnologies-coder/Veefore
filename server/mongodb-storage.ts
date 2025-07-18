@@ -100,6 +100,7 @@ const SocialAccountSchema = new mongoose.Schema({
   platform: { type: String, required: true },
   username: { type: String, required: true },
   accountId: String,
+  pageId: String,
   accessToken: String,
   refreshToken: String,
   expiresAt: Date,
@@ -972,12 +973,18 @@ export class MongoStorage implements IStorage {
   }
 
   private convertSocialAccount(mongoAccount: any): SocialAccount {
+    console.log(`[CONVERT DEBUG] Converting social account: ${mongoAccount.username}`);
+    console.log(`[CONVERT DEBUG] Raw mongoAccount pageId:`, mongoAccount.pageId);
+    console.log(`[CONVERT DEBUG] Raw mongoAccount accountId:`, mongoAccount.accountId);
+    console.log(`[CONVERT DEBUG] All available fields:`, Object.keys(mongoAccount.toObject ? mongoAccount.toObject() : mongoAccount));
+    
     return {
       id: mongoAccount._id.toString(),
       workspaceId: mongoAccount.workspaceId,
       platform: mongoAccount.platform,
       username: mongoAccount.username,
       accountId: mongoAccount.accountId || null,
+      pageId: mongoAccount.pageId || null,
       accessToken: mongoAccount.accessToken || null,
       refreshToken: mongoAccount.refreshToken || null,
       expiresAt: mongoAccount.expiresAt || null,

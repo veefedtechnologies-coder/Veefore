@@ -16,8 +16,8 @@ async function testWebhookWithSavedRule() {
             id: "test_user_123", 
             username: "test_customer" 
           },
-          text: "Great product! I need details about free shipping please!",  // Contains "free" keyword
-          post_id: "18076220419901491",  // One of our target posts
+          text: "Great product! I need info about this item please!",  // Contains "info" keyword
+          post_id: "18374233234126113",  // Matches rule target post
           comment_id: `test_comment_${Date.now()}`,
           created_time: Date.now()
         }
@@ -26,8 +26,9 @@ async function testWebhookWithSavedRule() {
   };
   
   console.log('🎯 Testing webhook with:');
-  console.log('- Comment: "Great product! I need details about free shipping please!"');
-  console.log('- Contains keyword: "free" ✅');
+  console.log('- Comment: "Great product! I need info about this item please!"');
+  console.log('- Contains keyword: "info" ✅');
+  console.log('- Target post: 18374233234126113 ✅');
   console.log('- Expected behavior: Use saved automation rule responses');
   console.log('- Expected comment reply: "Message sent!"');
   console.log('- Expected DM: "hi"');

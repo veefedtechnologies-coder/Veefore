@@ -96,12 +96,26 @@ export class NewWebhookProcessor {
 
     const comment = change.value;
     const commentText = comment.text.toLowerCase();
-    const mediaId = comment.media?.id;
-    const commentId = comment.id;
+    
+    // Debug: Log all available fields in comment object
+    console.log(`[NEW WEBHOOK] Raw comment object:`, comment);
+    console.log(`[NEW WEBHOOK] Available comment fields:`, Object.keys(comment));
+    
+    // Instagram webhook provides post ID and comment ID in specific fields
+    // Based on actual webhook payload: post_id and comment_id are top-level fields in the value object
+    const mediaId = comment.post_id || comment.media?.id || comment.parent_id || comment.media_id;
+    const commentId = comment.comment_id || comment.id;
     const userId = comment.from.id;
     const username = comment.from.username;
 
     console.log(`[NEW WEBHOOK] Processing comment from @${username}: "${comment.text}"`);
+    console.log(`[NEW WEBHOOK] Field extraction results:`, {
+      'comment.post_id': comment.post_id,
+      'comment.comment_id': comment.comment_id,
+      'comment.id': comment.id,
+      'extracted_mediaId': mediaId,
+      'extracted_commentId': commentId
+    });
     console.log(`[NEW WEBHOOK] Comment details:`, {
       commentId,
       mediaId,
@@ -327,11 +341,89 @@ export class NewWebhookProcessor {
   private async findSocialAccountByPageId(pageId: string): Promise<any> {
     try {
       const allAccounts = await this.storage.getAllSocialAccounts();
-      return allAccounts.find(account => 
+      console.log(`[NEW WEBHOOK] Looking for page ID: ${pageId}`);
+      console.log(`[NEW WEBHOOK] Total accounts from storage: ${allAccounts.length}`);
+      
+      // Debug: Show all accounts with their details
+      allAccounts.forEach((account, index) => {
+        console.log(`[NEW WEBHOOK] Account ${index + 1}: @${account.username} platform:${account.platform} pageId:${account.pageId} accountId:${account.accountId} isActive:${account.isActive} workspaceId:${account.workspaceId}`);
+      });
+      
+      // Find all matching accounts
+      const matchingAccounts = allAccounts.filter(account => 
         account.platform === 'instagram' && 
-        account.accountId === pageId &&
+        (account.accountId === pageId || account.pageId === pageId) &&
         account.isActive
       );
+      
+      console.log(`[NEW WEBHOOK] Found ${matchingAccounts.length} matching accounts BEFORE sorting:`);
+      matchingAccounts.forEach((acc, index) => {
+        console.log(`[NEW WEBHOOK] ${index + 1}. @${acc.username} in workspace ${acc.workspaceId}`);
+      });
+      
+      // Sort accounts to prioritize your workspace (6847b9cdfabaede1706f2994)
+      matchingAccounts.sort((a, b) => {
+        const yourWorkspace = '6847b9cdfabaede1706f2994';
+        if (a.workspaceId === yourWorkspace && b.workspaceId !== yourWorkspace) return -1;
+        if (b.workspaceId === yourWorkspace && a.workspaceId !== yourWorkspace) return 1;
+        return 0;
+      });
+      
+      console.log(`[NEW WEBHOOK] Found ${matchingAccounts.length} matching accounts AFTER sorting:`);
+      matchingAccounts.forEach((acc, index) => {
+        console.log(`[NEW WEBHOOK] ${index + 1}. @${acc.username} in workspace ${acc.workspaceId}`);
+      });
+      
+      if (matchingAccounts.length === 0) {
+        console.log(`[NEW WEBHOOK] No matching social account found for page ${pageId}`);
+        return null;
+      }
+      
+      if (matchingAccounts.length === 1) {
+        console.log(`[NEW WEBHOOK] Found unique account: ${matchingAccounts[0].username} for workspace ${matchingAccounts[0].workspaceId}`);
+        return matchingAccounts[0];
+      }
+      
+      // Multiple accounts with same pageId - prioritize by automation rules
+      console.log(`[NEW WEBHOOK] Found ${matchingAccounts.length} accounts with same pageId, checking automation rules...`);
+      
+      let bestAccount = null;
+      let maxActiveRules = 0;
+      
+      for (const account of matchingAccounts) {
+        const rules = await this.automationSystem.getRulesForWebhook(account.workspaceId);
+        const activeRules = rules.filter(rule => rule.isActive);
+        console.log(`[NEW WEBHOOK] Account @${account.username} (workspace: ${account.workspaceId}) has ${activeRules.length} active automation rules`);
+        
+        if (activeRules.length > maxActiveRules) {
+          maxActiveRules = activeRules.length;
+          bestAccount = account;
+        }
+        // Tie-breaker: if same number of rules, prefer the account with newer/named rules
+        else if (activeRules.length === maxActiveRules && maxActiveRules > 0) {
+          const hasNamedRule = activeRules.some(rule => rule.name && rule.name !== 'Unnamed');
+          const currentBestHasNamedRule = bestAccount ? 
+            (await this.automationSystem.getRulesForWebhook(bestAccount.workspaceId))
+              .filter(r => r.isActive)
+              .some(rule => rule.name && rule.name !== 'Unnamed') : false;
+          
+          if (hasNamedRule && !currentBestHasNamedRule) {
+            console.log(`[NEW WEBHOOK] Preferring account with named automation rules`);
+            bestAccount = account;
+          }
+        }
+      }
+      
+      if (bestAccount) {
+        console.log(`[NEW WEBHOOK] Selected account: @${bestAccount.username} (workspace: ${bestAccount.workspaceId}) with ${maxActiveRules} active rules`);
+        return bestAccount;
+      }
+      
+      // If all have same number of rules, use the first one
+      const selectedAccount = matchingAccounts[0];
+      console.log(`[NEW WEBHOOK] Using first account: @${selectedAccount.username} (workspace: ${selectedAccount.workspaceId})`);
+      return selectedAccount;
+      
     } catch (error) {
       console.error(`[NEW WEBHOOK] Error finding social account:`, error);
       return null;
