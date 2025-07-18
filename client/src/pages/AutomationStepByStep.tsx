@@ -369,8 +369,7 @@ export default function AutomationStepByStep() {
       name: `${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} Automation`,
       workspaceId: workspaceId,
       type: getBackendType(automationType),
-      trigger: {
-        type: getBackendType(automationType),
+      triggers: {
         aiMode: 'contextual',
         keywords: getCurrentKeywords(),
         hashtags: [],
@@ -378,35 +377,36 @@ export default function AutomationStepByStep() {
         newFollowers: false,
         postInteraction: automationType === 'comment_dm' || automationType === 'comment_only'
       },
-      action: {
-        responses: commentReplies.filter(reply => reply.trim().length > 0),
-        aiPersonality: aiPersonality,
+      responses: automationType === 'comment_dm' ? 
+        [...commentReplies.filter(reply => reply.trim().length > 0), dmMessage] :
+        commentReplies.filter(reply => reply.trim().length > 0),
+      aiPersonality: aiPersonality,
+      responseLength: 'medium',
+      conditions: {},
+      schedule: {},
+      aiConfig: {
+        personality: aiPersonality,
         responseLength: 'medium',
-        aiConfig: {
-          personality: aiPersonality,
-          responseLength: 'medium',
-          dailyLimit: maxRepliesPerDay,
-          responseDelay: cooldownPeriod / 60, // Convert minutes to hours
-          language: 'auto',
-          contextualMode: true
-        },
-        conditions: {},
-        schedule: {},
-        duration: {},
-        activeTime: {
-          start: activeHours.start,
-          end: activeHours.end,
-          days: activeDays
-        }
+        dailyLimit: maxRepliesPerDay,
+        responseDelay: cooldownPeriod / 60, // Convert minutes to hours
+        language: 'auto',
+        contextualMode: true
       },
-      isActive: true,
-      description: `Auto ${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} automation rule`
+      duration: {},
+      activeTime: {
+        start: activeHours.start,
+        end: activeHours.end,
+        days: activeDays
+      },
+      isActive: true
     }
 
     try {
+      console.log('Creating automation rule with data:', ruleData)
       await createAutomationMutation.mutateAsync(ruleData)
     } catch (error) {
       console.error('Error creating automation rule:', error)
+      console.error('Error details:', error.response?.data || error)
     }
   }
   const [previewComment, setPreviewComment] = useState('Amazing content! info please!')
