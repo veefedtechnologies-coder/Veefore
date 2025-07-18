@@ -1027,12 +1027,12 @@ const VideoGeneratorAdvanced = () => {
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Hook</label>
-                      <p className="text-gray-900 bg-yellow-50 p-3 rounded-lg">{generatedScript.hook}</p>
+                      <label className="text-sm font-medium text-gray-700">Title</label>
+                      <p className="text-gray-900 bg-blue-50 p-3 rounded-lg">{generatedScript.title}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Call to Action</label>
-                      <p className="text-gray-900 bg-green-50 p-3 rounded-lg">{generatedScript.callToAction}</p>
+                      <label className="text-sm font-medium text-gray-700">Description</label>
+                      <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{generatedScript.description}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1062,15 +1062,15 @@ const VideoGeneratorAdvanced = () => {
                         <div className="space-y-2">
                           <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Visual</label>
-                            <p className="text-gray-900">{scene.description}</p>
+                            <p className="text-gray-900">{scene.visualDescription}</p>
                           </div>
                           <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Style</label>
-                            <p className="text-gray-700 text-sm">{scene.visualStyle}</p>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Camera & Lighting</label>
+                            <p className="text-gray-700 text-sm">{scene.cameraAngle} • {scene.lighting}</p>
                           </div>
                           <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Voiceover</label>
-                            <p className="text-gray-700 text-sm italic">"{scene.voiceover}"</p>
+                            <p className="text-gray-700 text-sm italic">"{scene.narration}"</p>
                           </div>
                         </div>
                       </div>
