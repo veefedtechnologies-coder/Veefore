@@ -132,6 +132,14 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 18, 2025: **AUTOMATION RESPONSE SELECTION FIXED - PREDICTABLE RESPONSES IMPLEMENTED** - Fixed automation system to use specific configured responses instead of random selection
+  - ✅ **Random Selection Eliminated**: Removed Math.random() logic that was randomly selecting from response arrays
+  - ✅ **First Response Selection**: System now consistently uses the first response (index 0) from configured arrays
+  - ✅ **Predictable Behavior**: Comment and DM responses now use exact responses user configured in automation rules
+  - ✅ **Applied to All Automation Types**: Fixed comment-to-DM, comment-only, and DM-only automation methods
+  - ✅ **User-Controlled Responses**: Automation now uses specific responses exactly as configured by user
+  - **Technical Achievement**: Complete elimination of random response selection for predictable, user-controlled automation behavior
+  - **User Experience**: Automation now sends exact responses user configured, providing full control over messaging
 - July 18, 2025: **COMMENT-TO-DM AUTOMATION SYSTEM FULLY OPERATIONAL AND PRODUCTION READY** - Successfully resolved all critical issues and achieved 100% working automation system
   - ✅ **Webhook Processing Complete**: Instagram webhooks now process comments correctly and return "EVENT_RECEIVED"
   - ✅ **Social Account Matching Fixed**: Updated social account page ID to match Instagram webhook page ID (17841474747481653)

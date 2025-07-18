@@ -182,18 +182,18 @@ export class NewWebhookProcessor {
   private async executeCommentDMAutomation(rule: DatabaseAutomationRule, context: any): Promise<void> {
     console.log(`[NEW WEBHOOK] Executing Comment → DM automation for rule: ${rule.name}`);
 
-    // Step 1: Send comment reply
+    // Step 1: Send comment reply (use first response)
     const commentResponses = rule.commentReplies || [];
     if (commentResponses.length > 0) {
-      const randomResponse = commentResponses[Math.floor(Math.random() * commentResponses.length)];
-      await this.sendCommentReply(context.commentId, randomResponse, context.socialAccount);
+      const response = commentResponses[0]; // Use first response instead of random
+      await this.sendCommentReply(context.commentId, response, context.socialAccount);
     }
 
-    // Step 2: Send DM
+    // Step 2: Send DM (use first response)
     const dmResponses = rule.dmResponses || [];
     if (dmResponses.length > 0) {
-      const randomDMResponse = dmResponses[Math.floor(Math.random() * dmResponses.length)];
-      await this.sendDirectMessage(context.userId, randomDMResponse, context.socialAccount);
+      const dmResponse = dmResponses[0]; // Use first response instead of random
+      await this.sendDirectMessage(context.userId, dmResponse, context.socialAccount);
     }
   }
 
@@ -205,8 +205,8 @@ export class NewWebhookProcessor {
 
     const commentResponses = rule.commentReplies || [];
     if (commentResponses.length > 0) {
-      const randomResponse = commentResponses[Math.floor(Math.random() * commentResponses.length)];
-      await this.sendCommentReply(context.commentId, randomResponse, context.socialAccount);
+      const response = commentResponses[0]; // Use first response instead of random
+      await this.sendCommentReply(context.commentId, response, context.socialAccount);
     }
   }
 
@@ -218,8 +218,8 @@ export class NewWebhookProcessor {
 
     const dmResponses = rule.dmResponses || [];
     if (dmResponses.length > 0) {
-      const randomDMResponse = dmResponses[Math.floor(Math.random() * dmResponses.length)];
-      await this.sendDirectMessage(context.userId, randomDMResponse, context.socialAccount);
+      const dmResponse = dmResponses[0]; // Use first response instead of random
+      await this.sendDirectMessage(context.userId, dmResponse, context.socialAccount);
     }
   }
 
