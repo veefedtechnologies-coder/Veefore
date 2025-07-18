@@ -365,8 +365,7 @@ router.post('/generate-script', authenticateJWT, async (req: AuthenticatedReques
     }
 
     // Generate script using OpenAI
-    const openaiModule = await import('./openai-client');
-    const OpenAIService = openaiModule.default || openaiModule.OpenAIService;
+    const { default: OpenAIService } = await import('./openai-client');
     const service = new OpenAIService();
     
     console.log('[VIDEO API] Creating OpenAI service for script generation');
@@ -411,8 +410,7 @@ router.post('/regenerate-scene', authenticateJWT, async (req: AuthenticatedReque
     }
 
     // Regenerate scene using OpenAI
-    const openaiService = await import('./openai-client');
-    const OpenAIService = openaiService.default || openaiService.OpenAIService;
+    const { default: OpenAIService } = await import('./openai-client');
     const service = new OpenAIService();
     
     const updatedScene = await service.regenerateScene({
