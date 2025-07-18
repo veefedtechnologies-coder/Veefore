@@ -706,6 +706,15 @@ export class InstagramWebhookHandler {
 
         try {
           // Step 1: Reply to the comment
+          console.log(`[WEBHOOK] DEBUG: Rule structure before automation call:`, JSON.stringify({
+            id: rule.id,
+            type: rule.type,
+            actionResponses: rule.action?.responses,
+            actionDmResponses: rule.action?.dmResponses,
+            directResponses: rule.responses,
+            directDmResponses: rule.dmResponses
+          }));
+          
           const commentResponse = await this.automation.generateContextualResponse(
             value.text,
             rule,

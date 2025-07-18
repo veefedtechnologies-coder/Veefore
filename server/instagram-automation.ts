@@ -352,6 +352,19 @@ export class InstagramAutomation {
     userProfile?: { username: string }
   ): Promise<string> {
     try {
+      console.log(`[AUTOMATION] === RESPONSE GENERATION DEBUG START ===`);
+      console.log(`[AUTOMATION] Rule received in generateContextualResponse:`, JSON.stringify({
+        id: rule.id,
+        type: rule.type,
+        name: rule.name,
+        actionExists: !!rule.action,
+        actionResponses: rule.action?.responses,
+        actionDmResponses: rule.action?.dmResponses,
+        directResponses: rule.responses,
+        directDmResponses: rule.dmResponses,
+        entireRuleAction: rule.action
+      }));
+      
       console.log(`[AI AUTOMATION] Processing message for rule type: ${rule.trigger?.type || rule.action?.type}`);
       
       // Extract user configuration from rule
@@ -375,19 +388,36 @@ export class InstagramAutomation {
       console.log(`[AI AUTOMATION] Generating response for rule type: ${rule.type}`);
       
       // First try to use pre-configured responses
-      // For comment-to-DM rules, check dmResponses first, then responses
-      // For regular rules, check responses first, then dmResponses
+      // For comment-to-DM rules, check responses for comment replies
+      // For DM rules, check dmResponses first, then responses
+      // For comment_dm rules, check responses for comment replies
       let responses = [];
       
-      if (rule.type === 'dm' && rule.action.dmResponses && rule.action.dmResponses.length > 0) {
-        responses = rule.action.dmResponses;
-        console.log(`[AUTOMATION] Using DM responses: ${JSON.stringify(responses)}`);
-      } else if (rule.action.responses && rule.action.responses.length > 0) {
+      console.log(`[AUTOMATION] RESPONSE SELECTION DEBUG:`);
+      console.log(`[AUTOMATION] - rule.type: ${rule.type}`);
+      console.log(`[AUTOMATION] - rule.action: ${JSON.stringify(rule.action)}`);
+      console.log(`[AUTOMATION] - rule.action?.responses: ${JSON.stringify(rule.action?.responses)}`);
+      console.log(`[AUTOMATION] - rule.action?.dmResponses: ${JSON.stringify(rule.action?.dmResponses)}`);
+      
+      if (rule.type === 'comment_dm' && rule.action?.responses && rule.action.responses.length > 0) {
         responses = rule.action.responses;
-        console.log(`[AUTOMATION] Using action responses: ${JSON.stringify(responses)}`);
-      } else if (rule.action.dmResponses && rule.action.dmResponses.length > 0) {
+        console.log(`[AUTOMATION] ✅ Using comment_dm responses: ${JSON.stringify(responses)}`);
+      } else if (rule.type === 'dm' && rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
         responses = rule.action.dmResponses;
-        console.log(`[AUTOMATION] Using fallback DM responses: ${JSON.stringify(responses)}`);
+        console.log(`[AUTOMATION] ✅ Using DM responses: ${JSON.stringify(responses)}`);
+      } else if (rule.action?.responses && rule.action.responses.length > 0) {
+        responses = rule.action.responses;
+        console.log(`[AUTOMATION] ✅ Using action responses: ${JSON.stringify(responses)}`);
+      } else if (rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
+        responses = rule.action.dmResponses;
+        console.log(`[AUTOMATION] ✅ Using fallback DM responses: ${JSON.stringify(responses)}`);
+      } else {
+        console.log(`[AUTOMATION] ❌ NO RESPONSES FOUND - checking conditions:`);
+        console.log(`[AUTOMATION] - rule.type === 'comment_dm': ${rule.type === 'comment_dm'}`);
+        console.log(`[AUTOMATION] - rule.action?.responses exists: ${!!rule.action?.responses}`);
+        console.log(`[AUTOMATION] - rule.action?.responses.length > 0: ${rule.action?.responses && rule.action.responses.length > 0}`);
+        console.log(`[AUTOMATION] - rule.action?.dmResponses exists: ${!!rule.action?.dmResponses}`);
+        console.log(`[AUTOMATION] - rule.action?.dmResponses.length > 0: ${rule.action?.dmResponses && rule.action.dmResponses.length > 0}`);
       }
       
       // Check if we have valid non-empty responses
