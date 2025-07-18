@@ -662,69 +662,104 @@ export class InstagramWebhookHandler {
       // Get automation rules for this workspace
       const rules = await this.getAutomationRules(socialAccount.workspaceId);
       
-      for (const rule of rules) {
-        console.log(`[WEBHOOK] Processing rule: ${rule.id}, name: ${rule.name}, active: ${rule.isActive}`);
+      // Filter rules that should handle comments
+      const commentRules = rules.filter(rule => {
+        const isActive = rule.isActive;
         
-        if (!rule.isActive) {
-          console.log(`[WEBHOOK] Rule ${rule.id} is inactive, skipping`);
-          continue;
-        }
-
-        console.log(`[WEBHOOK] Rule structure:`, {
-          trigger: rule.trigger,
-          action: rule.action,
-          isActive: rule.isActive
-        });
+        // Handle different rule types for comments:
+        // 1. 'comment' type - comment-only automation
+        // 2. 'dm' type with postInteraction=true - comment-to-dm automation (check both locations)
+        const hasPostInteraction = rule.triggers?.postInteraction === true || rule.postInteraction === true;
+        const canHandleComments = rule.type === 'comment' || 
+                                 (rule.type === 'dm' && hasPostInteraction);
+        
+        console.log(`[WEBHOOK] Rule ${rule.name}: active=${isActive}, type=${rule.type}, postInteraction=${rule.triggers?.postInteraction || rule.postInteraction}, canHandleComments=${canHandleComments}`);
+        
+        return isActive && canHandleComments;
+      });
+      
+      console.log(`[WEBHOOK] Found ${commentRules.length} active comment rules out of ${rules.length} total rules`);
+      
+      for (const rule of commentRules) {
+        console.log(`[WEBHOOK] Processing comment rule: ${rule.id}, name: ${rule.name}, type: ${rule.type}`);
 
         const commentId = value.comment_id || (value as any).id;
         
         // Check if this comment has already been processed
         if (this.automation.isCommentProcessed(commentId)) {
           console.log(`[WEBHOOK] ⚠️ Comment ${commentId} already processed, skipping automation`);
-          return;
+          continue;
+        }
+
+        // Check if rule should trigger for this comment based on keywords
+        if (!this.shouldTriggerRule(rule, value.text)) {
+          console.log(`[WEBHOOK] Rule ${rule.name} not triggered for comment: "${value.text}"`);
+          continue;
         }
 
         // Mark comment as processed to prevent duplicates
         this.automation.markCommentProcessed(commentId);
 
-        console.log(`[WEBHOOK] Starting AI response generation for comment: "${value.text}"`);
+        console.log(`[WEBHOOK] Starting comment-to-DM automation for comment: "${value.text}"`);
 
         try {
-          // Generate stealth response for the comment
-          console.log(`[WEBHOOK] Calling stealth response generator...`);
-          const response = await this.automation.generateContextualResponse(
+          // Step 1: Reply to the comment
+          const commentResponse = await this.automation.generateContextualResponse(
             value.text,
             rule,
             { username: value.from.username }
           );
 
-          console.log(`[WEBHOOK] Stealth response generated: "${response}"`);
+          console.log(`[WEBHOOK] Comment reply generated: "${commentResponse}"`);
 
-          // Send the automated comment reply using stealth patterns
-          console.log(`[WEBHOOK] Sending stealth comment with access token length: ${socialAccount.accessToken?.length || 0}`);
-          const result = await this.automation.sendAutomatedComment(
+          // Send the automated comment reply
+          const commentResult = await this.automation.sendAutomatedComment(
             socialAccount.accessToken,
             commentId,
-            response,
+            commentResponse,
             socialAccount.workspaceId,
             rule.id
           );
 
-          console.log(`[WEBHOOK] Comment send result:`, result);
+          console.log(`[WEBHOOK] Comment send result:`, commentResult);
 
-          if (result.success) {
-            console.log(`[WEBHOOK] ✓ Successfully sent stealth comment: ${result.commentId}`);
+          if (commentResult.success) {
+            console.log(`[WEBHOOK] ✓ Successfully sent comment reply: ${commentResult.commentId}`);
+            
+            // Step 2: Send DM (for comment-to-dm automation)
+            if (rule.type === 'dm') {
+              console.log(`[WEBHOOK] Sending follow-up DM for comment-to-DM automation`);
+              
+              // Generate DM message (could be different from comment reply)
+              const dmMessage = rule.responses && rule.responses.length > 1 ? 
+                rule.responses[1] : // Use second response as DM message
+                `Hi ${value.from.username}! Thanks for your comment. I've sent you more details here!`;
+              
+              // Send DM to the commenter
+              const dmResult = await this.sendDirectMessage(
+                socialAccount.accessToken,
+                value.from.id,
+                dmMessage,
+                socialAccount
+              );
+              
+              if (dmResult.success) {
+                console.log(`[WEBHOOK] ✓ Successfully sent follow-up DM for comment-to-DM automation`);
+              } else {
+                console.log(`[WEBHOOK] ✗ Failed to send follow-up DM: ${dmResult.error}`);
+              }
+            }
           } else {
-            console.log(`[WEBHOOK] ✗ Failed to send stealth comment: ${result.error}`);
+            console.log(`[WEBHOOK] ✗ Failed to send comment reply: ${commentResult.error}`);
           }
         } catch (error) {
           // Check if this is a stealth responder intentionally declining to respond
           if ((error as Error).message.includes('natural behavior patterns')) {
             console.log(`[WEBHOOK] ✓ Stealth responder declined to respond to maintain natural patterns`);
-            return; // This is intentional behavior, not an error
+            continue; // This is intentional behavior, not an error
           }
           
-          console.error(`[WEBHOOK] Actual error in automation flow:`, error);
+          console.error(`[WEBHOOK] Actual error in comment automation flow:`, error);
           console.error(`[WEBHOOK] Error stack:`, (error as Error).stack);
         }
       }
@@ -817,22 +852,58 @@ export class InstagramWebhookHandler {
       console.log(`[WEBHOOK] Available accounts:`, accounts.map(acc => ({ 
         id: acc.accountId, 
         username: acc.username, 
-        platform: acc.platform 
+        platform: acc.platform,
+        workspaceId: acc.workspaceId 
       })));
       
-      // Try exact match first
-      let account = accounts.find(acc => 
+      // Find all matching accounts
+      const matchingAccounts = accounts.filter(acc => 
         acc.platform === 'instagram' && 
         acc.accountId === pageId
       );
       
-      // If no exact match, try to find by workspace (fallback for development)
-      if (!account && accounts.length > 0) {
-        account = accounts.find(acc => acc.platform === 'instagram');
-        console.log(`[WEBHOOK] Using fallback account: ${account?.username}`);
+      if (matchingAccounts.length === 0) {
+        // If no exact match, try to find by workspace (fallback for development)
+        if (accounts.length > 0) {
+          const fallbackAccount = accounts.find(acc => acc.platform === 'instagram');
+          console.log(`[WEBHOOK] Using fallback account: ${fallbackAccount?.username}`);
+          return fallbackAccount;
+        }
+        return null;
       }
       
-      return account;
+      if (matchingAccounts.length === 1) {
+        console.log(`[WEBHOOK] Found unique account: ${matchingAccounts[0].username} for workspace ${matchingAccounts[0].workspaceId}`);
+        return matchingAccounts[0];
+      }
+      
+      // Multiple accounts with same accountId - prioritize by automation rules
+      console.log(`[WEBHOOK] Found ${matchingAccounts.length} accounts with same accountId, checking automation rules...`);
+      
+      let bestAccount = null;
+      let maxActiveRules = 0;
+      
+      for (const account of matchingAccounts) {
+        const rules = await this.getAutomationRules(account.workspaceId);
+        const activeRules = rules.filter(rule => rule.isActive);
+        console.log(`[WEBHOOK] Account ${account.username} (workspace: ${account.workspaceId}) has ${activeRules.length} active automation rules`);
+        
+        if (activeRules.length > maxActiveRules) {
+          maxActiveRules = activeRules.length;
+          bestAccount = account;
+        }
+      }
+      
+      if (bestAccount) {
+        console.log(`[WEBHOOK] Selected account: ${bestAccount.username} (workspace: ${bestAccount.workspaceId}) with ${maxActiveRules} active rules`);
+        return bestAccount;
+      }
+      
+      // If all have same number of rules, use the first one
+      const selectedAccount = matchingAccounts[0];
+      console.log(`[WEBHOOK] Using first account: ${selectedAccount.username} (workspace: ${selectedAccount.workspaceId})`);
+      return selectedAccount;
+      
     } catch (error) {
       console.error('[WEBHOOK] Error finding social account:', error);
       return null;
@@ -868,29 +939,40 @@ export class InstagramWebhookHandler {
       action: rule.action
     });
 
-    // For Instagram Auto-Reply rules, always trigger for comments (contextual AI mode)
-    if (rule.name === 'Instagram Auto-Reply' || rule.isActive) {
-      console.log(`[WEBHOOK] Rule ${rule.name} is active, triggering response`);
+    // For contextual AI mode, always trigger (this is the default for new rules)
+    if (rule.triggers && rule.triggers.aiMode === 'contextual') {
+      console.log(`[WEBHOOK] Rule ${rule.name} uses contextual AI mode, triggering for all comments`);
       return true;
     }
 
-    // Legacy fallback - check for triggers structure
-    if (rule.triggers) {
-      // For contextual AI mode, always trigger
-      if (rule.triggers.aiMode === 'contextual') {
-        return true;
-      }
-
-      // For keyword mode, check for trigger keywords
-      if (rule.triggers.keywords && rule.triggers.keywords.length > 0) {
-        const hasKeyword = rule.triggers.keywords.some((keyword: string) => 
-          lowerContent.includes(keyword.toLowerCase())
-        );
-        if (!hasKeyword) return false;
-      }
+    // Check if rule has specific keywords to match
+    let keywords = [];
+    if (rule.triggers && rule.triggers.keywords) {
+      keywords = rule.triggers.keywords;
     }
 
-    return true;
+    console.log(`[WEBHOOK] Checking keywords: ${JSON.stringify(keywords)}`);
+
+    // If no keywords specified, trigger for all comments (default behavior)
+    if (!keywords || keywords.length === 0) {
+      console.log(`[WEBHOOK] No keywords specified, triggering for all comments`);
+      return true;
+    }
+
+    // Check if any keyword matches the comment content
+    const hasKeyword = keywords.some((keyword: string) => {
+      const matches = lowerContent.includes(keyword.toLowerCase());
+      console.log(`[WEBHOOK] Keyword "${keyword}" matches "${content}": ${matches}`);
+      return matches;
+    });
+
+    if (hasKeyword) {
+      console.log(`[WEBHOOK] Keyword match found, triggering rule`);
+      return true;
+    } else {
+      console.log(`[WEBHOOK] No keyword match found, not triggering rule`);
+      return false;
+    }
   }
 
   /**

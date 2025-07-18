@@ -373,11 +373,16 @@ export class InstagramAutomation {
       
       console.log(`[AI AUTOMATION] Using configuration: personality=${personality}, length=${responseLength}, language=${language}, contextual=${contextualMode}`);
       
-      // Check if this is a DM rule - use DM-specific response with 100% rate
-      const isDMRule = (rule.trigger?.type === 'dm') || (rule.action?.type === 'dm');
+      // Determine automation type and response strategy
+      const isCommentToDMRule = rule.type === 'dm' && rule.triggers?.postInteraction === true;
+      const isPureDMRule = rule.type === 'dm' && rule.triggers?.postInteraction !== true;
+      const isCommentOnlyRule = rule.type === 'comment';
       
-      if (isDMRule) {
-        console.log(`[AI AUTOMATION] Using DM response generator with 100% response rate`);
+      console.log(`[AI AUTOMATION] Rule analysis: type=${rule.type}, postInteraction=${rule.triggers?.postInteraction}, isCommentToDM=${isCommentToDMRule}, isPureDM=${isPureDMRule}, isCommentOnly=${isCommentOnlyRule}`);
+      
+      // For comment-to-DM and pure DM rules, always respond with guaranteed responses
+      if (isCommentToDMRule || isPureDMRule) {
+        console.log(`[AI AUTOMATION] Using guaranteed response generator for ${isCommentToDMRule ? 'comment-to-DM' : 'pure DM'} automation`);
         const dmResult = await this.stealthResponder.generateDMResponse(
           message,
           userProfile?.username || 'unknown',
@@ -392,7 +397,7 @@ export class InstagramAutomation {
         );
         
         if (dmResult.shouldRespond && dmResult.response) {
-          console.log(`[AI AUTOMATION] DM response generated: "${dmResult.response}"`);
+          console.log(`[AI AUTOMATION] Guaranteed response generated: "${dmResult.response}"`);
           return dmResult.response;
         } else {
           console.log(`[AI AUTOMATION] DM daily limit reached`);

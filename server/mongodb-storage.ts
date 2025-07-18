@@ -340,7 +340,13 @@ const AutomationRuleSchema = new mongoose.Schema({
   workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
   description: { type: String },
   isActive: { type: Boolean, default: true },
+  type: { type: String }, // Rule type (dm, comment, etc.)
+  postInteraction: { type: Boolean }, // For comment-to-DM detection
+  platform: { type: String }, // Platform (instagram, etc.)
+  keywords: [{ type: String }], // Keywords for triggering
+  responses: [{ type: String }], // Response templates
   trigger: { type: mongoose.Schema.Types.Mixed, default: {} },
+  triggers: { type: mongoose.Schema.Types.Mixed, default: {} }, // Alternative triggers format
   action: { type: mongoose.Schema.Types.Mixed, default: {} },
   lastRun: { type: Date },
   nextRun: { type: Date },
@@ -1508,9 +1514,13 @@ export class MongoStorage implements IStorage {
           workspaceId: typeof workspaceId === 'string' ? workspaceId : parseInt(rule.workspaceId),
           description: rule.description || null,
           isActive: rule.isActive !== false,
-          type: trigger.type || action.type || 'dm', // Extract type for webhook processing
+          type: rule.type || trigger.type || action.type || 'dm', // Extract type for webhook processing
+          postInteraction: rule.postInteraction, // Include postInteraction field for comment-to-DM detection
           trigger: trigger,
+          triggers: rule.triggers || trigger, // Include triggers field for compatibility
           action: action,
+          keywords: rule.keywords || [], // Include keywords field
+          responses: rule.responses || [], // Include responses field
           lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
           nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
           createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
