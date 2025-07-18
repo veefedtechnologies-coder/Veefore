@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   Video, 
   Play, 
@@ -103,94 +105,160 @@ const VideoGeneratorAdvanced = () => {
     enableColorGrading: true
   });
 
-  // Sample projects
-  const recentProjects = [
-    {
-      id: 1,
-      title: 'Sci-Fi Adventure',
-      thumbnail: '🌌',
-      lastEdited: '2 days ago',
-      status: 'completed'
+  const queryClient = useQueryClient();
+  
+  // Fetch recent video projects from backend
+  const { data: recentProjects = [], isLoading: projectsLoading } = useQuery({
+    queryKey: ['/api/video/jobs'],
+    queryFn: () => apiRequest('/api/video/jobs'),
+    select: (data) => data?.map(job => ({
+      id: job.id,
+      title: job.title || 'Untitled Project',
+      thumbnail: job.finalVideo ? '🎬' : '⏳',
+      lastEdited: new Date(job.updatedAt || job.createdAt).toLocaleDateString(),
+      status: job.status
+    })) || []
+  });
+
+  // Script generation mutation
+  const generateScriptMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('/api/video/generate-script', {
+        method: 'POST',
+        body: JSON.stringify({
+          prompt,
+          duration: settings.duration,
+          visualStyle: settings.visualStyle,
+          tone: settings.voiceTone
+        })
+      });
+      return response;
     },
-    {
-      id: 2,
-      title: 'Product Demo',
-      thumbnail: '📱',
-      lastEdited: '5 days ago',
-      status: 'completed'
+    onSuccess: (data) => {
+      if (data.script) {
+        setGeneratedScript(data.script);
+        setCurrentStep('settings');
+      }
     },
-    {
-      id: 3,
-      title: 'Travel Vlog',
-      thumbnail: '🗺️',
-      lastEdited: '1 week ago',
-      status: 'completed'
+    onError: (error) => {
+      console.error('Script generation failed:', error);
+      setIsGenerating(false);
     }
-  ];
+  });
+
+  // Video generation mutation
+  const generateVideoMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('/api/video/generate', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: generatedScript?.title || 'AI Generated Video',
+          prompt,
+          script: generatedScript,
+          duration: settings.duration,
+          voiceProfile: {
+            gender: settings.voiceGender,
+            language: settings.voiceLanguage,
+            accent: settings.voiceAccent,
+            tone: settings.voiceTone
+          },
+          enableAvatar: settings.avatar,
+          enableMusic: settings.backgroundMusic,
+          visualStyle: settings.visualStyle,
+          motionEngine: settings.motionEngine,
+          uploadedImages: []
+        })
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      if (data.jobId) {
+        setCurrentJobId(data.jobId);
+        setCurrentStep('preview');
+        // Start polling for job progress
+        queryClient.invalidateQueries(['/api/video/jobs']);
+      }
+    },
+    onError: (error) => {
+      console.error('Video generation failed:', error);
+      setIsGenerating(false);
+    }
+  });
+
+  // Track current job progress
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  
+  const { data: currentJob } = useQuery({
+    queryKey: ['/api/video/job', currentJobId],
+    queryFn: () => apiRequest(`/api/video/job/${currentJobId}`),
+    enabled: !!currentJobId,
+    refetchInterval: 2000 // Poll every 2 seconds
+  });
+
+  // WebSocket connection for real-time updates
+  useEffect(() => {
+    if (!currentJobId) return;
+    
+    const ws = new WebSocket(`ws://${window.location.host}/ws/video`);
+    
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+      ws.send(JSON.stringify({ type: 'subscribe', jobId: currentJobId }));
+    };
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'progress') {
+        setProgress(data.progress);
+        setCurrentStep(data.step || 'Processing...');
+      } else if (data.type === 'complete') {
+        setIsGenerating(false);
+        setProgress(100);
+        queryClient.invalidateQueries(['/api/video/jobs']);
+        queryClient.invalidateQueries(['/api/video/job', currentJobId]);
+      }
+    };
+    
+    ws.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+    
+    return () => {
+      ws.close();
+    };
+  }, [currentJobId, queryClient]);
 
   const generateScript = async () => {
+    if (!prompt.trim()) {
+      alert('Please enter a video prompt first');
+      return;
+    }
+    
     setIsGenerating(true);
     setProgress(0);
     setCurrentStep('script');
     
-    // Simulate script generation
+    // Show progress animation while API call is in progress
     const interval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
+        if (prev >= 90) {
           clearInterval(interval);
-          setIsGenerating(false);
-          
-          // Generate sample script
-          const sampleScript: GeneratedScript = {
-            title: "AI-Generated Video Script",
-            totalDuration: settings.duration,
-            hook: "Hook your audience with an attention-grabbing opening that immediately addresses their pain point or curiosity.",
-            callToAction: "Don't forget to like and subscribe for more amazing content!",
-            scenes: [
-              {
-                id: '1',
-                duration: 8,
-                description: 'Opening scene with dramatic landscape and title overlay',
-                visualStyle: 'Cinematic wide shot with golden hour lighting',
-                voiceover: 'Welcome to an incredible journey that will change everything you know about...'
-              },
-              {
-                id: '2', 
-                duration: 15,
-                description: 'Problem introduction with animated graphics',
-                visualStyle: 'Clean animated graphics with bold typography',
-                voiceover: 'Millions of people struggle with this exact challenge every single day. But what if there was a better way?'
-              },
-              {
-                id: '3',
-                duration: 20,
-                description: 'Solution demonstration with real examples',
-                visualStyle: 'Split screen showing before and after scenarios',
-                voiceover: 'Introducing our revolutionary approach that has helped thousands of people achieve remarkable results.'
-              },
-              {
-                id: '4',
-                duration: 12,
-                description: 'Benefits and features highlight',
-                visualStyle: 'Dynamic motion graphics with feature callouts',
-                voiceover: 'With these powerful features, you can achieve results faster than ever before.'
-              },
-              {
-                id: '5',
-                duration: 5,
-                description: 'Call to action with subscribe button',
-                visualStyle: 'Branded outro with animated subscribe button',
-                voiceover: 'Ready to get started? Click the link below and join thousands of satisfied users!'
-              }
-            ]
-          };
-          
-          setGeneratedScript(sampleScript);
-          return 100;
+          return 90; // Stop at 90% until API returns
         }
-        return prev + 20;
+        return prev + 10;
       });
-    }, 800);
+    }, 500);
+    
+    try {
+      await generateScriptMutation.mutateAsync();
+      setProgress(100);
+      setIsGenerating(false);
+      clearInterval(interval);
+    } catch (error) {
+      clearInterval(interval);
+      setIsGenerating(false);
+      setProgress(0);
+    }
   };
 
   const renderPromptStep = () => (
@@ -243,11 +311,13 @@ const VideoGeneratorAdvanced = () => {
             {/* Generate button - enhanced with modern styling */}
             <div className="flex px-4 py-3 justify-center">
               <button
-                onClick={() => setCurrentStep('settings')}
-                disabled={!prompt.trim()}
+                onClick={generateScript}
+                disabled={!prompt.trim() || isGenerating}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <span className="truncate">Generate Video</span>
+                <span className="truncate">
+                  {isGenerating ? 'Generating Script...' : 'Generate Script'}
+                </span>
               </button>
             </div>
 
@@ -1182,10 +1252,20 @@ const VideoGeneratorAdvanced = () => {
               <CardContent className="space-y-3">
                 <Button 
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                  onClick={() => setCurrentStep('preview')}
+                  onClick={async () => {
+                    setIsGenerating(true);
+                    setProgress(0);
+                    try {
+                      await generateVideoMutation.mutateAsync();
+                    } catch (error) {
+                      console.error('Video generation failed:', error);
+                      setIsGenerating(false);
+                    }
+                  }}
+                  disabled={isGenerating || !generatedScript}
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  Generate Final Video
+                  {isGenerating ? 'Generating Video...' : 'Generate Final Video'}
                 </Button>
                 <Button variant="outline" className="w-full">
                   <Eye className="w-4 h-4 mr-2" />
@@ -1208,55 +1288,133 @@ const VideoGeneratorAdvanced = () => {
     </div>
   );
 
-  const renderPreview = () => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Video Preview</h1>
-          <p className="text-gray-600">Your AI-generated video is ready!</p>
-        </div>
+  const renderPreview = () => {
+    const isVideoCompleted = currentJob?.status === 'completed' && currentJob?.finalVideo;
+    const isVideoGenerating = currentJob?.status === 'generating' || isGenerating;
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {isVideoCompleted ? 'Video Preview' : 'Video Generation'}
+            </h1>
+            <p className="text-gray-600">
+              {isVideoCompleted ? 'Your AI-generated video is ready!' : 'AI is creating your video...'}
+            </p>
+          </div>
 
-        <Card className="bg-white">
-          <CardContent className="p-8">
-            <div className="aspect-video bg-gray-900 rounded-lg mb-6 flex items-center justify-center">
-              <div className="text-center text-white">
-                <Play className="w-20 h-20 mx-auto mb-4 opacity-70" />
-                <p className="text-xl">Generated Video Preview</p>
-                <p className="text-gray-400">Click to play your AI-generated video</p>
-              </div>
-            </div>
+          <Card className="bg-white">
+            <CardContent className="p-8">
+              {isVideoGenerating ? (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                      <Wand2 className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Creating Your Video</h3>
+                    <p className="text-gray-600 mb-4">{currentJob?.currentStep || 'Starting video generation...'}</p>
+                    <Progress value={currentJob?.progress || progress} className="h-3 mb-2" />
+                    <p className="text-sm text-gray-500">{currentJob?.progress || progress}% complete</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">Generation Process</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-gray-700">Script processed</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${(currentJob?.progress || progress) > 20 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="text-gray-700">AI scenes generated</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${(currentJob?.progress || progress) > 50 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="text-gray-700">Motion applied</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${(currentJob?.progress || progress) > 80 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="text-gray-700">Voiceover added</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${(currentJob?.progress || progress) >= 100 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="text-gray-700">Final video compilation</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : isVideoCompleted ? (
+                <>
+                  <div className="aspect-video bg-gray-900 rounded-lg mb-6 flex items-center justify-center">
+                    {currentJob?.finalVideo ? (
+                      <video 
+                        src={currentJob.finalVideo}
+                        controls
+                        className="w-full h-full rounded-lg"
+                        poster={currentJob.thumbnailUrl}
+                      />
+                    ) : (
+                      <div className="text-center text-white">
+                        <Play className="w-20 h-20 mx-auto mb-4 opacity-70" />
+                        <p className="text-xl">Generated Video Preview</p>
+                        <p className="text-gray-400">Click to play your AI-generated video</p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="aspect-video bg-gray-900 rounded-lg mb-6 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <Play className="w-20 h-20 mx-auto mb-4 opacity-70" />
+                    <p className="text-xl">Generated Video Preview</p>
+                    <p className="text-gray-400">Click to play your AI-generated video</p>
+                  </div>
+                </div>
+              )}
 
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Video Details</h3>
-                <div className="text-sm space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Duration:</span>
-                    <span>{settings.duration}s</span>
+              <div className="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Video Details</h3>
+                  <div className="text-sm space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Duration:</span>
+                      <span>{settings.duration}s</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Resolution:</span>
+                      <span>{settings.resolution}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Style:</span>
+                      <span>{settings.visualStyle}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Resolution:</span>
-                    <span>{settings.resolution}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Style:</span>
-                    <span>{settings.visualStyle}</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Features</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {settings.backgroundMusic && <Badge variant="secondary">Music</Badge>}
+                    {settings.avatar && <Badge variant="secondary">AI Avatar</Badge>}
+                    {settings.captions && <Badge variant="secondary">Captions</Badge>}
+                    <Badge variant="secondary">{settings.voiceGender} Voice</Badge>
                   </div>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Features</h3>
-                <div className="flex flex-wrap gap-2">
-                  {settings.backgroundMusic && <Badge variant="secondary">Music</Badge>}
-                  {settings.avatar && <Badge variant="secondary">AI Avatar</Badge>}
-                  {settings.captions && <Badge variant="secondary">Captions</Badge>}
-                  <Badge variant="secondary">{settings.voiceGender} Voice</Badge>
-                </div>
-              </div>
-            </div>
 
-            <div className="flex gap-4">
-              <Button className="flex-1 bg-green-600 hover:bg-green-700">
+              <div className="flex gap-4">
+              <Button 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                disabled={!isVideoCompleted}
+                onClick={() => {
+                  if (currentJob?.finalVideo) {
+                    const link = document.createElement('a');
+                    link.href = currentJob.finalVideo;
+                    link.download = `${currentJob.title || 'video'}.mp4`;
+                    link.click();
+                  }
+                }}
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download Video
               </Button>
@@ -1270,16 +1428,20 @@ const VideoGeneratorAdvanced = () => {
                   setCurrentStep('prompt');
                   setPrompt('');
                   setGeneratedScript(null);
+                  setCurrentJobId(null);
+                  setIsGenerating(false);
+                  setProgress(0);
                 }}
               >
                 Create New
               </Button>
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Main render logic
   switch (currentStep) {
