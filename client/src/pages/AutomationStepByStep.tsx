@@ -223,6 +223,16 @@ export default function AutomationStepByStep() {
     },
     enabled: true
   })
+
+  // Transform real account data
+  const realAccounts = socialAccountsData ? socialAccountsData.map((account: any) => ({
+    id: account.id,
+    name: `@${account.username}`,
+    followers: `${account.followersCount} followers`,
+    platform: account.platform,
+    avatar: account.profilePictureUrl || `https://picsum.photos/40/40?random=${account.id}`,
+    workspaceId: account.workspaceId
+  })) : []
   
   // Fetch real Instagram posts when account is selected
   const { data: postsData, isLoading: postsLoading } = useQuery({
@@ -525,14 +535,7 @@ export default function AutomationStepByStep() {
     }
   ]
 
-  // Transform real account data
-  const realAccounts = socialAccountsData ? socialAccountsData.map((account: any) => ({
-    id: account.id,
-    name: `@${account.username}`,
-    followers: `${account.followersCount} followers`,
-    platform: account.platform,
-    avatar: account.profilePictureUrl || `https://picsum.photos/40/40?random=${account.id}`
-  })) : []
+
 
   // Transform real posts data
   const realPosts = postsData ? postsData.map((post: any) => {
