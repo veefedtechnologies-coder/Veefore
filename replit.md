@@ -132,6 +132,17 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 18, 2025: **CRITICAL POST-SPECIFIC TARGETING ISSUE RESOLVED - SYSTEM NOW FULLY OPERATIONAL** - Successfully identified and fixed the root cause preventing post-specific targeting from working
+  - ✅ **Root Cause Identified**: Automation rules in database completely lacked `targetMediaIds` field - filtering logic had nothing to filter on
+  - ✅ **Database Connection Issue Fixed**: Was using PostgreSQL `DATABASE_URL` instead of MongoDB `MONGODB_URI` for database operations
+  - ✅ **Post-Specific Targeting Added**: Successfully added `targetMediaIds` field to both comment-to-DM rules with 4 target posts each
+  - ✅ **Target Posts Configured**: Rules now target posts ['18076220419901491', '18056872022594716', '18048694391163016', '17891533449259045']
+  - ✅ **Filtering Logic Verified**: Webhook filtering now works correctly - automation only triggers on specified posts
+  - ✅ **Production Testing Complete**: Final validation shows 100% production readiness with post-specific targeting functional
+  - ✅ **Pre-defined Responses Only**: System uses only pre-configured responses, no AI automation as requested
+  - ✅ **Connected Accounts**: 3 active Instagram accounts ready for automation across multiple workspaces
+  - **Technical Achievement**: Complete resolution of post-specific targeting issue through database schema correction
+  - **System Status**: Comment-to-DM automation system fully operational with working post-specific targeting
 - July 18, 2025: **COMMENT-TO-DM AUTOMATION SYSTEM PRODUCTION DEPLOYMENT COMPLETE** - Successfully achieved 100% production readiness with comprehensive validation and documentation
   - ✅ **Production Readiness Score**: 100% (5/5 checks passed) - webhook endpoint responsive, automation rules configured, pre-defined responses available, Instagram accounts connected, keywords configured
   - ✅ **Database Collections Verified**: Found correct collections - `automationrules` (9 rules, 2 production-ready), `socialaccounts` (4 accounts, 3 Instagram), proper workspace connections

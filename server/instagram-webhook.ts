@@ -696,6 +696,20 @@ export class InstagramWebhookHandler {
           continue;
         }
 
+        // Check if rule should trigger for this specific post (targetMediaIds filter)
+        const postId = value.media?.id || value.parent_id;
+        console.log(`[WEBHOOK] Post ID: ${postId}, Rule targetMediaIds: ${rule.targetMediaIds}`);
+        
+        if (rule.targetMediaIds && rule.targetMediaIds.length > 0) {
+          if (!rule.targetMediaIds.includes(postId)) {
+            console.log(`[WEBHOOK] Rule ${rule.name} not configured for post ${postId}. Skipping automation.`);
+            continue;
+          }
+          console.log(`[WEBHOOK] ✓ Rule ${rule.name} configured for post ${postId}`);
+        } else {
+          console.log(`[WEBHOOK] ⚠️ Rule ${rule.name} has no targetMediaIds - will trigger on ALL posts`);
+        }
+
         // Check if rule should trigger for this comment based on keywords
         if (!this.shouldTriggerRule(rule, value.text)) {
           console.log(`[WEBHOOK] Rule ${rule.name} not triggered for comment: "${value.text}"`);
