@@ -28,7 +28,8 @@ import {
   Monitor,
   AspectRatio,
   ArrowLeft,
-  Info
+  Info,
+  AlertCircle
 } from 'lucide-react';
 
 interface ScriptScene {
@@ -888,28 +889,105 @@ const VideoGeneratorAdvanced = () => {
     </div>
   );
 
-  const renderScriptStep = () => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Generated Script & Scenes</h1>
-          <p className="text-gray-600">Review and customize your AI-generated video script</p>
-        </div>
-
-        {isGenerating ? (
-          <div className="max-w-2xl mx-auto">
+  const renderScriptStep = () => {
+    // Check if user hasn't configured settings properly
+    if (!prompt.trim()) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+          <div className="max-w-4xl mx-auto p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Script Generation</h1>
+              <p className="text-gray-600">Complete the workflow steps to generate your AI video script</p>
+            </div>
+            
             <Card className="bg-white">
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                  <Wand2 className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <AlertCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Generating Your Script...</h3>
-                <Progress value={progress} className="h-2 mb-4" />
-                <p className="text-gray-600">AI is creating scenes and voiceover based on your prompt</p>
+                <h3 className="text-xl font-semibold mb-4">Workflow Steps Required</h3>
+                <p className="text-gray-600 mb-6">Please complete the following steps in order:</p>
+                
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">1</span>
+                    </div>
+                    <span className="text-gray-700">Enter your video prompt</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                      <span className="text-gray-600 font-bold">2</span>
+                    </div>
+                    <span className="text-gray-400">Configure video settings</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                      <span className="text-gray-600 font-bold">3</span>
+                    </div>
+                    <span className="text-gray-400">Generate AI script</span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setCurrentStep('prompt')}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Go to Prompt Step
+                </button>
               </CardContent>
             </Card>
           </div>
-        ) : generatedScript ? (
+        </div>
+      );
+    }
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Generated Script & Scenes</h1>
+            <p className="text-gray-600">Review and customize your AI-generated video script</p>
+          </div>
+
+          {!generatedScript && !isGenerating ? (
+            <div className="max-w-2xl mx-auto">
+              <Card className="bg-white">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Wand2 className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">Ready to Generate Script</h3>
+                  <p className="text-gray-600 mb-6">Click the button below to generate your AI video script with OpenAI</p>
+                  <p className="text-sm text-gray-500 mb-6">
+                    <strong>Prompt:</strong> {prompt}
+                  </p>
+                  
+                  <button
+                    onClick={generateScript}
+                    disabled={isGenerating}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                  >
+                    <Wand2 className="w-5 h-5 mr-2 inline" />
+                    Generate Script with OpenAI
+                  </button>
+                </CardContent>
+              </Card>
+            </div>
+          ) : isGenerating ? (
+            <div className="max-w-2xl mx-auto">
+              <Card className="bg-white">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                    <Wand2 className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">Generating Your Script...</h3>
+                  <Progress value={progress} className="h-2 mb-4" />
+                  <p className="text-gray-600">AI is creating scenes and voiceover based on your prompt</p>
+                </CardContent>
+              </Card>
+            </div>
+          ) : generatedScript ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Script Overview */}
             <div className="lg:col-span-2 space-y-6">
@@ -1296,6 +1374,7 @@ const VideoGeneratorAdvanced = () => {
       </div>
     </div>
   );
+  };
 
   const renderPreview = () => {
     const isVideoCompleted = currentJob?.status === 'completed' && currentJob?.finalVideo;
