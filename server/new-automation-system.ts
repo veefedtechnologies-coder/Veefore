@@ -120,20 +120,15 @@ export class NewAutomationSystem {
       type: rule.type,
       isActive: rule.isActive,
       
-      // Reconstruct frontend triggers structure
-      triggers: {
-        aiMode: 'keyword' as const,
-        keywords: rule.keywords || [],
-        hashtags: [],
-        mentions: false,
-        newFollowers: false,
-        postInteraction: rule.type === 'comment_dm' || rule.type === 'comment_only'
-      },
+      // Direct field mapping to match new frontend structure
+      keywords: rule.keywords || [],
+      targetMediaIds: rule.targetMediaIds || [],
       
-      // Map responses
-      responses: rule.action.responses || [],
-      dmResponses: rule.action.dmResponses || [],
-      targetPosts: rule.targetMediaIds || [],
+      // Map responses in nested structure
+      responses: {
+        responses: rule.action.responses || [],
+        dmResponses: rule.action.dmResponses || []
+      },
       
       createdAt: rule.createdAt,
       updatedAt: rule.updatedAt
@@ -166,18 +161,18 @@ export class NewAutomationSystem {
     if (updates.type) dbUpdates.type = updates.type;
     if (updates.isActive !== undefined) dbUpdates.isActive = updates.isActive;
     
-    if (updates.triggers?.keywords) {
-      dbUpdates.keywords = updates.triggers.keywords;
+    if (updates.keywords) {
+      dbUpdates.keywords = updates.keywords;
     }
     
-    if (updates.targetPosts) {
-      dbUpdates.targetMediaIds = updates.targetPosts;
+    if (updates.targetMediaIds) {
+      dbUpdates.targetMediaIds = updates.targetMediaIds;
     }
     
-    if (updates.responses || updates.dmResponses) {
+    if (updates.responses) {
       dbUpdates.action = {
-        responses: updates.responses || [],
-        dmResponses: updates.dmResponses || []
+        responses: updates.responses.responses || [],
+        dmResponses: updates.responses.dmResponses || []
       };
     }
     
