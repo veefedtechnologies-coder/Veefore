@@ -195,7 +195,7 @@ const VideoGeneratorAdvanced = () => {
 
   const renderPromptStep = () => (
     <div className="relative flex size-full min-h-screen flex-col bg-neutral-50" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
-      <div className="layout-container flex h-screen flex-col overflow-hidden">
+      <div className="layout-container flex min-h-screen flex-col">
         {/* Header matching Cosmos Studio exactly */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3">
           <div className="flex items-center gap-4 text-[#141414]">
@@ -221,7 +221,7 @@ const VideoGeneratorAdvanced = () => {
         </header>
 
         {/* Main content area matching exact layout */}
-        <div className="px-40 flex flex-1 justify-center py-5 overflow-y-auto">
+        <div className="px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             {/* Main title */}
             <h1 className="text-[#141414] tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
@@ -280,7 +280,7 @@ const VideoGeneratorAdvanced = () => {
 
   const renderSettingsStep = () => (
     <div className="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-neutral-50 via-white to-neutral-100" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
-      <div className="layout-container flex h-screen flex-col overflow-hidden">
+      <div className="layout-container flex min-h-screen flex-col">
         {/* Header with enhanced visual appeal */}
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3 bg-white/80 backdrop-blur-sm">
           <div className="flex items-center gap-4 text-[#141414]">
@@ -306,7 +306,7 @@ const VideoGeneratorAdvanced = () => {
         </header>
 
         {/* Main content area with enhanced visuals */}
-        <div className="px-40 flex flex-1 justify-center py-5 overflow-y-auto">
+        <div className="px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             {/* Enhanced title section with animations */}
             <div className="text-center mb-8 animate-fade-in-up">
