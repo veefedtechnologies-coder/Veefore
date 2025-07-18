@@ -57,13 +57,26 @@ export default function AutomationStepByStep() {
   // Fetch real Instagram accounts
   const { data: socialAccountsData, isLoading: accountsLoading } = useQuery({
     queryKey: ['/api/social-accounts'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/social-accounts')
+      return response
+    },
     enabled: true
   })
   
   // Fetch real Instagram posts when account is selected
   const { data: postsData, isLoading: postsLoading } = useQuery({
     queryKey: ['/api/instagram-content', selectedAccount],
-    enabled: !!selectedAccount
+    queryFn: async () => {
+      if (!selectedAccount) return []
+      // Get workspace ID from social accounts data
+      const selectedAccountData = realAccounts.find(acc => acc.id === selectedAccount)
+      const workspaceId = selectedAccountData?.workspaceId || '6847b9cdfabaede1706f2994'
+      
+      const response = await apiRequest(`/api/instagram-content?workspaceId=${workspaceId}`)
+      return response
+    },
+    enabled: !!selectedAccount && !!socialAccountsData
   })
   
   // Create automation rule mutation
