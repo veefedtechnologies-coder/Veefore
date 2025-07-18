@@ -426,8 +426,8 @@ function App() {
                   />
                 )}
 
-                {/* Cosmos Studio Interface - Full height */}
-                <main className="flex-1 overflow-hidden">
+                {/* Cosmos Studio Interface - Full height with scrolling */}
+                <main className="flex-1 overflow-y-auto">
                   <VideoGeneratorAdvanced />
                 </main>
               </div>
