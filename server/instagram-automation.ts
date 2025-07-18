@@ -407,7 +407,7 @@ export class InstagramAutomation {
     try {
       // Simple AI response using OpenAI if available
       if (process.env.OPENAI_API_KEY) {
-        const OpenAI = require('openai');
+        const { default: OpenAI } = await import('openai');
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
         const personalityPrompt = {
