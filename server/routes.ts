@@ -2329,11 +2329,32 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             }
           }
           
-          // If refresh failed, provide sample posts for automation testing
+          // If refresh failed, try alternative endpoints and provide debugging info
           if (!mediaResponse.ok) {
             const errorData = await mediaResponse.json().catch(() => ({}));
             console.log('[CONTENT API] Instagram API still failed after token refresh:', errorData);
-            console.log('[CONTENT API] Providing sample posts for automation testing');
+            
+            // Try alternative Instagram Basic Display API endpoint
+            console.log('[CONTENT API] Trying alternative Instagram Basic Display API endpoint');
+            try {
+              const basicUrl = `https://graph.instagram.com/me/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
+              const basicResponse = await fetch(basicUrl);
+              
+              if (basicResponse.ok) {
+                console.log('[CONTENT API] Instagram Basic Display API successful');
+                mediaResponse = basicResponse;
+              } else {
+                const basicError = await basicResponse.json().catch(() => ({}));
+                console.log('[CONTENT API] Instagram Basic Display API also failed:', basicError);
+              }
+            } catch (basicErr) {
+              console.log('[CONTENT API] Instagram Basic Display API error:', basicErr);
+            }
+          }
+          
+          // If both endpoints failed, provide sample posts for automation testing
+          if (!mediaResponse.ok) {
+            console.log('[CONTENT API] All Instagram API endpoints failed - providing sample posts for automation testing');
             
             // Sample posts for automation testing based on the actual account
             const samplePosts = [

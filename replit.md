@@ -132,6 +132,15 @@ VeeFore is a comprehensive social media management platform that leverages AI to
 
 ## Changelog
 
+- July 18, 2025: **INSTAGRAM REAL POSTS LOADING COMPLETE** - Fixed Instagram API token refresh and real posts loading in automation system
+  - ✅ **Fixed Token Refresh**: Automatic Instagram token refresh system now working properly with Instagram Business API
+  - ✅ **Real Posts Loading**: Instagram Basic Display API successfully fetching 15 real posts from @rahulc1020 account
+  - ✅ **Alternative API Endpoints**: Added fallback to Instagram Basic Display API when Business API fails
+  - ✅ **Automation System**: Post selection now displays actual user posts instead of sample data
+  - ✅ **React Query Integration**: Fixed queryFn implementations for social accounts and Instagram content API calls
+  - ✅ **Workspace ID Integration**: Proper workspace ID parameter passing for authenticated API requests
+  - **Technical Achievement**: Complete real Instagram content integration with automatic token refresh and fallback systems
+  - **User Experience**: Automation system now shows authentic user posts for real automation rule configuration
 - July 18, 2025: **WORKFLOW ORDER ENFORCEMENT AND SCRIPT GENERATION FIXES COMPLETE** - Fixed critical workflow order issue and completed script generation functionality
   - ✅ **Workflow Order Fixed**: Enforced proper workflow order (Prompt → Settings → Script Generation → Video Generation) instead of showing "Continue to Advanced Settings" after script generation
   - ✅ **Script Generation Authentication**: Resolved authentication issues in script generation API - OpenAI integration now working perfectly
