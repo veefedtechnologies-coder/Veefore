@@ -124,6 +124,16 @@ const VideoGeneratorAdvanced = () => {
   // Script generation mutation
   const generateScriptMutation = useMutation({
     mutationFn: async () => {
+      console.log('[SCRIPT GEN] Starting script generation with:', {
+        prompt,
+        duration: settings.duration,
+        visualStyle: settings.visualStyle,
+        tone: settings.voiceTone,
+        voiceGender: settings.voiceGender,
+        language: settings.voiceLanguage,
+        accent: settings.voiceAccent
+      });
+      
       const response = await apiRequest('/api/video/generate-script', {
         method: 'POST',
         body: JSON.stringify({
@@ -136,16 +146,21 @@ const VideoGeneratorAdvanced = () => {
           accent: settings.voiceAccent
         })
       });
+      
+      console.log('[SCRIPT GEN] API Response:', response);
       return response;
     },
     onSuccess: (data) => {
+      console.log('[SCRIPT GEN] Success:', data);
       if (data.script) {
         setGeneratedScript(data.script);
         setCurrentStep('script');
+      } else {
+        console.error('[SCRIPT GEN] No script in response data');
       }
     },
     onError: (error) => {
-      console.error('Script generation failed:', error);
+      console.error('[SCRIPT GEN] Script generation failed:', error);
       setIsGenerating(false);
     }
   });
