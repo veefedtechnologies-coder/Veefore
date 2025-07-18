@@ -13,7 +13,7 @@ import { AnalyticsDashboard } from './components/analytics/analytics-dashboard'
 import { CreatePost } from './components/create/create-post'
 import { ProfessionalDashboard } from './components/dashboard/professional-dashboard'
 import VeeGPT from './pages/VeeGPT'
-import VideoGeneratorTest from './pages/VideoGeneratorTest'
+import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 import { CalendarView } from './components/calendar/calendar-view'
 import { ScheduledPosts } from './components/dashboard/scheduled-posts'
 import { DraftsSection } from './components/dashboard/drafts-section'
@@ -293,7 +293,7 @@ export default function App() {
                     />
                   )}
                   <main className="flex-1 overflow-y-auto">
-                    <VideoGeneratorTest />
+                    <VideoGeneratorAdvanced />
                   </main>
                 </div>
               </div>
