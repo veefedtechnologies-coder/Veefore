@@ -133,16 +133,16 @@ const AutomationListManager = ({
                     <div>
                       <span className="text-sm text-gray-500">Keywords:</span>
                       <div className="mt-1">
-                        {rule.triggers?.keywords?.length > 0 ? (
+                        {rule.keywords?.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {rule.triggers.keywords.slice(0, 3).map((keyword: string, index: number) => (
+                            {rule.keywords.slice(0, 3).map((keyword: string, index: number) => (
                               <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                                 {keyword}
                               </span>
                             ))}
-                            {rule.triggers.keywords.length > 3 && (
+                            {rule.keywords.length > 3 && (
                               <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                                +{rule.triggers.keywords.length - 3} more
+                                +{rule.keywords.length - 3} more
                               </span>
                             )}
                           </div>
@@ -153,13 +153,13 @@ const AutomationListManager = ({
                     </div>
 
                     <div>
-                      <span className="text-sm text-gray-500">AI Personality:</span>
-                      <p className="text-sm text-gray-900 capitalize">{rule.aiPersonality || 'Friendly'}</p>
+                      <span className="text-sm text-gray-500">Target Posts:</span>
+                      <p className="text-sm text-gray-900">{rule.targetMediaIds?.length || 0} posts</p>
                     </div>
 
                     <div>
-                      <span className="text-sm text-gray-500">Daily Limit:</span>
-                      <p className="text-sm text-gray-900">{rule.aiConfig?.dailyLimit || 50} responses</p>
+                      <span className="text-sm text-gray-500">Responses:</span>
+                      <p className="text-sm text-gray-900">{rule.responses?.responses?.length || 0} comment + {rule.responses?.dmResponses?.length || 0} DM</p>
                     </div>
                   </div>
 
