@@ -290,8 +290,8 @@ export default function AutomationStepByStep() {
     title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
     type: post.media_type === 'VIDEO' ? 'reel' : 'post',
     image: post.media_url || post.thumbnail_url || 'https://picsum.photos/300/300?random=1',
-    likes: post.like_count || 0,
-    comments: post.comments_count || 0,
+    likes: post.likes || 0,
+    comments: post.comments || 0,
     caption: post.caption || 'Instagram post content'
   })) : []
 
@@ -612,16 +612,14 @@ export default function AutomationStepByStep() {
                       }`}
                     >
                       <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 overflow-hidden">
-                        {post.thumbnailUrl ? (
+                        {post.image ? (
                           <img 
-                            src={post.thumbnailUrl} 
+                            src={post.image} 
                             alt={post.caption || post.title} 
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              // Fallback to mediaUrl if thumbnailUrl fails
-                              if (post.mediaUrl && e.currentTarget.src !== post.mediaUrl) {
-                                e.currentTarget.src = post.mediaUrl;
-                              }
+                              // Fallback to placeholder if image fails
+                              e.currentTarget.src = 'https://picsum.photos/300/300?random=1';
                             }}
                           />
                         ) : (
@@ -637,11 +635,11 @@ export default function AutomationStepByStep() {
                           <div className="flex items-center gap-2">
                             <span className="flex items-center gap-1">
                               <Heart className="w-3 h-3" />
-                              {post.engagement?.likes || 0}
+                              {post.likes || 0}
                             </span>
                             <span className="flex items-center gap-1">
                               <MessageCircle className="w-3 h-3" />
-                              {post.engagement?.comments || 0}
+                              {post.comments || 0}
                             </span>
                           </div>
                         </div>
