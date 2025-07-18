@@ -77,7 +77,7 @@ export class NewAutomationSystem {
       name: frontendRule.name,
       workspaceId: frontendRule.workspaceId,
       type: frontendRule.type,
-      isActive: frontendRule.isActive,
+      isActive: frontendRule.isActive ?? true,
       
       // Extract keywords directly from frontend (new format)
       keywords: frontendRule.keywords || [],
@@ -194,8 +194,8 @@ export class NewAutomationSystem {
    * Save to MongoDB database
    */
   private async saveToDatabase(rule: DatabaseAutomationRule): Promise<DatabaseAutomationRule> {
-    const { MongoClient, ObjectId } = require('mongodb');
-    const client = new MongoClient(process.env.MONGODB_URI);
+    const { MongoClient, ObjectId } = await import('mongodb');
+    const client = new MongoClient(process.env.MONGODB_URI!);
     
     try {
       await client.connect();
@@ -217,8 +217,8 @@ export class NewAutomationSystem {
    * Load from MongoDB database
    */
   private async loadFromDatabase(workspaceId: string): Promise<DatabaseAutomationRule[]> {
-    const { MongoClient } = require('mongodb');
-    const client = new MongoClient(process.env.MONGODB_URI);
+    const { MongoClient } = await import('mongodb');
+    const client = new MongoClient(process.env.MONGODB_URI!);
     
     try {
       await client.connect();
@@ -243,8 +243,8 @@ export class NewAutomationSystem {
    * Update in MongoDB database
    */
   private async updateInDatabase(ruleId: string, updates: Partial<DatabaseAutomationRule>): Promise<DatabaseAutomationRule> {
-    const { MongoClient, ObjectId } = require('mongodb');
-    const client = new MongoClient(process.env.MONGODB_URI);
+    const { MongoClient, ObjectId } = await import('mongodb');
+    const client = new MongoClient(process.env.MONGODB_URI!);
     
     try {
       await client.connect();
@@ -270,8 +270,8 @@ export class NewAutomationSystem {
    * Delete from MongoDB database
    */
   private async deleteFromDatabase(ruleId: string): Promise<void> {
-    const { MongoClient, ObjectId } = require('mongodb');
-    const client = new MongoClient(process.env.MONGODB_URI);
+    const { MongoClient, ObjectId } = await import('mongodb');
+    const client = new MongoClient(process.env.MONGODB_URI!);
     
     try {
       await client.connect();
