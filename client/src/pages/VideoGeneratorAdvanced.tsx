@@ -196,69 +196,75 @@ const VideoGeneratorAdvanced = () => {
   const renderPromptStep = () => (
     <div className="relative flex size-full min-h-screen flex-col bg-neutral-50" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
       <div className="layout-container flex min-h-screen flex-col">
-        {/* Header matching Cosmos Studio exactly */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3">
+        {/* Header - enhanced with modern styling */}
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3 bg-white shadow-sm">
           <div className="flex items-center gap-4 text-[#141414]">
-            <div className="size-4">
-              <Video className="w-4 h-4" />
+            <div className="size-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+              <Video className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">VeeFore Studio</h2>
           </div>
           <div className="flex flex-1 justify-end gap-8">
             <div className="flex items-center gap-9">
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Dashboard</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Templates</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Tutorials</a>
-              <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Community</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Dashboard</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Templates</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Tutorials</a>
+              <a className="text-[#141414] text-sm font-medium leading-normal hover:text-purple-600 transition-colors duration-200" href="#">Community</a>
             </div>
-            <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-[#ededed] text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
+            <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5 transition-all duration-200 shadow-sm hover:shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
               </svg>
             </button>
-            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/a/ACg8ocJPrcoVstl69SDbEJG3VutOYCtG2q1O0L-jelhQ0JSevpHsGg=s96-c")'}}></div>
+            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-purple-200 shadow-lg" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/a/ACg8ocJPrcoVstl69SDbEJG3VutOYCtG2q1O0L-jelhQ0JSevpHsGg=s96-c")'}}></div>
           </div>
         </header>
 
         {/* Main content area matching exact layout */}
         <div className="px-40 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            {/* Main title */}
-            <h1 className="text-[#141414] tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
+            {/* Main title - enhanced with gradient */}
+            <h1 className="text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-3 pt-6">
               Unleash Your Creativity with AI-Powered Video Generation
             </h1>
             
-            {/* Input area - exact match */}
+            {/* Input area - enhanced with modern styling */}
             <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label className="flex flex-col min-w-40 flex-1">
                 <textarea
                   placeholder="Describe your video idea, and let AI bring it to life"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#ededed] focus:border-none min-h-36 placeholder:text-neutral-500 p-4 text-base font-normal leading-normal"
+                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-2 focus:ring-purple-500/20 border border-gray-200 bg-white hover:bg-gray-50 focus:bg-white focus:border-purple-500 min-h-36 placeholder:text-neutral-500 p-4 text-base font-normal leading-normal transition-all duration-200 shadow-sm hover:shadow-md"
                 />
               </label>
             </div>
             
-            {/* Generate button - exact match */}
+            {/* Generate button - enhanced with modern styling */}
             <div className="flex px-4 py-3 justify-center">
               <button
                 onClick={() => setCurrentStep('settings')}
                 disabled={!prompt.trim()}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-black text-neutral-50 text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50"
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-base font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <span className="truncate">Generate Video</span>
               </button>
             </div>
 
-            {/* Recent Projects - exact match */}
+            {/* Recent Projects - enhanced with modern styling */}
             <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Recent Projects</h3>
             <div className="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <div className="flex items-stretch p-4 gap-3">
                 {recentProjects.map((project) => (
-                  <div key={project.id} className="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40">
-                    <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col bg-gradient-to-br from-purple-400 to-blue-500"></div>
-                    <div>
+                  <div key={project.id} className="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40 cursor-pointer hover:scale-105 transition-all duration-200">
+                    <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col bg-gradient-to-br from-purple-400 via-blue-500 to-indigo-600 shadow-lg hover:shadow-xl relative overflow-hidden">
+                      <div className="absolute inset-0 bg-black/20"></div>
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="text-white text-sm font-semibold truncate">{project.title}</div>
+                        <div className="text-white/80 text-xs">{project.lastEdited}</div>
+                      </div>
+                    </div>
+                    <div className="px-1">
                       <p className="text-[#141414] text-base font-medium leading-normal">{project.title}</p>
                       <p className="text-neutral-500 text-sm font-normal leading-normal">Last edited: {project.lastEdited}</p>
                     </div>
@@ -267,11 +273,25 @@ const VideoGeneratorAdvanced = () => {
               </div>
             </div>
 
-            {/* AI Assistant & Tips - exact match */}
+            {/* AI Assistant & Tips - enhanced with modern styling */}
             <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">AI Assistant & Tips</h3>
-            <p className="text-[#141414] text-base font-normal leading-normal pb-3 pt-1 px-4">
-              Need help getting started? Explore our tutorials or ask our AI assistant for guidance on crafting the perfect video prompt.
-            </p>
+            <div className="p-4">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 256 256">
+                      <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216V88H40ZM216,200H40V104H216v96Z"></path>
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[#141414] text-sm font-semibold leading-normal mb-2">Pro Tip</p>
+                    <p className="text-[#6b7280] text-sm font-normal leading-normal">
+                      Need help getting started? Explore our tutorials or ask our AI assistant for guidance on crafting the perfect video prompt.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -282,7 +302,7 @@ const VideoGeneratorAdvanced = () => {
     <div className="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-neutral-50 via-white to-neutral-100" style={{fontFamily: '"Space Grotesk", "Noto Sans", sans-serif'}}>
       <div className="layout-container flex min-h-screen flex-col">
         {/* Header with enhanced visual appeal */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3 bg-white/80 backdrop-blur-sm">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] px-10 py-3 bg-white shadow-sm">
           <div className="flex items-center gap-4 text-[#141414]">
             <div className="size-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
               <Video className="w-5 h-5 text-white" />
