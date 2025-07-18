@@ -667,9 +667,11 @@ export class InstagramWebhookHandler {
         
         // Handle different rule types for comments:
         // 1. 'comment' type - comment-only automation
-        // 2. 'dm' type with postInteraction=true - comment-to-dm automation (check both locations)
+        // 2. 'comment_dm' type - comment-to-dm automation (new type)
+        // 3. 'dm' type with postInteraction=true - legacy comment-to-dm automation (check both locations)
         const hasPostInteraction = rule.triggers?.postInteraction === true || rule.postInteraction === true;
         const canHandleComments = rule.type === 'comment' || 
+                                 rule.type === 'comment_dm' ||
                                  (rule.type === 'dm' && hasPostInteraction);
         
         console.log(`[WEBHOOK] Rule ${rule.name}: active=${isActive}, type=${rule.type}, postInteraction=${rule.triggers?.postInteraction || rule.postInteraction}, canHandleComments=${canHandleComments}`);
@@ -736,13 +738,18 @@ export class InstagramWebhookHandler {
             this.automation.markCommentProcessed(commentId);
             
             // Step 2: Send DM (for comment-to-dm automation)
-            if (rule.type === 'dm') {
+            if (rule.type === 'dm' || rule.type === 'comment_dm') {
               console.log(`[WEBHOOK] Sending follow-up DM for comment-to-DM automation`);
               
-              // Generate DM message (could be different from comment reply)
-              const dmMessage = rule.responses && rule.responses.length > 1 ? 
-                rule.responses[1] : // Use second response as DM message
-                `Hi ${value.from.username}! Thanks for your comment. I've sent you more details here!`;
+              // Generate DM message using dmResponses field for comment_dm type
+              let dmMessage;
+              if (rule.type === 'comment_dm' && rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
+                dmMessage = rule.action.dmResponses[0]; // Use first DM response
+              } else if (rule.responses && rule.responses.length > 1) {
+                dmMessage = rule.responses[1]; // Use second response as DM message
+              } else {
+                dmMessage = `Hi ${value.from.username}! Thanks for your comment. I've sent you more details here!`;
+              }
               
               // Send DM to the commenter
               const dmResult = await this.sendDirectMessage(

@@ -1,56 +1,87 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
-// Read MongoDB URI from environment
-const uri = process.env.MONGODB_URI || 'mongodb+srv://metatraq:xmhD4TqOyYb4hLxA@cluster0.axjeh.mongodb.net/veeforedb?retryWrites=true&w=majority';
+const MONGO_URI = "mongodb+srv://brandboost09:Arpitc8433@cluster0.mekr2dh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const DATABASE_NAME = "veeforedb";
 
-async function debugAutomationRules() {
-  console.log('=== AUTOMATION RULES DEBUG ===');
-  console.log('Connecting to MongoDB...');
+async function debugRuleStructure() {
+  const client = new MongoClient(MONGO_URI);
   
-  const client = new MongoClient(uri);
   try {
     await client.connect();
-    console.log('Connected successfully');
+    console.log('Connected to MongoDB');
     
-    const db = client.db('veeforedb');
-    const rules = await db.collection('automationrules').find({}).toArray();
+    const db = client.db(DATABASE_NAME);
+    const collection = db.collection('AutomationRule');
     
-    console.log(`Found ${rules.length} automation rules`);
-    
-    rules.forEach((rule, index) => {
-      console.log(`\n--- Rule ${index + 1}: ${rule.name} ---`);
-      console.log('Rule ID:', rule._id);
-      console.log('Rule type:', rule.type);
-      console.log('Rule isActive:', rule.isActive);
-      console.log('Rule triggers:', JSON.stringify(rule.triggers, null, 2));
-      console.log('Rule action:', JSON.stringify(rule.action, null, 2));
-      
-      // Check for responses
-      console.log('Action responses:', rule.action?.responses);
-      console.log('Action dmResponses:', rule.action?.dmResponses);
-      
-      // Check response lengths
-      const responses = rule.action?.responses || [];
-      const dmResponses = rule.action?.dmResponses || [];
-      console.log('Responses length:', responses.length);
-      console.log('DM responses length:', dmResponses.length);
-      
-      if (responses.length > 0) {
-        console.log('First response:', responses[0]);
-        console.log('Response is empty?', responses[0]?.trim() === '');
-      }
-      
-      if (dmResponses.length > 0) {
-        console.log('First DM response:', dmResponses[0]);
-        console.log('DM response is empty?', dmResponses[0]?.trim() === '');
-      }
+    // Find the rule we created
+    const rule = await collection.findOne({
+      workspaceId: '6847b9cdfabaede1706f2994',
+      name: 'Working Comment to DM Automation'
     });
     
+    if (!rule) {
+      console.log('❌ Rule not found');
+      return;
+    }
+    
+    console.log('✅ Found rule:', rule.name);
+    console.log('📋 Full rule structure:');
+    console.log(JSON.stringify(rule, null, 2));
+    
+    // Check the specific fields that might be causing issues
+    console.log('\n🔍 DETAILED FIELD ANALYSIS:');
+    console.log('- Rule ID:', rule._id);
+    console.log('- Workspace ID:', rule.workspaceId);
+    console.log('- Type:', rule.type);
+    console.log('- Is Active:', rule.isActive);
+    console.log('- Triggers:', rule.triggers);
+    console.log('- Action:', rule.action);
+    console.log('- Comment Responses:', rule.action?.responses);
+    console.log('- DM Responses:', rule.action?.dmResponses);
+    
+    // Check if responses exist and are properly structured
+    if (rule.action?.responses && rule.action.responses.length > 0) {
+      console.log('✅ Comment responses found:', rule.action.responses.length);
+    } else {
+      console.log('❌ No comment responses found');
+    }
+    
+    if (rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
+      console.log('✅ DM responses found:', rule.action.dmResponses.length);
+    } else {
+      console.log('❌ No DM responses found');
+    }
+    
+    console.log('\n🔧 WEBHOOK PROCESSING SIMULATION:');
+    const testComment = "free";
+    const keywords = rule.triggers?.keywords || [];
+    const matchedKeyword = keywords.find(keyword => 
+      testComment.toLowerCase().includes(keyword.toLowerCase())
+    );
+    
+    if (matchedKeyword) {
+      console.log('✅ Keyword match found:', matchedKeyword);
+      const responses = rule.action?.responses || [];
+      const dmResponses = rule.action?.dmResponses || [];
+      
+      console.log('📝 Available comment responses:', responses);
+      console.log('💬 Available DM responses:', dmResponses);
+      
+      if (responses.length > 0 && dmResponses.length > 0) {
+        console.log('✅ Rule should work - all required fields present');
+      } else {
+        console.log('❌ Rule missing required responses');
+      }
+    } else {
+      console.log('❌ No keyword match for test comment');
+    }
+    
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
   } finally {
     await client.close();
   }
 }
 
-debugAutomationRules().catch(console.error);
+console.log('🔍 DEBUGGING RULE STRUCTURE...');
+debugRuleStructure();
