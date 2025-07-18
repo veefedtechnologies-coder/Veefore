@@ -1341,6 +1341,8 @@ export default function AutomationStepByStep() {
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
     
+
+    
     // For comment_dm automation in step 3 (DM configuration), show only DM preview
     if (automationType === 'comment_dm' && currentStep === 3) {
       return (
@@ -1507,13 +1509,15 @@ export default function AutomationStepByStep() {
           <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
             {selectedPostData ? (
               <img 
-                src={selectedPostData.thumbnailUrl || selectedPostData.mediaUrl} 
+                src={selectedPostData.image || selectedPostData.thumbnailUrl || selectedPostData.mediaUrl} 
                 alt="Post" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Fallback to mediaUrl if thumbnailUrl fails
+                  // Fallback to other image sources if primary fails
                   if (selectedPostData.mediaUrl && e.currentTarget.src !== selectedPostData.mediaUrl) {
                     e.currentTarget.src = selectedPostData.mediaUrl;
+                  } else if (selectedPostData.thumbnailUrl && e.currentTarget.src !== selectedPostData.thumbnailUrl) {
+                    e.currentTarget.src = selectedPostData.thumbnailUrl;
                   }
                 }}
               />
@@ -1553,7 +1557,7 @@ export default function AutomationStepByStep() {
             
             {/* Likes count */}
             <div className="text-sm font-semibold text-gray-900 mb-2">
-              {selectedPostData ? `${(selectedPostData.engagement?.likes || 0).toLocaleString()} likes` : '1,247 likes'}
+              {selectedPostData ? `${(selectedPostData.likes || selectedPostData.engagement?.likes || 0).toLocaleString()} likes` : '1,247 likes'}
             </div>
             
             {/* Caption */}
@@ -1566,7 +1570,7 @@ export default function AutomationStepByStep() {
             
             {/* View all comments */}
             <button className="text-sm text-gray-500 mb-3 hover:text-gray-700">
-              View all 47 comments
+              View all {selectedPostData ? (selectedPostData.comments || selectedPostData.engagement?.comments || 0) : 47} comments
             </button>
             
             {/* Comments Section with Live Automation Preview */}
