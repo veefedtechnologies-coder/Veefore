@@ -34,11 +34,171 @@ import {
   Settings,
   ChevronDown,
   Search,
-  Check
+  Check,
+  Play,
+  Pause,
+  Trash2
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { useToast } from '@/hooks/use-toast'
+
+// AutomationListManager component
+const AutomationListManager = ({ 
+  automationRules, 
+  rulesLoading, 
+  updateAutomationMutation, 
+  deleteAutomationMutation 
+}: {
+  automationRules: any[]
+  rulesLoading: boolean
+  updateAutomationMutation: any
+  deleteAutomationMutation: any
+}) => {
+  const { toast } = useToast()
+
+  const handleToggleActive = async (ruleId: string, isActive: boolean) => {
+    try {
+      await updateAutomationMutation.mutateAsync({
+        ruleId,
+        updates: { isActive: !isActive }
+      })
+    } catch (error) {
+      console.error('Error toggling automation:', error)
+    }
+  }
+
+  const handleDelete = async (ruleId: string) => {
+    if (window.confirm('Are you sure you want to delete this automation rule?')) {
+      try {
+        await deleteAutomationMutation.mutateAsync(ruleId)
+      } catch (error) {
+        console.error('Error deleting automation:', error)
+      }
+    }
+  }
+
+  if (rulesLoading) {
+    return (
+      <div className="p-8">
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-gray-100 rounded-lg p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-8">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Automation Rules</h2>
+        <p className="text-gray-600">Manage your active automation rules</p>
+      </div>
+
+      {automationRules?.length === 0 ? (
+        <div className="text-center py-12">
+          <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No automation rules yet</h3>
+          <p className="text-gray-600 mb-4">Create your first automation rule to get started</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {automationRules?.map((rule) => (
+            <div key={rule.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`p-2 rounded-lg ${rule.isActive ? 'bg-green-100' : 'bg-gray-100'}`}>
+                      <Bot className={`w-5 h-5 ${rule.isActive ? 'text-green-600' : 'text-gray-400'}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{rule.name}</h3>
+                      <p className="text-sm text-gray-600 capitalize">{rule.type} automation</p>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      rule.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {rule.isActive ? 'Active' : 'Paused'}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <span className="text-sm text-gray-500">Keywords:</span>
+                      <div className="mt-1">
+                        {rule.triggers?.keywords?.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {rule.triggers.keywords.slice(0, 3).map((keyword: string, index: number) => (
+                              <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                {keyword}
+                              </span>
+                            ))}
+                            {rule.triggers.keywords.length > 3 && (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                                +{rule.triggers.keywords.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">No keywords</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-sm text-gray-500">AI Personality:</span>
+                      <p className="text-sm text-gray-900 capitalize">{rule.aiPersonality || 'Friendly'}</p>
+                    </div>
+
+                    <div>
+                      <span className="text-sm text-gray-500">Daily Limit:</span>
+                      <p className="text-sm text-gray-900">{rule.aiConfig?.dailyLimit || 50} responses</p>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-500">
+                    Created: {new Date(rule.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 ml-4">
+                  <button
+                    onClick={() => handleToggleActive(rule.id, rule.isActive)}
+                    disabled={updateAutomationMutation.isPending}
+                    className={`p-2 rounded-lg transition-colors ${
+                      rule.isActive 
+                        ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' 
+                        : 'bg-green-100 text-green-600 hover:bg-green-200'
+                    }`}
+                    title={rule.isActive ? 'Pause automation' : 'Resume automation'}
+                  >
+                    {rule.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(rule.id)}
+                    disabled={deleteAutomationMutation.isPending}
+                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                    title="Delete automation"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function AutomationStepByStep() {
   console.log('AutomationStepByStep component loaded successfully')
@@ -109,6 +269,52 @@ export default function AutomationStepByStep() {
   const [newKeyword, setNewKeyword] = useState('')
   const [commentReply, setCommentReply] = useState('')
   const [dmMessage, setDmMessage] = useState('')
+  const [showAutomationList, setShowAutomationList] = useState(false)
+
+  // Fetch existing automation rules
+  const { data: automationRules, isLoading: rulesLoading, refetch: refetchRules } = useQuery({
+    queryKey: ['/api/automation/rules', realAccounts?.[0]?.workspaceId],
+    queryFn: async () => {
+      const workspaceId = realAccounts?.[0]?.workspaceId
+      if (!workspaceId) return []
+      const response = await apiRequest(`/api/automation/rules/${workspaceId}`)
+      return response.rules || []
+    },
+    enabled: !!realAccounts?.[0]?.workspaceId
+  })
+
+  // Mutation for updating automation rules
+  const updateAutomationMutation = useMutation({
+    mutationFn: async ({ ruleId, updates }: { ruleId: string, updates: any }) => {
+      return await apiRequest(`/api/automation/rules/${ruleId}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      })
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Automation rule updated successfully",
+      })
+      refetchRules()
+    }
+  })
+
+  // Mutation for deleting automation rules
+  const deleteAutomationMutation = useMutation({
+    mutationFn: async (ruleId: string) => {
+      return await apiRequest(`/api/automation/rules/${ruleId}`, {
+        method: 'DELETE'
+      })
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Automation rule deleted successfully",
+      })
+      refetchRules()
+    }
+  })
   
   // Function to create automation rule
   const createAutomationRule = async () => {
@@ -1810,65 +2016,97 @@ export default function AutomationStepByStep() {
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
-      {/* Full Width Header Bar */}
-      <div className="bg-white border-b border-gray-200 px-8 py-6 mb-8 flex items-center justify-between w-full shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
-            <Bot className="w-6 h-6 text-white" />
+      {/* Sleek Management Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4 w-full shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Automation Studio
+                </h1>
+                <p className="text-sm text-gray-600">Smart social media automation</p>
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Automation Studio
-          </h1>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAutomationList(!showAutomationList)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Manage Automations
+            </button>
+            <button
+              onClick={() => {
+                setCurrentStep(1)
+                setShowAutomationList(false)
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md"
+            >
+              <Plus className="w-4 h-4" />
+              New Automation
+            </button>
+          </div>
         </div>
-        <button 
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          onClick={() => window.history.back()}
-        >
-          <X className="w-6 h-6 text-gray-600" />
-        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 pb-20">
-
-        {/* Progress Steps */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between max-w-5xl mx-auto">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center group">
-                  <div className={`flex items-center justify-center w-14 h-14 rounded-full border-3 transition-all duration-300 shadow-lg ${
-                    currentStep >= step.id 
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200' 
-                      : currentStep === step.id
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200'
-                      : 'border-gray-300 text-gray-400 bg-white hover:border-gray-400 hover:shadow-md'
-                  }`}>
-                    {currentStep > step.id ? (
-                      <CheckCircle className="w-7 h-7" />
-                    ) : (
-                      <span className="text-sm font-bold">{step.id}</span>
-                    )}
-                  </div>
-                  <div className="mt-3 text-center transition-all duration-300">
-                    <div className={`text-sm font-semibold ${
-                      currentStep >= step.id ? 'text-blue-700' : 'text-gray-700'
-                    }`}>{step.title}</div>
-                    <div className={`text-xs mt-1 ${
-                      currentStep >= step.id ? 'text-blue-600' : 'text-gray-500'
-                    }`}>{step.description}</div>
-                  </div>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className={`flex-1 h-1 mx-6 mt-[-25px] rounded-full transition-all duration-500 ${
-                    currentStep > step.id 
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-sm' 
-                      : 'bg-gray-200'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
+      {/* Show automation list or step-by-step flow */}
+      {showAutomationList ? (
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <AutomationListManager 
+            automationRules={automationRules}
+            rulesLoading={rulesLoading}
+            updateAutomationMutation={updateAutomationMutation}
+            deleteAutomationMutation={deleteAutomationMutation}
+          />
         </div>
+      ) : (
+        <div className="max-w-7xl mx-auto p-6 pb-20">
+
+          {/* Progress Steps */}
+          <div className="mb-12">
+            <div className="flex items-center justify-between max-w-5xl mx-auto">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center group">
+                    <div className={`flex items-center justify-center w-14 h-14 rounded-full border-3 transition-all duration-300 shadow-lg ${
+                      currentStep >= step.id 
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200' 
+                        : currentStep === step.id
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200'
+                        : 'border-gray-300 text-gray-400 bg-white hover:border-gray-400 hover:shadow-md'
+                    }`}>
+                      {currentStep > step.id ? (
+                        <CheckCircle className="w-7 h-7" />
+                      ) : (
+                        <span className="text-sm font-bold">{step.id}</span>
+                      )}
+                    </div>
+                    <div className="mt-3 text-center transition-all duration-300">
+                      <div className={`text-sm font-semibold ${
+                        currentStep >= step.id ? 'text-blue-700' : 'text-gray-700'
+                      }`}>{step.title}</div>
+                      <div className={`text-xs mt-1 ${
+                        currentStep >= step.id ? 'text-blue-600' : 'text-gray-500'
+                      }`}>{step.description}</div>
+                    </div>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`flex-1 h-1 mx-6 mt-[-25px] rounded-full transition-all duration-500 ${
+                      currentStep > step.id 
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-sm' 
+                        : 'bg-gray-200'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Section */}
@@ -1929,6 +2167,7 @@ export default function AutomationStepByStep() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
