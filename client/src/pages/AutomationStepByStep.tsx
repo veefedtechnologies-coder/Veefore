@@ -285,15 +285,18 @@ export default function AutomationStepByStep() {
   })) : []
 
   // Transform real posts data
-  const realPosts = postsData ? postsData.map((post: any) => ({
-    id: post.id,
-    title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
-    type: post.media_type === 'VIDEO' ? 'reel' : 'post',
-    image: post.media_url || post.thumbnail_url || 'https://picsum.photos/300/300?random=1',
-    likes: post.likes || 0,
-    comments: post.comments || 0,
-    caption: post.caption || 'Instagram post content'
-  })) : []
+  const realPosts = postsData ? postsData.map((post: any) => {
+    console.log('Processing post data:', post); // Debug log
+    return {
+      id: post.id,
+      title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
+      type: post.media_type === 'VIDEO' ? 'reel' : 'post',
+      image: post.media_url || post.thumbnail_url || 'https://picsum.photos/300/300?random=1',
+      likes: post.likes || 0,
+      comments: post.comments || 0,
+      caption: post.caption || 'Instagram post content'
+    };
+  }) : []
 
   // Dynamic steps based on automation type
   const getSteps = () => {
