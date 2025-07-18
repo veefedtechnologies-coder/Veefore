@@ -35,7 +35,7 @@ export const resetOpenAIClient = (): void => {
 };
 
 /**
- * Enhanced OpenAI Service for Video Script Generation
+ * Enhanced OpenAI Service for Complete Video Generation Pipeline
  */
 class OpenAIService {
   private openai: OpenAI;
@@ -45,69 +45,102 @@ class OpenAIService {
   }
 
   /**
-   * Generate video script with scenes using OpenAI GPT-4
+   * Generate complete video script with scenes and voiceover instructions using OpenAI GPT-4
    */
   async generateVideoScript(params: {
     prompt: string;
     duration: number;
     visualStyle: string;
     tone: string;
+    voiceGender?: string;
+    language?: string;
+    accent?: string;
   }) {
-    const { prompt, duration, visualStyle, tone } = params;
+    const { prompt, duration, visualStyle, tone, voiceGender = 'Female', language = 'English', accent = 'American' } = params;
 
     try {
-      console.log('[OPENAI] Generating video script with GPT-4...');
+      console.log('[OPENAI] Generating complete video script with voiceover instructions...');
 
-      const systemPrompt = `You are an expert video scriptwriter specializing in creating engaging, structured video scripts for AI video generation.
+      const systemPrompt = `You are an expert video scriptwriter and AI video generation specialist. Create a complete video production script with detailed scene breakdowns, visual descriptions, and voiceover instructions.
 
-Your task is to create a professional video script with detailed scene breakdowns that will be used to generate images and narration for an AI video.
+Your task is to create a professional video script that will be used for:
+1. AI image generation for each scene
+2. Voiceover generation using ElevenLabs
+3. Complete video production pipeline
 
-Guidelines:
+REQUIREMENTS:
 - Total video duration: ${duration} seconds
 - Visual style: ${visualStyle}
 - Tone: ${tone}
-- Break the script into logical scenes (3-8 scenes depending on duration)
+- Voice: ${voiceGender} voice with ${accent} accent in ${language}
+- Break into logical scenes (3-8 scenes based on duration)
 - Each scene should be 3-8 seconds long
-- Provide clear visual descriptions for AI image generation
-- Write compelling narration that matches the tone
-- Include emotional context for each scene
+- Provide detailed visual descriptions for AI image generation
+- Write compelling narration optimized for voiceover
+- Include emotional context and voiceover instructions
 
-Respond with JSON in this exact format:
+CRITICAL: Respond with JSON in this EXACT format:
 {
-  "title": "Generated video title",
+  "title": "Compelling video title",
+  "description": "Brief video description",
   "totalDuration": ${duration},
+  "voiceProfile": {
+    "gender": "${voiceGender}",
+    "language": "${language}",
+    "accent": "${accent}",
+    "tone": "${tone}",
+    "pace": "medium",
+    "emphasis": "natural"
+  },
   "scenes": [
     {
       "id": "scene_1",
       "duration": 5,
-      "narration": "Clear, engaging narration text for this scene",
-      "description": "Detailed visual description for AI image generation (photorealistic, cinematic, etc.)",
-      "emotion": "calm/energetic/dramatic/inspiring/etc",
-      "visualElements": ["element1", "element2", "element3"]
+      "narration": "Clear, engaging narration text optimized for voiceover",
+      "visualDescription": "Detailed visual description for AI image generation (cinematic, photorealistic, etc.)",
+      "voiceInstructions": {
+        "emotion": "calm/energetic/dramatic/inspiring",
+        "pace": "slow/medium/fast",
+        "emphasis": "words to emphasize",
+        "pause": "natural pause points"
+      },
+      "visualElements": ["specific visual element 1", "element 2", "element 3"],
+      "cameraAngle": "wide/close-up/medium/aerial",
+      "lighting": "natural/dramatic/soft/golden hour"
     }
-  ]
+  ],
+  "motionEngine": {
+    "recommendation": "RunwayGen2/AnimateDiff",
+    "reason": "Brief reason for engine choice based on scene complexity"
+  }
 }`;
 
       const response = await this.openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Create a professional video script for: ${prompt}` }
+          { role: "user", content: `Create a complete video production script for: ${prompt}` }
         ],
         response_format: { type: "json_object" },
         temperature: 0.8,
-        max_tokens: 2000
+        max_tokens: 3000
       });
 
       const script = JSON.parse(response.choices[0].message.content || '{}');
       
-      // Add unique IDs to scenes
+      // Ensure all scenes have unique IDs and complete structure
       script.scenes = script.scenes.map((scene: any, index: number) => ({
         ...scene,
-        id: scene.id || `scene_${index + 1}`
+        id: scene.id || `scene_${index + 1}`,
+        voiceInstructions: scene.voiceInstructions || {
+          emotion: 'natural',
+          pace: 'medium',
+          emphasis: '',
+          pause: 'natural'
+        }
       }));
 
-      console.log('[OPENAI] Script generated successfully:', script.title);
+      console.log('[OPENAI] Complete video script generated successfully:', script.title);
       return script;
 
     } catch (error) {
@@ -120,9 +153,9 @@ Respond with JSON in this exact format:
   }
 
   /**
-   * Generate a mock script for testing when OpenAI fails
+   * Generate a comprehensive mock script for testing when OpenAI fails
    */
-  private generateMockScript(prompt: string, duration: number, visualStyle: string, tone: string) {
+  private generateMockScript(prompt: string, duration: number, visualStyle: string, tone: string, voiceGender = 'Female', language = 'English', accent = 'American') {
     const scenesCount = Math.min(Math.max(Math.ceil(duration / 5), 3), 8); // 3-8 scenes
     const sceneLength = Math.floor(duration / scenesCount);
     
@@ -131,18 +164,209 @@ Respond with JSON in this exact format:
       scenes.push({
         id: `scene_${i + 1}`,
         duration: sceneLength,
-        narration: `Scene ${i + 1}: This is a ${tone} segment about ${prompt}. The ${visualStyle} style creates engaging content that captures the viewer's attention.`,
-        description: `${visualStyle} cinematography showing ${prompt} - Scene ${i + 1}. High quality, professional production with excellent lighting and composition.`,
-        emotion: i % 3 === 0 ? 'calm' : i % 3 === 1 ? 'energetic' : 'inspiring',
-        visualElements: ['cinematic lighting', 'professional composition', 'high quality']
+        narration: `Scene ${i + 1}: This is a ${tone} segment about ${prompt}. The ${visualStyle} style creates engaging content that captures the viewer's attention and delivers the message effectively.`,
+        visualDescription: `${visualStyle} cinematography showing ${prompt} - Scene ${i + 1}. High quality, professional production with excellent lighting and composition. Cinematic, photorealistic, 8K resolution.`,
+        voiceInstructions: {
+          emotion: i % 3 === 0 ? 'calm' : i % 3 === 1 ? 'energetic' : 'inspiring',
+          pace: 'medium',
+          emphasis: i % 2 === 0 ? 'key words' : 'natural flow',
+          pause: 'natural pause points'
+        },
+        visualElements: ['cinematic lighting', 'professional composition', 'high quality', 'engaging visuals'],
+        cameraAngle: i % 2 === 0 ? 'wide' : 'close-up',
+        lighting: i % 3 === 0 ? 'natural' : i % 3 === 1 ? 'dramatic' : 'golden hour'
       });
     }
 
     return {
       title: `${prompt} - AI Generated Video`,
+      description: `A ${duration}-second video about ${prompt} with ${visualStyle} style and ${tone} tone`,
       totalDuration: duration,
-      scenes: scenes
+      voiceProfile: {
+        gender: voiceGender,
+        language: language,
+        accent: accent,
+        tone: tone,
+        pace: 'medium',
+        emphasis: 'natural'
+      },
+      scenes: scenes,
+      motionEngine: {
+        recommendation: 'AnimateDiff',
+        reason: 'Mock script generation - using budget-friendly option for testing'
+      }
     };
+  }
+
+  /**
+   * Generate voiceover text optimized for ElevenLabs
+   */
+  async generateVoiceoverText(params: {
+    scenes: any[];
+    voiceProfile: any;
+    totalDuration: number;
+  }) {
+    const { scenes, voiceProfile, totalDuration } = params;
+
+    try {
+      console.log('[OPENAI] Optimizing voiceover text for ElevenLabs...');
+
+      const systemPrompt = `You are a voiceover optimization expert. Your task is to refine narration text to be perfectly suited for AI voiceover generation using ElevenLabs.
+
+REQUIREMENTS:
+- Optimize timing and pacing for ${totalDuration} seconds total duration
+- Voice profile: ${voiceProfile.gender} voice, ${voiceProfile.language} language, ${voiceProfile.accent} accent
+- Tone: ${voiceProfile.tone}
+- Add natural pauses, emphasis markers, and pronunciation guides
+- Ensure smooth transitions between scenes
+- Maintain emotional consistency
+
+For each scene, provide:
+1. Optimized narration text with timing markers
+2. Pronunciation guides for difficult words
+3. Emotional emphasis instructions
+4. Natural pause points
+
+Respond with JSON in this format:
+{
+  "optimizedScenes": [
+    {
+      "id": "scene_1",
+      "optimizedNarration": "Narration with (pause) and *emphasis* markers",
+      "pronunciationGuide": "difficult-word: pronunciation",
+      "timingNotes": "Speed up/slow down instructions",
+      "emotionalCues": "Specific emotional direction for this scene"
+    }
+  ],
+  "totalEstimatedDuration": ${totalDuration},
+  "voiceSettings": {
+    "stability": 0.75,
+    "similarity_boost": 0.8,
+    "style": 0.6
+  }
+}`;
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Optimize voiceover for scenes: ${JSON.stringify(scenes)}` }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3,
+        max_tokens: 2000
+      });
+
+      const optimizedVoiceover = JSON.parse(response.choices[0].message.content || '{}');
+      console.log('[OPENAI] ✓ Voiceover optimization complete');
+      return optimizedVoiceover;
+
+    } catch (error) {
+      console.error('[OPENAI] Voiceover optimization error:', error);
+      
+      // Fallback to basic optimization
+      return {
+        optimizedScenes: scenes.map(scene => ({
+          id: scene.id,
+          optimizedNarration: scene.narration,
+          pronunciationGuide: '',
+          timingNotes: 'natural pace',
+          emotionalCues: scene.voiceInstructions?.emotion || 'natural'
+        })),
+        totalEstimatedDuration: totalDuration,
+        voiceSettings: {
+          stability: 0.75,
+          similarity_boost: 0.8,
+          style: 0.6
+        }
+      };
+    }
+  }
+
+  /**
+   * Generate enhanced scene descriptions for image generation
+   */
+  async generateSceneImagePrompts(params: {
+    scenes: any[];
+    visualStyle: string;
+    overallTheme: string;
+  }) {
+    const { scenes, visualStyle, overallTheme } = params;
+
+    try {
+      console.log('[OPENAI] Generating enhanced scene image prompts...');
+
+      const systemPrompt = `You are an expert AI image generation prompt engineer. Create highly detailed, optimized prompts for scene image generation using SDXL and similar models.
+
+REQUIREMENTS:
+- Visual style: ${visualStyle}
+- Overall theme: ${overallTheme}
+- Each prompt should be 50-100 words
+- Include specific technical details for AI image generation
+- Add negative prompts to avoid unwanted elements
+- Ensure visual consistency across all scenes
+- Use proven prompt engineering techniques
+
+For each scene, provide:
+1. Detailed positive prompt with technical specifications
+2. Negative prompt to avoid unwanted elements
+3. Style consistency notes
+4. Technical settings recommendations
+
+Respond with JSON in this format:
+{
+  "enhancedScenes": [
+    {
+      "id": "scene_1",
+      "positivePrompt": "Detailed, technical prompt with style specifications",
+      "negativePrompt": "Elements to avoid in generation",
+      "styleNotes": "Consistency requirements",
+      "technicalSettings": {
+        "width": 1024,
+        "height": 1024,
+        "steps": 30,
+        "guidance_scale": 7.5
+      }
+    }
+  ],
+  "overallStyleGuide": "Consistency guidelines for all scenes"
+}`;
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Create optimized image prompts for scenes: ${JSON.stringify(scenes)}` }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7,
+        max_tokens: 2500
+      });
+
+      const enhancedPrompts = JSON.parse(response.choices[0].message.content || '{}');
+      console.log('[OPENAI] ✓ Enhanced scene image prompts generated');
+      return enhancedPrompts;
+
+    } catch (error) {
+      console.error('[OPENAI] Scene image prompt generation error:', error);
+      
+      // Fallback to basic prompts
+      return {
+        enhancedScenes: scenes.map(scene => ({
+          id: scene.id,
+          positivePrompt: `${scene.visualDescription}, ${visualStyle}, cinematic, high quality, 8K, photorealistic`,
+          negativePrompt: 'blurry, low quality, distorted, watermark, text, worst quality',
+          styleNotes: `Maintain ${visualStyle} consistency`,
+          technicalSettings: {
+            width: 1024,
+            height: 1024,
+            steps: 30,
+            guidance_scale: 7.5
+          }
+        })),
+        overallStyleGuide: `Maintain consistent ${visualStyle} style throughout all scenes`
+      };
+    }
   }
 
   /**

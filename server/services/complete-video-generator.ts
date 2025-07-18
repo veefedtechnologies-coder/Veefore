@@ -4,7 +4,7 @@
  */
 
 import OpenAI from 'openai';
-import { getOpenAIClient } from '../openai-client';
+import { getOpenAIClient, OpenAIService } from '../openai-client';
 import ffmpeg from 'fluent-ffmpeg';
 import axios from 'axios';
 import { writeFile, readFile, mkdir } from 'fs/promises';
@@ -63,6 +63,7 @@ interface SceneData {
 
 export class CompleteVideoGenerator {
   private openai: OpenAI;
+  private openaiService: OpenAIService;
   private elevenLabs: ElevenLabsService;
   private replicate: ReplicateService;
   private runway: RunwayService;
@@ -70,6 +71,7 @@ export class CompleteVideoGenerator {
 
   constructor() {
     this.openai = getOpenAIClient();
+    this.openaiService = new OpenAIService();
     this.elevenLabs = new ElevenLabsService();
     this.replicate = new ReplicateService();
     this.runway = new RunwayService();
@@ -164,71 +166,53 @@ export class CompleteVideoGenerator {
   }
 
   /**
-   * Step 1: Generate script with OpenAI GPT-4
+   * Step 1: Generate comprehensive video script with OpenAI GPT-4
    */
   private async generateScript(job: VideoGenerationJob): Promise<any> {
-    const systemPrompt = `You are an expert video scriptwriter. Create a professional video script with detailed scene breakdowns.
-
-Guidelines:
-- Total duration: ${job.duration} seconds
-- Visual style: ${job.visualStyle}
-- Tone: ${job.voiceProfile.tone}
-- Break into 3-8 scenes (3-8 seconds each)
-- Provide clear visual descriptions for AI image generation
-- Include emotion and visual elements for each scene
-
-Respond with JSON:
-{
-  "title": "Video title",
-  "totalDuration": ${job.duration},
-  "scenes": [
-    {
-      "id": "scene_1",
-      "duration": 5,
-      "narration": "Scene narration text",
-      "description": "Detailed visual description for image generation",
-      "emotion": "calm/energetic/dramatic/inspiring",
-      "visualElements": ["element1", "element2", "element3"]
-    }
-  ]
-}`;
-
-    const response = await this.openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Create a video script for: ${job.prompt}` }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.8,
-      max_tokens: 2000
+    console.log('[VIDEO] Generating comprehensive video script with OpenAI service...');
+    
+    const script = await this.openaiService.generateVideoScript({
+      prompt: job.prompt,
+      duration: job.duration,
+      visualStyle: job.visualStyle,
+      tone: job.voiceProfile.tone,
+      voiceGender: job.voiceProfile.gender,
+      language: job.voiceProfile.language,
+      accent: job.voiceProfile.accent
     });
 
-    const script = JSON.parse(response.choices[0].message.content || '{}');
-    script.scenes = script.scenes.map((scene: any, index: number) => ({
-      ...scene,
-      id: scene.id || `scene_${index + 1}`
-    }));
-
+    console.log('[VIDEO] ✓ Comprehensive script generated with voiceover instructions');
     return script;
   }
 
   /**
-   * Step 2: Generate scene images with Replicate SDXL
+   * Step 2: Generate scene images with enhanced OpenAI prompts and Replicate SDXL
    */
   private async generateSceneImages(job: VideoGenerationJob): Promise<string[]> {
     const images: string[] = [];
+    
+    console.log('[VIDEO] Generating enhanced scene image prompts with OpenAI...');
+    
+    // First, get enhanced prompts from OpenAI
+    const enhancedPrompts = await this.openaiService.generateSceneImagePrompts({
+      scenes: job.script.scenes,
+      visualStyle: job.visualStyle,
+      overallTheme: job.prompt
+    });
     
     if (!process.env.REPLICATE_API_TOKEN) {
       console.warn('[VIDEO] Replicate API token not found, using demo images');
       return job.script.scenes.map(() => 'https://via.placeholder.com/1024x576/000000/FFFFFF?text=Demo+Scene');
     }
 
-    for (const scene of job.script.scenes) {
+    for (let i = 0; i < job.script.scenes.length; i++) {
+      const scene = job.script.scenes[i];
+      const enhancedPrompt = enhancedPrompts.enhancedScenes[i];
+      
       try {
-        // Use the actual Replicate service
+        // Use enhanced prompt instead of basic scene description
         const imageUrl = await this.replicate.generateImage(
-          scene.description,
+          enhancedPrompt?.positivePrompt || scene.visualDescription || scene.description,
           job.visualStyle
         );
         images.push(imageUrl);
@@ -241,6 +225,7 @@ Respond with JSON:
       }
     }
 
+    console.log('[VIDEO] ✓ Enhanced scene images generated with OpenAI-optimized prompts');
     return images;
   }
 
@@ -363,25 +348,43 @@ Respond with JSON:
   }
 
   /**
-   * Step 5: Generate voiceover with ElevenLabs
+   * Step 5: Generate optimized voiceover with OpenAI + ElevenLabs
    */
   private async generateVoiceover(job: VideoGenerationJob): Promise<string[]> {
     const audioFiles: string[] = [];
+    
+    console.log('[VIDEO] Optimizing voiceover text with OpenAI...');
+    
+    // First, optimize the voiceover text with OpenAI
+    const optimizedVoiceover = await this.openaiService.generateVoiceoverText({
+      scenes: job.script.scenes,
+      voiceProfile: job.script.voiceProfile || job.voiceProfile,
+      totalDuration: job.duration
+    });
     
     if (!process.env.ELEVENLABS_API_KEY) {
       console.warn('[VIDEO] ElevenLabs API key not found, creating silent audio');
       return job.script.scenes.map(() => this.createSilentAudio(5)); // 5-second silent audio
     }
 
-    for (const scene of job.script.scenes) {
+    for (let i = 0; i < job.script.scenes.length; i++) {
+      const scene = job.script.scenes[i];
+      const optimizedScene = optimizedVoiceover.optimizedScenes[i];
+      
       try {
         // Create audio file path
         const audioPath = join(this.outputDir, `${job.id}_scene_${scene.id}_voice.mp3`);
         
-        // Use the actual ElevenLabs service
+        // Use optimized narration text instead of raw scene text
+        const textToSpeak = optimizedScene?.optimizedNarration || scene.narration;
+        
+        // Use the actual ElevenLabs service with optimized settings
         await this.elevenLabs.generateVoice(
-          scene.narration,
-          job.voiceProfile,
+          textToSpeak,
+          {
+            ...job.voiceProfile,
+            ...optimizedVoiceover.voiceSettings
+          },
           audioPath
         );
         

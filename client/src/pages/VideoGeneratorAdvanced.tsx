@@ -129,7 +129,10 @@ const VideoGeneratorAdvanced = () => {
           prompt,
           duration: settings.duration,
           visualStyle: settings.visualStyle,
-          tone: settings.voiceTone
+          tone: settings.voiceTone,
+          voiceGender: settings.voiceGender,
+          language: settings.voiceLanguage,
+          accent: settings.voiceAccent
         })
       });
       return response;

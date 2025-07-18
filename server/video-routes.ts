@@ -355,32 +355,51 @@ async function startCompleteVideoGeneration(jobId: string, job: any) {
 
 // Additional API endpoints for complete video generation workflow
 
-// Generate or regenerate script
+// Generate or regenerate script with comprehensive OpenAI service
 router.post('/generate-script', authenticateJWT, async (req: AuthenticatedRequest, res) => {
   try {
-    const { prompt, duration = 30, visualStyle = 'cinematic', tone = 'professional' } = req.body;
+    const { 
+      prompt, 
+      duration = 30, 
+      visualStyle = 'cinematic', 
+      tone = 'professional',
+      voiceGender = 'Female',
+      language = 'English',
+      accent = 'American'
+    } = req.body;
     
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Generate script using OpenAI
+    // Generate comprehensive script using enhanced OpenAI service
     const { default: OpenAIService } = await import('./openai-client');
     const service = new OpenAIService();
     
-    console.log('[VIDEO API] Creating OpenAI service for script generation');
+    console.log('[VIDEO API] Generating comprehensive script with OpenAI service...');
     
     const script = await service.generateVideoScript({
       prompt,
       duration,
       visualStyle,
-      tone
+      tone,
+      voiceGender,
+      language,
+      accent
     });
+
+    console.log('[VIDEO API] ✓ Comprehensive script generated with voiceover instructions');
 
     res.json({
       success: true,
       script,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
+      features: {
+        voiceProfile: script.voiceProfile,
+        motionEngine: script.motionEngine,
+        totalScenes: script.scenes?.length || 0,
+        voiceoverOptimized: true
+      }
     });
     
   } catch (error) {
