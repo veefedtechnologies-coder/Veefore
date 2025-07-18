@@ -262,6 +262,8 @@ export default function AutomationStepByStep() {
         title: "Success!",
         description: "Automation rule created successfully",
       })
+      // Refetch the rules to show the new rule
+      refetchRules()
       // Reset form or redirect
       setCurrentStep(1)
     },
@@ -367,7 +369,8 @@ export default function AutomationStepByStep() {
       name: `${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} Automation`,
       workspaceId: workspaceId,
       type: getBackendType(automationType),
-      triggers: {
+      trigger: {
+        type: getBackendType(automationType),
         aiMode: 'contextual',
         keywords: getCurrentKeywords(),
         hashtags: [],
@@ -375,26 +378,29 @@ export default function AutomationStepByStep() {
         newFollowers: false,
         postInteraction: automationType === 'comment_dm' || automationType === 'comment_only'
       },
-      responses: commentReplies.filter(reply => reply.trim().length > 0),
-      aiPersonality: aiPersonality,
-      responseLength: 'medium',
-      aiConfig: {
-        personality: aiPersonality,
+      action: {
+        responses: commentReplies.filter(reply => reply.trim().length > 0),
+        aiPersonality: aiPersonality,
         responseLength: 'medium',
-        dailyLimit: maxRepliesPerDay,
-        responseDelay: cooldownPeriod / 60, // Convert minutes to hours
-        language: 'auto',
-        contextualMode: true
+        aiConfig: {
+          personality: aiPersonality,
+          responseLength: 'medium',
+          dailyLimit: maxRepliesPerDay,
+          responseDelay: cooldownPeriod / 60, // Convert minutes to hours
+          language: 'auto',
+          contextualMode: true
+        },
+        conditions: {},
+        schedule: {},
+        duration: {},
+        activeTime: {
+          start: activeHours.start,
+          end: activeHours.end,
+          days: activeDays
+        }
       },
-      conditions: {},
-      schedule: {},
-      duration: {},
-      activeTime: {
-        start: activeHours.start,
-        end: activeHours.end,
-        days: activeDays
-      },
-      isActive: true
+      isActive: true,
+      description: `Auto ${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} automation rule`
     }
 
     try {
@@ -422,24 +428,42 @@ export default function AutomationStepByStep() {
   const [commentKeywords, setCommentKeywords] = useState([])
   const [publicReply, setPublicReply] = useState('')
   
-
+  // Additional state variables for automation settings
+  const [aiPersonality, setAiPersonality] = useState('friendly')
+  const [maxRepliesPerDay, setMaxRepliesPerDay] = useState(10)
+  const [cooldownPeriod, setCooldownPeriod] = useState(30) // in minutes
+  const [activeHours, setActiveHours] = useState({ start: '09:00', end: '17:00' })
+  const [activeDays, setActiveDays] = useState(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
   
-  // Advanced settings (shown for all types)
-  const [maxRepliesPerDay, setMaxRepliesPerDay] = useState(50)
-  const [cooldownPeriod, setCooldownPeriod] = useState(60)
-  const [aiPersonality, setAiPersonality] = useState('professional')
-  const [activeHours, setActiveHours] = useState({ start: '09:00', end: '18:00' })
-  const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false]) // Mon-Fri default
-  
-  // Modern dropdown states
+  // UI state for dropdowns
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
   const [contentTypeDropdownOpen, setContentTypeDropdownOpen] = useState(false)
-  const [automationTypeDropdownOpen, setAutomationTypeDropdownOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   
+  // Refs for dropdown click outside handling
+  const accountDropdownRef = useRef(null)
+  const contentTypeDropdownRef = useRef(null)
+  
+  // Helper function to get current keywords based on automation type
+  const getCurrentKeywords = () => {
+    switch (automationType) {
+      case 'comment_dm':
+        return keywords
+      case 'dm_only':
+        return dmKeywords
+      case 'comment_only':
+        return commentKeywords
+      default:
+        return keywords
+    }
+  }
+  
+
+  
+  // Modern dropdown states
+  const [automationTypeDropdownOpen, setAutomationTypeDropdownOpen] = useState(false)
+  
   // Refs for dropdown management
-  const accountDropdownRef = useRef<HTMLDivElement>(null)
-  const contentTypeDropdownRef = useRef<HTMLDivElement>(null)
   const automationTypeDropdownRef = useRef<HTMLDivElement>(null)
   
   // Handle click outside dropdowns
@@ -629,17 +653,7 @@ export default function AutomationStepByStep() {
     setCurrentKeywords(currentKeywords.filter(k => k !== keywordToRemove))
   }
 
-  const getCurrentKeywords = () => {
-    switch (automationType) {
-      case 'comment_dm':
-      case 'comment_only':
-        return keywords
-      case 'dm_only':
-        return dmKeywords
-      default:
-        return keywords
-    }
-  }
+
 
   const getCurrentKeywordsSetter = () => {
     switch (automationType) {
