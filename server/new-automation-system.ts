@@ -110,32 +110,45 @@ export class NewAutomationSystem {
   async getRules(workspaceId: string): Promise<FrontendAutomationRule[]> {
     console.log('[NEW AUTOMATION] Getting rules for workspace:', workspaceId);
     
-    const dbRules = await this.loadFromDatabase(workspaceId);
-    
-    // Convert database format to frontend format
-    const frontendRules: FrontendAutomationRule[] = dbRules.map(rule => ({
-      id: rule._id?.toString(),
-      name: rule.name,
-      workspaceId: rule.workspaceId,
-      type: rule.type,
-      isActive: rule.isActive,
+    try {
+      const dbRules = await this.loadFromDatabase(workspaceId);
       
-      // Direct field mapping to match new frontend structure
-      keywords: rule.keywords || [],
-      targetMediaIds: rule.targetMediaIds || [],
+      // Convert database format to frontend format with error handling
+      const frontendRules: FrontendAutomationRule[] = dbRules.map(rule => {
+        // Support both old and new database formats
+        const commentResponses = rule.action?.responses || rule.commentReplies || [];
+        const dmResponses = rule.action?.dmResponses || rule.dmResponses || [];
+        
+        console.log(`[NEW AUTOMATION] Converting rule: ${rule.name} - commentResponses: ${commentResponses.length}, dmResponses: ${dmResponses.length}`);
+        
+        return {
+          id: rule._id?.toString(),
+          name: rule.name,
+          workspaceId: rule.workspaceId,
+          type: rule.type,
+          isActive: rule.isActive,
+          
+          // Direct field mapping to match new frontend structure
+          keywords: rule.keywords || [],
+          targetMediaIds: rule.targetMediaIds || [],
+          
+          // Map responses in nested structure - support both formats
+          responses: {
+            responses: commentResponses,
+            dmResponses: dmResponses
+          },
+          
+          createdAt: rule.createdAt,
+          updatedAt: rule.updatedAt
+        };
+      });
       
-      // Map responses in nested structure
-      responses: {
-        responses: rule.action.responses || [],
-        dmResponses: rule.action.dmResponses || []
-      },
-      
-      createdAt: rule.createdAt,
-      updatedAt: rule.updatedAt
-    }));
-    
-    console.log('[NEW AUTOMATION] Converted to frontend format:', frontendRules.length, 'rules');
-    return frontendRules;
+      console.log('[NEW AUTOMATION] Converted to frontend format:', frontendRules.length, 'rules');
+      return frontendRules;
+    } catch (error) {
+      console.error('[NEW AUTOMATION] Get rules error:', error);
+      throw new Error('Failed to fetch automation rules');
+    }
   }
 
   /**
