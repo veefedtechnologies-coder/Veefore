@@ -686,7 +686,11 @@ export class InstagramWebhookHandler {
         const commentId = value.comment_id || (value as any).id;
         
         // Check if this comment has already been processed
-        if (this.automation.isCommentProcessed(commentId)) {
+        console.log(`[WEBHOOK DEBUG] Checking if comment ${commentId} is already processed...`);
+        const isAlreadyProcessed = this.automation.isCommentProcessed(commentId);
+        console.log(`[WEBHOOK DEBUG] Comment ${commentId} processed status: ${isAlreadyProcessed}`);
+        
+        if (isAlreadyProcessed) {
           console.log(`[WEBHOOK] ⚠️ Comment ${commentId} already processed, skipping automation`);
           continue;
         }
@@ -696,9 +700,6 @@ export class InstagramWebhookHandler {
           console.log(`[WEBHOOK] Rule ${rule.name} not triggered for comment: "${value.text}"`);
           continue;
         }
-
-        // Mark comment as processed to prevent duplicates
-        this.automation.markCommentProcessed(commentId);
 
         console.log(`[WEBHOOK] Starting comment-to-DM automation for comment: "${value.text}"`);
 
@@ -725,6 +726,9 @@ export class InstagramWebhookHandler {
 
           if (commentResult.success) {
             console.log(`[WEBHOOK] ✓ Successfully sent comment reply: ${commentResult.commentId}`);
+            
+            // Mark comment as processed only after successful processing
+            this.automation.markCommentProcessed(commentId);
             
             // Step 2: Send DM (for comment-to-dm automation)
             if (rule.type === 'dm') {
@@ -949,6 +953,9 @@ export class InstagramWebhookHandler {
     let keywords = [];
     if (rule.triggers && rule.triggers.keywords) {
       keywords = rule.triggers.keywords;
+    } else if (rule.keywords) {
+      // Check direct keywords field (for comment-to-DM rules)
+      keywords = rule.keywords;
     }
 
     console.log(`[WEBHOOK] Checking keywords: ${JSON.stringify(keywords)}`);
