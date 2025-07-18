@@ -348,12 +348,12 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.duration}
                       onChange={(e) => setSettings(prev => ({...prev, duration: parseInt(e.target.value)}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value={15}>15 seconds</option>
-                      <option value={30}>30 seconds</option>
-                      <option value={60}>1 minute</option>
-                      <option value={90}>1.5 minutes</option>
+                      <option value={15}>⚡ 15 seconds - Quick & Punchy</option>
+                      <option value={30}>🎯 30 seconds - Social Media Perfect</option>
+                      <option value={60}>📱 1 minute - Standard Format</option>
+                      <option value={90}>🎬 1.5 minutes - Extended Content</option>
                     </select>
                   </div>
                   <div>
@@ -361,11 +361,11 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.resolution}
                       onChange={(e) => setSettings(prev => ({...prev, resolution: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="720p">720p HD</option>
-                      <option value="1080p">1080p Full HD</option>
-                      <option value="4K">4K Ultra HD</option>
+                      <option value="720p">🎥 720p HD - Fast & Efficient</option>
+                      <option value="1080p">✨ 1080p Full HD - Premium Quality</option>
+                      <option value="4K">💎 4K Ultra HD - Professional Grade</option>
                     </select>
                   </div>
                   <div>
@@ -373,11 +373,11 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.aspectRatio}
                       onChange={(e) => setSettings(prev => ({...prev, aspectRatio: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="16:9">16:9 Landscape</option>
-                      <option value="9:16">9:16 Portrait</option>
-                      <option value="1:1">1:1 Square</option>
+                      <option value="16:9">📺 16:9 Landscape - YouTube & Desktop</option>
+                      <option value="9:16">📱 9:16 Portrait - TikTok & Stories</option>
+                      <option value="1:1">⬜ 1:1 Square - Instagram Feed</option>
                     </select>
                   </div>
                 </div>
@@ -397,11 +397,11 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.motionEngine}
                       onChange={(e) => setSettings(prev => ({...prev, motionEngine: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="Auto">Auto (AI Decides) - Recommended</option>
-                      <option value="Runway Gen-2">Runway Gen-2 (Cinematic Quality)</option>
-                      <option value="AnimateDiff">AnimateDiff + Interpolation (Budget)</option>
+                      <option value="Auto">🤖 Auto (AI Decides) - Recommended</option>
+                      <option value="Runway Gen-2">🎬 Runway Gen-2 - Cinematic Quality</option>
+                      <option value="AnimateDiff">⚡ AnimateDiff + Interpolation - Budget</option>
                     </select>
                   </div>
                   <div className="text-xs text-gray-600 bg-white/50 p-3 rounded-lg">
@@ -414,13 +414,13 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.visualStyle}
                       onChange={(e) => setSettings(prev => ({...prev, visualStyle: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="cinematic">Cinematic</option>
-                      <option value="realistic">Realistic</option>
-                      <option value="stylized">Stylized</option>
-                      <option value="anime">Anime</option>
-                      <option value="documentary">Documentary</option>
+                      <option value="cinematic">🎭 Cinematic - Hollywood Style</option>
+                      <option value="realistic">📸 Realistic - Natural Look</option>
+                      <option value="stylized">🎨 Stylized - Artistic Flair</option>
+                      <option value="anime">🌟 Anime - Japanese Animation</option>
+                      <option value="documentary">📹 Documentary - Professional</option>
                     </select>
                   </div>
                 </div>
@@ -440,11 +440,11 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.voiceGender}
                       onChange={(e) => setSettings(prev => ({...prev, voiceGender: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="female">Female</option>
-                      <option value="male">Male</option>
-                      <option value="neutral">Neutral</option>
+                      <option value="female">👩 Female Voice - Warm & Engaging</option>
+                      <option value="male">👨 Male Voice - Strong & Authoritative</option>
+                      <option value="neutral">🎭 Neutral Voice - Versatile & Clear</option>
                     </select>
                   </div>
                   <div>
@@ -452,15 +452,15 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.voiceLanguage}
                       onChange={(e) => setSettings(prev => ({...prev, voiceLanguage: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="English">English (American)</option>
-                      <option value="English-UK">English (British)</option>
-                      <option value="English-AU">English (Australian)</option>
-                      <option value="Hindi">Hindi (Indian)</option>
-                      <option value="Spanish">Spanish</option>
-                      <option value="French">French</option>
-                      <option value="German">German</option>
+                      <option value="English">🇺🇸 English (American) - Global Standard</option>
+                      <option value="English-UK">🇬🇧 English (British) - Professional</option>
+                      <option value="English-AU">🇦🇺 English (Australian) - Friendly</option>
+                      <option value="Hindi">🇮🇳 Hindi (Indian) - Regional Connect</option>
+                      <option value="Spanish">🇪🇸 Spanish - Vibrant & Expressive</option>
+                      <option value="French">🇫🇷 French - Elegant & Refined</option>
+                      <option value="German">🇩🇪 German - Precise & Clear</option>
                     </select>
                   </div>
                   <div>
@@ -468,12 +468,12 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.voiceTone}
                       onChange={(e) => setSettings(prev => ({...prev, voiceTone: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="professional">Professional</option>
-                      <option value="casual">Casual</option>
-                      <option value="energetic">Energetic</option>
-                      <option value="calm">Calm</option>
+                      <option value="professional">💼 Professional - Business Ready</option>
+                      <option value="casual">😊 Casual - Friendly & Approachable</option>
+                      <option value="energetic">⚡ Energetic - Dynamic & Exciting</option>
+                      <option value="calm">🧘 Calm - Soothing & Peaceful</option>
                     </select>
                   </div>
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
@@ -516,12 +516,12 @@ const VideoGeneratorAdvanced = () => {
                         <select
                           value={settings.avatarStyle}
                           onChange={(e) => setSettings(prev => ({...prev, avatarStyle: e.target.value}))}
-                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                          className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                         >
-                          <option value="realistic">Realistic</option>
-                          <option value="professional">Professional</option>
-                          <option value="casual">Casual</option>
-                          <option value="animated">Animated</option>
+                          <option value="realistic">🎯 Realistic - Lifelike Appearance</option>
+                          <option value="professional">💼 Professional - Business Ready</option>
+                          <option value="casual">😊 Casual - Friendly & Relatable</option>
+                          <option value="animated">🎨 Animated - Stylized Character</option>
                         </select>
                       </div>
                       <div>
@@ -529,12 +529,12 @@ const VideoGeneratorAdvanced = () => {
                         <select
                           value={settings.avatarPosition}
                           onChange={(e) => setSettings(prev => ({...prev, avatarPosition: e.target.value}))}
-                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                          className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                         >
-                          <option value="corner">Corner Overlay</option>
-                          <option value="intro-only">Intro Only (5-10s)</option>
-                          <option value="fullscreen">Full Screen</option>
-                          <option value="cutins">Story Cut-ins</option>
+                          <option value="corner">📍 Corner Overlay - Subtle Presence</option>
+                          <option value="intro-only">🎬 Intro Only - Opening Hook</option>
+                          <option value="fullscreen">🖥️ Full Screen - Maximum Impact</option>
+                          <option value="cutins">✨ Story Cut-ins - Dynamic Storytelling</option>
                         </select>
                       </div>
                     </>
@@ -580,13 +580,13 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.transitions}
                       onChange={(e) => setSettings(prev => ({...prev, transitions: e.target.value}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value="smooth">Smooth Fade</option>
-                      <option value="crossfade">Cross Fade</option>
-                      <option value="slide">Slide Transition</option>
-                      <option value="wipe">Wipe Effect</option>
-                      <option value="zoom">Zoom Transition</option>
+                      <option value="smooth">🌟 Smooth Fade - Elegant & Clean</option>
+                      <option value="crossfade">🔄 Cross Fade - Seamless Blend</option>
+                      <option value="slide">➡️ Slide Transition - Dynamic Movement</option>
+                      <option value="wipe">🪟 Wipe Effect - Dramatic Reveal</option>
+                      <option value="zoom">🔍 Zoom Transition - Cinematic Focus</option>
                     </select>
                   </div>
                   <div className="flex items-center justify-between bg-neutral-50 rounded-xl p-3">
@@ -618,14 +618,14 @@ const VideoGeneratorAdvanced = () => {
                     <select
                       value={settings.speedControl}
                       onChange={(e) => setSettings(prev => ({...prev, speedControl: parseFloat(e.target.value)}))}
-                      className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                      className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                     >
-                      <option value={0.5}>0.5x (Slow Motion)</option>
-                      <option value={0.75}>0.75x (Slow)</option>
-                      <option value={1.0}>1.0x (Normal)</option>
-                      <option value={1.25}>1.25x (Fast)</option>
-                      <option value={1.5}>1.5x (Faster)</option>
-                      <option value={2.0}>2.0x (Time-lapse)</option>
+                      <option value={0.5}>🐌 0.5x - Slow Motion Drama</option>
+                      <option value={0.75}>⏳ 0.75x - Gentle Slow</option>
+                      <option value={1.0}>▶️ 1.0x - Normal Speed</option>
+                      <option value={1.25}>⚡ 1.25x - Slightly Fast</option>
+                      <option value={1.5}>🚀 1.5x - Energetic</option>
+                      <option value={2.0}>🏃 2.0x - Time-lapse</option>
                     </select>
                   </div>
                 </div>
@@ -659,14 +659,14 @@ const VideoGeneratorAdvanced = () => {
                         <select
                           value={settings.musicGenre}
                           onChange={(e) => setSettings(prev => ({...prev, musicGenre: e.target.value}))}
-                          className="w-full rounded-xl bg-neutral-50 border-none p-3 text-[#141414] focus:outline-0 focus:ring-0"
+                          className="w-full rounded-xl bg-gradient-to-r from-neutral-50 to-gray-50 border border-gray-200 p-3 text-[#141414] focus:outline-0 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 hover:shadow-sm cursor-pointer"
                         >
-                          <option value="corporate">Corporate</option>
-                          <option value="cinematic">Cinematic</option>
-                          <option value="upbeat">Upbeat</option>
-                          <option value="ambient">Ambient</option>
-                          <option value="emotional">Emotional</option>
-                          <option value="tech">Tech/Electronic</option>
+                          <option value="corporate">🏢 Corporate - Professional & Clean</option>
+                          <option value="cinematic">🎬 Cinematic - Epic & Dramatic</option>
+                          <option value="upbeat">🎉 Upbeat - Energetic & Fun</option>
+                          <option value="ambient">🌙 Ambient - Calm & Atmospheric</option>
+                          <option value="emotional">💝 Emotional - Heartfelt & Moving</option>
+                          <option value="tech">🤖 Tech/Electronic - Modern & Digital</option>
                         </select>
                       </div>
                       <div>

@@ -29,7 +29,7 @@ import { apiRequest } from '@/lib/queryClient'
 import Profile from './pages/Profile'
 import Integration from './pages/Integration'
 import AutomationStepByStep from './pages/AutomationStepByStep'
-import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
+import VideoGenerator from './pages/VideoGenerator'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -428,7 +428,7 @@ function App() {
 
                 {/* Cosmos Studio Interface - Full height */}
                 <main className="flex-1 overflow-hidden">
-                  <VideoGeneratorAdvanced />
+                  <VideoGenerator />
                 </main>
               </div>
             </div>
