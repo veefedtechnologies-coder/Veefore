@@ -18,6 +18,8 @@ import { videoShortenerAI } from './video-shortener-ai';
 import { RealVideoProcessor } from './real-video-processor';
 import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
+import { NewAutomationSystem } from "./new-automation-system";
+import { NewWebhookProcessor } from "./new-webhook-processor";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
@@ -73,6 +75,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const dashboardCache = new DashboardCache(storage);
   const thumbnailAIService = new ThumbnailAIService(storage);
   const trendingTopicsAPI = TrendingTopicsAPI.getInstance();
+  
+  // NEW AUTOMATION SYSTEM INSTANCES
+  const newAutomationSystem = new NewAutomationSystem(storage);
+  const newWebhookProcessor = new NewWebhookProcessor(storage);
 
   // TEST ROUTE - Optimized generation test (early placement to avoid middleware issues)
   app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
@@ -6963,58 +6969,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  app.get('/api/automation/rules/:workspaceId', requireAuth, async (req, res) => {
-    try {
-      const { workspaceId } = req.params;
-      
-      // Get automation rules for workspace
-      const rawRules = await storage.getAutomationRules?.(workspaceId) || [];
-      
-      // Transform backend format to frontend format
-      const rules = rawRules.map(rule => {
-        const trigger = rule.trigger || {};
-        const action = rule.action || {};
-        
-        return {
-          id: rule.id,
-          name: rule.name || `${trigger.type === 'comment' ? 'Auto Comment' : 'Auto DM'} Rule`,
-          workspaceId: rule.workspaceId,
-          type: trigger.type || 'dm',
-          isActive: rule.isActive,
-          triggers: {
-            aiMode: trigger.aiMode || 'contextual',
-            keywords: trigger.keywords || [],
-            hashtags: trigger.hashtags || [],
-            mentions: trigger.mentions || false,
-            newFollowers: trigger.newFollowers || false,
-            postInteraction: trigger.postInteraction || false
-          },
-          responses: action.responses || [],
-          aiPersonality: action.aiPersonality || 'friendly',
-          responseLength: action.responseLength || 'medium',
-          conditions: action.conditions || {},
-          schedule: action.schedule || {},
-          aiConfig: action.aiConfig || {
-            personality: action.aiPersonality || 'friendly',
-            responseLength: action.responseLength || 'medium',
-            dailyLimit: action.aiConfig?.dailyLimit || 50,
-            responseDelay: action.aiConfig?.responseDelay || 5,
-            language: action.aiConfig?.language || 'auto',
-            contextualMode: action.aiConfig?.contextualMode !== false
-          },
-          duration: action.duration || {},
-          activeTime: action.activeTime || {},
-          createdAt: rule.createdAt,
-          updatedAt: rule.updatedAt
-        };
-      });
-      
-      res.json({ rules });
-    } catch (error: any) {
-      console.error('[AUTOMATION] Get rules error:', error);
-      res.status(500).json({ error: 'Failed to fetch automation rules' });
-    }
-  });
+  // OLD AUTOMATION ENDPOINT - REPLACED BY NEW SYSTEM
 
   // Debug endpoint to update automation rules structure
   app.post('/api/debug/update-automation-rules', async (req, res) => {
@@ -7068,105 +7023,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  app.post('/api/automation/rules', requireAuth, async (req, res) => {
-    try {
-      const { 
-        name,
-        workspaceId, 
-        type, 
-        triggers, 
-        responses, 
-        aiPersonality, 
-        responseLength, 
-        conditions, 
-        schedule, 
-        aiConfig,
-        duration,
-        activeTime,
-        isActive 
-      } = req.body;
-      
-      if (!workspaceId || !type || !triggers) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
+  // OLD AUTOMATION CREATE ENDPOINT - REPLACED BY NEW SYSTEM
 
-      // For contextual AI mode, responses array can be empty since AI generates them
-      // For keyword mode, responses are required
-      if (triggers.aiMode === 'keyword' && (!responses || responses.length === 0)) {
-        return res.status(400).json({ error: 'Responses required for keyword mode' });
-      }
-
-      // Convert frontend format to webhook-compatible format
-      const trigger = {
-        type: type, // 'dm' or 'comment'
-        aiMode: triggers?.aiMode || 'contextual',
-        keywords: triggers?.keywords || [],
-        hashtags: triggers?.hashtags || [],
-        mentions: triggers?.mentions || false,
-        newFollowers: triggers?.newFollowers || false,
-        postInteraction: triggers?.postInteraction || false
-      };
-
-      const action = {
-        type: type, // 'dm' or 'comment'
-        responses: responses || [],
-        aiPersonality: aiPersonality || aiConfig?.personality || 'friendly',
-        responseLength: responseLength || aiConfig?.responseLength || 'medium',
-        aiConfig: aiConfig || {
-          personality: 'friendly',
-          responseLength: 'medium',
-          dailyLimit: 50,
-          responseDelay: 5,
-          language: 'auto',
-          contextualMode: true
-        },
-        conditions: conditions || {},
-        duration: duration || {},
-        activeTime: activeTime || {}
-      };
-
-      const rule = await storage.createAutomationRule?.({
-        name: name || `${type === 'comment' ? 'Auto Comment' : 'Auto DM'} Rule`,
-        workspaceId,
-        description: `Automated ${type} responses with AI`,
-        trigger,
-        action,
-        isActive: isActive !== undefined ? isActive : true
-      });
-
-      res.json({ rule });
-    } catch (error: any) {
-      console.error('[AUTOMATION] Create rule error:', error);
-      res.status(500).json({ error: 'Failed to create automation rule' });
-    }
-  });
-
-  app.put('/api/automation/rules/:ruleId', requireAuth, async (req, res) => {
-    try {
-      const { ruleId } = req.params;
-      const updates = req.body;
-      
-      const rule = await storage.updateAutomationRule?.(ruleId, updates);
-      
-      res.json({ rule });
-    } catch (error: any) {
-      console.error('[AUTOMATION] Update rule error:', error);
-      res.status(500).json({ error: 'Failed to update automation rule' });
-    }
-  });
-
-  app.delete('/api/automation/rules/:ruleId', requireAuth, async (req, res) => {
-    try {
-      const { ruleId } = req.params;
-      
-      await storage.deleteAutomationRule?.(ruleId);
-      
-      res.json({ success: true });
-    } catch (error: any) {
-      console.error('[AUTOMATION] Delete rule error:', error);
-      res.status(500).json({ error: 'Failed to delete automation rule' });
-    }
-  });
+  // OLD AUTOMATION UPDATE/DELETE ENDPOINTS - REPLACED BY NEW SYSTEM
 
   app.get('/api/automation/logs/:workspaceId', requireAuth, async (req, res) => {
     try {
@@ -7205,35 +7064,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     await webhookHandler.handleVerification(req, res);
   });
 
-  // Instagram webhook handler - supports both paths for compatibility
-  app.post('/webhook/instagram', async (req, res) => {
-    await handleInstagramWebhook(req, res);
-  });
-  
-  app.post('/api/instagram/webhook', async (req, res) => {
-    await handleInstagramWebhook(req, res);
-  });
-  
-  async function handleInstagramWebhook(req: any, res: any) {
-    console.log('[WEBHOOK] Instagram webhook event received');
-    
-    // Check if this is a DM webhook and handle with enhanced memory system
-    const isDMWebhook = req.body?.entry?.[0]?.messaging;
-    
-    if (isDMWebhook) {
-      console.log('[ENHANCED DM] Processing Instagram DM with conversation memory');
-      try {
-        await enhancedDMService.handleInstagramDMWebhook(req.body);
-        res.status(200).send('OK');
-      } catch (error) {
-        console.error('[ENHANCED DM ERROR] Failed to process DM webhook:', error);
-        res.status(500).send('Error processing DM');
-      }
-    } else {
-      // Handle other webhook events with existing handler
-      await webhookHandler.handleWebhookEvent(req, res);
-    }
-  }
+  // OLD WEBHOOK ENDPOINTS - REPLACED BY NEW SYSTEM
 
   // Test endpoint for webhook automation demo
   app.post('/api/test-webhook-automation', async (req, res) => {
@@ -13550,6 +13381,102 @@ Create a detailed growth strategy in JSON format:
 
   // Authentication routes
   app.use('/api/auth', authRoutes);
+
+  // ====== NEW AUTOMATION API ENDPOINTS ======
+  
+  // Get automation rules - NEW SYSTEM
+  app.get('/api/automation/rules', async (req: any, res: Response) => {
+    try {
+      const { workspaceId } = req.query;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      const rules = await newAutomationSystem.getRules(workspaceId);
+      res.json({ rules });
+    } catch (error: any) {
+      console.error('[NEW AUTOMATION] Get rules error:', error);
+      res.status(500).json({ error: 'Failed to fetch automation rules' });
+    }
+  });
+
+  // Create automation rule - NEW SYSTEM
+  app.post('/api/automation/rules', async (req: any, res: Response) => {
+    try {
+      const { workspaceId, name, type, keywords, targetMediaIds, responses } = req.body;
+      
+      if (!workspaceId || !name || !type || !keywords || !responses) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const rule = await newAutomationSystem.createRule({
+        workspaceId,
+        name,
+        type,
+        keywords,
+        targetMediaIds: targetMediaIds || [],
+        responses
+      });
+
+      res.json({ rule });
+    } catch (error: any) {
+      console.error('[NEW AUTOMATION] Create rule error:', error);
+      res.status(500).json({ error: 'Failed to create automation rule' });
+    }
+  });
+
+  // Update automation rule - NEW SYSTEM
+  app.put('/api/automation/rules/:ruleId', async (req: any, res: Response) => {
+    try {
+      const { ruleId } = req.params;
+      const updates = req.body;
+      
+      const rule = await newAutomationSystem.updateRule(ruleId, updates);
+      res.json({ rule });
+    } catch (error: any) {
+      console.error('[NEW AUTOMATION] Update rule error:', error);
+      res.status(500).json({ error: 'Failed to update automation rule' });
+    }
+  });
+
+  // Delete automation rule - NEW SYSTEM
+  app.delete('/api/automation/rules/:ruleId', async (req: any, res: Response) => {
+    try {
+      const { ruleId } = req.params;
+      
+      await newAutomationSystem.deleteRule(ruleId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[NEW AUTOMATION] Delete rule error:', error);
+      res.status(500).json({ error: 'Failed to delete automation rule' });
+    }
+  });
+
+  // Toggle automation rule - NEW SYSTEM
+  app.post('/api/automation/rules/:ruleId/toggle', async (req: any, res: Response) => {
+    try {
+      const { ruleId } = req.params;
+      
+      const rule = await newAutomationSystem.toggleRule(ruleId);
+      res.json({ rule });
+    } catch (error: any) {
+      console.error('[NEW AUTOMATION] Toggle rule error:', error);
+      res.status(500).json({ error: 'Failed to toggle automation rule' });
+    }
+  });
+
+  // New webhook endpoint - NEW SYSTEM
+  app.post('/webhook/instagram', async (req: any, res: Response) => {
+    try {
+      console.log('[NEW WEBHOOK] Instagram webhook received');
+      
+      const result = await newWebhookProcessor.processWebhook(req.body);
+      res.json({ message: 'EVENT_RECEIVED', processed: result });
+    } catch (error: any) {
+      console.error('[NEW WEBHOOK] Processing error:', error);
+      res.status(500).json({ error: 'Failed to process webhook' });
+    }
+  });
 
   return httpServer;
 }
