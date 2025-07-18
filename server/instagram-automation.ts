@@ -1,6 +1,5 @@
 import { IStorage } from './storage';
 import { AIResponseGenerator, MessageContext, AIResponseConfig } from './ai-response-generator';
-import { InstagramStealthResponder } from './instagram-stealth-responder';
 
 export interface AutomationRule {
   id: string;
@@ -51,12 +50,10 @@ export interface AutomationLog {
 
 export class InstagramAutomation {
   private aiGenerator: AIResponseGenerator;
-  private stealthResponder: InstagramStealthResponder;
   private processedComments = new Set<string>();
 
   constructor(private storage: IStorage) {
     this.aiGenerator = new AIResponseGenerator();
-    this.stealthResponder = new InstagramStealthResponder();
   }
 
   /**
@@ -328,22 +325,16 @@ export class InstagramAutomation {
             continue;
           }
 
-          // Generate stealth response with maximum human behavior simulation
-          const stealthResponse = await this.stealthResponder.generateStealthResponse(
-            caption,
-            mention.username || 'unknown',
-            { postId: mention.id, platform: 'instagram' }
-          );
+          // Generate response using configured responses or AI
+          const response = await this.generateContextualResponse(caption, rule, { username: mention.username || 'unknown' });
           
-          if (stealthResponse.shouldRespond) {
-            console.log(`[STEALTH] Generated ultra-natural response: "${stealthResponse.response}" (delay: ${stealthResponse.delay}ms)`);
+          if (response) {
+            console.log(`[AUTOMATION] Generated response: "${response}"`);
             
-            // Apply stealth delay before responding
-            setTimeout(async () => {
-              await this.sendAutomatedComment(accessToken, mention.id, stealthResponse.response, workspaceId, rule.id);
-            }, stealthResponse.delay);
+            // Send automated comment
+            await this.sendAutomatedComment(accessToken, mention.id, response, workspaceId, rule.id);
           } else {
-            console.log(`[STEALTH] Skipping response to maintain human-like behavior patterns`);
+            console.log(`[AUTOMATION] No response generated`);
           }
         }
       }
@@ -380,58 +371,91 @@ export class InstagramAutomation {
       
       console.log(`[AI AUTOMATION] Rule analysis: type=${rule.type}, postInteraction=${rule.triggers?.postInteraction}, isCommentToDM=${isCommentToDMRule}, isPureDM=${isPureDMRule}, isCommentOnly=${isCommentOnlyRule}`);
       
-      // For comment-to-DM and pure DM rules, always respond with guaranteed responses
-      if (isCommentToDMRule || isPureDMRule) {
-        console.log(`[AI AUTOMATION] Using guaranteed response generator for ${isCommentToDMRule ? 'comment-to-DM' : 'pure DM'} automation`);
-        const dmResult = await this.stealthResponder.generateDMResponse(
-          message,
-          userProfile?.username || 'unknown',
-          { 
-            platform: 'instagram', 
-            ruleId: rule.id,
-            aiPersonality: personality,
-            responseLength: responseLength,
-            language: language,
-            contextualMode: contextualMode
-          }
-        );
-        
-        if (dmResult.shouldRespond && dmResult.response) {
-          console.log(`[AI AUTOMATION] Guaranteed response generated: "${dmResult.response}"`);
-          return dmResult.response;
-        } else {
-          console.log(`[AI AUTOMATION] DM daily limit reached`);
-          throw new Error('DM daily limit reached');
-        }
-      } else {
-        console.log(`[AI AUTOMATION] Using comment stealth responder for: "${message}"`);
-        
-        // Use regular stealth responder for comments
-        const stealthResult = await this.stealthResponder.generateStealthResponse(
-          message,
-          userProfile?.username || 'unknown',
-          { 
-            platform: 'instagram', 
-            ruleId: rule.id,
-            aiPersonality: personality,
-            responseLength: responseLength,
-            language: language,
-            contextualMode: contextualMode
-          }
-        );
-        
-        if (stealthResult.shouldRespond && stealthResult.response) {
-          console.log(`[AI AUTOMATION] Stealth response generated: "${stealthResult.response}"`);
-          return stealthResult.response;
-        } else {
-          console.log(`[AI AUTOMATION] Stealth responder declined to respond for natural behavior`);
-          throw new Error('Stealth responder declined to respond');
-        }
+      // Generate response using configured responses or AI
+      console.log(`[AI AUTOMATION] Generating response for rule type: ${rule.type}`);
+      
+      // First try to use pre-configured responses
+      const responses = rule.action.responses || rule.action.dmResponses || [];
+      if (responses.length > 0 && responses[0].trim() !== '') {
+        // Use pre-configured response
+        const response = responses[Math.floor(Math.random() * responses.length)];
+        console.log(`[AI AUTOMATION] Using pre-configured response: "${response}"`);
+        return response;
       }
+      
+      // If no pre-configured response, generate AI response
+      console.log(`[AI AUTOMATION] No pre-configured response, generating AI response`);
+      const aiResponse = await this.generateAIResponse(message, personality, responseLength, language);
+      console.log(`[AI AUTOMATION] AI response generated: "${aiResponse}"`);
+      return aiResponse;
       
     } catch (error) {
       console.error('[AI AUTOMATION] Response generation failed:', error);
-      throw new Error('No response generated to maintain natural behavior patterns');
+      throw new Error('Response generation failed');
+    }
+  }
+
+  /**
+   * Generate AI response using OpenAI
+   */
+  private async generateAIResponse(
+    message: string,
+    personality: string = 'friendly',
+    responseLength: string = 'medium',
+    language: string = 'auto'
+  ): Promise<string> {
+    try {
+      // Simple AI response using OpenAI if available
+      if (process.env.OPENAI_API_KEY) {
+        const OpenAI = require('openai');
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+        const personalityPrompt = {
+          friendly: 'Reply in a friendly, warm tone',
+          professional: 'Reply in a professional, business-like tone',
+          casual: 'Reply in a casual, relaxed tone',
+          helpful: 'Reply in a helpful, informative tone'
+        }[personality] || 'Reply in a friendly tone';
+
+        const lengthPrompt = {
+          short: 'Keep it very brief (1-2 sentences)',
+          medium: 'Keep it concise (2-3 sentences)',
+          long: 'Provide a detailed response (3-5 sentences)'
+        }[responseLength] || 'Keep it concise';
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+          messages: [
+            {
+              role: 'system',
+              content: `You are a social media automation assistant. ${personalityPrompt}. ${lengthPrompt}. Generate a contextual response to the user's comment.`
+            },
+            {
+              role: 'user',
+              content: `User commented: "${message}". Generate an appropriate response.`
+            }
+          ],
+          max_tokens: 100,
+          temperature: 0.7
+        });
+
+        return response.choices[0].message.content.trim();
+      }
+
+      // Fallback to simple responses if OpenAI not available
+      const fallbackResponses = [
+        'Thanks for your comment!',
+        'Thank you for reaching out!',
+        'I appreciate your message!',
+        'Thanks for your interest!',
+        'Thank you for connecting!'
+      ];
+
+      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+    } catch (error) {
+      console.error('[AI AUTOMATION] AI response generation failed:', error);
+      // Return a simple fallback response
+      return 'Thank you for your comment!';
     }
   }
 

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { IStorage } from './storage';
 import { InstagramAutomation } from './instagram-automation';
-import { InstagramStealthResponder } from './instagram-stealth-responder';
 
 interface WebhookEntry {
   id: string;
@@ -370,7 +369,7 @@ export class InstagramWebhookHandler {
           console.error(`[WEBHOOK] Failed to send DM:`, dmResponse.error);
         }
       } else {
-        console.log(`[WEBHOOK] ✓ Stealth responder declined to respond to maintain natural patterns`);
+        console.log(`[WEBHOOK] No response generated for message: "${messageText}"`);
       }
 
     } catch (error) {
@@ -757,13 +756,7 @@ export class InstagramWebhookHandler {
             console.log(`[WEBHOOK] ✗ Failed to send comment reply: ${commentResult.error}`);
           }
         } catch (error) {
-          // Check if this is a stealth responder intentionally declining to respond
-          if ((error as Error).message.includes('natural behavior patterns')) {
-            console.log(`[WEBHOOK] ✓ Stealth responder declined to respond to maintain natural patterns`);
-            continue; // This is intentional behavior, not an error
-          }
-          
-          console.error(`[WEBHOOK] Actual error in comment automation flow:`, error);
+          console.error(`[WEBHOOK] Error in comment automation flow:`, error);
           console.error(`[WEBHOOK] Error stack:`, (error as Error).stack);
         }
       }
