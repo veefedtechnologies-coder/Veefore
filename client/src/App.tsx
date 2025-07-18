@@ -2,21 +2,21 @@ import { Switch, Route } from 'wouter'
 import { useState, useEffect } from 'react'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import { apiRequest } from './lib/queryClient'
-import { SignIn } from './pages/SignIn'
-import { SignUp } from './pages/SignUp'
-import { Landing } from './pages/Landing'
-import { Onboarding } from './pages/Onboarding'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import Landing from './pages/Landing'
+import Onboarding from './pages/Onboarding'
 import { Sidebar } from './components/layout/sidebar'
 import { Header } from './components/layout/header'
 import { CreateDropdown } from './components/layout/create-dropdown'
 import { AnalyticsDashboard } from './components/analytics/analytics-dashboard'
 import { CreatePost } from './components/create/create-post'
 import { ProfessionalDashboard } from './components/dashboard/professional-dashboard'
-import { VeeGPT } from './pages/VeeGPT'
-import { VideoGeneratorTest } from './pages/VideoGeneratorTest'
+import VeeGPT from './pages/VeeGPT'
+import VideoGeneratorTest from './pages/VideoGeneratorTest'
 import { CalendarView } from './components/calendar/calendar-view'
 import { ScheduledPosts } from './components/dashboard/scheduled-posts'
-import { Drafts } from './components/dashboard/drafts-section'
+import { DraftsSection } from './components/dashboard/drafts-section'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient'
@@ -102,7 +102,7 @@ export default function App() {
                       <TabsContent value="drafts" className="mt-6">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           <ScheduledPosts />
-                          <Drafts />
+                          <DraftsSection />
                         </div>
                       </TabsContent>
                       <TabsContent value="content" className="mt-6">
