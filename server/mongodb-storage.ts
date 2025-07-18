@@ -104,6 +104,9 @@ const SocialAccountSchema = new mongoose.Schema({
   refreshToken: String,
   expiresAt: Date,
   isActive: { type: Boolean, default: true },
+  // Instagram webhook matching fields
+  pageId: String,
+  instagramId: String,
   // Instagram sync data fields
   followersCount: { type: Number, default: 0 },
   followingCount: { type: Number, default: 0 },
@@ -982,6 +985,9 @@ export class MongoStorage implements IStorage {
       refreshToken: mongoAccount.refreshToken || null,
       expiresAt: mongoAccount.expiresAt || null,
       isActive: mongoAccount.isActive !== false,
+      // Instagram webhook matching fields
+      pageId: mongoAccount.pageId ?? null,
+      instagramId: mongoAccount.instagramId ?? null,
       // Platform-specific sync data fields
       followersCount: mongoAccount.followersCount ?? null,
       followingCount: mongoAccount.followingCount ?? null,
