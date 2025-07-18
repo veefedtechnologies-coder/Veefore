@@ -1096,10 +1096,15 @@ const VideoGeneratorAdvanced = () => {
                     Regenerate
                   </Button>
                   <Button 
-                    className="w-full bg-purple-600 hover:bg-purple-700"
-                    onClick={() => setCurrentStep('advanced')}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={() => {
+                      setIsGenerating(true);
+                      generateVideoMutation.mutate();
+                    }}
+                    disabled={isGenerating || generateVideoMutation.isPending}
                   >
-                    Continue to Advanced Settings
+                    <Video className="w-4 h-4 mr-2" />
+                    {isGenerating || generateVideoMutation.isPending ? 'Generating Video...' : 'Generate Video'}
                   </Button>
                 </CardContent>
               </Card>
