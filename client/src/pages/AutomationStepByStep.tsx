@@ -121,19 +121,63 @@ export default function AutomationStepByStep() {
       return
     }
 
+    // Get the workspace ID from selected account data
+    const selectedAccountData = realAccounts.find(acc => acc.id === selectedAccount)
+    const workspaceId = selectedAccountData?.workspaceId
+    if (!workspaceId) {
+      toast({
+        title: "Error",
+        description: "No workspace found for selected account.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Map our automation type to the backend format
+    const getBackendType = (type: string) => {
+      switch (type) {
+        case 'comment_dm':
+          return 'dm' // This will handle both comment and DM
+        case 'dm_only':
+          return 'dm'
+        case 'comment_only':
+          return 'comment'
+        default:
+          return 'dm'
+      }
+    }
+
     const ruleData = {
-      workspaceId: 'current-workspace', // This would come from context
-      socialAccountId: selectedAccount,
-      postId: selectedPost,
-      automationType: automationType,
-      keywords: getCurrentKeywords(),
-      commentReplies: commentReplies.filter(reply => reply.trim().length > 0),
-      dmMessage: dmMessage.trim(),
-      dmButtonText: dmButtonText.trim(),
-      maxRepliesPerDay: maxRepliesPerDay,
+      name: `${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} Automation`,
+      workspaceId: workspaceId,
+      type: getBackendType(automationType),
+      triggers: {
+        aiMode: 'contextual',
+        keywords: getCurrentKeywords(),
+        hashtags: [],
+        mentions: false,
+        newFollowers: false,
+        postInteraction: automationType === 'comment_dm' || automationType === 'comment_only'
+      },
+      responses: commentReplies.filter(reply => reply.trim().length > 0),
       aiPersonality: aiPersonality,
-      activeHours: activeHours,
-      activeDays: activeDays,
+      responseLength: 'medium',
+      aiConfig: {
+        personality: aiPersonality,
+        responseLength: 'medium',
+        dailyLimit: maxRepliesPerDay,
+        responseDelay: cooldownPeriod / 60, // Convert minutes to hours
+        language: 'auto',
+        contextualMode: true
+      },
+      conditions: {},
+      schedule: {},
+      duration: {},
+      activeTime: {
+        start: activeHours.start,
+        end: activeHours.end,
+        days: activeDays
+      },
       isActive: true
     }
 
@@ -1859,10 +1903,20 @@ export default function AutomationStepByStep() {
                 ) : (
                   <button
                     onClick={handleFinish}
-                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    disabled={createAutomationMutation.isPending}
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    <CheckCircle className="w-4 h-4" />
-                    Activate Automation
+                    {createAutomationMutation.isPending ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Activate Automation
+                      </>
+                    )}
                   </button>
                 )}
               </div>
