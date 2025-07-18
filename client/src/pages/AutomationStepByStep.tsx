@@ -36,9 +36,15 @@ import {
   Search,
   Check
 } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { apiRequest } from '@/lib/queryClient'
+import { useToast } from '@/hooks/use-toast'
 
 export default function AutomationStepByStep() {
   console.log('AutomationStepByStep component loaded successfully')
+  
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
   
   // Step flow state
   const [currentStep, setCurrentStep] = useState(1)
@@ -48,11 +54,82 @@ export default function AutomationStepByStep() {
   const [automationType, setAutomationType] = useState('')
   const [selectedPost, setSelectedPost] = useState('')
   
+  // Fetch real Instagram accounts
+  const { data: socialAccountsData, isLoading: accountsLoading } = useQuery({
+    queryKey: ['/api/social-accounts'],
+    enabled: true
+  })
+  
+  // Fetch real Instagram posts when account is selected
+  const { data: postsData, isLoading: postsLoading } = useQuery({
+    queryKey: ['/api/instagram-content', selectedAccount],
+    enabled: !!selectedAccount
+  })
+  
+  // Create automation rule mutation
+  const createAutomationMutation = useMutation({
+    mutationFn: async (automationData: any) => {
+      return await apiRequest('/api/automation/rules', {
+        method: 'POST',
+        body: JSON.stringify(automationData)
+      })
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Automation rule created successfully",
+      })
+      // Reset form or redirect
+      setCurrentStep(1)
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create automation rule",
+        variant: "destructive",
+      })
+    }
+  })
+  
   // Automation-specific states
   const [keywords, setKeywords] = useState([])
   const [newKeyword, setNewKeyword] = useState('')
   const [commentReply, setCommentReply] = useState('')
   const [dmMessage, setDmMessage] = useState('')
+  
+  // Function to create automation rule
+  const createAutomationRule = async () => {
+    if (!selectedAccount || !selectedPost || !automationType) {
+      toast({
+        title: "Error",
+        description: "Please complete all required fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const ruleData = {
+      workspaceId: 'current-workspace', // This would come from context
+      socialAccountId: selectedAccount,
+      postId: selectedPost,
+      automationType: automationType,
+      keywords: getCurrentKeywords(),
+      commentReplies: commentReplies.filter(reply => reply.trim().length > 0),
+      dmMessage: dmMessage.trim(),
+      dmButtonText: dmButtonText.trim(),
+      maxRepliesPerDay: maxRepliesPerDay,
+      aiPersonality: aiPersonality,
+      activeHours: activeHours,
+      activeDays: activeDays,
+      isActive: true
+    }
+
+    try {
+      await createAutomationMutation.mutateAsync(ruleData)
+    } catch (error) {
+      console.error('Error creating automation rule:', error)
+    }
+  }
   const [previewComment, setPreviewComment] = useState('Amazing content! info please!')
   
   // Multiple comment replies and delay settings
@@ -185,41 +262,25 @@ export default function AutomationStepByStep() {
     }
   ]
 
-  const mockAccounts = [
-    { id: 'acc1', name: '@arpit9996363', followers: '9 followers', platform: 'Instagram', avatar: 'https://picsum.photos/40/40?random=1' },
-    { id: 'acc2', name: '@rahulc1020', followers: '4 followers', platform: 'Instagram', avatar: 'https://picsum.photos/40/40?random=2' },
-    { id: 'acc3', name: '@business_account', followers: '1.2K followers', platform: 'Instagram', avatar: 'https://picsum.photos/40/40?random=3' }
-  ]
+  // Transform real account data
+  const realAccounts = socialAccountsData ? socialAccountsData.map((account: any) => ({
+    id: account.id,
+    name: `@${account.username}`,
+    followers: `${account.followersCount} followers`,
+    platform: account.platform,
+    avatar: account.profilePictureUrl || `https://picsum.photos/40/40?random=${account.id}`
+  })) : []
 
-  const mockPosts = [
-    { 
-      id: 'post1', 
-      title: 'New Product Launch', 
-      type: 'post', 
-      image: 'https://picsum.photos/300/300?random=1',
-      likes: 124,
-      comments: 23,
-      caption: 'Excited to announce our latest product! What do you think? 🚀'
-    },
-    { 
-      id: 'post2', 
-      title: 'Behind the Scenes', 
-      type: 'reel', 
-      image: 'https://picsum.photos/300/300?random=2',
-      likes: 89,
-      comments: 12,
-      caption: 'Behind the scenes of our creative process 🎬'
-    },
-    { 
-      id: 'post3', 
-      title: 'Team Update', 
-      type: 'story', 
-      image: 'https://picsum.photos/300/300?random=3',
-      likes: 45,
-      comments: 8,
-      caption: 'Team working hard on exciting new features! 💪'
-    }
-  ]
+  // Transform real posts data
+  const realPosts = postsData ? postsData.map((post: any) => ({
+    id: post.id,
+    title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
+    type: post.media_type === 'VIDEO' ? 'reel' : 'post',
+    image: post.media_url || post.thumbnail_url || 'https://picsum.photos/300/300?random=1',
+    likes: post.like_count || 0,
+    comments: post.comments_count || 0,
+    caption: post.caption || 'Instagram post content'
+  })) : []
 
   // Dynamic steps based on automation type
   const getSteps = () => {
@@ -250,7 +311,7 @@ export default function AutomationStepByStep() {
 
   // Function to get content types based on selected platform/account
   const getContentTypesForPlatform = (accountId) => {
-    const account = mockAccounts.find(acc => acc.id === accountId)
+    const account = realAccounts.find(acc => acc.id === accountId)
     if (!account) return []
     
     switch (account.platform.toLowerCase()) {
@@ -358,7 +419,7 @@ export default function AutomationStepByStep() {
       if (currentStep === 1) {
         setContentType('')
         // Auto-set platform based on selected account
-        const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
+        const selectedAccountData = realAccounts.find(a => a.id === selectedAccount)
         if (selectedAccountData) {
           setSelectedPlatform(selectedAccountData.platform.toLowerCase())
         }
@@ -373,23 +434,9 @@ export default function AutomationStepByStep() {
     }
   }
 
-  const handleFinish = () => {
-    const automationConfig = {
-      selectedAccount,
-      contentType,
-      automationType,
-      selectedPost,
-      keywords: getCurrentKeywords(),
-      commentReply: automationType === 'comment_dm' ? commentReply : publicReply,
-      dmMessage: automationType === 'dm_only' ? dmAutoReply : dmMessage,
-      maxRepliesPerDay,
-      cooldownPeriod,
-      aiPersonality,
-      activeHours
-    }
-    
-    console.log('Automation configured:', automationConfig)
-    alert('Automation configured successfully!')
+  const handleFinish = async () => {
+    // Create the automation rule with real API call
+    await createAutomationRule()
   }
 
   const renderStepContent = () => {
@@ -411,8 +458,8 @@ export default function AutomationStepByStep() {
                   className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
                 >
                   <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
-                    {selectedAccount 
-                      ? mockAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + mockAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + mockAccounts.find(acc => acc.id === selectedAccount)?.platform
+                    {accountsLoading ? 'Loading accounts...' : selectedAccount 
+                      ? realAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.platform
                       : 'Choose your social media account...'
                     }
                   </span>
@@ -434,7 +481,7 @@ export default function AutomationStepByStep() {
                       </div>
                     </div>
                     <div className="py-1">
-                      {mockAccounts
+                      {realAccounts
                         .filter(account => 
                           account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           account.platform.toLowerCase().includes(searchTerm.toLowerCase())
@@ -462,7 +509,7 @@ export default function AutomationStepByStep() {
                           </button>
                         ))
                       }
-                      {mockAccounts.filter(account => 
+                      {realAccounts.filter(account => 
                         account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         account.platform.toLowerCase().includes(searchTerm.toLowerCase())
                       ).length === 0 && (
@@ -541,7 +588,7 @@ export default function AutomationStepByStep() {
                   Select Post
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {mockPosts.filter(post => post.type === contentType).map(post => (
+                  {(postsLoading ? [] : realPosts.filter(post => post.type === contentType)).map(post => (
                     <button
                       key={post.id}
                       onClick={() => setSelectedPost(post.id)}
@@ -552,22 +599,42 @@ export default function AutomationStepByStep() {
                       }`}
                     >
                       <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 flex items-center justify-center">
-                        <img src={post.thumbnail} alt={post.caption} className="w-full h-full object-cover rounded-lg" />
+                        <img src={post.image} alt={post.caption} className="w-full h-full object-cover rounded-lg" />
                       </div>
-                      <div className="text-xs text-gray-600 font-medium truncate">{post.caption}</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Heart className="w-3 h-3 text-red-500" />
-                        <span className="text-xs text-gray-500">{post.likes}</span>
-                        <MessageCircle className="w-3 h-3 text-blue-500 ml-2" />
-                        <span className="text-xs text-gray-500">{post.comments}</span>
+                      <div className="space-y-1">
+                        <h4 className="font-medium text-gray-900 text-sm truncate">{post.title}</h4>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span className="capitalize">{post.type}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="flex items-center gap-1">
+                              <Heart className="w-3 h-3" />
+                              {post.likes}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="w-3 h-3" />
+                              {post.comments}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                       {selectedPost === post.id && (
-                        <div className="absolute -top-2 -right-2 p-1 bg-emerald-500 rounded-full shadow-lg">
-                          <CheckCircle className="w-4 h-4 text-white" />
+                        <div className="absolute top-2 right-2 p-1 bg-emerald-500 rounded-full">
+                          <Check className="w-3 h-3 text-white" />
                         </div>
                       )}
                     </button>
                   ))}
+                  {postsLoading && (
+                    <div className="col-span-full text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+                      <p className="text-gray-500 mt-2">Loading posts...</p>
+                    </div>
+                  )}
+                  {!postsLoading && realPosts.filter(post => post.type === contentType).length === 0 && (
+                    <div className="col-span-full text-center py-8 text-gray-500">
+                      No {contentType}s found for this account
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -911,13 +978,13 @@ export default function AutomationStepByStep() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <span className="text-sm font-medium text-gray-600">Account:</span>
-                    <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Selected Post:</span>
                     <div className="text-lg font-semibold text-gray-900">
                       {selectedPost ? (
-                        <span>{mockPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {mockPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                        <span>{realPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {realPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
                       ) : (
                         'Not selected'
                       )}
@@ -961,13 +1028,13 @@ export default function AutomationStepByStep() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <span className="text-sm font-medium text-gray-600">Account:</span>
-                    <div className="text-lg font-semibold text-gray-900">{mockAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Selected Post:</span>
                     <div className="text-lg font-semibold text-gray-900">
                       {selectedPost ? (
-                        <span>{mockPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {mockPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                        <span>{realPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {realPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
                       ) : (
                         'Not selected'
                       )}
@@ -1239,8 +1306,8 @@ export default function AutomationStepByStep() {
   }
 
   const renderInstagramPreview = () => {
-    const selectedAccountData = mockAccounts.find(a => a.id === selectedAccount)
-    const selectedPostData = mockPosts.find(p => p.id === selectedPost)
+    const selectedAccountData = realAccounts.find(a => a.id === selectedAccount)
+    const selectedPostData = realPosts.find(p => p.id === selectedPost)
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
     
