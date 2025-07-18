@@ -251,25 +251,32 @@ const VideoGeneratorAdvanced = () => {
               </button>
             </div>
 
-            {/* Recent Projects - enhanced with modern styling */}
-            <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Recent Projects</h3>
-            <div className="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <div className="flex items-stretch p-4 gap-3">
+            {/* Recent Projects - enhanced with larger thumbnails and better spacing */}
+            <div className="bg-gradient-to-r from-gray-50 to-white rounded-xl mx-4 p-6 shadow-sm border border-gray-100">
+              <h3 className="text-[#141414] text-xl font-bold leading-tight tracking-[-0.015em] pb-6">Recent Projects</h3>
+              <div className="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex items-stretch gap-6">
                 {recentProjects.map((project) => (
-                  <div key={project.id} className="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40 cursor-pointer hover:scale-105 transition-all duration-200">
-                    <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col bg-gradient-to-br from-purple-400 via-blue-500 to-indigo-600 shadow-lg hover:shadow-xl relative overflow-hidden">
+                  <div key={project.id} className="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60 cursor-pointer hover:scale-105 transition-all duration-200">
+                    <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col bg-gradient-to-br from-purple-400 via-blue-500 to-indigo-600 shadow-lg hover:shadow-xl relative overflow-hidden h-36">
                       <div className="absolute inset-0 bg-black/20"></div>
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <div className="text-white text-sm font-semibold truncate">{project.title}</div>
-                        <div className="text-white/80 text-xs">{project.lastEdited}</div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="text-white text-base font-semibold truncate">{project.title}</div>
+                        <div className="text-white/80 text-sm">{project.lastEdited}</div>
+                      </div>
+                      <div className="absolute top-4 right-4">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                          <Play className="w-4 h-4 text-white" />
+                        </div>
                       </div>
                     </div>
-                    <div className="px-1">
-                      <p className="text-[#141414] text-base font-medium leading-normal">{project.title}</p>
+                    <div className="px-2">
+                      <p className="text-[#141414] text-lg font-semibold leading-normal">{project.title}</p>
                       <p className="text-neutral-500 text-sm font-normal leading-normal">Last edited: {project.lastEdited}</p>
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             </div>
 
