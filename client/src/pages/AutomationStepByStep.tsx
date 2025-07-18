@@ -289,7 +289,7 @@ export default function AutomationStepByStep() {
     queryFn: async () => {
       const workspaceId = realAccounts?.[0]?.workspaceId
       if (!workspaceId) return []
-      const response = await apiRequest(`/api/automation/rules/${workspaceId}`)
+      const response = await apiRequest(`/api/automation/rules?workspaceId=${workspaceId}`)
       return response.rules || []
     },
     enabled: !!realAccounts?.[0]?.workspaceId
@@ -351,53 +351,18 @@ export default function AutomationStepByStep() {
       return
     }
 
-    // Map our automation type to the backend format
-    const getBackendType = (type: string) => {
-      switch (type) {
-        case 'comment_dm':
-          return 'dm' // This will handle both comment and DM
-        case 'dm_only':
-          return 'dm'
-        case 'comment_only':
-          return 'comment'
-        default:
-          return 'dm'
-      }
-    }
-
+    // Get current keywords and responses based on automation type
+    const currentKeywords = getCurrentKeywords()
+    const currentResponses = getCurrentResponses()
+    
+    // NEW SYSTEM FORMAT - matches what the new-automation-system.ts expects
     const ruleData = {
       name: `${automationType === 'comment_only' ? 'Comment' : automationType === 'dm_only' ? 'DM' : 'Comment to DM'} Automation`,
       workspaceId: workspaceId,
-      type: getBackendType(automationType),
-      triggers: {
-        aiMode: 'contextual',
-        keywords: getCurrentKeywords(),
-        hashtags: [],
-        mentions: false,
-        newFollowers: false,
-        postInteraction: automationType === 'comment_dm' || automationType === 'comment_only'
-      },
-      responses: automationType === 'comment_dm' ? 
-        [...commentReplies.filter(reply => reply.trim().length > 0), dmMessage] :
-        commentReplies.filter(reply => reply.trim().length > 0),
-      aiPersonality: aiPersonality,
-      responseLength: 'medium',
-      conditions: {},
-      schedule: {},
-      aiConfig: {
-        personality: aiPersonality,
-        responseLength: 'medium',
-        dailyLimit: maxRepliesPerDay,
-        responseDelay: cooldownPeriod / 60, // Convert minutes to hours
-        language: 'auto',
-        contextualMode: true
-      },
-      duration: {},
-      activeTime: {
-        start: activeHours.start,
-        end: activeHours.end,
-        days: activeDays
-      },
+      type: automationType, // Use exact automation type (comment_dm, dm_only, comment_only)
+      keywords: currentKeywords,
+      targetMediaIds: selectedPost ? [selectedPost] : [],
+      responses: currentResponses,
       isActive: true
     }
 
@@ -455,6 +420,32 @@ export default function AutomationStepByStep() {
         return commentKeywords
       default:
         return keywords
+    }
+  }
+
+  // Helper function to get current responses based on automation type
+  const getCurrentResponses = () => {
+    switch (automationType) {
+      case 'comment_dm':
+        return {
+          responses: commentReplies.filter(reply => reply.trim().length > 0),
+          dmResponses: dmMessage ? [dmMessage] : []
+        }
+      case 'dm_only':
+        return {
+          responses: [],
+          dmResponses: dmAutoReply ? [dmAutoReply] : []
+        }
+      case 'comment_only':
+        return {
+          responses: publicReply ? [publicReply] : [],
+          dmResponses: []
+        }
+      default:
+        return {
+          responses: [],
+          dmResponses: []
+        }
     }
   }
   

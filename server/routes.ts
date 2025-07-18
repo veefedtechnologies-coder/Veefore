@@ -8100,141 +8100,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Automation endpoints
-  app.post('/api/automation/rules', requireAuth, async (req: any, res: any) => {
-    try {
-      const { user } = req;
-      const { 
-        name, 
-        workspaceId, 
-        type, 
-        trigger, 
-        action, 
-        isActive = true,
-        description 
-      } = req.body;
-
-      if (!name || !workspaceId || !type || !trigger || !action) {
-        return res.status(400).json({ 
-          error: 'Name, workspace, type, trigger, and action are required' 
-        });
-      }
-
-      // Verify workspace access
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
-      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
-      if (!workspace) {
-        return res.status(403).json({ error: 'Access denied to workspace' });
-      }
-
-      // Create automation rule
-      const automationRule = await storage.createAutomationRule({
-        name,
-        workspaceId: parseInt(workspaceId),
-        type,
-        trigger,
-        action,
-        isActive,
-        description: description || null
-      });
-
-      console.log('[AUTOMATION] Created automation rule:', {
-        id: automationRule.id,
-        name,
-        type,
-        workspaceId
-      });
-
-      res.json({
-        success: true,
-        message: 'Automation rule created successfully',
-        rule: automationRule
-      });
-
-    } catch (error: any) {
-      console.error('[AUTOMATION] Error creating automation rule:', error);
-      res.status(500).json({ error: 'Failed to create automation rule' });
-    }
-  });
-
-  app.get('/api/automation/rules', requireAuth, async (req: any, res: any) => {
-    try {
-      const { user } = req;
-      const { workspaceId } = req.query;
-
-      if (!workspaceId) {
-        return res.status(400).json({ error: 'Workspace ID is required' });
-      }
-
-      // Verify workspace access
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
-      const workspace = workspaces.find(w => w.id.toString() === workspaceId.toString());
-      if (!workspace) {
-        return res.status(403).json({ error: 'Access denied to workspace' });
-      }
-
-      // Get automation rules
-      const rules = await storage.getAutomationRulesByType(parseInt(workspaceId), null);
-
-      res.json({
-        success: true,
-        rules,
-        total: rules.length
-      });
-
-    } catch (error: any) {
-      console.error('[AUTOMATION] Error fetching automation rules:', error);
-      res.status(500).json({ error: 'Failed to fetch automation rules' });
-    }
-  });
-
-  app.patch('/api/automation/rules/:id/toggle', requireAuth, async (req: any, res: any) => {
-    try {
-      const { user } = req;
-      const { id } = req.params;
-      const { isActive } = req.body;
-
-      if (!id) {
-        return res.status(400).json({ error: 'Rule ID is required' });
-      }
-
-      // Get rule details
-      const rules = await storage.getAutomationRulesByType(null, null);
-      const rule = rules.find(r => r.id.toString() === id.toString());
-      
-      if (!rule) {
-        return res.status(404).json({ error: 'Automation rule not found' });
-      }
-
-      // Verify workspace access
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
-      const workspace = workspaces.find(w => w.id === rule.workspaceId);
-      if (!workspace) {
-        return res.status(403).json({ error: 'Access denied to workspace' });
-      }
-
-      // Update rule status
-      const updatedRule = await storage.updateAutomationRule(rule.id, {
-        isActive: typeof isActive === 'boolean' ? isActive : !rule.isActive
-      });
-
-      console.log('[AUTOMATION] Toggled automation rule:', {
-        id: rule.id,
-        name: rule.name,
-        isActive: updatedRule.isActive
-      });
-
-      res.json({
-        success: true,
-        message: `Automation rule ${updatedRule.isActive ? 'enabled' : 'disabled'}`,
-        rule: updatedRule
-      });
-
-    } catch (error: any) {
-      console.error('[AUTOMATION] Error toggling automation rule:', error);
-      res.status(500).json({ error: 'Failed to toggle automation rule' });
-    }
-  });
+  // OLD AUTOMATION ENDPOINTS REMOVED - USING NEW SYSTEM ONLY
 
   // Update content route
   app.put('/api/content/:id', requireAuth, async (req: any, res: Response) => {
@@ -13385,7 +13251,7 @@ Create a detailed growth strategy in JSON format:
   // ====== NEW AUTOMATION API ENDPOINTS ======
   
   // Get automation rules - NEW SYSTEM
-  app.get('/api/automation/rules', async (req: any, res: Response) => {
+  app.get('/api/automation/rules', requireAuth, async (req: any, res: Response) => {
     try {
       const { workspaceId } = req.query;
       if (!workspaceId) {
@@ -13401,11 +13267,17 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Create automation rule - NEW SYSTEM
-  app.post('/api/automation/rules', async (req: any, res: Response) => {
+  app.post('/api/automation/rules', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log('[NEW AUTOMATION] Creating rule with body:', req.body);
       const { workspaceId, name, type, keywords, targetMediaIds, responses } = req.body;
       
+      console.log('[NEW AUTOMATION] Extracted fields:', {
+        workspaceId, name, type, keywords, targetMediaIds, responses
+      });
+      
       if (!workspaceId || !name || !type || !keywords || !responses) {
+        console.log('[NEW AUTOMATION] Missing required fields validation failed');
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
@@ -13418,6 +13290,7 @@ Create a detailed growth strategy in JSON format:
         responses
       });
 
+      console.log('[NEW AUTOMATION] Rule created successfully:', rule);
       res.json({ rule });
     } catch (error: any) {
       console.error('[NEW AUTOMATION] Create rule error:', error);
