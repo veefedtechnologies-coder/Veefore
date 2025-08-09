@@ -1476,111 +1476,42 @@ body {
     0 10px 20px -4px rgba(139, 92, 246, 0.08);
 }
 
-/* Advanced morphing animations for industry cards */
+/* Optimized morphing animations for industry cards */
 @keyframes morph-industry-card {
   0%, 100% {
-    border-radius: 2.5rem;
-    transform: scale(1) rotate(0deg);
-  }
-  25% {
-    border-radius: 2.8rem 2.2rem 2.5rem 2.5rem;
-    transform: scale(1.01) rotate(0.5deg);
+    border-radius: 2rem;
+    transform: scale(1);
   }
   50% {
-    border-radius: 2.3rem 2.7rem 2.4rem 2.6rem;
-    transform: scale(1.02) rotate(-0.3deg);
-  }
-  75% {
-    border-radius: 2.6rem 2.4rem 2.7rem 2.3rem;
-    transform: scale(1.01) rotate(0.2deg);
+    border-radius: 2.5rem;
+    transform: scale(1.01);
   }
 }
 
-/* Industry-specific gradient animations */
-@keyframes industry-gradient-1 {
-  0%, 100% { 
-    background: radial-gradient(circle at 20% 80%, #3b82f6 0%, #1d4ed8 50%, transparent 100%);
-  }
-  33% { 
-    background: radial-gradient(circle at 60% 20%, #2563eb 0%, #1e40af 50%, transparent 100%);
-  }
-  66% { 
-    background: radial-gradient(circle at 80% 60%, #1d4ed8 0%, #1e3a8a 50%, transparent 100%);
-  }
-}
+/* Simplified gradient system for better performance */
 
-@keyframes industry-gradient-2 {
-  0%, 100% { 
-    background: radial-gradient(circle at 80% 20%, #ef4444 0%, #dc2626 50%, transparent 100%);
-  }
-  33% { 
-    background: radial-gradient(circle at 20% 80%, #f87171 0%, #ef4444 50%, transparent 100%);
-  }
-  66% { 
-    background: radial-gradient(circle at 60% 40%, #dc2626 0%, #b91c1c 50%, transparent 100%);
-  }
-}
-
-@keyframes industry-gradient-3 {
-  0%, 100% { 
-    background: radial-gradient(circle at 40% 60%, #6b7280 0%, #4b5563 50%, transparent 100%);
-  }
-  33% { 
-    background: radial-gradient(circle at 80% 30%, #9ca3af 0%, #6b7280 50%, transparent 100%);
-  }
-  66% { 
-    background: radial-gradient(circle at 30% 70%, #4b5563 0%, #374151 50%, transparent 100%);
-  }
-}
-
-@keyframes industry-gradient-4 {
-  0%, 100% { 
-    background: radial-gradient(circle at 70% 30%, #8b5cf6 0%, #7c3aed 50%, transparent 100%);
-  }
-  33% { 
-    background: radial-gradient(circle at 30% 70%, #a855f7 0%, #8b5cf6 50%, transparent 100%);
-  }
-  66% { 
-    background: radial-gradient(circle at 60% 80%, #7c3aed 0%, #6d28d9 50%, transparent 100%);
-  }
-}
-
-/* Floating icon animations with Apple-style physics */
+/* Optimized floating icon animations */
 @keyframes icon-float-industry {
   0%, 100% {
-    transform: translateY(0px) translateX(0px) scale(1) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-12px) translateX(4px) scale(1.05) rotate(2deg);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-20px) translateX(-2px) scale(1.08) rotate(-1deg);
-  }
-  75% {
-    transform: translateY(-15px) translateX(6px) scale(1.06) rotate(3deg);
+    transform: translateY(-8px);
   }
 }
 
-/* Particle system for industry cards */
+/* Simplified particle system for better performance */
 @keyframes industry-particles {
   0% {
-    transform: translateY(0px) translateX(0px) scale(0.8) rotate(0deg);
+    transform: translateY(0px);
     opacity: 0.4;
   }
-  25% {
-    transform: translateY(-30px) translateX(20px) scale(1.2) rotate(90deg);
+  50% {
+    transform: translateY(-15px);
     opacity: 0.8;
   }
-  50% {
-    transform: translateY(-60px) translateX(-10px) scale(1.5) rotate(180deg);
-    opacity: 1;
-  }
-  75% {
-    transform: translateY(-40px) translateX(30px) scale(1.3) rotate(270deg);
-    opacity: 0.6;
-  }
   100% {
-    transform: translateY(-80px) translateX(0px) scale(0.5) rotate(360deg);
+    transform: translateY(-30px);
     opacity: 0;
   }
 }
@@ -1615,15 +1546,15 @@ body {
 
 /* Apply new animations to industry section elements */
 .animate-industry-card-morph {
-  animation: morph-industry-card 20s ease-in-out infinite;
+  animation: morph-industry-card 8s ease-in-out infinite;
 }
 
 .animate-icon-float-industry {
-  animation: icon-float-industry 8s ease-in-out infinite;
+  animation: icon-float-industry 4s ease-in-out infinite;
 }
 
 .animate-industry-particles {
-  animation: industry-particles 15s linear infinite;
+  animation: industry-particles 6s linear infinite;
 }
 
 .animate-feature-highlight {

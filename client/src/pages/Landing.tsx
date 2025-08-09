@@ -2259,79 +2259,56 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 className="group relative overflow-hidden industry-card-hover"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                {/* Revolutionary Next-Gen Card Container */}
-                <div className={`relative bg-gradient-to-br ${solution.gradientFrom} ${solution.gradientTo} ${solution.hoverColor} backdrop-blur-2xl rounded-[3rem] border border-white/30 shadow-3xl hover:shadow-4xl transition-all duration-1000 group-hover:-translate-y-4 group-hover:scale-[1.02] overflow-hidden animate-industry-card-morph`}>
+                {/* Optimized Card Container */}
+                <div className={`relative bg-gradient-to-br ${solution.gradientFrom} ${solution.gradientTo} ${solution.hoverColor} backdrop-blur-xl rounded-[2.5rem] border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:-translate-y-2 group-hover:scale-[1.01] overflow-hidden`}>
                   
-                  {/* Animated Background Pattern */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="w-full h-full" style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.8'%3E%3Cpolygon points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E")`,
-                      backgroundSize: '50px 50px',
-                      animation: 'float 20s infinite ease-in-out'
-                    }} />
+                  {/* Simple Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="w-full h-full bg-gradient-to-br from-white/20 to-transparent" />
                   </div>
 
-                  {/* Dynamic Status Badges */}
+                  {/* Simplified Status Badges */}
                   <div className="absolute top-6 right-6 flex flex-col gap-2">
                     {solution.liveDemo && (
-                      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
                         ● LIVE DEMO
                       </div>
                     )}
                     {solution.aiPowered && (
                       <div className="bg-violet-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        🧠 AI-POWERED
+                        AI-POWERED
                       </div>
                     )}
                     {solution.trending && (
-                      <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce">
-                        🔥 TRENDING
+                      <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        TRENDING
                       </div>
                     )}
                     {solution.secure && (
                       <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        🛡️ SECURE
+                        SECURE
                       </div>
                     )}
                     {solution.premium && (
                       <div className="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        👑 PREMIUM
+                        PREMIUM
                       </div>
                     )}
                   </div>
 
-                  {/* Floating Particle System */}
-                  {solution.particles.map((particle, pIndex) => (
-                    <div
-                      key={pIndex}
-                      className="absolute text-2xl animate-industry-particles opacity-0 group-hover:opacity-100"
-                      style={{
-                        left: `${20 + pIndex * 30}%`,
-                        top: `${30 + pIndex * 20}%`,
-                        animationDelay: `${pIndex * 2}s`,
-                        animationDuration: '15s'
-                      }}
-                    >
-                      {particle}
-                    </div>
-                  ))}
+                  {/* Simplified Visual Elements */}
                   
                   <div className="relative p-10 text-white">
-                    {/* Revolutionary Icon with Holographic Effect */}
+                    {/* Optimized Icon with Simple Effect */}
                     <div className="flex items-start justify-between mb-8">
                       <div className="relative">
-                        <div className="w-24 h-24 rounded-3xl bg-white/20 backdrop-blur-lg border border-white/30 flex items-center justify-center group-hover:scale-125 group-hover:rotate-12 transition-all duration-700 shadow-2xl animate-icon-float-industry">
-                          <div className="w-20 h-20 rounded-2xl bg-white/90 flex items-center justify-center">
+                        <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-lg border border-white/30 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl">
+                          <div className="w-16 h-16 rounded-xl bg-white/90 flex items-center justify-center">
                             {React.cloneElement(solution.icon, { 
-                              className: "text-gray-800",
-                              style: { filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }
+                              className: "text-gray-800"
                             })}
                           </div>
                         </div>
-                        
-                        {/* Advanced Holographic Ring */}
-                        <div className="absolute inset-0 rounded-3xl border-2 border-white/20 animate-spin" style={{animationDuration: '10s'}} />
-                        <div className="absolute inset-2 rounded-2xl border border-white/40 animate-spin" style={{animationDuration: '8s', animationDirection: 'reverse'}} />
                       </div>
                       
                       {/* Real-Time Metrics Dashboard */}
