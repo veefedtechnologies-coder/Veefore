@@ -734,7 +734,7 @@ export default function VeeGPT() {
             <div className="px-3 pb-4 space-y-2">
               <button
                 onClick={startNewChat}
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm bg-gray-100 text-gray-900 rounded-lg"
+                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "New chat" : ""}
               >
                 <Edit className="w-4 h-4 flex-shrink-0" />
@@ -748,6 +748,22 @@ export default function VeeGPT() {
               >
                 <Search className="w-4 h-4 flex-shrink-0" />
                 {!sidebarCollapsed && <span>Search chats</span>}
+              </button>
+              
+              <button 
+                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title={sidebarCollapsed ? "Content Assistant" : ""}
+              >
+                <Zap className="w-4 h-4 flex-shrink-0" />
+                {!sidebarCollapsed && <span>Content Assistant</span>}
+              </button>
+              
+              <button 
+                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title={sidebarCollapsed ? "Analytics" : ""}
+              >
+                <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                {!sidebarCollapsed && <span>Analytics</span>}
               </button>
             </div>
 
