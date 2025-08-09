@@ -451,25 +451,18 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* Input Area */}
-        <div className="p-6 bg-white border-t border-gray-100">
+        {/* Input Area - ChatGPT Style */}
+        <div className="p-6">
           <div className="max-w-4xl mx-auto">
             <div className="relative">
-              <div className="flex items-end space-x-4 bg-gray-50 rounded-2xl p-4 border border-gray-200 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-200">
+              <div className="flex items-end space-x-4">
                 <div className="flex items-center space-x-3">
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl"
+                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-2"
                   >
                     <Paperclip className="w-4 h-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl"
-                  >
-                    <Mic className="w-4 h-4" />
                   </Button>
                 </div>
                 
@@ -485,8 +478,8 @@ export default function VeeGPT() {
                       textarea.style.height = Math.max(24, textarea.scrollHeight) + 'px'
                     }}
                     onKeyDown={handleKeyPress}
-                    placeholder="Type your message to VeeGPT..."
-                    className="w-full px-0 py-0 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+                    placeholder="Message VeeGPT"
+                    className="w-full px-0 py-2 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500 text-base"
                     style={{ 
                       height: '24px',
                       maxHeight: '120px',
@@ -499,9 +492,9 @@ export default function VeeGPT() {
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                  className={`px-3 py-3 rounded-xl transition-all duration-200 ${
+                  className={`p-2 rounded-lg transition-all duration-200 ${
                     inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-sm hover:shadow-md'
+                      ? 'bg-gray-900 hover:bg-gray-800 text-white'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -511,20 +504,20 @@ export default function VeeGPT() {
                     <Send className="w-4 h-4" />
                   )}
                 </Button>
+
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-2"
+                >
+                  <Mic className="w-4 h-4" />
+                </Button>
               </div>
               
-              {/* Quick Actions */}
-              <div className="flex items-center justify-between mt-3 px-2">
-                <div className="flex items-center space-x-2">
-                  <button className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-                    ✨ Use AI for content
-                  </button>
-                  <button className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-                    📊 Generate insights
-                  </button>
-                </div>
+              {/* Footer text like ChatGPT */}
+              <div className="text-center mt-4">
                 <div className="text-xs text-gray-400">
-                  Press Enter to send, Shift+Enter for new line
+                  VeeGPT can make mistakes. Check important info.
                 </div>
               </div>
             </div>
