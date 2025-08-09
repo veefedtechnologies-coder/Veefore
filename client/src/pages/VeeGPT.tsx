@@ -520,47 +520,29 @@ export default function VeeGPT() {
       case 'complete':
         console.log('VeeGPT: Streaming message completed')
         console.log('VeeGPT: Resetting generation state to FALSE')
-        // Update final content in query cache
-        if (data.messageId && data.finalContent && currentConversationId) {
-          queryClient.setQueryData(
-            ['/api/chat/conversations', currentConversationId, 'messages'],
-            (oldData: any) => {
-              if (!oldData) return oldData
-              return oldData.map((message: any) => {
-                if (message.id === data.messageId) {
-                  return { ...message, content: data.finalContent }
-                }
-                return message
-              })
-            }
-          )
-          // Clear streaming content as message is now final
+        
+        // Generation completed - reset generation state
+        setIsGenerating(false)
+        console.log('VeeGPT: REF SET TO FALSE in complete event')
+        isGeneratingRef.current = false
+        
+        // Clear streaming content as message is now final
+        if (data.messageId) {
           setStreamingContent(prev => {
             const updated = { ...prev }
             delete updated[data.messageId]
             return updated
           })
         }
-        // Generation completed - reset generation state
-        setIsGenerating(false)
-        // Delay ref reset to allow final render
-        setTimeout(() => {
-          console.log('VeeGPT: REF SET TO FALSE in complete event timeout')
-          isGeneratingRef.current = false
-        }, 100)
-        if (data.messageId) {
-          setStreamingContent(prev => {
-            const newContent = { ...prev }
-            delete newContent[data.messageId]
-            return newContent
-          })
-        }
+        
+        // Invalidate queries to get final message state from backend
         if (currentConversationId) {
           queryClient.invalidateQueries({ 
             queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
           })
           queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
         }
+        
         // Resolve the streaming Promise
         if (streamResolveRef.current) {
           streamResolveRef.current({ success: true })
@@ -604,19 +586,24 @@ export default function VeeGPT() {
   const handleStopGeneration = async () => {
     console.log('VeeGPT: Stopping streaming generation')
     
-    // Stop streaming immediately
+    // Stop streaming state immediately for UI feedback
     setIsGenerating(false)
     console.log('VeeGPT: REF SET TO FALSE in handleStopGeneration')
     isGeneratingRef.current = false
     
-    // Clear any streaming content
-    setStreamingContent({})
+    // DON'T clear streaming content yet - let it persist until backend confirms stop
+    // This prevents the text from disappearing while waiting for stop confirmation
     
     // Call backend to stop generation
     if (currentConversationId) {
       console.log('VeeGPT: Stopping generation for conversation:', currentConversationId)
       try {
         await stopGenerationMutation.mutateAsync(currentConversationId)
+        // After successful stop, invalidate queries to get the final state
+        queryClient.invalidateQueries({ 
+          queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
+        })
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       } catch (error) {
         console.error('VeeGPT: Error stopping generation:', error)
       }
