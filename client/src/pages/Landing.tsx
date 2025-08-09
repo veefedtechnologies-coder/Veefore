@@ -22,18 +22,43 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [previewMode, setPreviewMode] = useState<'overview' | 'detailed'>('overview')
   const [isInteractionActive, setIsInteractionActive] = useState(false)
+  const [liveStats, setLiveStats] = useState({
+    conversations: 2847,
+    contentGenerated: 1203,
+    analyticsViews: 856,
+    activeUsers: 342
+  })
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [selectedFeature, setSelectedFeature] = useState<number | null>(null)
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setIsVisible(true)
     
     // Auto-cycle through features
-    const interval = setInterval(() => {
+    const featureInterval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 8)
     }, 4000)
+
+    // Simulate live data updates
+    const statsInterval = setInterval(() => {
+      setLiveStats(prev => ({
+        conversations: prev.conversations + Math.floor(Math.random() * 5),
+        contentGenerated: prev.contentGenerated + Math.floor(Math.random() * 3),
+        analyticsViews: prev.analyticsViews + Math.floor(Math.random() * 4),
+        activeUsers: Math.max(200, prev.activeUsers + Math.floor(Math.random() * 4) - 2)
+      }))
+    }, 3000)
+
+    // Update current time
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
     
     return () => {
-      clearInterval(interval)
+      clearInterval(featureInterval)
+      clearInterval(statsInterval)
+      clearInterval(timeInterval)
     }
   }, [])
 
@@ -810,57 +835,206 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   </div>
                 </div>
                 
-                {/* Interactive Platform Interface */}
-                <div className="bg-gradient-to-br from-gray-50 to-white p-12 rounded-b-[2.5rem] min-h-[500px]">
-                  {/* Feature Grid - Interactive */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Ultra-Realistic Platform Interface */}
+                <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-b-[2.5rem] min-h-[600px]">
+                  {/* Real-time Platform Header */}
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
+                        <Zap className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-gray-900 font-bold text-lg">VeeFore Dashboard</h3>
+                        <p className="text-gray-500 text-sm">Live Platform Preview • {currentTime.toLocaleTimeString()}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-green-600 text-sm font-medium">Online</span>
+                    </div>
+                  </div>
+
+                  {/* Detailed Feature Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {platformFeatures.slice(0, 4).map((feature, index) => (
                       <div 
                         key={feature.id}
-                        onClick={() => handleNavigation(feature.link.substring(1))}
-                        className="group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-700 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
-                        style={{
-                          animationDelay: `${index * 200}ms`
+                        onClick={() => {
+                          setSelectedFeature(index)
+                          handleNavigation(feature.link.substring(1))
                         }}
+                        onMouseEnter={() => setSelectedFeature(index)}
+                        onMouseLeave={() => setSelectedFeature(null)}
+                        className={`group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl border transition-all duration-500 cursor-pointer transform hover:-translate-y-1 ${
+                          selectedFeature === index 
+                            ? 'border-violet-200 shadow-violet-100/50 scale-105' 
+                            : 'border-gray-100 hover:border-gray-200'
+                        }`}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
-                        {/* Interactive Hover Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 via-blue-600/5 to-emerald-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
-                          <div className="bg-white/90 backdrop-blur-xl rounded-2xl px-6 py-3 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-8 h-8 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
-                                <ArrowRight className="w-4 h-4 text-white" />
-                              </div>
-                              <span className="text-gray-800 font-semibold text-sm">Try {feature.title.split(' ')[0]}</span>
-                            </div>
+                        {/* Feature Status Bar */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                            {feature.icon}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                            <span className="text-xs text-gray-500">Live</span>
                           </div>
                         </div>
                         
-                        <div className="relative">
-                          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
-                            <div className="text-white text-xl">
-                              {feature.icon}
-                            </div>
+                        <h3 className="text-gray-900 font-bold text-base mb-2">{feature.title.split(' ')[0]}</h3>
+                        <p className="text-gray-600 text-xs mb-4 leading-relaxed">{feature.subtitle}</p>
+                        
+                        {/* Real-time Activity Indicator */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-500">Activity</span>
+                            <span className="text-gray-700 font-medium">
+                              {index === 0 && `${Math.floor(liveStats.conversations / 100)}% usage`}
+                              {index === 1 && `${Math.floor(liveStats.contentGenerated / 50)} videos`}
+                              {index === 2 && `${Math.floor(liveStats.analyticsViews / 40)} views`}
+                              {index === 3 && `${Math.floor(liveStats.activeUsers / 20)} posts`}
+                            </span>
                           </div>
-                          
-                          <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title.split(' ')[0]}</h3>
-                          <p className="text-gray-600 text-sm leading-relaxed">{feature.subtitle}</p>
-                          
-                          <div className="mt-6 flex items-center justify-between">
-                            <div className="flex items-center text-gray-500 text-xs group-hover:text-gray-700 transition-colors">
-                              <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-                              Ready to use
-                            </div>
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <ExternalLink className="w-4 h-4 text-gray-400" />
-                            </div>
+                          <div className="w-full bg-gray-100 rounded-full h-1.5">
+                            <div 
+                              className={`h-1.5 rounded-full bg-gradient-to-r ${feature.color} transition-all duration-1000`}
+                              style={{ 
+                                width: `${45 + (index * 15) + Math.sin(Date.now() / 2000 + index) * 10}%` 
+                              }}
+                            />
                           </div>
                         </div>
+
+                        {/* Interactive Action Button */}
+                        <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <button className={`w-full py-2 px-4 rounded-xl bg-gradient-to-r ${feature.color} text-white text-xs font-medium hover:shadow-lg transition-all duration-300`}>
+                            Launch {feature.title.split(' ')[0]}
+                          </button>
+                        </div>
                         
-                        <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                        {/* Selected Feature Highlight */}
+                        {selectedFeature === index && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-violet-600/5 via-blue-600/5 to-emerald-600/5 rounded-2xl" />
+                        )}
                       </div>
                     ))}
+                  </div>
+
+                  {/* Live Analytics Dashboard */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-gray-900 font-bold text-base">Real-Time Platform Analytics</h4>
+                      <div className="flex items-center space-x-2">
+                        <Activity className="w-4 h-4 text-green-500" />
+                        <span className="text-green-600 text-sm font-medium">Live</span>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      {[
+                        { 
+                          label: 'AI Conversations', 
+                          value: liveStats.conversations.toLocaleString(), 
+                          trend: '+12%', 
+                          color: 'text-violet-600',
+                          bgColor: 'bg-violet-50'
+                        },
+                        { 
+                          label: 'Content Generated', 
+                          value: liveStats.contentGenerated.toLocaleString(), 
+                          trend: '+24%', 
+                          color: 'text-blue-600',
+                          bgColor: 'bg-blue-50'
+                        },
+                        { 
+                          label: 'Analytics Views', 
+                          value: liveStats.analyticsViews.toLocaleString(), 
+                          trend: '+8%', 
+                          color: 'text-emerald-600',
+                          bgColor: 'bg-emerald-50'
+                        },
+                        { 
+                          label: 'Active Users', 
+                          value: liveStats.activeUsers.toLocaleString(), 
+                          trend: '+15%', 
+                          color: 'text-pink-600',
+                          bgColor: 'bg-pink-50'
+                        }
+                      ].map((stat, index) => (
+                        <div key={index} className={`${stat.bgColor} rounded-xl p-4 border border-white/50`}>
+                          <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                          <div className="text-xs text-gray-600 mb-2">{stat.label}</div>
+                          <div className={`text-xs font-semibold ${stat.color} flex items-center space-x-1`}>
+                            <TrendingUp className="w-3 h-3" />
+                            <span>{stat.trend}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Live Activity Feed */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-gray-900 font-bold text-base">Recent Platform Activity</h4>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-gray-500 text-xs">Live updates</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {[
+                        {
+                          user: "Sarah Chen",
+                          action: "Generated AI video using Cosmos Studio",
+                          time: "2 minutes ago",
+                          type: "video",
+                          color: "text-blue-600"
+                        },
+                        {
+                          user: "Marketing Team",
+                          action: "Analyzed performance metrics in Analytics Pro",
+                          time: "5 minutes ago",
+                          type: "analytics",
+                          color: "text-emerald-600"
+                        },
+                        {
+                          user: "Alex Rodriguez",
+                          action: "Started conversation with VeeGPT",
+                          time: "8 minutes ago",
+                          type: "chat",
+                          color: "text-violet-600"
+                        },
+                        {
+                          user: "Content Creator",
+                          action: "Published social media campaign",
+                          time: "12 minutes ago",
+                          type: "content",
+                          color: "text-pink-600"
+                        }
+                      ].map((activity, index) => (
+                        <div key={index} className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-white/60 transition-colors">
+                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-r ${
+                            activity.type === 'video' ? 'from-blue-500 to-cyan-500' :
+                            activity.type === 'analytics' ? 'from-emerald-500 to-teal-600' :
+                            activity.type === 'chat' ? 'from-violet-500 to-purple-600' :
+                            'from-pink-500 to-rose-500'
+                          } flex items-center justify-center text-white`}>
+                            {activity.type === 'video' && <Video className="w-4 h-4" />}
+                            {activity.type === 'analytics' && <BarChart3 className="w-4 h-4" />}
+                            {activity.type === 'chat' && <MessageSquare className="w-4 h-4" />}
+                            {activity.type === 'content' && <Palette className="w-4 h-4" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-gray-900 text-sm font-medium">{activity.user}</p>
+                            <p className="text-gray-600 text-xs">{activity.action}</p>
+                          </div>
+                          <div className="text-gray-500 text-xs">{activity.time}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   
                   {/* Advanced Interactive Demo Controls */}
