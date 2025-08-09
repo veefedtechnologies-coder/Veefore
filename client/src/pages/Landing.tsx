@@ -1377,10 +1377,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             {/* Primary Feature - Large Hero Card */}
             <div className="col-span-12 lg:col-span-8 group">
-              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/50 shadow-2xl">
+              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-white via-blue-50 to-indigo-50 border border-gray-200/50 shadow-2xl">
                 {/* Animated Background */}
                 <div className="absolute inset-0">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-gray-50/30 to-indigo-50/50 animate-gradient-shift" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-blue-50/30 to-indigo-50/50 animate-gradient-shift" />
                   <div className="absolute inset-0 opacity-30">
                     {[...Array(20)].map((_, i) => (
                       <div
