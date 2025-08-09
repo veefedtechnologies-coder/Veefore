@@ -970,24 +970,135 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   </div>
                 </div>
 
-                {/* Enhanced Floating Preview */}
+                {/* Revolutionary Interactive Preview */}
                 {hoveredFeature === index && (
-                  <div className="absolute -top-6 -right-6 w-64 h-40 bg-gray-900/95 backdrop-blur-2xl border border-white/20 rounded-3xl overflow-hidden shadow-2xl z-20 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="p-6">
-                      <div className="flex items-center mb-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                          <Zap className="w-4 h-4 text-white" />
+                  <div className="absolute -top-8 -right-8 w-80 h-64 z-30 animate-in fade-in slide-in-from-top-6 duration-700">
+                    {/* Main Preview Container */}
+                    <div className="relative w-full h-full bg-gray-950/95 backdrop-blur-3xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+                      {/* Dynamic Header with Feature Color */}
+                      <div className={`relative h-16 bg-gradient-to-r ${feature.color} overflow-hidden`}>
+                        <div className="absolute inset-0 bg-black/20" />
+                        
+                        {/* Animated Particles */}
+                        <div className="absolute inset-0">
+                          {[...Array(6)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="absolute w-1 h-1 bg-white/60 rounded-full animate-pulse"
+                              style={{
+                                left: `${20 + i * 15}%`,
+                                top: `${30 + (i % 2) * 40}%`,
+                                animationDelay: `${i * 0.2}s`,
+                                animationDuration: '2s'
+                              }}
+                            />
+                          ))}
                         </div>
-                        <div className="text-white text-sm font-bold">Quick Preview</div>
-                      </div>
-                      <div className="text-gray-300 text-xs leading-relaxed">
-                        {feature.features.slice(0, 4).map((feat, idx) => (
-                          <div key={idx} className="flex items-center mb-1">
-                            <div className="w-1.5 h-1.5 bg-violet-400 rounded-full mr-2" />
-                            {feat}
+                        
+                        {/* Header Content */}
+                        <div className="relative flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center">
+                              <Sparkles className="w-4 h-4 text-white" />
+                            </div>
+                            <div className="text-white font-bold text-sm">Live Preview</div>
                           </div>
-                        ))}
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-white/60 rounded-full" />
+                            <div className="w-2 h-2 bg-white/40 rounded-full" />
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Interactive Content Area */}
+                      <div className="p-6 space-y-4">
+                        {/* Feature Title with Animation */}
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg`}>
+                            <div className="text-white text-xs">
+                              {feature.icon}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-white font-bold text-sm">{feature.title.split(' - ')[0]}</div>
+                            <div className="text-gray-400 text-xs uppercase tracking-wider">{feature.subtitle}</div>
+                          </div>
+                        </div>
+
+                        {/* Feature Showcase */}
+                        <div className="space-y-3">
+                          {feature.features.slice(0, 3).map((feat, idx) => (
+                            <div 
+                              key={idx} 
+                              className="flex items-center space-x-3 group/item hover:bg-white/5 rounded-xl p-2 transition-all duration-300"
+                              style={{ animationDelay: `${idx * 0.1}s` }}
+                            >
+                              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-600/20 border border-violet-400/30 flex items-center justify-center group-hover/item:scale-110 transition-transform">
+                                <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-gray-300 text-xs font-medium">{feat}</div>
+                                <div className="w-full bg-gray-800 rounded-full h-1 mt-1">
+                                  <div 
+                                    className={`h-1 bg-gradient-to-r ${feature.color} rounded-full animate-pulse`}
+                                    style={{ 
+                                      width: `${60 + idx * 15}%`,
+                                      animationDelay: `${idx * 0.2}s`
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="text-gray-500 text-xs">●</div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Action Bar */}
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                          <div className="flex space-x-2">
+                            {[...Array(3)].map((_, i) => (
+                              <div 
+                                key={i}
+                                className="w-8 h-6 bg-gray-800 rounded border border-gray-700 flex items-center justify-center"
+                              >
+                                <div className="w-3 h-1 bg-gray-600 rounded" />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-gray-400 text-xs">Try Now</div>
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+                              <ArrowRight className="w-3 h-3 text-white" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Glow Effect */}
+                      <div className={`absolute inset-0 bg-gradient-to-t ${feature.color} opacity-5 pointer-events-none`} />
+                      
+                      {/* Border Glow */}
+                      <div className={`absolute inset-0 rounded-3xl border border-transparent bg-gradient-to-r ${feature.color} opacity-20 pointer-events-none`} style={{
+                        mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                        maskComposite: 'subtract'
+                      }} />
+                    </div>
+
+                    {/* Floating Ambient Elements */}
+                    <div className="absolute -inset-4 pointer-events-none">
+                      {[...Array(8)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`absolute w-2 h-2 bg-gradient-to-r ${feature.color} rounded-full blur-sm animate-pulse`}
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${i * 0.3}s`,
+                            animationDuration: `${2 + Math.random() * 2}s`
+                          }}
+                        />
+                      ))}
                     </div>
                   </div>
                 )}
