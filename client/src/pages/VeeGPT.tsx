@@ -98,11 +98,48 @@ export default function VeeGPT() {
       })
       return response
     },
-    onSuccess: (data) => {
-      setCurrentConversationId(data.conversation.id)
+    onMutate: async (content) => {
+      // Show the user message immediately by transitioning to chat view
       setHasSentFirstMessage(true)
+      
+      // Create a temporary conversation ID for optimistic updates
+      const tempConversationId = Date.now()
+      setCurrentConversationId(tempConversationId)
+      
+      // Create optimistic user message
+      const optimisticUserMessage = {
+        id: Date.now(),
+        conversationId: tempConversationId,
+        role: 'user',
+        content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      // Set the optimistic message data
+      queryClient.setQueryData(['/api/chat/conversations', tempConversationId, 'messages'], [optimisticUserMessage])
+      
+      return { tempConversationId }
+    },
+    onSuccess: (data, content, context) => {
+      // Replace temporary conversation ID with real one
+      setCurrentConversationId(data.conversation.id)
+      
+      // Clear the temporary data and let the real data load
+      if (context?.tempConversationId) {
+        queryClient.removeQueries({ queryKey: ['/api/chat/conversations', context.tempConversationId, 'messages'] })
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.conversation.id, 'messages'] })
+    },
+    onError: (err, content, context) => {
+      // Revert optimistic updates on error
+      setHasSentFirstMessage(false)
+      setCurrentConversationId(null)
+      if (context?.tempConversationId) {
+        queryClient.removeQueries({ queryKey: ['/api/chat/conversations', context.tempConversationId, 'messages'] })
+      }
     }
   })
 
@@ -115,8 +152,37 @@ export default function VeeGPT() {
       })
       return response
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] })
+    onMutate: async ({ conversationId, content }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ['/api/chat/conversations', conversationId, 'messages'] })
+      
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(['/api/chat/conversations', conversationId, 'messages'])
+      
+      // Optimistically update to show the user message immediately
+      const optimisticUserMessage = {
+        id: Date.now(), // temporary ID
+        conversationId,
+        role: 'user',
+        content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      queryClient.setQueryData(['/api/chat/conversations', conversationId, 'messages'], (old: any[]) => 
+        old ? [...old, optimisticUserMessage] : [optimisticUserMessage]
+      )
+      
+      // Return a context object with the snapshotted value
+      return { previousMessages }
+    },
+    onError: (err, { conversationId }, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(['/api/chat/conversations', conversationId, 'messages'], context?.previousMessages)
+    },
+    onSuccess: (data, { conversationId }) => {
+      // Replace optimistic update with real data
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', conversationId, 'messages'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
     }
   })
@@ -636,15 +702,19 @@ export default function VeeGPT() {
             ))}
             {(createConversationMutation.isPending || sendMessageMutation.isPending) && (
               <div className="flex space-x-4 justify-start">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500 text-white">
-                  <Bot className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-transparent">
+                  <img 
+                    src={veeforeLogo} 
+                    alt="VeeFore AI" 
+                    className="w-6 h-6 object-contain"
+                  />
                 </div>
                 <div className="flex-1">
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
                     <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
