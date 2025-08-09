@@ -62,11 +62,14 @@ const formatLastInteractionDate = (dateString: string | Date | null) => {
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
+  const diffMinutes = diffMs / (1000 * 60)
   const diffHours = diffMs / (1000 * 60 * 60)
   const diffDays = diffMs / (1000 * 60 * 60 * 24)
   
-  if (diffHours < 1) {
+  if (diffMinutes < 1) {
     return 'Just now'
+  } else if (diffMinutes < 60) {
+    return `${Math.floor(diffMinutes)}m ago`
   } else if (diffHours < 24) {
     return `${Math.floor(diffHours)}h ago`
   } else if (diffDays < 7) {
