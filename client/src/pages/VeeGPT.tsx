@@ -316,11 +316,15 @@ export default function VeeGPT() {
         setIsGenerating(true)
         // Update streaming content for real-time display - accumulate chunks
         if (data.messageId && data.content) {
-          console.log('VeeGPT: Accumulating chunk for message', data.messageId, ':', data.content)
-          setStreamingContent(prev => ({
-            ...prev,
-            [data.messageId]: (prev[data.messageId] || '') + data.content
-          }))
+          setStreamingContent(prev => {
+            const currentContent = prev[data.messageId] || ''
+            const newContent = currentContent + data.content
+            console.log('VeeGPT: Accumulating chunk for message', data.messageId, 'from:', `"${currentContent}"`, 'adding:', `"${data.content}"`, 'result:', `"${newContent}"`)
+            return {
+              ...prev,
+              [data.messageId]: newContent
+            }
+          })
         }
         break
 
