@@ -13545,11 +13545,11 @@ Create a detailed growth strategy in JSON format:
       let aiMessage: any = null;
 
       try {
-        // Create placeholder AI message
+        // Create placeholder AI message with initial content
         aiMessage = await storage.createChatMessage({
           conversationId: convId,
           role: 'assistant',
-          content: '',
+          content: ' ',
           tokensUsed: 0
         });
 
@@ -13577,10 +13577,11 @@ Create a detailed growth strategy in JSON format:
         }
 
         // Update the AI message with complete content
-        if (aiMessage && aiResponseContent) {
+        if (aiMessage) {
+          const finalContent = aiResponseContent || 'I apologize, but I was unable to generate a response.';
           await storage.updateChatMessage(aiMessage.id, {
-            content: aiResponseContent,
-            tokensUsed: Math.ceil(aiResponseContent.length / 4)
+            content: finalContent,
+            tokensUsed: Math.ceil(finalContent.length / 4)
           });
         }
 
