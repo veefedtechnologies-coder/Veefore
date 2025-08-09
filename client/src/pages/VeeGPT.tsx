@@ -32,50 +32,7 @@ import { apiRequest } from '@/lib/queryClient'
 import { getAuth } from 'firebase/auth'
 // import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png' // Commented out to fix build error
 
-// TypewriterText component for AI responses
-function TypewriterText({ text, speed = 30, onComplete }: { text: string, speed?: number, onComplete?: () => void }) {
-  const [displayedText, setDisplayedText] = useState('')
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isCompleted, setIsCompleted] = useState(false)
-  const [initialText] = useState(text) // Store initial text to prevent re-animation
-
-  useEffect(() => {
-    // Only animate if not completed and text matches initial text
-    if (!isCompleted && text === initialText && currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex])
-        setCurrentIndex(currentIndex + 1)
-      }, speed)
-      return () => clearTimeout(timer)
-    } else if (!isCompleted && currentIndex === text.length && text === initialText) {
-      setIsCompleted(true)
-      if (onComplete) {
-        onComplete()
-      }
-    }
-  }, [currentIndex, text, speed, onComplete, isCompleted, initialText])
-
-  return (
-    <div 
-      className="leading-relaxed"
-      style={{
-        wordWrap: 'break-word',
-        wordBreak: 'break-all',
-        overflowWrap: 'anywhere',
-        whiteSpace: 'pre-wrap',
-        maxWidth: '100%',
-        width: '100%',
-        hyphens: 'auto',
-        lineBreak: 'anywhere'
-      }}
-    >
-      {isCompleted ? text : displayedText}
-      {!isCompleted && currentIndex < text.length && (
-        <span className="animate-pulse">|</span>
-      )}
-    </div>
-  )
-}
+// Real-time streaming - no animation, chunks appear immediately as they arrive
 
 type ChatConversation = {
   id: number
@@ -105,7 +62,7 @@ export default function VeeGPT() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
-  const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
+  // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
@@ -359,17 +316,34 @@ export default function VeeGPT() {
       case 'complete':
         console.log('VeeGPT: Streaming message completed')
         console.log('VeeGPT: Resetting generation state to FALSE')
+        // Update final content in query cache
+        if (data.messageId && data.finalContent && currentConversationId) {
+          queryClient.setQueryData(
+            ['/api/chat/conversations', currentConversationId, 'messages'],
+            (oldData: any) => {
+              if (!oldData) return oldData
+              return oldData.map((message: any) => {
+                if (message.id === data.messageId) {
+                  return { ...message, content: data.finalContent }
+                }
+                return message
+              })
+            }
+          )
+          // Clear streaming content as message is now final
+          setStreamingContent(prev => {
+            const updated = { ...prev }
+            delete updated[data.messageId]
+            return updated
+          })
+        }
         // Generation completed - reset generation state
         setIsGenerating(false)
-        // Trigger a final re-render to show stop button during completion
-        setRenderTrigger(prev => prev + 1)
-        // Delay ref reset to allow final render with stop button visible
+        // Delay ref reset to allow final render
         setTimeout(() => {
           console.log('VeeGPT: REF SET TO FALSE in complete event timeout')
           isGeneratingRef.current = false
-          setRenderTrigger(prev => prev + 1) // Trigger final cleanup render
         }, 100)
-        // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
             const newContent = { ...prev }
@@ -403,28 +377,17 @@ export default function VeeGPT() {
     if (!currentConversationId) return
 
     // Update streaming content state for real-time display
-    setStreamingContent(prev => ({
-      ...prev,
-      [messageId]: (prev[messageId] || '') + newChunk
-    }))
-
-    // Also update query cache
-    queryClient.setQueryData(
-      ['/api/chat/conversations', currentConversationId, 'messages'],
-      (oldData: any) => {
-        if (!oldData) return oldData
-
-        return oldData.map((message: any) => {
-          if (message.id === messageId) {
-            return {
-              ...message,
-              content: (message.content || '') + newChunk
-            }
-          }
-          return message
-        })
+    setStreamingContent(prev => {
+      const updated = {
+        ...prev,
+        [messageId]: (prev[messageId] || '') + newChunk
       }
-    )
+      console.log('VeeGPT: Updated streaming content for message', messageId, ':', updated[messageId])
+      return updated
+    })
+
+    // Note: We don't update query cache during streaming to avoid conflicts
+    // Final content is updated when streaming completes
   }
 
   // Send message mutation with streaming
@@ -547,19 +510,7 @@ export default function VeeGPT() {
   // Track the previous message count to detect truly new messages
   const [previousMessageCount, setPreviousMessageCount] = useState(0)
   
-  // Track new AI messages for typewriter effect (only for truly new messages)
-  useEffect(() => {
-    if (messages.length > previousMessageCount) {
-      // Only animate if this is a new message (not loaded from database)
-      const newMessages = messages.slice(previousMessageCount)
-      const newAIMessage = newMessages.find(msg => msg.role === 'assistant')
-      
-      if (newAIMessage && !typewriterMessageIds.has(newAIMessage.id)) {
-        setTypewriterMessageIds(prev => new Set([...prev, newAIMessage.id]))
-      }
-    }
-    setPreviousMessageCount(messages.length)
-  }, [messages, typewriterMessageIds, previousMessageCount])
+  // No typewriter animation - streaming content updates in real-time
 
   // Check if we have any conversations to determine initial state
   useEffect(() => {
@@ -976,20 +927,7 @@ export default function VeeGPT() {
                     overflowWrap: 'break-word',
                     maxWidth: '100%'
                   }}>
-                    {message.role === 'assistant' && typewriterMessageIds.has(message.id) ? (
-                      <TypewriterText 
-                        text={message.content} 
-                        speed={25}
-                        onComplete={() => {
-                          // Remove from typewriter set when animation completes
-                          setTypewriterMessageIds(prev => {
-                            const newSet = new Set(prev)
-                            newSet.delete(message.id)
-                            return newSet
-                          })
-                        }}
-                      />
-                    ) : message.role === 'assistant' ? (
+                    {message.role === 'assistant' ? (
                       <div 
                         className="leading-relaxed"
                         style={{
@@ -1004,7 +942,7 @@ export default function VeeGPT() {
                         }}
                       >
                         {streamingContent[message.id] || message.content}
-                        {streamingContent[message.id] && isGenerating && (
+                        {isGenerating && streamingContent[message.id] && (
                           <span className="animate-pulse text-gray-400">|</span>
                         )}
                       </div>
@@ -1026,8 +964,8 @@ export default function VeeGPT() {
                       </div>
                     )}
                   </div>
-                  {/* Hide timestamp during typewriter animation for AI messages */}
-                  {!(message.role === 'assistant' && typewriterMessageIds.has(message.id)) && (
+                  {/* Show timestamp for all messages */}
+                  {(
                     <div className={`mt-2 text-xs text-gray-500 ${
                       message.role === 'user' ? 'text-right' : 'text-left'
                     }`}>
