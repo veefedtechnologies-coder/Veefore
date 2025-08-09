@@ -8,6 +8,10 @@ import {
   ShoppingCart, CreditCard, ExternalLink, Github, Twitter, MousePointer2,
   Sparkle, Triangle, Send
 } from 'lucide-react'
+import { 
+  SiInstagram, SiFacebook, SiX, SiLinkedin, SiTiktok, SiYoutube,
+  SiPinterest, SiSnapchat, SiReddit, SiDiscord, SiTelegram, SiWhatsapp
+} from 'react-icons/si'
 import { Button } from '@/components/ui/button'
 
 // Import generated interface images
@@ -2796,18 +2800,18 @@ const Landing = ({ onNavigate }: LandingProps) => {
           <div className="mb-32">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
               {[
-                { name: "Instagram", users: "2B+", gradient: "from-pink-500 to-rose-500", delay: "0s" },
-                { name: "Facebook", users: "3B+", gradient: "from-blue-500 to-indigo-500", delay: "0.2s" },
-                { name: "Twitter/X", users: "500M+", gradient: "from-gray-700 to-gray-900", delay: "0.4s" },
-                { name: "LinkedIn", users: "900M+", gradient: "from-blue-600 to-blue-700", delay: "0.6s" },
-                { name: "TikTok", users: "1B+", gradient: "from-gray-800 to-black", delay: "0.8s" },
-                { name: "YouTube", users: "2.7B+", gradient: "from-red-500 to-red-600", delay: "1s" },
-                { name: "Pinterest", users: "450M+", gradient: "from-red-400 to-pink-500", delay: "1.2s" },
-                { name: "Snapchat", users: "375M+", gradient: "from-yellow-400 to-yellow-500", delay: "1.4s" },
-                { name: "Reddit", users: "430M+", gradient: "from-orange-500 to-red-500", delay: "1.6s" },
-                { name: "Discord", users: "150M+", gradient: "from-indigo-500 to-purple-600", delay: "1.8s" },
-                { name: "Telegram", users: "700M+", gradient: "from-blue-400 to-cyan-500", delay: "2s" },
-                { name: "WhatsApp", users: "2.8B+", gradient: "from-green-400 to-emerald-500", delay: "2.2s" }
+                { name: "Instagram", users: "2B+", gradient: "from-pink-500 to-rose-500", Icon: SiInstagram, delay: "0s" },
+                { name: "Facebook", users: "3B+", gradient: "from-blue-500 to-indigo-500", Icon: SiFacebook, delay: "0.2s" },
+                { name: "Twitter/X", users: "500M+", gradient: "from-gray-700 to-gray-900", Icon: SiX, delay: "0.4s" },
+                { name: "LinkedIn", users: "900M+", gradient: "from-blue-600 to-blue-700", Icon: SiLinkedin, delay: "0.6s" },
+                { name: "TikTok", users: "1B+", gradient: "from-gray-800 to-black", Icon: SiTiktok, delay: "0.8s" },
+                { name: "YouTube", users: "2.7B+", gradient: "from-red-500 to-red-600", Icon: SiYoutube, delay: "1s" },
+                { name: "Pinterest", users: "450M+", gradient: "from-red-400 to-pink-500", Icon: SiPinterest, delay: "1.2s" },
+                { name: "Snapchat", users: "375M+", gradient: "from-yellow-400 to-yellow-500", Icon: SiSnapchat, delay: "1.4s" },
+                { name: "Reddit", users: "430M+", gradient: "from-orange-500 to-red-500", Icon: SiReddit, delay: "1.6s" },
+                { name: "Discord", users: "150M+", gradient: "from-indigo-500 to-purple-600", Icon: SiDiscord, delay: "1.8s" },
+                { name: "Telegram", users: "700M+", gradient: "from-blue-400 to-cyan-500", Icon: SiTelegram, delay: "2s" },
+                { name: "WhatsApp", users: "2.8B+", gradient: "from-green-400 to-emerald-500", Icon: SiWhatsapp, delay: "2.2s" }
               ].map((platform, index) => (
                 <div key={index} className="group relative">
                   {/* Card Glass Morphism Background */}
@@ -2822,8 +2826,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   
                   {/* Card Content */}
                   <div className="relative p-8 text-center">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${platform.gradient} rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl transform transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 animate-icon-float-platform`} style={{animationDelay: platform.delay}}>
-                      <Globe className="w-8 h-8 text-white" />
+                    <div className={`w-16 h-16 bg-gradient-to-r ${platform.gradient} rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl transform transition-all duration-500 group-hover:scale-125`}>
+                      <platform.Icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-xl transition-all duration-300">{platform.name}</h3>
                     <p className="text-sm text-gray-600 font-medium">{platform.users} users</p>
@@ -2904,7 +2908,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     
                     {/* Card Content */}
                     <div className="relative p-10 text-center">
-                      <div className={`w-20 h-20 bg-gradient-to-r ${tool.gradient} rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 animate-icon-float-business`} style={{animationDelay: tool.delay}}>
+                      <div className={`w-20 h-20 bg-gradient-to-r ${tool.gradient} rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-110`}>
                         <tool.icon className="w-10 h-10 text-white" />
                       </div>
                       <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-3xl transition-all duration-300">{tool.name}</h4>
