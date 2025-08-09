@@ -246,6 +246,26 @@ export default function VeeGPT() {
     }
   }, [currentConversationId, messages.length, optimisticMessages.length])
 
+  // Clear streaming content when real messages have loaded (prevents flashing during stop)
+  useEffect(() => {
+    if (currentConversationId && messages.length > 0 && Object.keys(streamingContent).length > 0) {
+      // Check if any streaming message ID now exists in real messages
+      const streamingMessageIds = Object.keys(streamingContent).map(id => parseInt(id))
+      const realMessageIds = messages.map(m => m.id)
+      
+      streamingMessageIds.forEach(streamingId => {
+        if (realMessageIds.includes(streamingId)) {
+          // This streaming message now exists as a real message, safe to clear streaming content
+          setStreamingContent(prev => {
+            const updated = { ...prev }
+            delete updated[streamingId]
+            return updated
+          })
+        }
+      })
+    }
+  }, [currentConversationId, messages, streamingContent])
+
   // Add temporary streaming message if we have streaming content for a message not in the list
   Object.keys(streamingContent).forEach(messageId => {
     const numericMessageId = parseInt(messageId)
@@ -526,14 +546,8 @@ export default function VeeGPT() {
         console.log('VeeGPT: REF SET TO FALSE in complete event')
         isGeneratingRef.current = false
         
-        // Clear streaming content as message is now final
-        if (data.messageId) {
-          setStreamingContent(prev => {
-            const updated = { ...prev }
-            delete updated[data.messageId]
-            return updated
-          })
-        }
+        // DON'T clear streaming content immediately - let queries load first
+        // This prevents the disappearing text issue during stop operations
         
         // Invalidate queries to get final message state from backend
         if (currentConversationId) {
@@ -541,6 +555,8 @@ export default function VeeGPT() {
             queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
           })
           queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+          
+          // Streaming content will be cleared by useEffect when real message loads
         }
         
         // Resolve the streaming Promise
