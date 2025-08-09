@@ -701,7 +701,8 @@ export default function VeeGPT() {
   const shouldShowSidebar = conversations.length > 0
   
   // Show welcome screen when starting a new chat or when no conversation is selected
-  if (!hasSentFirstMessage || (hasUserStartedNewChat && !currentConversationId)) {
+  // Always show sidebar if conversations exist, regardless of new chat state
+  if (!currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat)) {
     return (
       <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
         {/* Sidebar - show if conversations exist */}
