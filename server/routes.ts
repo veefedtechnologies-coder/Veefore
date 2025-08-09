@@ -13587,8 +13587,8 @@ Create a detailed growth strategy in JSON format:
           
           console.log(`[CHAT STREAM] [${timestamp}] Chunk sent, waiting 1 second...`);
           
-          // Add massive server-side delay between sends (1000ms = 1 second)
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Reduce server delay for testing (100ms)
+          await new Promise(resolve => setTimeout(resolve, 100));
           
           console.log(`[CHAT STREAM] [${Date.now()}] Wait complete, processing next chunk`);
         }

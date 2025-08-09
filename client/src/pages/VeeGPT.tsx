@@ -244,6 +244,7 @@ export default function VeeGPT() {
                 if (line.startsWith('data: ')) {
                   try {
                     const data = JSON.parse(line.slice(6))
+                    console.log('VeeGPT: Received stream event:', data)
                     handleStreamEvent(data)
                   } catch (e) {
                     console.log('VeeGPT: Parse error for line:', line)
@@ -275,7 +276,8 @@ export default function VeeGPT() {
   }
 
   const handleStreamEvent = (data: any) => {
-    console.log('VeeGPT: Stream event:', data)
+    console.log('VeeGPT: ====== STREAM EVENT RECEIVED ======', data)
+    console.log('VeeGPT: Event type:', data.type, 'Timestamp:', Date.now())
     console.log('VeeGPT: Generation state during stream event:', {
       isGenerating,
       isGeneratingRef: isGeneratingRef.current,
@@ -334,10 +336,12 @@ export default function VeeGPT() {
         break
 
       case 'chunk':
-        console.log('VeeGPT: Generation state during chunk:', {
+        console.log('VeeGPT: CHUNK RECEIVED:', {
+          messageId: data.messageId,
+          content: data.content,
+          timestamp: data.timestamp,
           isGenerating,
-          isGeneratingRef: isGeneratingRef.current,
-          eventType: 'chunk'
+          isGeneratingRef: isGeneratingRef.current
         })
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
@@ -346,12 +350,14 @@ export default function VeeGPT() {
           setStreamingContent(prev => {
             const currentContent = prev[data.messageId] || ''
             const newContent = currentContent + data.content
-            console.log('VeeGPT: Accumulating chunk for message', data.messageId, 'from:', `"${currentContent}"`, 'adding:', `"${data.content}"`, 'result:', `"${newContent}"`)
+            console.log('VeeGPT: STREAMING UPDATE - Message:', data.messageId, 'Current:', `"${currentContent}"`, 'Adding:', `"${data.content}"`, 'New Total:', `"${newContent}"`)
             return {
               ...prev,
               [data.messageId]: newContent
             }
           })
+        } else {
+          console.log('VeeGPT: CHUNK IGNORED - Missing messageId or content:', { messageId: data.messageId, content: data.content })
         }
         break
 
