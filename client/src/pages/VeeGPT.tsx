@@ -1487,7 +1487,7 @@ export default function VeeGPT() {
                         {streamingContent[message.id] !== undefined ? (
                           <span>
                             {streamingContent[message.id] || ''}
-                            {(isGenerating || streamingContent[message.id] !== undefined) && (
+                            {isGenerating && streamingContent[message.id] !== undefined && (
                               <span className="animate-pulse text-blue-500 ml-1">▋</span>
                             )}
                           </span>
