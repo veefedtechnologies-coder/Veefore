@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
+import { getAuth } from 'firebase/auth'
 import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
 
 // TypewriterText component for AI responses
@@ -193,25 +194,34 @@ export default function VeeGPT() {
 
   // Streaming helper functions
   const handleStreamingMessage = async (content: string, conversationId: number): Promise<any> => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       setIsGenerating(true)
       
-      // Get auth token
-      const token = localStorage.getItem('authToken')
-      if (!token) {
-        reject(new Error('No auth token'))
-        return
-      }
+      try {
+        // Use same auth approach as apiRequest
+        const auth = getAuth()
+        const user = auth.currentUser
+        
+        if (!user) {
+          throw new Error('Please sign in to continue')
+        }
 
-      // Use fetch for streaming response
-      fetch(`/api/chat/conversations/${conversationId}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ content })
-      }).then(response => {
+        const token = await user.getIdToken()
+        console.log('VeeGPT: Got auth token for streaming request')
+
+        const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ content })
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+
         if (!response.body) {
           throw new Error('No response body')
         }
@@ -235,6 +245,7 @@ export default function VeeGPT() {
                     const data = JSON.parse(line.slice(6))
                     handleStreamEvent(data)
                   } catch (e) {
+                    console.log('VeeGPT: Parse error for line:', line)
                     // Ignore parse errors for incomplete data
                   }
                 }
@@ -252,11 +263,11 @@ export default function VeeGPT() {
         readStream()
         setCurrentEventSource({ close: () => reader.cancel() })
 
-      }).catch(error => {
+      } catch (error) {
         console.error('VeeGPT: Fetch error:', error)
         setIsGenerating(false)
         reject(error)
-      })
+      }
     })
   }
 
