@@ -342,6 +342,68 @@ div[contenteditable="true"].transparent-input {
   animation: slow-pulse 8s ease-in-out infinite;
 }
 
+/* Missing morphing animations for hero orbs */
+@keyframes morph-1 {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  33% {
+    transform: scale(1.1) rotate(120deg);
+    opacity: 0.6;
+  }
+  66% {
+    transform: scale(0.9) rotate(240deg);
+    opacity: 0.9;
+  }
+}
+
+@keyframes morph-2 {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.7;
+  }
+  25% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(0.8) rotate(180deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(1.1) rotate(270deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes morph-3 {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.3) rotate(144deg);
+    opacity: 0.4;
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(0.7) rotate(288deg);
+    opacity: 0.8;
+  }
+}
+
+.animate-morph-1 {
+  animation: morph-1 20s ease-in-out infinite;
+}
+
+.animate-morph-2 {
+  animation: morph-2 25s ease-in-out infinite;
+}
+
+.animate-morph-3 {
+  animation: morph-3 18s ease-in-out infinite;
+}
+
 /* Chat message text wrapping */
 .chat-message-content {
   word-wrap: break-word !important;

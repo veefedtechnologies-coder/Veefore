@@ -753,9 +753,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
               {/* Main preview window */}
               <div 
                 className="relative mx-auto"
-                style={{
-                  transform: `rotateX(${scrollY * 0.005}deg)`
-                }}
               >
                 <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
                   {/* Browser-style header */}
@@ -779,10 +776,9 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       {platformFeatures.slice(0, 4).map((feature, index) => (
                         <div 
                           key={feature.id}
-                          className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-500 cursor-pointer"
+                          className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-500 cursor-pointer animate-slow-float"
                           style={{
-                            animationDelay: `${index * 0.1}s`,
-                            transform: `translateY(${scrollY * 0.1 * (index + 1)}px)`
+                            animationDelay: `${index * 2}s`
                           }}
                         >
                           <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
