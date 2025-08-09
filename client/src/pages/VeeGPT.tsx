@@ -359,7 +359,13 @@ export default function VeeGPT() {
         console.log('VeeGPT: Resetting generation state to FALSE')
         // Generation completed - reset generation state
         setIsGenerating(false)
-        isGeneratingRef.current = false
+        // Trigger a final re-render to show stop button during completion
+        setRenderTrigger(prev => prev + 1)
+        // Delay ref reset to allow final render with stop button visible
+        setTimeout(() => {
+          isGeneratingRef.current = false
+          setRenderTrigger(prev => prev + 1) // Trigger final cleanup render
+        }, 100)
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
