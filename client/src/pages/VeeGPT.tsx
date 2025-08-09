@@ -28,12 +28,15 @@ interface ConversationWithMessages extends ChatConversation {
 }
 
 export default function VeeGPT() {
+  console.log('VeeGPT component rendering')
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
+  
+  console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
 
   const quickPrompts = [
     { icon: Lightbulb, text: "Inspire me!" },

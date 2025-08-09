@@ -357,18 +357,20 @@ const AutomationRuleSchema = new mongoose.Schema({
 
 // VeeGPT Chat schemas  
 const ChatConversationSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
   userId: { type: String, required: true },
-  title: { type: String, required: true },
+  workspaceId: { type: String, required: true },
+  title: { type: String, required: true, default: "New chat" },
+  messageCount: { type: Number, default: 0 },
+  lastMessageAt: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
 const ChatMessageSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
   conversationId: { type: String, required: true },
-  content: { type: String, required: true },
   role: { type: String, required: true, enum: ['user', 'assistant'] },
+  content: { type: String, required: true },
+  tokensUsed: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -4535,9 +4537,12 @@ export class MongoStorage implements IStorage {
     const conversations = await ChatConversationModel.find({ userId })
       .sort({ updatedAt: -1 });
     return conversations.map(doc => ({
-      id: doc.id,
+      id: parseInt(doc._id.toString().slice(-8), 16), // Convert ObjectId to number
       userId: doc.userId,
+      workspaceId: doc.workspaceId,
       title: doc.title,
+      messageCount: doc.messageCount,
+      lastMessageAt: doc.lastMessageAt,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt
     }));
@@ -4552,9 +4557,12 @@ export class MongoStorage implements IStorage {
     });
     const saved = await doc.save();
     return {
-      id: saved.id,
+      id: parseInt(saved._id.toString().slice(-8), 16), // Convert ObjectId to number
       userId: saved.userId,
+      workspaceId: saved.workspaceId,
       title: saved.title,
+      messageCount: saved.messageCount,
+      lastMessageAt: saved.lastMessageAt,
       createdAt: saved.createdAt,
       updatedAt: saved.updatedAt
     };
@@ -4565,10 +4573,11 @@ export class MongoStorage implements IStorage {
     const messages = await ChatMessageModel.find({ conversationId })
       .sort({ createdAt: 1 });
     return messages.map(doc => ({
-      id: doc.id,
-      conversationId: doc.conversationId,
-      content: doc.content,
+      id: parseInt(doc._id.toString().slice(-8), 16), // Convert ObjectId to number
+      conversationId: parseInt(doc.conversationId),
       role: doc.role,
+      content: doc.content,
+      tokensUsed: doc.tokensUsed,
       createdAt: doc.createdAt
     }));
   }
@@ -4581,12 +4590,41 @@ export class MongoStorage implements IStorage {
     });
     const saved = await doc.save();
     return {
-      id: saved.id,
-      conversationId: saved.conversationId,
-      content: saved.content,
+      id: parseInt(saved._id.toString().slice(-8), 16), // Convert ObjectId to number
+      conversationId: parseInt(saved.conversationId),
       role: saved.role,
+      content: saved.content,
+      tokensUsed: saved.tokensUsed,
       createdAt: saved.createdAt
     };
+  }
+
+  async updateChatConversation(id: string | number, updates: Partial<ChatConversation>): Promise<ChatConversation> {
+    await this.connect();
+    const updated = await ChatConversationModel.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) throw new Error('Conversation not found');
+    return {
+      id: parseInt(updated._id.toString().slice(-8), 16), // Convert ObjectId to number
+      userId: updated.userId,
+      workspaceId: updated.workspaceId,
+      title: updated.title,
+      messageCount: updated.messageCount,
+      lastMessageAt: updated.lastMessageAt,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt
+    };
+  }
+
+  async deleteChatConversation(id: string | number): Promise<void> {
+    await this.connect();
+    // Delete all messages in the conversation first
+    await ChatMessageModel.deleteMany({ conversationId: id.toString() });
+    // Delete the conversation
+    await ChatConversationModel.findByIdAndDelete(id);
   }
 }
 
