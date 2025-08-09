@@ -300,24 +300,36 @@ export default function VeeGPT() {
         break
 
       case 'aiMessageStart':
-        // Add AI message placeholder to cache immediately with empty content
-        if (currentConversationId && data.message) {
-          // Initialize streaming content for this message
+        // Initialize streaming content for this message
+        if (data.messageId) {
+          console.log('VeeGPT: Starting AI message stream for ID:', data.messageId)
           setStreamingContent(prev => ({
             ...prev,
-            [data.message.id]: ''
+            [data.messageId]: ''
           }))
           
-          queryClient.setQueryData(
-            ['/api/chat/conversations', currentConversationId, 'messages'],
-            (oldMessages: any[]) => {
-              if (!oldMessages) return [{ ...data.message, content: '' }]
-              // Check if message already exists to avoid duplicates
-              const messageExists = oldMessages.some(msg => msg.id === data.message.id)
-              if (messageExists) return oldMessages
-              return [...oldMessages, { ...data.message, content: '' }]
+          // Add placeholder AI message to cache
+          if (currentConversationId) {
+            const placeholderMessage = {
+              id: data.messageId,
+              conversationId: currentConversationId,
+              role: 'assistant' as const,
+              content: '',
+              tokensUsed: 0,
+              createdAt: new Date().toISOString()
             }
-          )
+            
+            queryClient.setQueryData(
+              ['/api/chat/conversations', currentConversationId, 'messages'],
+              (oldMessages: any[]) => {
+                if (!oldMessages) return [placeholderMessage]
+                // Check if message already exists to avoid duplicates
+                const messageExists = oldMessages.some(msg => msg.id === data.messageId)
+                if (messageExists) return oldMessages
+                return [...oldMessages, placeholderMessage]
+              }
+            )
+          }
         }
         break
 
