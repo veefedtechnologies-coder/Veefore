@@ -281,16 +281,24 @@ app.use((req, res, next) => {
   });
   
   // Function to broadcast to all clients in a conversation
-  global.broadcastToConversation = (conversationId: number, data: any) => {
+  (global as any).broadcastToConversation = (conversationId: number, data: any) => {
     const connections = wsConnections.get(conversationId);
-    if (connections) {
+    console.log(`[WebSocket] Broadcasting to conversation ${conversationId}, connections: ${connections?.size || 0}`);
+    
+    if (connections && connections.size > 0) {
       const message = JSON.stringify(data);
       connections.forEach(ws => {
         if (ws.readyState === 1) { // WebSocket.OPEN
           ws.send(message);
-          console.log(`[WebSocket] Broadcasted to conversation ${conversationId}:`, data.type);
+          console.log(`[WebSocket] Sent ${data.type} to client for conversation ${conversationId}`);
+        } else {
+          console.log(`[WebSocket] Removing closed connection for conversation ${conversationId}`);
+          connections.delete(ws);
         }
       });
+    } else {
+      console.log(`[WebSocket] No active connections for conversation ${conversationId}`);
+      console.log(`[WebSocket] Active conversations:`, Array.from(wsConnections.keys()));
     }
   };
 

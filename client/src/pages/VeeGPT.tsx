@@ -104,17 +104,24 @@ export default function VeeGPT() {
         const data = JSON.parse(event.data)
         console.log('[WebSocket] Received:', data)
         
-        if (data.type === 'aiMessageStart') {
+        if (data.type === 'subscribed') {
+          console.log(`[WebSocket] Successfully subscribed to conversation ${data.conversationId}`)
+        } else if (data.type === 'aiMessageStart') {
           console.log(`[WebSocket] AI message started: ${data.messageId}`)
           setStreamingContent(prev => ({ ...prev, [data.messageId]: '' }))
           setIsGenerating(true)
           isGeneratingRef.current = true
+          console.log(`[WebSocket] Set streaming for message ${data.messageId}, isGenerating: true`)
         } else if (data.type === 'chunk') {
           console.log(`[WebSocket] Chunk received for message ${data.messageId}: "${data.content}"`)
-          setStreamingContent(prev => ({
-            ...prev,
-            [data.messageId]: (prev[data.messageId] || '') + data.content
-          }))
+          setStreamingContent(prev => {
+            const updated = {
+              ...prev,
+              [data.messageId]: (prev[data.messageId] || '') + data.content
+            }
+            console.log(`[WebSocket] Updated streaming content for ${data.messageId}:`, updated[data.messageId])
+            return updated
+          })
         } else if (data.type === 'complete') {
           console.log(`[WebSocket] Generation complete for message ${data.messageId}`)
           setIsGenerating(false)
@@ -122,6 +129,7 @@ export default function VeeGPT() {
           setStreamingContent(prev => {
             const updated = { ...prev }
             delete updated[data.messageId]
+            console.log(`[WebSocket] Cleared streaming content for ${data.messageId}`)
             return updated
           })
           queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
@@ -168,15 +176,22 @@ export default function VeeGPT() {
     }
   }, [queryClient])
 
-  // Subscribe to conversation when it changes
+  // Subscribe to conversation when it changes or WebSocket connects
   useEffect(() => {
-    if (currentConversationId && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'subscribe',
-        conversationId: currentConversationId
-      }))
-      console.log(`[WebSocket] Subscribed to conversation ${currentConversationId}`)
+    const subscribe = () => {
+      if (currentConversationId && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'subscribe',
+          conversationId: currentConversationId
+        }))
+        console.log(`[WebSocket] Subscribing to conversation ${currentConversationId}`)
+      }
     }
+
+    subscribe()
+    
+    // Subscribe after a small delay to ensure WebSocket is ready
+    setTimeout(subscribe, 200)
   }, [currentConversationId])
 
   const quickPrompts = [
@@ -1004,12 +1019,12 @@ export default function VeeGPT() {
                         {streamingContent[message.id] !== undefined ? (
                           <span>
                             {streamingContent[message.id]}
-                            <span className="animate-pulse">▋</span>
+                            {isGenerating && (
+                              <span className="animate-pulse text-blue-500 ml-1">▋</span>
+                            )}
                           </span>
                         ) : message.content}
-                        {isGenerating && streamingContent[message.id] !== undefined && (
-                          <span className="animate-pulse text-gray-400">|</span>
-                        )}
+
                       </div>
                     ) : (
                       <div 
