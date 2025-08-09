@@ -2992,7 +2992,16 @@ const Landing = ({ onNavigate }: LandingProps) => {
           {/* Revolutionary 3D Premium Pricing Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-24">
             {pricingTiers.map((tier, index) => (
-              <div key={index} className="group relative">
+              <div key={index} className={`group relative ${tier.popular ? 'pt-8' : ''}`}>
+                {/* Popular Badge with Advanced Styling */}
+                {tier.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-30">
+                    <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full text-base font-bold shadow-2xl border-4 border-white backdrop-blur-sm">
+                      <span className="text-white drop-shadow-sm">✨ Most Popular ✨</span>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Card 3D Container with Perspective */}
                 <div className="relative transform-gpu perspective-1000">
                   {/* Glass Morphism Background with Advanced Effects */}
@@ -3008,15 +3017,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     <div className={`absolute bottom-8 left-8 w-2 h-2 bg-gradient-to-r ${tier.popular ? 'from-purple-400 to-pink-500' : 'from-slate-400 to-slate-500'} rounded-full animate-platform-particles opacity-50`} style={{animationDelay: '3s'}} />
                     <div className={`absolute top-1/2 right-8 w-1.5 h-1.5 bg-gradient-to-r ${tier.popular ? 'from-indigo-400 to-blue-500' : 'from-slate-300 to-slate-400'} rounded-full animate-platform-particles opacity-60`} style={{animationDelay: '5s'}} />
                   </div>
-
-                  {/* Popular Badge with Advanced Styling */}
-                  {tier.popular && (
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
-                      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full text-sm font-bold shadow-2xl border-4 border-white/50 backdrop-blur-sm animate-pulse-slow">
-                        <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">✨ Most Popular ✨</span>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Card Content with Premium Spacing */}
                   <div className="relative p-12 text-center transform transition-all duration-500 group-hover:scale-105">
