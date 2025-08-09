@@ -198,11 +198,24 @@ export default function VeeGPT() {
   // Streaming helper functions
   const handleStreamingMessage = async (content: string, conversationId: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
-      setIsGenerating(true)
+      console.log('VeeGPT: Setting generation state to TRUE')
+      
+      // Set ref first for immediate availability
       isGeneratingRef.current = true
+      
+      // Set state to trigger re-render and make stop button visible
+      setIsGenerating(true)
       
       // Store resolve function for completion handler
       streamResolveRef.current = resolve
+      
+      console.log('VeeGPT: Generation state set:', {
+        isGenerating: 'pending-state-update', 
+        isGeneratingRef: true
+      })
+      
+      // Small delay to ensure state update is processed
+      await new Promise(resolve => setTimeout(resolve, 10))
       
       try {
         // Use same auth approach as apiRequest
@@ -282,6 +295,11 @@ export default function VeeGPT() {
 
   const handleStreamEvent = (data: any) => {
     console.log('VeeGPT: Stream event:', data)
+    console.log('VeeGPT: Generation state during stream event:', {
+      isGenerating,
+      isGeneratingRef: isGeneratingRef.current,
+      eventType: data.type
+    })
 
     switch (data.type) {
       case 'userMessage':
@@ -325,6 +343,7 @@ export default function VeeGPT() {
 
       case 'complete':
         console.log('VeeGPT: Streaming message completed')
+        console.log('VeeGPT: Resetting generation state to FALSE')
         // Generation completed - reset generation state
         setIsGenerating(false)
         isGeneratingRef.current = false
