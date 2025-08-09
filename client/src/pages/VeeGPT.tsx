@@ -17,7 +17,8 @@ import {
   Share,
   MoreHorizontal,
   User,
-  Bot
+  Bot,
+  Paperclip
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -315,36 +316,65 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-full bg-white flex">
+    <div className="h-full bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white flex flex-col">
+      <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
         {/* Header */}
-        <div className="p-4 border-b border-gray-700">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">VeeGPT</h2>
+              <p className="text-xs text-gray-500">AI Assistant</p>
+            </div>
+          </div>
           <button
             onClick={startNewChat}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 font-medium shadow-sm hover:shadow-md"
           >
             <Plus className="w-4 h-4" />
-            <span className="font-medium">New chat</span>
+            <span>New Conversation</span>
           </button>
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-2">
+        <div className="flex-1 overflow-y-auto py-4">
+          <div className="px-4 space-y-2">
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+              Recent Conversations
+            </div>
             {conversations.map((conversation) => (
               <button
                 key={conversation.id}
                 onClick={() => selectConversation(conversation.id)}
-                className={`w-full text-left p-3 rounded-lg mb-1 transition-colors ${
+                className={`w-full text-left p-3 rounded-xl transition-all duration-200 group hover:shadow-sm ${
                   currentConversationId === conversation.id
-                    ? 'bg-gray-700'
-                    : 'hover:bg-gray-800'
+                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 shadow-sm'
+                    : 'hover:bg-gray-50 border border-transparent'
                 }`}
               >
-                <div className="flex items-center space-x-2">
-                  <MessageSquare className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm truncate">{conversation.title}</span>
+                <div className="flex items-start space-x-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    currentConversationId === conversation.id
+                      ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
+                  }`}>
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`text-sm font-medium truncate ${
+                      currentConversationId === conversation.id
+                        ? 'text-gray-900'
+                        : 'text-gray-700 group-hover:text-gray-900'
+                    }`}>
+                      {conversation.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {conversation.messageCount} messages
+                    </p>
+                  </div>
                 </div>
               </button>
             ))}
@@ -352,74 +382,96 @@ export default function VeeGPT() {
         </div>
 
         {/* Bottom section */}
-        <div className="p-4 border-t border-gray-700">
-          <div className="text-xs text-gray-400">
-            VeeGPT can make mistakes. Check important info.
+        <div className="p-4 border-t border-gray-100 bg-gray-50">
+          <div className="text-xs text-gray-500 text-center">
+            🤖 VeeGPT can make mistakes. Verify important information.
           </div>
         </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-semibold text-gray-900">VeeGPT</h1>
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
-              Beta
-            </span>
+        <div className="flex items-center justify-between p-6 bg-white border-b border-gray-100">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">VeeGPT</h1>
+              <p className="text-sm text-gray-500">Your AI-powered assistant</p>
+            </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="hover:bg-gray-100 text-gray-600 hover:text-gray-900"
+            >
               <Share className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="hover:bg-gray-100 text-gray-600 hover:text-gray-900"
+            >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-3xl mx-auto space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white">
+          <div className="max-w-4xl mx-auto space-y-8">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex space-x-4 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                  message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
                 }`}
               >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-xl px-4 py-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white ml-auto'
-                      : 'bg-gray-100 text-gray-900'
-                  }`}
-                >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
+                  message.role === 'user'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                    : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
+                }`}>
+                  {message.role === 'user' ? (
+                    <User className="w-5 h-5" />
+                  ) : (
+                    <Bot className="w-5 h-5" />
+                  )}
                 </div>
-                {message.role === 'user' && (
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-white" />
+                <div className={`flex-1 max-w-3xl`}>
+                  <div className={`px-6 py-4 rounded-2xl shadow-sm border ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-200 ml-auto max-w-2xl'
+                      : 'bg-white text-gray-900 border-gray-100'
+                  }`}>
+                    <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                   </div>
-                )}
+                  <div className={`mt-2 text-xs text-gray-500 ${
+                    message.role === 'user' ? 'text-right' : 'text-left'
+                  }`}>
+                    {new Date(message.createdAt).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
+                </div>
               </div>
             ))}
             {(createConversationMutation.isPending || sendMessageMutation.isPending) && (
               <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+                  <Bot className="w-5 h-5 text-white" />
                 </div>
-                <div className="bg-gray-100 px-4 py-3 rounded-lg">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="flex-1">
+                  <div className="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -429,37 +481,81 @@ export default function VeeGPT() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-gray-200">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-end space-x-4">
-              <div className="flex-1 border border-gray-300 rounded-lg">
-                <textarea
-                  ref={inputRef}
-                  value={inputText}
-                  onChange={(e) => {
-                    setInputText(e.target.value)
-                    // Auto-resize textarea
-                    const textarea = e.target as HTMLTextAreaElement
-                    textarea.style.height = 'auto'
-                    textarea.style.height = Math.max(48, textarea.scrollHeight) + 'px'
-                  }}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Message VeeGPT..."
-                  className="w-full px-4 py-3 border-0 resize-none focus:outline-none focus:ring-0 rounded-lg"
-                  style={{ 
-                    height: '48px',
-                    maxHeight: '200px'
-                  }}
-                  rows={1}
-                />
+        <div className="p-6 bg-white border-t border-gray-100">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              <div className="flex items-end space-x-4 bg-gray-50 rounded-2xl p-4 border border-gray-200 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-200">
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-xl"
+                  >
+                    <Mic className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex-1">
+                  <textarea
+                    ref={inputRef}
+                    value={inputText}
+                    onChange={(e) => {
+                      setInputText(e.target.value)
+                      // Auto-resize textarea
+                      const textarea = e.target as HTMLTextAreaElement
+                      textarea.style.height = 'auto'
+                      textarea.style.height = Math.max(24, textarea.scrollHeight) + 'px'
+                    }}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Type your message to VeeGPT..."
+                    className="w-full px-0 py-0 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+                    style={{ 
+                      height: '24px',
+                      maxHeight: '120px',
+                      lineHeight: '24px'
+                    }}
+                    rows={1}
+                  />
+                </div>
+                
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
+                  className={`px-3 py-3 rounded-xl transition-all duration-200 ${
+                    inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-sm hover:shadow-md'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
               </div>
-              <Button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                className="px-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+              
+              {/* Quick Actions */}
+              <div className="flex items-center justify-between mt-3 px-2">
+                <div className="flex items-center space-x-2">
+                  <button className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                    ✨ Use AI for content
+                  </button>
+                  <button className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                    📊 Generate insights
+                  </button>
+                </div>
+                <div className="text-xs text-gray-400">
+                  Press Enter to send, Shift+Enter for new line
+                </div>
+              </div>
             </div>
           </div>
         </div>
