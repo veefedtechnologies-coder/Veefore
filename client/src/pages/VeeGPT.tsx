@@ -34,24 +34,24 @@ import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
 function TypewriterText({ text, speed = 30, onComplete }: { text: string, speed?: number, onComplete?: () => void }) {
   const [displayedText, setDisplayedText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [initialText] = useState(text) // Store initial text to prevent re-animation
 
   useEffect(() => {
-    if (currentIndex < text.length) {
+    // Only animate if not completed and text matches initial text
+    if (!isCompleted && text === initialText && currentIndex < text.length) {
       const timer = setTimeout(() => {
         setDisplayedText(prev => prev + text[currentIndex])
         setCurrentIndex(currentIndex + 1)
       }, speed)
       return () => clearTimeout(timer)
-    } else if (onComplete && currentIndex === text.length) {
-      onComplete()
+    } else if (!isCompleted && currentIndex === text.length && text === initialText) {
+      setIsCompleted(true)
+      if (onComplete) {
+        onComplete()
+      }
     }
-  }, [currentIndex, text, speed, onComplete])
-
-  // Reset when text changes (for new messages)
-  useEffect(() => {
-    setDisplayedText('')
-    setCurrentIndex(0)
-  }, [text])
+  }, [currentIndex, text, speed, onComplete, isCompleted, initialText])
 
   return (
     <div 
@@ -67,8 +67,8 @@ function TypewriterText({ text, speed = 30, onComplete }: { text: string, speed?
         lineBreak: 'anywhere'
       }}
     >
-      {displayedText}
-      {currentIndex < text.length && (
+      {isCompleted ? text : displayedText}
+      {!isCompleted && currentIndex < text.length && (
         <span className="animate-pulse">|</span>
       )}
     </div>
