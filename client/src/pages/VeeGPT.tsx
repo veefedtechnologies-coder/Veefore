@@ -346,6 +346,8 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current,
           eventType: 'chunk'
         })
+        // Ensure isGenerating state is true during chunks to show stop button
+        setIsGenerating(true)
         // Force re-render to show stop button during streaming chunks
         setRenderTrigger(prev => prev + 1)
         // Update the AI message content in real-time
@@ -1147,14 +1149,14 @@ export default function VeeGPT() {
               </div>
               
               {(() => {
-                // Show stop button ONLY during actual streaming (not during initial loading)
-                const shouldShowStop = (isGenerating || isGeneratingRef.current) && renderTrigger >= 0
-                console.log('VeeGPT: Stop button visibility check:', {
-                  isGenerating,
-                  isGeneratingRef: isGeneratingRef.current,
-                  renderTrigger,
-                  shouldShowStop
-                })
+                // Show stop button during streaming chunks
+                const shouldShowStop = isGenerating || isGeneratingRef.current
+                // console.log('VeeGPT: Stop button visibility check:', {
+                //   isGenerating,
+                //   isGeneratingRef: isGeneratingRef.current,
+                //   renderTrigger,
+                //   shouldShowStop
+                // })
                 return shouldShowStop
               })() ? (
                 <button

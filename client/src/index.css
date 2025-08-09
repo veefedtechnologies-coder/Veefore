@@ -54,13 +54,6 @@ div[contenteditable="true"].transparent-input {
   background-color: transparent !important;
 }
 
-/* Force complete transparency on the main VeeGPT containers */
-.h-full.w-full.flex {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-}
-
 /* Keep body/html with default backgrounds but make input containers transparent */
 .veegpt-input-container {
   background: transparent !important;
