@@ -4,16 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ChatGPT-style transparent input field - force complete transparency */
-div[contenteditable="true"] {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
+/* ChatGPT-style input field placeholder */
+div[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
 }
 
 /* Modern Dropdown Animations */
