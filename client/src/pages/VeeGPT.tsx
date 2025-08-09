@@ -80,14 +80,23 @@ export default function VeeGPT() {
   useEffect(() => {
     // Connect to WebSocket server (same port as HTTP server with WebSocket upgrade)
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.hostname}:5000`
+    const wsUrl = `${protocol}//${window.location.host}`
     
     console.log('[WebSocket] Connecting to:', wsUrl)
     const ws = new WebSocket(wsUrl)
     
     ws.onopen = () => {
-      console.log('[WebSocket] Connected for streaming')
+      console.log('[WebSocket] Connected successfully for streaming')
       wsRef.current = ws
+      
+      // Subscribe to current conversation if we have one
+      if (currentConversationId) {
+        ws.send(JSON.stringify({
+          type: 'subscribe',
+          conversationId: currentConversationId
+        }))
+        console.log(`[WebSocket] Auto-subscribed to conversation ${currentConversationId}`)
+      }
     }
     
     ws.onmessage = (event) => {
@@ -126,13 +135,30 @@ export default function VeeGPT() {
       }
     }
     
-    ws.onclose = () => {
-      console.log('[WebSocket] Connection closed')
+    ws.onclose = (event) => {
+      console.log('[WebSocket] Connection closed:', event.code, event.reason)
       wsRef.current = null
+      
+      // Auto-reconnect after 2 seconds if not a normal closure
+      if (event.code !== 1000 && event.code !== 1001) {
+        console.log('[WebSocket] Attempting to reconnect in 2 seconds...')
+        setTimeout(() => {
+          if (!wsRef.current) {
+            // This will trigger a re-render and reconnection
+            setStreamingContent({})
+          }
+        }, 2000)
+      }
     }
     
     ws.onerror = (error) => {
-      console.error('[WebSocket] Error:', error)
+      console.error('[WebSocket] Connection error:', error)
+      console.log('[WebSocket] Error details:', {
+        readyState: ws.readyState,
+        url: wsUrl,
+        protocol: window.location.protocol,
+        host: window.location.host
+      })
     }
     
     return () => {
@@ -975,7 +1001,12 @@ export default function VeeGPT() {
                           lineBreak: 'anywhere'
                         }}
                       >
-                        {streamingContent[message.id] !== undefined ? streamingContent[message.id] : message.content}
+                        {streamingContent[message.id] !== undefined ? (
+                          <span>
+                            {streamingContent[message.id]}
+                            <span className="animate-pulse">▋</span>
+                          </span>
+                        ) : message.content}
                         {isGenerating && streamingContent[message.id] !== undefined && (
                           <span className="animate-pulse text-gray-400">|</span>
                         )}
