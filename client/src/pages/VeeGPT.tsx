@@ -348,7 +348,7 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-full w-full bg-gray-50 flex">
+    <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
       {/* VeeGPT Sidebar */}
       <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
         {/* Top Logo/Brand with Toggle */}
@@ -449,15 +449,15 @@ export default function VeeGPT() {
                       
                       {!sidebarCollapsed && (hoveredChatId === conversation.id || dropdownOpen === conversation.id) && (
                         <div className="relative">
-                          <button
+                          <div
                             onClick={(e) => {
                               e.stopPropagation()
                               setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
                             }}
-                            className="p-1 hover:bg-gray-200 rounded transition-colors"
+                            className="p-1 hover:bg-gray-200 rounded transition-colors cursor-pointer"
                           >
                             <MoreHorizontal className="w-4 h-4 text-gray-500" />
-                          </button>
+                          </div>
                           
                           {dropdownOpen === conversation.id && (
                             <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
@@ -541,6 +541,29 @@ export default function VeeGPT() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white relative">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">V</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-lg font-semibold text-gray-900">VeeGPT</h1>
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <button className="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <Share className="w-4 h-4" />
+              <span>Share</span>
+            </button>
+            <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8">
