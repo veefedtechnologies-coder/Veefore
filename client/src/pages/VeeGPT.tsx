@@ -109,7 +109,7 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
-  const [refBasedGenerating, setRefBasedGenerating] = useState(false)
+  const [renderTrigger, setRenderTrigger] = useState(0)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -118,10 +118,7 @@ export default function VeeGPT() {
   
   console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
 
-  // Sync ref state with React state to trigger re-renders
-  useEffect(() => {
-    setRefBasedGenerating(isGeneratingRef.current)
-  }, [isGenerating]) // Update when isGenerating state changes
+  // No complex synchronization needed
 
   const quickPrompts = [
     { icon: Lightbulb, text: "Inspire me!" },
@@ -179,7 +176,6 @@ export default function VeeGPT() {
       setCurrentConversationId(null)
       setIsGenerating(false)
       isGeneratingRef.current = false
-      setRefBasedGenerating(false)
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -213,7 +209,6 @@ export default function VeeGPT() {
       
       // Set state to trigger re-render and make stop button visible
       setIsGenerating(true)
-      setRefBasedGenerating(true)
       
 
       
@@ -351,6 +346,8 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current,
           eventType: 'chunk'
         })
+        // Trigger re-render to ensure stop button visibility during streaming
+        setRenderTrigger(prev => prev + 1)
         // Update the AI message content in real-time
         if (data.messageId && data.content && currentConversationId) {
           updateMessageContentInCache(data.messageId, data.content)
@@ -363,7 +360,6 @@ export default function VeeGPT() {
         // Generation completed - reset generation state
         setIsGenerating(false)
         isGeneratingRef.current = false
-        setRefBasedGenerating(false)
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
@@ -389,7 +385,6 @@ export default function VeeGPT() {
         console.error('VeeGPT: Stream error:', data.error)
         setIsGenerating(false)
         isGeneratingRef.current = false
-        setRefBasedGenerating(false)
         break
     }
   }
@@ -435,7 +430,6 @@ export default function VeeGPT() {
       console.error('VeeGPT: Error sending streaming message:', error)
       setIsGenerating(false)
       isGeneratingRef.current = false
-      setRefBasedGenerating(false)
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -484,7 +478,6 @@ export default function VeeGPT() {
     // Stop streaming immediately
     setIsGenerating(false)
     isGeneratingRef.current = false
-    setRefBasedGenerating(false)
     if (currentEventSource) {
       currentEventSource.close()
       setCurrentEventSource(null)
@@ -1168,13 +1161,13 @@ export default function VeeGPT() {
               </div>
               
               {(() => {
-                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || refBasedGenerating
+                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current
                 console.log('VeeGPT: Stop button visibility check:', {
                   createPending: createConversationMutation.isPending,
                   sendPending: sendMessageMutation.isPending,
                   isGenerating,
                   isGeneratingRef: isGeneratingRef.current,
-                  refBasedGenerating,
+                  renderTrigger,
                   shouldShowStop
                 })
                 return shouldShowStop
