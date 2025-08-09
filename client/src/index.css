@@ -4,6 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ChatGPT-style transparent input field - force complete transparency */
+div[contenteditable="true"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
 /* Modern Dropdown Animations */
 @keyframes dropdown-enter {
   from {

@@ -472,8 +472,8 @@ export default function VeeGPT() {
         </div>
 
         {/* ChatGPT-style completely flat input - no background, no container */}
-        <div style={{ padding: '24px 0', backgroundColor: 'transparent' }}>
-          <div style={{ maxWidth: '48rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px' }}>
+        <div style={{ padding: '24px 0', backgroundColor: 'transparent', background: 'none' }}>
+          <div style={{ maxWidth: '48rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px', backgroundColor: 'transparent', background: 'none' }}>
             <button style={{ color: '#6b7280', padding: '4px', border: 'none', background: 'transparent', cursor: 'pointer' }}>
               <Paperclip style={{ width: '20px', height: '20px' }} />
             </button>
