@@ -21,7 +21,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
-  BarChart3
+  BarChart3,
+  Share,
+  Archive,
+  Trash2
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -52,6 +55,8 @@ export default function VeeGPT() {
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
   const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
@@ -414,23 +419,102 @@ export default function VeeGPT() {
             )}
             <div className="space-y-2">
               {conversations.map((conversation) => (
-                <button
+                <div
                   key={conversation.id}
-                  onClick={() => selectConversation(conversation.id)}
-                  className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
-                    currentConversationId === conversation.id
-                      ? 'bg-gray-200 text-gray-900'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  title={sidebarCollapsed ? conversation.title : ""}
+                  className="relative"
+                  onMouseEnter={() => setHoveredChatId(conversation.id)}
+                  onMouseLeave={() => {
+                    setHoveredChatId(null)
+                    if (dropdownOpen === conversation.id) {
+                      setTimeout(() => setDropdownOpen(null), 200)
+                    }
+                  }}
                 >
-                  <div className="flex items-center space-x-3">
-                    <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                    {!sidebarCollapsed && (
-                      <div className="truncate text-base font-medium">{conversation.title}</div>
-                    )}
-                  </div>
-                </button>
+                  <button
+                    onClick={() => selectConversation(conversation.id)}
+                    className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
+                      currentConversationId === conversation.id
+                        ? 'bg-gray-200 text-gray-900'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    title={sidebarCollapsed ? conversation.title : ""}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                        {!sidebarCollapsed && (
+                          <div className="truncate text-base font-medium">{conversation.title}</div>
+                        )}
+                      </div>
+                      
+                      {!sidebarCollapsed && (hoveredChatId === conversation.id || dropdownOpen === conversation.id) && (
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
+                            }}
+                            className="p-1 hover:bg-gray-200 rounded transition-colors"
+                          >
+                            <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                          </button>
+                          
+                          {dropdownOpen === conversation.id && (
+                            <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log('Share conversation:', conversation.id)
+                                  setDropdownOpen(null)
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                              >
+                                <Share className="w-4 h-4" />
+                                <span>Share</span>
+                              </button>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log('Rename conversation:', conversation.id)
+                                  setDropdownOpen(null)
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                              >
+                                <Edit className="w-4 h-4" />
+                                <span>Rename</span>
+                              </button>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log('Archive conversation:', conversation.id)
+                                  setDropdownOpen(null)
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                              >
+                                <Archive className="w-4 h-4" />
+                                <span>Archive</span>
+                              </button>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  console.log('Delete conversation:', conversation.id)
+                                  setDropdownOpen(null)
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span>Delete</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </div>
               ))}
             </div>
           </div>
