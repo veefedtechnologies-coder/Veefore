@@ -38,7 +38,6 @@ import subscriptionRoutes from './routes/subscription';
 import { registerAdminRoutes } from './admin-routes';
 import videoRoutes, { setupVideoWebSocket } from './video-routes';
 import authRoutes from './auth-routes';
-import veeGptChatRoutes from './veegpt-chat-routes';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Configure multer for file uploads
@@ -12302,9 +12301,6 @@ Create a detailed growth strategy in JSON format:
 
   // Subscription Routes
   app.use('/api/subscription', subscriptionRoutes);
-  
-  // Register VeeGPT chat routes
-  app.use('/api/chat', requireAuth, veeGptChatRoutes);
 
   // Video Generator Routes - Set storage for middleware
   app.use('/api/video', (req: any, res: any, next: any) => {

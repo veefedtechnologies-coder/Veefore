@@ -1,5 +1,4 @@
 import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -1574,43 +1573,3 @@ export const insertWaitlistUserSchema = createInsertSchema(waitlistUsers).pick({
 
 export type WaitlistUser = typeof waitlistUsers.$inferSelect;
 export type InsertWaitlistUser = z.infer<typeof insertWaitlistUserSchema>;
-
-// VeeGPT Chat System
-export const chatConversations = pgTable("chat_conversations", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
-  title: text("title").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const chatMessages = pgTable("chat_messages", {
-  id: serial("id").primaryKey(),
-  conversationId: integer("conversation_id").references(() => chatConversations.id).notNull(),
-  role: text("role").notNull(), // 'user' or 'assistant'
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Relations
-export const chatConversationsRelations = relations(chatConversations, ({ many }) => ({
-  messages: many(chatMessages),
-}));
-
-export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
-  conversation: one(chatConversations, {
-    fields: [chatMessages.conversationId],
-    references: [chatConversations.id],
-  }),
-}));
-
-// Types
-export type ChatConversation = typeof chatConversations.$inferSelect;
-export type InsertChatConversation = typeof chatConversations.$inferInsert;
-export type VeeGPTMessage = typeof chatMessages.$inferSelect;
-export type InsertVeeGPTMessage = typeof chatMessages.$inferInsert;
-
-// Zod Schemas
-export const insertChatConversationSchema = createInsertSchema(chatConversations);
-export const insertChatMessageSchema = createInsertSchema(chatMessages);
