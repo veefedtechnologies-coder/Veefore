@@ -13488,7 +13488,6 @@ Create a detailed growth strategy in JSON format:
     try {
       const { conversationId } = req.params;
       const messages = await storage.getChatMessages(parseInt(conversationId));
-      console.log('[CHAT DEBUG] Sample message data:', JSON.stringify(messages[0], null, 2));
       res.json(messages);
     } catch (error: any) {
       console.error('[CHAT] Get messages error:', error);
