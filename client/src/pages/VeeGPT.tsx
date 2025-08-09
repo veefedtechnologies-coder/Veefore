@@ -463,69 +463,71 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* ChatGPT-style completely invisible floating input */}
-        <div className="p-6 bg-white">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center space-x-3 px-4">
-              <button className="text-gray-500 hover:text-gray-700 p-1 rounded">
-                <Paperclip className="w-5 h-5" />
-              </button>
-              
-              <textarea
-                ref={inputRef}
-                value={inputText}
-                onChange={(e) => {
-                  setInputText(e.target.value)
-                  // Auto-resize textarea
-                  const textarea = e.target as HTMLTextAreaElement
-                  textarea.style.height = 'auto'
-                  textarea.style.height = Math.max(24, textarea.scrollHeight) + 'px'
-                }}
-                onKeyDown={handleKeyPress}
-                placeholder="Message VeeGPT"
-                style={{ 
-                  width: '100%',
-                  height: '24px',
-                  maxHeight: '120px',
-                  lineHeight: '24px',
-                  border: 'none',
-                  background: 'transparent',
-                  outline: 'none',
-                  boxShadow: 'none',
-                  resize: 'none',
-                  padding: '4px 0',
-                  fontSize: '16px',
-                  color: '#374151',
-                  fontFamily: 'inherit'
-                }}
-                rows={1}
-              />
-              
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                className={`p-1 rounded ${
-                  inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending
-                    ? 'text-gray-900 hover:text-gray-700'
-                    : 'text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
-                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
-
-              <button className="text-gray-500 hover:text-gray-700 p-1 rounded">
-                <Mic className="w-5 h-5" />
-              </button>
-            </div>
+        {/* ChatGPT-style completely flat input - no background, no container */}
+        <div style={{ padding: '24px 0', backgroundColor: 'transparent' }}>
+          <div style={{ maxWidth: '48rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px' }}>
+            <button style={{ color: '#6b7280', padding: '4px', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+              <Paperclip style={{ width: '20px', height: '20px' }} />
+            </button>
             
-            <div className="text-center mt-4">
-              <div className="text-xs text-gray-400">
-                VeeGPT can make mistakes. Check important info.
-              </div>
+            <textarea
+              ref={inputRef}
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value)
+                // Auto-resize textarea
+                const textarea = e.target as HTMLTextAreaElement
+                textarea.style.height = 'auto'
+                textarea.style.height = Math.max(24, textarea.scrollHeight) + 'px'
+              }}
+              onKeyDown={handleKeyPress}
+              placeholder="Message VeeGPT"
+              style={{ 
+                flex: 1,
+                height: '24px',
+                maxHeight: '120px',
+                lineHeight: '24px',
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                boxShadow: 'none',
+                resize: 'none',
+                padding: '0',
+                margin: '0',
+                fontSize: '16px',
+                color: '#374151',
+                fontFamily: 'inherit',
+                borderRadius: '0'
+              }}
+              rows={1}
+            />
+            
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
+              style={{ 
+                color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
+                padding: '4px',
+                border: 'none',
+                background: 'transparent',
+                cursor: inputText.trim() ? 'pointer' : 'not-allowed'
+              }}
+            >
+              {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+                <div style={{ width: '20px', height: '20px', border: '2px solid #9ca3af', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <Send style={{ width: '20px', height: '20px' }} />
+              )}
+            </button>
+
+            <button style={{ color: '#6b7280', padding: '4px', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+              <Mic style={{ width: '20px', height: '20px' }} />
+            </button>
+          </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+              VeeGPT can make mistakes. Check important info.
             </div>
           </div>
         </div>
