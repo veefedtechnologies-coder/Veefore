@@ -2262,7 +2262,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 {/* Main Card with Premium Glass Effect */}
                 <div className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-700 group-hover:-translate-y-2 overflow-hidden">
                   {/* Premium Gradient Border */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-purple-500/10 rounded-[2.5rem] p-[1px]">
+                  <div className={`absolute inset-0 rounded-[2.5rem] p-[1px] ${index === 0 ? 'bg-gradient-to-r from-blue-500/10 via-blue-400/10 to-blue-500/10' : index === 1 ? 'bg-gradient-to-r from-red-500/10 via-rose-400/10 to-red-500/10' : 'bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-purple-500/10'}`}>
                     <div className="h-full w-full bg-white rounded-[2.4rem]" />
                   </div>
                   
@@ -2276,7 +2276,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     <div className="flex items-start justify-between mb-10">
                       <div className="relative">
                         <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-white to-gray-50 border border-gray-200 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg">
-                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+                          <div className={`w-16 h-16 rounded-2xl ${index === 0 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : index === 1 ? 'bg-gradient-to-br from-red-500 to-rose-600' : 'bg-gradient-to-br from-indigo-500 to-violet-600'} flex items-center justify-center`}>
                             {React.cloneElement(solution.icon, { 
                               className: "w-8 h-8 text-white",
                               style: { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }
@@ -2290,8 +2290,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                       
                       {/* Industry Badge */}
-                      <div className="px-4 py-2 bg-gradient-to-r from-indigo-100 to-violet-100 rounded-full border border-indigo-200">
-                        <span className="text-indigo-700 text-sm font-semibold">#{index + 1}</span>
+                      <div className={`px-4 py-2 rounded-full border ${index === 0 ? 'bg-gradient-to-r from-blue-100 to-blue-100 border-blue-200' : index === 1 ? 'bg-gradient-to-r from-red-100 to-rose-100 border-red-200' : 'bg-gradient-to-r from-indigo-100 to-violet-100 border-indigo-200'}`}>
+                        <span className={`text-sm font-semibold ${index === 0 ? 'text-blue-700' : index === 1 ? 'text-red-700' : 'text-indigo-700'}`}>#{index + 1}</span>
                       </div>
                     </div>
                     
@@ -2312,11 +2312,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
                             variant="ghost"
                             className="flex items-center gap-3 text-gray-600 hover:text-indigo-600 p-0 group/btn"
                           >
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-indigo-100 to-violet-100 flex items-center justify-center group-hover/btn:scale-110 transition-transform duration-300">
+                            <div className={`w-8 h-8 rounded-xl ${index === 0 ? 'bg-gradient-to-r from-blue-100 to-blue-100' : index === 1 ? 'bg-gradient-to-r from-red-100 to-rose-100' : 'bg-gradient-to-r from-indigo-100 to-violet-100'} flex items-center justify-center group-hover/btn:scale-110 transition-transform duration-300`}>
                               {expandedSections[`industry-${index}`] ? (
-                                <ChevronUp className="w-4 h-4 text-indigo-600" />
+                                <ChevronUp className={`w-4 h-4 ${index === 0 ? 'text-blue-600' : index === 1 ? 'text-red-600' : 'text-indigo-600'}`} />
                               ) : (
-                                <ChevronDown className="w-4 h-4 text-indigo-600" />
+                                <ChevronDown className={`w-4 h-4 ${index === 0 ? 'text-blue-600' : index === 1 ? 'text-red-600' : 'text-indigo-600'}`} />
                               )}
                             </div>
                             <span className="font-semibold">
@@ -2335,9 +2335,9 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 3).map((feature, idx) => (
                             <div 
                               key={idx} 
-                              className="flex items-start group/feature hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 rounded-xl p-3 -mx-3 transition-all duration-300"
+                              className={`flex items-start group/feature rounded-xl p-3 -mx-3 transition-all duration-300 ${index === 0 ? 'hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-50' : index === 1 ? 'hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50' : 'hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50'}`}
                             >
-                              <div className="w-7 h-7 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover/feature:scale-110 transition-transform duration-300 shadow-lg">
+                              <div className={`w-7 h-7 rounded-xl ${index === 0 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : index === 1 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'bg-gradient-to-r from-indigo-500 to-violet-600'} flex items-center justify-center flex-shrink-0 mt-0.5 group-hover/feature:scale-110 transition-transform duration-300 shadow-lg`}>
                                 <Check className="w-4 h-4 text-white" />
                               </div>
                               <span className="ml-4 text-gray-700 leading-relaxed group-hover/feature:text-gray-900 transition-colors duration-300 font-medium">
@@ -2359,7 +2359,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       
                       {/* CTA Button with Premium Styling */}
                       <div className="pt-6">
-                        <Button className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group/cta">
+                        <Button className={`w-full ${index === 0 ? 'bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700' : index === 1 ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700' : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700'} text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group/cta`}>
                           <span>Explore {solution.industry} Solutions</span>
                           <ArrowRight className="w-5 h-5 ml-2 group-hover/cta:translate-x-1 transition-transform duration-300" />
                         </Button>
