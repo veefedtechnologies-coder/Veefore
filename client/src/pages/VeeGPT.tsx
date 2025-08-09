@@ -45,7 +45,7 @@ export default function VeeGPT() {
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   
@@ -115,6 +115,11 @@ export default function VeeGPT() {
     console.log('VeeGPT: Sending message:', content)
     setInputText('')
     
+    // Clear contenteditable div
+    if (inputRef.current) {
+      inputRef.current.innerText = ''
+    }
+    
     try {
       if (!hasSentFirstMessage || !currentConversationId) {
         // Create new conversation
@@ -132,6 +137,9 @@ export default function VeeGPT() {
       console.error('VeeGPT: Error sending message:', error)
       // Restore input text if there was an error
       setInputText(content)
+      if (inputRef.current) {
+        inputRef.current.innerText = content
+      }
     }
   }
 
@@ -470,45 +478,52 @@ export default function VeeGPT() {
               <Paperclip style={{ width: '20px', height: '20px' }} />
             </button>
             
-            <textarea
+            <div
               ref={inputRef}
-              value={inputText}
-              onChange={(e) => {
-                setInputText(e.target.value)
-                // Auto-resize textarea
-                const textarea = e.target as HTMLTextAreaElement
-                textarea.style.height = 'auto'
-                textarea.style.height = Math.max(24, textarea.scrollHeight) + 'px'
+              contentEditable
+              suppressContentEditableWarning
+              onInput={(e) => {
+                const text = e.currentTarget.innerText
+                setInputText(text)
               }}
-              onKeyDown={handleKeyPress}
-              placeholder="Message VeeGPT"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSendMessage()
+                }
+              }}
               style={{ 
                 flex: 1,
-                height: '24px',
+                minHeight: '24px',
                 maxHeight: '120px',
                 lineHeight: '24px',
-                border: '0',
-                borderWidth: '0',
-                borderStyle: 'none',
-                background: 'none',
-                backgroundColor: 'transparent',
-                outline: '0',
-                outlineWidth: '0',
-                outlineStyle: 'none',
-                boxShadow: 'none',
-                resize: 'none',
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
                 padding: '0',
                 margin: '0',
                 fontSize: '16px',
                 color: '#374151',
                 fontFamily: 'inherit',
-                borderRadius: '0',
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'none'
+                overflow: 'auto',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                position: 'relative'
               }}
-              rows={1}
-            />
+            >
+              {inputText.length === 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  color: '#9ca3af',
+                  pointerEvents: 'none',
+                  userSelect: 'none'
+                }}>
+                  Message VeeGPT
+                </div>
+              )}
+            </div>
             
             <button
               onClick={handleSendMessage}
