@@ -13574,6 +13574,9 @@ Create a detailed growth strategy in JSON format:
             content: chunk,
             messageId: aiMessage.id 
           })}\n\n`);
+          
+          // Add delay to make streaming more visible (100ms between chunks)
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         // Update the AI message with complete content
