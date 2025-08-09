@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { 
-  ChevronDown, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
+  ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Clock, Eye, Heart, Share2, 
   DollarSign, Lightbulb, Rocket, Filter, Search, Bell, Settings, Upload, Download, Lock, 
   Smartphone, Laptop, Monitor, Sparkles, Crown, Diamond, Layers, Infinity, Cpu, Brain, 
