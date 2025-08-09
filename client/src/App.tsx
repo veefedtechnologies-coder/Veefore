@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Route, Switch, useLocation } from 'wouter'
 import { Sidebar } from './components/layout/sidebar'
 import { Header } from './components/layout/header'
@@ -119,6 +119,13 @@ function App() {
       <Route path="/onboarding">
         <div className="min-h-screen">
           <ProfessionalOnboarding />
+        </div>
+      </Route>
+
+      {/* VeeGPT Route - Accessible to everyone */}
+      <Route path="/veegpt">
+        <div className="min-h-screen">
+          <VeeGPT />
         </div>
       </Route>
 
@@ -369,33 +376,7 @@ function App() {
             </div>
           </Route>
           
-          <Route path="/veegpt">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
 
-              {/* Main Content Area - Full height without header */}
-              <div className="flex-1 h-screen overflow-hidden">
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
-
-                {/* VeeGPT Full Height - No padding, no scrolling wrapper */}
-                <VeeGPT />
-              </div>
-            </div>
-          </Route>
           
           <Route path="/video-generator">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">

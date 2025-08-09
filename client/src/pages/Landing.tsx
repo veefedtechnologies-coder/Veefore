@@ -810,103 +810,161 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Premium Stats Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white relative overflow-hidden">
-        {/* Animated Background Elements */}
+      {/* Revolutionary Platform Capabilities */}
+      <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+        {/* Elegant Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{backgroundImage: "radial-gradient(circle at 25px 25px, #3b82f6 2px, transparent 0), radial-gradient(circle at 75px 75px, #8b5cf6 2px, transparent 0)", backgroundSize: "100px 100px"}}></div>
+        </div>
+        
+        {/* Floating Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse animation-delay-2000"></div>
-          <div className="absolute bottom-10 left-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-25 animate-pulse animation-delay-4000"></div>
+          <div className="absolute top-20 left-20 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl animate-pulse opacity-20"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000 opacity-15"></div>
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6">
-              <TrendingUp className="w-5 h-5 text-cyan-400 mr-2" />
-              <span className="text-sm font-bold text-cyan-300">Global Impact & Growth</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 rounded-full px-8 py-4 mb-8">
+              <Sparkles className="w-6 h-6 text-blue-600 mr-3" />
+              <span className="text-lg font-bold text-blue-700">Launching Soon - Join the Revolution</span>
+              <Rocket className="w-6 h-6 text-blue-600 ml-3" />
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-6">
-              Trusted by <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">millions</span> worldwide
+            <h2 className="text-6xl lg:text-7xl font-bold mb-8 leading-tight text-gray-900">
+              Built for <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">tomorrow's</span> creators
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Join the global revolution of businesses transforming their social media presence with VeeFore's AI-powered platform
+            <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+              Be among the first to experience the future of AI-powered social media management. VeeFore is designed for ambitious creators and businesses ready to transform their digital presence.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="group relative">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300 hover:scale-105">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative z-10">
-                    <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                      {stat.value}
-                    </div>
-                    <div className="text-xl font-bold text-white mb-2">{stat.label}</div>
-                    <div className="text-sm text-gray-300">{stat.sublabel}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            <div className="group relative">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-blue-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Bot className="w-10 h-10 text-white" />
                   </div>
+                  <div className="text-4xl font-bold text-blue-600 mb-4">VeeGPT</div>
+                  <div className="text-xl font-bold text-gray-900 mb-3">AI Assistant</div>
+                  <div className="text-gray-600">Revolutionary AI trained on real-time social trends and viral content patterns</div>
                 </div>
               </div>
-            ))}
-          </div>
-          
-          {/* Trust Indicators */}
-          <div className="mt-16 pt-16 border-t border-white/10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-70">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">99.9%</div>
-                <div className="text-sm text-gray-400">Uptime</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">ISO 27001</div>
-                <div className="text-sm text-gray-400">Certified</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">GDPR</div>
-                <div className="text-sm text-gray-400">Compliant</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-1">24/7</div>
-                <div className="text-sm text-gray-400">Support</div>
+            </div>
+
+            <div className="group relative">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-purple-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Zap className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-purple-600 mb-4">1-Click</div>
+                  <div className="text-xl font-bold text-gray-900 mb-3">Automation</div>
+                  <div className="text-gray-600">Complete social media automation with intelligent scheduling and engagement</div>
+                </div>
               </div>
             </div>
+
+            <div className="group relative">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <BarChart3 className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-green-600 mb-4">Real-time</div>
+                  <div className="text-xl font-bold text-gray-900 mb-3">Analytics</div>
+                  <div className="text-gray-600">Advanced performance tracking with predictive insights and growth optimization</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-orange-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-red-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-orange-600 mb-4">Multi-Platform</div>
+                  <div className="text-xl font-bold text-gray-900 mb-3">Management</div>
+                  <div className="text-gray-600">Unified dashboard for Instagram, YouTube, TikTok, Twitter, and LinkedIn</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Early Access Benefits */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-white text-center">
+            <h3 className="text-4xl font-bold mb-6">Join the Early Access Program</h3>
+            <p className="text-xl mb-8 opacity-90">Be among the first 1000 users to experience VeeFore and help shape the future of social media management</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Crown className="w-8 h-8 text-yellow-300" />
+                </div>
+                <div className="text-lg font-bold mb-2">Lifetime Discount</div>
+                <div className="text-sm opacity-80">50% off for early adopters</div>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-blue-300" />
+                </div>
+                <div className="text-lg font-bold mb-2">Direct Access</div>
+                <div className="text-sm opacity-80">Priority support & feedback line</div>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-purple-300" />
+                </div>
+                <div className="text-lg font-bold mb-2">Exclusive Features</div>
+                <div className="text-sm opacity-80">Beta access to new AI models</div>
+              </div>
+            </div>
+
+            <Button className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300">
+              Join Early Access Waitlist
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Revolutionary Results Section */}
-      <section className="py-24 bg-gradient-to-br from-white via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Technology Stack Section */}
+      <section className="py-24 bg-gradient-to-br from-white via-gray-50 to-blue-50 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{backgroundImage: "radial-gradient(circle at 25px 25px, #9333ea 2px, transparent 0), radial-gradient(circle at 75px 75px, #ec4899 2px, transparent 0)", backgroundSize: "100px 100px"}}></div>
+          <div className="absolute inset-0" style={{backgroundImage: "radial-gradient(circle at 25px 25px, #3b82f6 2px, transparent 0), radial-gradient(circle at 75px 75px, #8b5cf6 2px, transparent 0)", backgroundSize: "100px 100px"}}></div>
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-purple-100 to-pink-100 rounded-full px-6 py-3 mb-6">
-              <BarChart3 className="w-5 h-5 text-purple-600 mr-2" />
-              <span className="text-sm font-bold text-purple-700">Proven Results & ROI</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-6 py-3 mb-6">
+              <Cpu className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-sm font-bold text-blue-700">Advanced AI Technology</span>
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              What can <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">VeeFore</span> do for you?
+              Powered by <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">cutting-edge</span> AI
             </h2>
             <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Discover the transformative power of AI-driven social media management with real, measurable results from businesses like yours
+              VeeFore combines the latest AI technologies to deliver unmatched social media management capabilities
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
             <div className="group relative">
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center shadow-2xl border-2 border-gray-100 hover:shadow-3xl transition-all duration-300 hover:-translate-y-3">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Clock className="w-10 h-10 text-white" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Bot className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-7xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-6">80%</div>
-                  <div className="text-xl font-bold text-gray-900 mb-4">Workload Reduction</div>
+                  <div className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent mb-6">GPT-4o</div>
+                  <div className="text-xl font-bold text-gray-900 mb-4">Language Models</div>
                   <div className="text-gray-600 leading-relaxed">
-                    Dramatic reduction in content creation time using VeeFore's advanced AI generation capabilities and automation
+                    Latest OpenAI GPT-4o integration for intelligent content generation, strategy planning, and audience analysis
                   </div>
                 </div>
               </div>
@@ -914,15 +972,15 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             <div className="group relative">
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center shadow-2xl border-2 border-gray-100 hover:shadow-3xl transition-all duration-300 hover:-translate-y-3">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-teal-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <TrendingUp className="w-10 h-10 text-white" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Image className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-7xl font-bold bg-gradient-to-r from-green-500 to-teal-500 bg-clip-text text-transparent mb-6">500%</div>
-                  <div className="text-xl font-bold text-gray-900 mb-4">Growth Acceleration</div>
+                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-6">DALL-E 3</div>
+                  <div className="text-xl font-bold text-gray-900 mb-4">Image Generation</div>
                   <div className="text-gray-600 leading-relaxed">
-                    Exponential growth across all social channels using VeeFore's intelligent automation and optimization algorithms
+                    Advanced AI image creation for stunning visuals, thumbnails, and branded content that captures attention
                   </div>
                 </div>
               </div>
@@ -930,36 +988,36 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             <div className="group relative">
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center shadow-2xl border-2 border-gray-100 hover:shadow-3xl transition-all duration-300 hover:-translate-y-3">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Users className="w-10 h-10 text-white" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <BarChart3 className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-7xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-6">2M+</div>
-                  <div className="text-xl font-bold text-gray-900 mb-4">New Followers</div>
+                  <div className="text-4xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-6">Analytics AI</div>
+                  <div className="text-xl font-bold text-gray-900 mb-4">Smart Insights</div>
                   <div className="text-gray-600 leading-relaxed">
-                    Massive follower growth on social media using VeeFore's data-driven growth strategies and AI insights
+                    Machine learning algorithms analyze performance data to provide actionable insights and growth recommendations
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Premium Company Logos */}
+          {/* Tech Stack Highlights */}
           <div className="text-center">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-8">Trusted by industry leaders worldwide</h3>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-8">Built with industry-leading technologies</h3>
             <div className="flex flex-wrap justify-center items-center gap-12 opacity-60">
               <div className="bg-white/80 backdrop-blur-sm rounded-xl px-8 py-4 shadow-lg">
-                <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">TechCorp</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">React</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl px-8 py-4 shadow-lg">
-                <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">GlobalFlow</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Node.js</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl px-8 py-4 shadow-lg">
-                <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">InnovateLab</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">MongoDB</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl px-8 py-4 shadow-lg">
-                <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">NextGen</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">OpenAI</div>
               </div>
             </div>
           </div>
@@ -1495,115 +1553,117 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Premium Testimonials */}
+      {/* Vision & Roadmap Section */}
       <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
         {/* Background Design */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-4000"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-4000"></div>
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-purple-100 to-blue-100 rounded-full px-8 py-4 mb-8">
-              <Star className="w-6 h-6 text-yellow-500 mr-3" />
-              <span className="text-lg font-bold text-purple-700">Customer Success Stories</span>
-              <Star className="w-6 h-6 text-yellow-500 ml-3" />
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-8 py-4 mb-8">
+              <Target className="w-6 h-6 text-blue-600 mr-3" />
+              <span className="text-lg font-bold text-blue-700">Vision & Roadmap</span>
+              <Rocket className="w-6 h-6 text-blue-600 ml-3" />
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-8">
-              What our <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">customers</span> are saying
+              The future of <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">social media</span> management
             </h2>
             <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Join thousands of satisfied customers who have transformed their social media strategy and achieved remarkable results with VeeFore
+              We're building the most comprehensive AI-powered social media platform. Here's what makes VeeFore different and where we're heading.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index}
-                className={`group relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-10 hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 ${
-                  activeTestimonial === index ? 'ring-4 ring-purple-500/50 scale-105' : ''
-                }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative z-10">
-                  {/* Quote Icon */}
-                  <div className="absolute -top-6 -left-6 w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-8 h-8 text-white" />
-                  </div>
-                  
-                  {/* Star Rating */}
-                  <div className="flex items-center mb-6 mt-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-6 h-6 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 mb-8">
-                    <img 
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
-                    />
-                    <div>
-                      <h4 className="text-2xl font-bold text-gray-900">{testimonial.name}</h4>
-                      <p className="text-lg text-purple-600 font-semibold">{testimonial.role}</p>
-                      <p className="text-sm text-gray-600 font-medium">{testimonial.company}</p>
-                    </div>
-                  </div>
-                  
-                  <blockquote className="text-xl text-gray-700 mb-8 italic leading-relaxed font-medium">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  
-                  {/* Results Badge */}
-                  <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-4">
-                    <div className="text-sm font-bold text-green-700 mb-1">Results Achieved:</div>
-                    <div className="text-lg font-bold text-green-800">
-                      {index === 0 ? "300% Growth in 6 months" : 
-                       index === 1 ? "85% Time Saved" :
-                       index === 2 ? "2M+ New Followers" : "ROI Increased 450%"}
-                    </div>
-                  </div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border-2 border-gray-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6">
+                <Lightbulb className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">Our Vision</h3>
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                To democratize social media success by making professional-grade AI tools accessible to creators and businesses of all sizes. We believe everyone deserves the power to create viral content and build authentic communities.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">AI-first approach to content creation</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">Human creativity enhanced by machine intelligence</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">Accessible pricing for all creators</span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Trust Indicators */}
-          <div className="text-center mt-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">4.9/5</div>
-                <div className="text-sm text-gray-600">Average Rating</div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border-2 border-gray-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                <Calendar className="w-8 h-8 text-white" />
               </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">10K+</div>
-                <div className="text-sm text-gray-600">Reviews</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">98%</div>
-                <div className="text-sm text-gray-600">Satisfaction</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">24/7</div>
-                <div className="text-sm text-gray-600">Support</div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-6">Launch Roadmap</h3>
+              <div className="space-y-6">
+                <div className="flex space-x-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mt-2"></div>
+                  <div>
+                    <div className="text-lg font-bold text-gray-900">Phase 1: Q1 2025</div>
+                    <div className="text-gray-600">Core platform with VeeGPT, basic automation, and Instagram integration</div>
+                  </div>
+                </div>
+                <div className="flex space-x-4">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mt-2"></div>
+                  <div>
+                    <div className="text-lg font-bold text-gray-900">Phase 2: Q2 2025</div>
+                    <div className="text-gray-600">Multi-platform support (YouTube, TikTok, Twitter), advanced analytics</div>
+                  </div>
+                </div>
+                <div className="flex space-x-4">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full mt-2"></div>
+                  <div>
+                    <div className="text-lg font-bold text-gray-900">Phase 3: Q3 2025</div>
+                    <div className="text-gray-600">AI video generation, team collaboration, enterprise features</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Pagination */}
-          <div className="flex justify-center space-x-3 mt-12">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveTestimonial(index)}
-                className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                  activeTestimonial === index ? 'bg-purple-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
-            ))}
+          {/* Key Features Preview */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-white text-center">
+            <h3 className="text-4xl font-bold mb-6">What Sets Us Apart</h3>
+            <p className="text-xl mb-8 opacity-90">Built by creators, for creators - with enterprise-grade AI at the core</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Brain className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-lg font-bold mb-2">True AI Intelligence</div>
+                <div className="text-sm opacity-80">Not just automation - real AI that learns and adapts</div>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-lg font-bold mb-2">Lightning Fast</div>
+                <div className="text-sm opacity-80">Create content in seconds, not hours</div>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-lg font-bold mb-2">Community Driven</div>
+                <div className="text-sm opacity-80">Built with feedback from real creators</div>
+              </div>
+            </div>
+
+            <Button className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 mt-8">
+              Join Our Journey
+            </Button>
           </div>
         </div>
       </section>
