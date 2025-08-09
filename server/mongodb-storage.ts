@@ -4613,14 +4613,14 @@ export class MongoStorage implements IStorage {
 
   async updateChatConversation(id: string | number, updates: Partial<ChatConversation>): Promise<ChatConversation> {
     await this.connect();
-    const updated = await ChatConversationModel.findByIdAndUpdate(
-      id,
+    const updated = await ChatConversationModel.findOneAndUpdate(
+      { id: id },
       { ...updates, updatedAt: new Date() },
       { new: true }
     );
     if (!updated) throw new Error('Conversation not found');
     return {
-      id: parseInt(updated._id.toString().slice(-8), 16), // Convert ObjectId to number
+      id: updated.id,
       userId: updated.userId,
       workspaceId: updated.workspaceId,
       title: updated.title,
@@ -4634,9 +4634,9 @@ export class MongoStorage implements IStorage {
   async deleteChatConversation(id: string | number): Promise<void> {
     await this.connect();
     // Delete all messages in the conversation first
-    await ChatMessageModel.deleteMany({ conversationId: id.toString() });
+    await ChatMessageModel.deleteMany({ conversationId: id });
     // Delete the conversation
-    await ChatConversationModel.findByIdAndDelete(id);
+    await ChatConversationModel.findOneAndDelete({ id: id });
   }
 }
 

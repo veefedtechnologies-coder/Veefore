@@ -13586,31 +13586,40 @@ Create a detailed growth strategy in JSON format:
       console.log('[CHAT] Created conversation:', conversation);
 
       // Create user message
+      console.log('[CHAT] Creating user message for conversation:', conversation.id);
       const userMessage = await storage.createChatMessage({
         conversationId: conversation.id,
         role: 'user',
         content: content.trim(),
         tokensUsed: 0
       });
+      console.log('[CHAT] Created user message:', userMessage);
 
       // Generate AI response
+      console.log('[CHAT] Generating AI response');
       const chatHistory = [{ role: 'user' as const, content: content.trim() }];
       const aiResponse = await OpenAIService.generateResponse(chatHistory);
+      console.log('[CHAT] Generated AI response:', aiResponse.substring(0, 100) + '...');
 
       // Create AI message
+      console.log('[CHAT] Creating AI message');
       const aiMessage = await storage.createChatMessage({
         conversationId: conversation.id,
         role: 'assistant',
         content: aiResponse,
         tokensUsed: Math.ceil(aiResponse.length / 4)
       });
+      console.log('[CHAT] Created AI message:', aiMessage);
 
       // Update conversation
+      console.log('[CHAT] Updating conversation');
       await storage.updateChatConversation(conversation.id, {
         lastMessageAt: new Date(),
         messageCount: 2
       });
+      console.log('[CHAT] Updated conversation successfully');
 
+      console.log('[CHAT] Sending response');
       res.json({ conversation, userMessage, aiMessage });
     } catch (error: any) {
       console.error('[CHAT] Create conversation error:', error);
