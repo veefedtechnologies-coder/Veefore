@@ -281,20 +281,34 @@ export default function VeeGPT() {
 
     switch (data.type) {
       case 'userMessage':
-        // Refresh messages to show user message
-        if (currentConversationId) {
-          queryClient.invalidateQueries({ 
-            queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
-          })
+        // Add user message to cache immediately
+        if (currentConversationId && data.message) {
+          queryClient.setQueryData(
+            ['/api/chat/conversations', currentConversationId, 'messages'],
+            (oldMessages: any[]) => {
+              if (!oldMessages) return [data.message]
+              // Check if message already exists to avoid duplicates
+              const messageExists = oldMessages.some(msg => msg.id === data.message.id)
+              if (messageExists) return oldMessages
+              return [...oldMessages, data.message]
+            }
+          )
         }
         break
 
       case 'aiMessageStart':
-        // AI message created, refresh to show placeholder
-        if (currentConversationId) {
-          queryClient.invalidateQueries({ 
-            queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
-          })
+        // Add AI message placeholder to cache immediately
+        if (currentConversationId && data.message) {
+          queryClient.setQueryData(
+            ['/api/chat/conversations', currentConversationId, 'messages'],
+            (oldMessages: any[]) => {
+              if (!oldMessages) return [data.message]
+              // Check if message already exists to avoid duplicates
+              const messageExists = oldMessages.some(msg => msg.id === data.message.id)
+              if (messageExists) return oldMessages
+              return [...oldMessages, data.message]
+            }
+          )
         }
         break
 
@@ -306,9 +320,8 @@ export default function VeeGPT() {
         break
 
       case 'complete':
-        // Generation completed
-        setIsGenerating(false)
-        isGeneratingRef.current = false
+        console.log('VeeGPT: Streaming message completed')
+        // Generation completed - this will be handled in the try/finally block
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
