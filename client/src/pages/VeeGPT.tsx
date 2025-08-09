@@ -565,8 +565,8 @@ export default function VeeGPT() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
-          <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
+          <div className="max-w-4xl mx-auto space-y-8 overflow-x-hidden">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -582,14 +582,36 @@ export default function VeeGPT() {
                 <div className={`${
                   message.role === 'user' 
                     ? 'max-w-md ml-auto' 
-                    : 'flex-1'
-                }`}>
+                    : 'flex-1 max-w-3xl'
+                }`} style={{
+                  minWidth: 0,
+                  overflow: 'hidden'
+                }}>
                   <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
                       ? 'bg-gray-200 text-gray-900'
                       : 'bg-transparent text-gray-900'
-                  }`}>
-                    <div className="whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere chat-message-content">{message.content}</div>
+                  }`} style={{
+                    wordWrap: 'break-word',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word',
+                    maxWidth: '100%'
+                  }}>
+                    <div 
+                      className="leading-relaxed"
+                      style={{
+                        wordWrap: 'break-word',
+                        wordBreak: 'break-all',
+                        overflowWrap: 'anywhere',
+                        whiteSpace: 'pre-wrap',
+                        maxWidth: '100%',
+                        width: '100%',
+                        hyphens: 'auto',
+                        lineBreak: 'anywhere'
+                      }}
+                    >
+                      {message.content}
+                    </div>
                   </div>
                   <div className={`mt-2 text-xs text-gray-500 ${
                     message.role === 'user' ? 'text-right' : 'text-left'
