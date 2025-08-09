@@ -11,6 +11,16 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+// Import generated interface images
+import VeeGPTInterface from '@assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png'
+import VideoStudioInterface from '@assets/generated_images/AI_Video_Studio_Interface_c4227f2a.png'
+import AnalyticsInterface from '@assets/generated_images/Analytics_Dashboard_Interface_939945d5.png'
+import ContentStudioInterface from '@assets/generated_images/Content_Studio_Interface_840b3ab8.png'
+import AutomationInterface from '@assets/generated_images/Automation_Engine_Interface_13697c8b.png'
+import SocialInboxInterface from '@assets/generated_images/Social_Inbox_Interface_a646e794.png'
+import SmartCalendarInterface from '@assets/generated_images/Smart_Calendar_Interface_c382119b.png'
+import SocialListeningInterface from '@assets/generated_images/Social_Listening_Interface_921552eb.png'
+
 interface LandingProps {
   onNavigate: (view: string) => void
 }
@@ -172,7 +182,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Experience the next generation of AI-powered social media assistance with VeeGPT, our flagship conversational AI that combines the power of GPT-4 with specialized social media expertise. Unlike generic chatbots, VeeGPT understands your brand, analyzes your audience, and provides contextual insights that drive real business growth.",
       icon: <Bot className="w-16 h-16 text-violet-500" />,
       gradient: "from-violet-500 via-purple-500 to-indigo-500",
-      image: "/api/placeholder/600/400",
+      image: VeeGPTInterface,
       details: [
         "Real-time streaming responses with ChatGPT-like interface optimized for social media workflows",
         "Advanced context awareness that remembers your brand voice, audience preferences, and campaign history",
@@ -193,7 +203,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Transform your video content strategy with Cosmos, our revolutionary AI video generation engine that creates broadcast-quality videos in minutes. From concept to final edit, Cosmos handles every aspect of video production using cutting-edge AI models and professional-grade automation.",
       icon: <Video className="w-16 h-16 text-blue-500" />,
       gradient: "from-blue-500 via-cyan-500 to-teal-500",
-      image: "/api/placeholder/600/400",
+      image: VideoStudioInterface,
       details: [
         "Advanced script generation using GPT-4 with viral content optimization and storytelling frameworks",
         "Automated scene creation with AI-generated visuals, animations, and professional transitions",
@@ -216,7 +226,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Unlock the full potential of your social media data with Analytics Pro, our comprehensive business intelligence platform that transforms raw metrics into actionable growth strategies. Built for enterprises and agencies managing multiple accounts and complex campaigns.",
       icon: <BarChart3 className="w-16 h-16 text-emerald-500" />,
       gradient: "from-emerald-500 via-green-500 to-teal-500",
-      image: "/api/placeholder/600/400",
+      image: AnalyticsInterface,
       details: [
         "Real-time dashboard with customizable widgets tracking 200+ social media metrics across all platforms",
         "Advanced audience demographics analysis with psychographic profiling and behavior prediction",
@@ -240,7 +250,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Revolutionize your content creation process with Content Studio, our advanced AI platform that combines creativity with data-driven insights. Generate high-converting content that resonates with your audience while maintaining your unique brand voice and style.",
       icon: <Palette className="w-16 h-16 text-pink-500" />,
       gradient: "from-pink-500 via-rose-500 to-red-500",
-      image: "/api/placeholder/600/400",
+      image: ContentStudioInterface,
       details: [
         "Advanced content generation using multiple AI models (GPT-4, Claude, custom fine-tuned models)",
         "Brand voice training with tone analysis and consistency enforcement across all content",
@@ -264,7 +274,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Transform your social media management with our sophisticated automation platform that goes beyond simple scheduling. Create intelligent workflows that respond to audience behavior, market conditions, and performance metrics in real-time.",
       icon: <Zap className="w-16 h-16 text-yellow-500" />,
       gradient: "from-yellow-500 via-orange-500 to-red-500",
-      image: "/api/placeholder/600/400",
+      image: AutomationInterface,
       details: [
         "Advanced rule-based automation with conditional logic, triggers, and complex workflow chains",
         "AI-powered comment management with context-aware responses and sentiment analysis",
@@ -288,7 +298,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Centralize all your social media communications in one powerful inbox designed for teams and enterprises. Manage conversations, customer service, and community engagement with AI-powered efficiency and human-level quality.",
       icon: <MessageSquare className="w-16 h-16 text-indigo-500" />,
       gradient: "from-indigo-500 via-blue-500 to-purple-500",
-      image: "/api/placeholder/600/400",
+      image: SocialInboxInterface,
       details: [
         "Unified inbox aggregating messages from 20+ social platforms and communication channels",
         "AI-powered message categorization with priority scoring and urgency detection",
@@ -312,7 +322,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Master your content strategy with our intelligent calendar system that combines AI-powered optimization with comprehensive planning tools. Plan, schedule, and optimize your content for maximum impact across all platforms.",
       icon: <Calendar className="w-16 h-16 text-green-500" />,
       gradient: "from-green-500 via-emerald-500 to-teal-500",
-      image: "/api/placeholder/600/400",
+      image: SmartCalendarInterface,
       details: [
         "AI-optimized posting schedules based on audience behavior, platform algorithms, and engagement patterns",
         "Advanced drag-and-drop calendar interface with bulk editing and multi-platform coordination",
@@ -336,7 +346,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
       description: "Accelerate your audience growth with our comprehensive platform that combines AI-driven strategies, competitive intelligence, and proven growth tactics to build engaged, high-value communities around your brand.",
       icon: <TrendingUp className="w-16 h-16 text-purple-500" />,
       gradient: "from-purple-500 via-pink-500 to-rose-500",
-      image: "/api/placeholder/600/400",
+      image: SocialListeningInterface,
       details: [
         "AI-powered growth strategies customized for your industry, audience, and business objectives",
         "Comprehensive competitor analysis with strategy insights and opportunity identification",
