@@ -3269,42 +3269,192 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-violet-600 to-blue-600 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      {/* Premium CTA Section - Apple Inspired */}
+      <section className="relative py-40 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Ultra Dynamic Background */}
+        <div className="absolute inset-0">
+          {/* Base Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-900 via-blue-800 to-indigo-900"></div>
+          
+          {/* Animated Mesh Gradients */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-violet-600/30 via-transparent to-transparent animate-pulse"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-blue-600/30 via-transparent to-transparent animate-pulse delay-1000"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-600/20 via-transparent to-transparent animate-pulse delay-500"></div>
+          
+          {/* Floating Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl animate-[float-premium_20s_ease-in-out_infinite]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-[float-delayed-premium_25s_ease-in-out_infinite]"></div>
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl animate-[morph-premium-1_30s_ease-in-out_infinite] -translate-x-1/2 -translate-y-1/2"></div>
+          
+          {/* Particle Effect */}
+          <div className="absolute inset-0 opacity-30">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full animate-[particles-float_15s_ease-in-out_infinite]"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 15}s`
+                }}
+              ></div>
+            ))}
+          </div>
+          
+          {/* Premium Noise Texture */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E")`
           }}></div>
         </div>
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-8">
-            Ready to Transform Your Social Media?
-          </h2>
-          <p className="text-xl lg:text-2xl text-blue-100 mb-12 leading-relaxed">
-            Join the future of social media management. Start with VeeGPT and explore our complete AI platform.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Button 
-              onClick={() => handleNavigation('veegpt')}
-              className="bg-white text-violet-600 hover:bg-gray-50 px-12 py-4 text-lg font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 border-2 border-white"
-            >
-              <Bot className="w-6 h-6 mr-3" />
-              Start with VeeGPT Free
-            </Button>
-            <Button 
-              variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-lg font-bold rounded-xl backdrop-blur-sm transition-all duration-300"
-            >
-              <Video className="w-6 h-6 mr-3" />
-              Explore Video Studio
-            </Button>
+        {/* Content Container */}
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Premium Header Section */}
+          <div className="text-center mb-20">
+            {/* Status Badge */}
+            <div className="inline-flex items-center backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl px-8 py-4 mb-12 shadow-2xl">
+              <div className="relative mr-4">
+                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
+              </div>
+              <span className="text-white font-semibold text-lg tracking-wide">AI Revolution • Coming Soon</span>
+            </div>
+            
+            {/* Apple-Style Typography */}
+            <h2 className="text-7xl lg:text-9xl font-black mb-12 leading-[0.85] tracking-tight">
+              <span className="block text-white mb-6">
+                Ready to
+              </span>
+              <span className="block bg-gradient-to-r from-emerald-400 via-blue-400 to-violet-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] mb-6">
+                Transform
+              </span>
+              <span className="block text-white/90 text-6xl lg:text-8xl">
+                Your Social Media?
+              </span>
+            </h2>
+            
+            <p className="text-2xl lg:text-3xl text-white/80 max-w-5xl mx-auto leading-relaxed font-light mb-16">
+              Step into the future of social media management. Experience revolutionary AI that understands, creates, and optimizes your content like never before.
+            </p>
           </div>
 
-          <div className="mt-12 text-blue-100">
-            <p className="text-lg">🚀 Join thousands of creators already transforming their social media with VeeFore</p>
+          {/* Premium Action Buttons */}
+          <div className="flex flex-col lg:flex-row gap-8 justify-center items-center mb-20">
+            {/* Primary CTA */}
+            <div className="group relative">
+              {/* Button Glow */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500 opacity-60 group-hover:opacity-100"></div>
+              
+              <Button 
+                onClick={() => handleNavigation('veegpt')}
+                className="relative bg-white text-slate-900 hover:bg-gray-50 px-16 py-6 text-xl font-bold rounded-2xl shadow-2xl transform hover:-translate-y-2 transition-all duration-500 border-0 group-hover:scale-105"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-violet-600 to-blue-600 rounded-lg flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-white" />
+                  </div>
+                  <span>Start with VeeGPT Free</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
+              </Button>
+            </div>
+            
+            {/* Secondary CTA */}
+            <div className="group relative">
+              <Button 
+                variant="outline"
+                className="relative backdrop-blur-xl bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 px-16 py-6 text-xl font-bold rounded-2xl transition-all duration-500 hover:-translate-y-1 group-hover:scale-105"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Video className="w-5 h-5 text-white" />
+                  </div>
+                  <span>Watch Demo</span>
+                  <Play className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                </div>
+              </Button>
+            </div>
+          </div>
+
+          {/* Premium Features Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+            {[
+              {
+                icon: Zap,
+                title: "AI-Powered",
+                description: "Revolutionary algorithms that understand your brand",
+                gradient: "from-yellow-400 to-orange-500"
+              },
+              {
+                icon: Shield,
+                title: "Enterprise Ready",
+                description: "Bank-level security with 99.9% uptime guarantee",
+                gradient: "from-emerald-400 to-green-500"
+              },
+              {
+                icon: TrendingUp,
+                title: "Real-time Analytics",
+                description: "Advanced insights that drive measurable growth",
+                gradient: "from-blue-400 to-violet-500"
+              }
+            ].map((feature, index) => (
+              <div 
+                key={index}
+                className="group relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 hover:-translate-y-2"
+              >
+                {/* Feature Icon */}
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-2xl`}>
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
+                <p className="text-white/70 text-lg leading-relaxed">{feature.description}</p>
+                
+                {/* Hover Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Social Proof Section */}
+          <div className="text-center">
+            <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 mb-12 shadow-2xl">
+              <div className="flex items-center justify-center space-x-8 mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <span className="text-white font-semibold text-lg">50+ Beta Testers</span>
+                </div>
+                <div className="w-px h-6 bg-white/20"></div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse delay-200"></div>
+                  <span className="text-white font-semibold text-lg">95% Satisfaction</span>
+                </div>
+                <div className="w-px h-6 bg-white/20"></div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-violet-400 rounded-full animate-pulse delay-400"></div>
+                  <span className="text-white font-semibold text-lg">24/7 Support</span>
+                </div>
+              </div>
+              <p className="text-white/80 text-xl font-light">
+                Join visionary creators and businesses already transforming their social media presence
+              </p>
+            </div>
+            
+            {/* Trust Indicators */}
+            <div className="flex justify-center items-center space-x-12 text-white/60">
+              <div className="flex items-center space-x-3">
+                <Shield className="w-6 h-6" />
+                <span className="font-medium">SOC 2 Compliant</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Lock className="w-6 h-6" />
+                <span className="font-medium">End-to-End Encrypted</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Award className="w-6 h-6" />
+                <span className="font-medium">Industry Leading</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
