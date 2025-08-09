@@ -500,12 +500,15 @@ export default function VeeGPT() {
         })
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
+        isGeneratingRef.current = true
+        
         // Update streaming content for real-time display - accumulate chunks
         if (data.messageId && data.content !== undefined) {
           console.log('VeeGPT: PROCESSING CHUNK - MessageId:', data.messageId, 'Content:', `"${data.content}"`)
           
           // Force immediate state update with React's flushSync for real-time streaming
           setStreamingContent(prev => {
+            // Initialize if not exists to catch first chunks that arrive before aiMessageStart
             const currentContent = prev[data.messageId] || ''
             const newContent = currentContent + data.content
             console.log('VeeGPT: STREAMING UPDATE - Message:', data.messageId, 'Current:', `"${currentContent}"`, 'Adding:', `"${data.content}"`, 'New Total:', `"${newContent}"`)
@@ -515,6 +518,41 @@ export default function VeeGPT() {
             newState[data.messageId] = newContent
             return newState
           })
+          
+          // Ensure placeholder message exists in cache if not already there
+          if (currentConversationId) {
+            queryClient.setQueryData(
+              ['/api/chat/conversations', currentConversationId, 'messages'],
+              (oldMessages: any[]) => {
+                if (!oldMessages) {
+                  const placeholderMessage = {
+                    id: data.messageId,
+                    conversationId: currentConversationId,
+                    role: 'assistant' as const,
+                    content: '',
+                    tokensUsed: 0,
+                    createdAt: new Date().toISOString()
+                  }
+                  return [placeholderMessage]
+                }
+                
+                // Check if message already exists
+                const messageExists = oldMessages.some(msg => msg.id === data.messageId)
+                if (!messageExists) {
+                  const placeholderMessage = {
+                    id: data.messageId,
+                    conversationId: currentConversationId,
+                    role: 'assistant' as const,
+                    content: '',
+                    tokensUsed: 0,
+                    createdAt: new Date().toISOString()
+                  }
+                  return [...oldMessages, placeholderMessage]
+                }
+                return oldMessages
+              }
+            )
+          }
         } else {
           console.log('VeeGPT: CHUNK IGNORED - Missing messageId or content:', { messageId: data.messageId, content: data.content })
         }
