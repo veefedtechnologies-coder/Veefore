@@ -278,8 +278,19 @@ export default function VeeGPT() {
       // WebSocket should already be connected and will handle streaming
       return response
     },
-    onMutate: async () => {
-      // Show the user message immediately by transitioning to chat view
+    onMutate: async (content: string) => {
+      // Create optimistic user message immediately for seamless UI transition
+      const optimisticUserMessage = {
+        id: Date.now(), // Temporary ID
+        conversationId: 0, // Will be updated when real conversation is created
+        role: 'user' as const,
+        content: content,
+        tokensUsed: 0,
+        createdAt: new Date()
+      }
+      
+      // Show optimistic message and transition to chat view immediately
+      setOptimisticMessages([optimisticUserMessage])
       setHasSentFirstMessage(true)
     },
     onSuccess: (data) => {
@@ -635,26 +646,7 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
-    // Immediately show optimistic UI updates to prevent blank page
-    if (!hasSentFirstMessage) {
-      // For new conversations, immediately transition to chat view
-      setHasSentFirstMessage(true)
-      
-      // Add optimistic user message to display immediately
-      const optimisticUserMessage = {
-        id: Date.now(), // Temporary ID
-        conversationId: 0, // Will be updated when real conversation is created
-        role: 'user' as const,
-        content: messageContent,
-        tokensUsed: 0,
-        createdAt: new Date()
-      }
-      
-      // Store optimistic message temporarily
-      setOptimisticMessages([optimisticUserMessage])
-    }
-    
-    // Clear input immediately after showing optimistic update
+    // Clear input immediately for responsive UI
     setInputText('')
     
     // Clear contenteditable div if using it
@@ -691,11 +683,7 @@ export default function VeeGPT() {
         textareaRef.current.value = messageContent
       }
       
-      // Revert optimistic updates on error
-      if (!currentConversationId) {
-        setHasSentFirstMessage(false)
-        setOptimisticMessages([])
-      }
+      // Revert optimistic updates handled by mutation onError
     }
   }
 
@@ -746,7 +734,8 @@ export default function VeeGPT() {
   
   // Show welcome screen when starting a new chat or when no conversation is selected
   // Always show sidebar if conversations exist, regardless of new chat state
-  if (!currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat)) {
+  // Don't show welcome screen if we have optimistic messages (instant UI transition)
+  if (!currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0) {
     return (
       <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
         {/* Sidebar - show if conversations exist */}
