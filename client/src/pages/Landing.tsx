@@ -2353,73 +2353,208 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Technology & Innovation Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-violet-900/50 to-blue-900/50 rounded-full px-6 py-3 mb-8 border border-violet-500/30">
-              <Cpu className="w-5 h-5 text-violet-400 mr-2" />
-              <span className="text-violet-300 font-semibold">Advanced Technology Stack</span>
+      {/* Revolutionary Technology & Innovation Section */}
+      <section className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Revolutionary Background with Apple-style Gradient Orbs */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50">
+          {/* Floating Gradient Orbs */}
+          <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl animate-float-premium" />
+          <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-float-delayed-premium" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-emerald-400/15 to-green-400/15 rounded-full blur-2xl animate-morph-premium-1" />
+          
+          {/* Neural Network Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <svg width="100%" height="100%" viewBox="0 0 100 100" className="animate-pulse">
+              <defs>
+                <pattern id="neural" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1" fill="currentColor" opacity="0.4"/>
+                  <circle cx="18" cy="18" r="1" fill="currentColor" opacity="0.4"/>
+                  <line x1="2" y1="2" x2="18" y2="18" stroke="currentColor" strokeWidth="0.5" opacity="0.2"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#neural)"/>
+            </svg>
+          </div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          {/* Revolutionary Header */}
+          <div className="text-center mb-24">
+            <div className="inline-flex items-center bg-white/80 backdrop-blur-xl rounded-full px-8 py-4 mb-8 border border-gray-200/50 shadow-xl">
+              <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full flex items-center justify-center mr-3 animate-icon-float-industry">
+                <Cpu className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-gray-700 font-bold text-lg">Advanced Technology Stack</span>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Powered by Cutting-Edge AI
+            
+            <h2 className="text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
+              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                Powered by
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent animate-gradient-shift">
+                Cutting-Edge AI
               </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+            
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               Built on enterprise-grade infrastructure with the latest AI models, cloud computing, and security technologies to deliver unmatched performance and reliability.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
-              <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
-                <Brain className="w-8 h-8 text-white" />
+          {/* Revolutionary 3D Technology Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+            {/* Advanced AI Models Card */}
+            <div className="group relative">
+              {/* Card Background with Glass Morphism */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" />
+              
+              {/* Floating Particles */}
+              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                <div className="absolute top-4 right-4 w-2 h-2 bg-violet-400 rounded-full animate-industry-particles opacity-60" />
+                <div className="absolute bottom-8 left-6 w-1.5 h-1.5 bg-purple-400 rounded-full animate-industry-particles opacity-40" style={{animationDelay: '2s'}} />
+                <div className="absolute top-1/2 right-8 w-1 h-1 bg-blue-400 rounded-full animate-industry-particles opacity-50" style={{animationDelay: '4s'}} />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Advanced AI Models</h3>
-              <p className="text-gray-400 mb-6">Multiple state-of-the-art AI models working in harmony to deliver exceptional results.</p>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />GPT-4 Turbo for advanced reasoning</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Claude 3 for content analysis</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Custom fine-tuned models</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />DALL-E 3 for image generation</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Whisper for audio processing</li>
-              </ul>
+              
+              {/* Card Content */}
+              <div className="relative p-10">
+                <div className="w-20 h-20 bg-gradient-to-r from-violet-500 to-purple-600 rounded-3xl flex items-center justify-center mb-8 shadow-xl transform transition-all duration-500 group-hover:scale-110 animate-icon-float-industry">
+                  <Brain className="w-10 h-10 text-white" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Advanced AI Models</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">Multiple state-of-the-art AI models working in harmony to deliver exceptional results.</p>
+                
+                <div className="space-y-4">
+                  {[
+                    "GPT-4 Turbo for advanced reasoning",
+                    "Claude 3 for content analysis", 
+                    "Custom fine-tuned models",
+                    "DALL-E 3 for image generation",
+                    "Whisper for audio processing"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-center group-hover:translate-x-2 transition-transform duration-300" style={{transitionDelay: `${index * 100}ms`}}>
+                      <div className="w-6 h-6 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-gray-700 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
-                <Cloud className="w-8 h-8 text-white" />
+            {/* Cloud Infrastructure Card */}
+            <div className="group relative">
+              {/* Card Background with Glass Morphism */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '5s'}} />
+              
+              {/* Floating Particles */}
+              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                <div className="absolute top-6 left-4 w-2 h-2 bg-blue-400 rounded-full animate-industry-particles opacity-60" />
+                <div className="absolute bottom-6 right-6 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-industry-particles opacity-40" style={{animationDelay: '3s'}} />
+                <div className="absolute top-1/3 left-8 w-1 h-1 bg-sky-400 rounded-full animate-industry-particles opacity-50" style={{animationDelay: '6s'}} />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Cloud Infrastructure</h3>
-              <p className="text-gray-400 mb-6">Enterprise-grade cloud infrastructure ensuring 99.9% uptime and global accessibility.</p>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Multi-region deployment</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Auto-scaling architecture</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />CDN optimization</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Real-time monitoring</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Disaster recovery</li>
-              </ul>
+              
+              {/* Card Content */}
+              <div className="relative p-10">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center mb-8 shadow-xl transform transition-all duration-500 group-hover:scale-110 animate-icon-float-industry" style={{animationDelay: '2s'}}>
+                  <Cloud className="w-10 h-10 text-white" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Cloud Infrastructure</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">Enterprise-grade cloud infrastructure ensuring 99.9% uptime and global accessibility.</p>
+                
+                <div className="space-y-4">
+                  {[
+                    "Multi-region deployment",
+                    "Auto-scaling architecture",
+                    "CDN optimization", 
+                    "Real-time monitoring",
+                    "Disaster recovery"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-center group-hover:translate-x-2 transition-transform duration-300" style={{transitionDelay: `${index * 100}ms`}}>
+                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-gray-700 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-                <Lock className="w-8 h-8 text-white" />
+            {/* Security & Privacy Card */}
+            <div className="group relative">
+              {/* Card Background with Glass Morphism */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '10s'}} />
+              
+              {/* Floating Particles */}
+              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                <div className="absolute top-8 right-6 w-2 h-2 bg-emerald-400 rounded-full animate-industry-particles opacity-60" />
+                <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-green-400 rounded-full animate-industry-particles opacity-40" style={{animationDelay: '4s'}} />
+                <div className="absolute top-2/3 right-4 w-1 h-1 bg-teal-400 rounded-full animate-industry-particles opacity-50" style={{animationDelay: '7s'}} />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Security & Privacy</h3>
-              <p className="text-gray-400 mb-6">Bank-level security with comprehensive privacy protection and regulatory compliance.</p>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />End-to-end encryption</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />SOC 2 Type II certified</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />GDPR compliant</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Regular security audits</li>
-                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Zero-trust architecture</li>
-              </ul>
+              
+              {/* Card Content */}
+              <div className="relative p-10">
+                <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl flex items-center justify-center mb-8 shadow-xl transform transition-all duration-500 group-hover:scale-110 animate-icon-float-industry" style={{animationDelay: '4s'}}>
+                  <Lock className="w-10 h-10 text-white" />
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Security & Privacy</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">Bank-level security with comprehensive privacy protection and regulatory compliance.</p>
+                
+                <div className="space-y-4">
+                  {[
+                    "End-to-end encryption",
+                    "SOC 2 Type II certified",
+                    "GDPR compliant",
+                    "Regular security audits", 
+                    "Zero-trust architecture"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-center group-hover:translate-x-2 transition-transform duration-300" style={{transitionDelay: `${index * 100}ms`}}>
+                      <div className="w-6 h-6 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-gray-700 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Revolutionary Technology Stack Footer */}
           <div className="text-center">
-            <p className="text-gray-400 text-lg">Built with modern technologies: React, Node.js, MongoDB, Redis, Docker, Kubernetes, and more</p>
+            <div className="inline-flex items-center bg-white/80 backdrop-blur-xl rounded-2xl px-8 py-6 border border-gray-200/50 shadow-xl">
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full animate-pulse" />
+                  <span className="text-gray-700 font-medium">React</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full animate-pulse" style={{animationDelay: '0.5s'}} />
+                  <span className="text-gray-700 font-medium">Node.js</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full animate-pulse" style={{animationDelay: '1s'}} />
+                  <span className="text-gray-700 font-medium">MongoDB</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-full animate-pulse" style={{animationDelay: '1.5s'}} />
+                  <span className="text-gray-700 font-medium">Redis</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-orange-500 to-yellow-600 rounded-full animate-pulse" style={{animationDelay: '2s'}} />
+                  <span className="text-gray-700 font-medium">Docker</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full animate-pulse" style={{animationDelay: '2.5s'}} />
+                  <span className="text-gray-700 font-medium">Kubernetes</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
