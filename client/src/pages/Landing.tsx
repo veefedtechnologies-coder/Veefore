@@ -1345,10 +1345,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             {/* Primary Feature - Large Hero Card */}
             <div className="col-span-12 lg:col-span-8 group">
-              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black shadow-2xl">
+              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/50 shadow-2xl">
                 {/* Animated Background */}
                 <div className="absolute inset-0">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-600/20 via-slate-600/30 to-gray-700/20 animate-gradient-shift" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-gray-50/30 to-indigo-50/50 animate-gradient-shift" />
                   <div className="absolute inset-0 opacity-30">
                     {[...Array(20)].map((_, i) => (
                       <div
@@ -1370,32 +1370,32 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center">
                     <div className="max-w-lg">
                       <div className="flex items-center space-x-3 mb-6">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
-                          <div className="text-white text-xl">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center">
+                          <div className="text-blue-600 text-xl">
                             {platformFeatures[0].icon}
                           </div>
                         </div>
                         <div>
-                          <div className="text-white/60 text-xs font-bold uppercase tracking-wider">
+                          <div className="text-gray-600 text-xs font-bold uppercase tracking-wider">
                             {platformFeatures[0].subtitle}
                           </div>
-                          <div className="text-white text-sm font-medium">
+                          <div className="text-gray-900 text-sm font-medium">
                             Next-Generation AI
                           </div>
                         </div>
                       </div>
                       
-                      <h3 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
+                      <h3 className="text-4xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
                         {detailedFeatures[0].title.split(' - ')[0]}
                       </h3>
-                      <p className="text-white/80 text-lg lg:text-xl font-light leading-relaxed mb-8">
+                      <p className="text-gray-700 text-lg lg:text-xl font-light leading-relaxed mb-8">
                         {detailedFeatures[0].description}
                       </p>
                       
                       <div className="space-y-4 mb-8">
                         {detailedFeatures[0].details.slice(0, 3).map((detail, idx) => (
-                          <div key={idx} className="flex items-center space-x-3 text-white/90">
-                            <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full" />
+                          <div key={idx} className="flex items-center space-x-3 text-gray-700">
+                            <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" />
                             <span className="text-sm font-medium">{detail}</span>
                           </div>
                         ))}
@@ -1403,10 +1403,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       
                       <button 
                         onClick={() => handleNavigation('veegpt')}
-                        className="group relative inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:scale-105"
+                        className="group relative inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-2xl text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
                       >
                         <span className="relative z-10">Experience VeeGPT</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </button>
                     </div>
                   </div>
@@ -1415,39 +1415,39 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <div className="flex-1 relative p-8 lg:p-12 flex items-center justify-center">
                     <div className="relative group-hover:scale-105 transition-transform duration-700">
                       {/* Main Interface Mockup */}
-                      <div className="w-80 h-96 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 overflow-hidden shadow-2xl">
-                        <div className="h-16 bg-white/5 border-b border-white/10 flex items-center justify-between px-6">
+                      <div className="w-80 h-96 rounded-3xl bg-white border border-gray-200 overflow-hidden shadow-2xl">
+                        <div className="h-16 bg-gray-50 border-b border-gray-200 flex items-center justify-between px-6">
                           <div className="flex items-center space-x-2">
                             <div className="w-3 h-3 bg-red-400 rounded-full" />
                             <div className="w-3 h-3 bg-yellow-400 rounded-full" />
                             <div className="w-3 h-3 bg-green-400 rounded-full" />
                           </div>
-                          <div className="text-white/60 text-xs font-medium">VeeGPT</div>
+                          <div className="text-gray-600 text-xs font-medium">VeeGPT</div>
                         </div>
                         <div className="p-6 space-y-4">
                           {/* Animated Chat Bubbles */}
-                          <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
+                          <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
                             <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600" />
-                              <span className="text-white/80 text-xs">VeeGPT</span>
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600" />
+                              <span className="text-gray-700 text-xs">VeeGPT</span>
                             </div>
-                            <div className="text-white/70 text-sm">
+                            <div className="text-gray-700 text-sm">
                               <div className="animate-typing">How can I help you create amazing content today?</div>
                             </div>
                           </div>
                           
-                          <div className="bg-gray-500/20 rounded-2xl p-4 border border-gray-400/20 ml-8">
-                            <div className="text-white/90 text-sm">
+                          <div className="bg-gray-100 rounded-2xl p-4 border border-gray-200 ml-8">
+                            <div className="text-gray-800 text-sm">
                               Generate a viral TikTok script about AI
                             </div>
                           </div>
                           
-                          <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
+                          <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
                             <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 animate-pulse" />
-                              <span className="text-white/80 text-xs">VeeGPT</span>
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 animate-pulse" />
+                              <span className="text-gray-700 text-xs">VeeGPT</span>
                             </div>
-                            <div className="text-white/70 text-sm">
+                            <div className="text-gray-700 text-sm">
                               <div className="animate-pulse">Creating your viral script...</div>
                             </div>
                           </div>
@@ -1455,17 +1455,17 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                       
                       {/* Floating Action Cards with Real Interface Preview */}
-                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
+                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
                         <img 
                           src="attached_assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png"
                           alt="VeeGPT Preview"
                           className="w-full h-full object-cover opacity-80"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-br from-gray-600/40 to-gray-700/40 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 to-indigo-600/40 flex items-center justify-center">
                           <Sparkles className="w-8 h-8 text-white" />
                         </div>
                       </div>
-                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center animate-float-delayed-premium shadow-xl">
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center animate-float-delayed-premium shadow-xl">
                         <Zap className="w-6 h-6 text-white" />
                       </div>
                     </div>
@@ -1476,28 +1476,28 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* Secondary Feature - Tall Card */}
             <div className="col-span-12 lg:col-span-4 group">
-              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-gray-800 via-slate-700 to-zinc-800 shadow-2xl relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-blue-50 to-indigo-50 border border-gray-200 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-50/20 to-transparent" />
                 
                 <div className="relative h-full p-8 flex flex-col">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <div className="text-white text-2xl">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-blue-600 text-2xl">
                         {detailedFeatures[1].icon}
                       </div>
                     </div>
                     <div>
-                      <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                      <div className="text-gray-600 text-xs font-bold uppercase tracking-wider">
                         AI Video Studio
                       </div>
-                      <div className="text-white text-lg font-bold">
+                      <div className="text-gray-900 text-lg font-bold">
                         {detailedFeatures[1].title.split(' - ')[0]}
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-center">
-                    <p className="text-white/90 text-lg mb-8 leading-relaxed">
+                    <p className="text-gray-700 text-lg mb-8 leading-relaxed">
                       {detailedFeatures[1].description.substring(0, 200)}...
                     </p>
                     
@@ -1508,23 +1508,23 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         { label: "Professional Voiceover", value: "92%" },
                         { label: "Scene Creation", value: "88%" }
                       ].map((metric, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                          <span className="text-white/90 text-sm font-medium">{metric.label}</span>
+                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-100">
+                          <span className="text-gray-700 text-sm font-medium">{metric.label}</span>
                           <div className="flex items-center space-x-3">
-                            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
+                            <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-gray-300 to-gray-400 rounded-full transition-all duration-1000"
+                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-1000"
                                 style={{ width: metric.value }}
                               />
                             </div>
-                            <span className="text-white/70 text-xs font-medium w-8">{metric.value}</span>
+                            <span className="text-gray-600 text-xs font-medium w-8">{metric.value}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                   
-                  <button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                  <button className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-2xl py-4 text-white font-medium transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg">
                     <span>Explore Video Studio</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
