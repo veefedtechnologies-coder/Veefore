@@ -846,264 +846,214 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Premium Platform Features Section - Glass Morphism Design */}
-      <section id="platform" className="relative py-32 px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50 overflow-hidden">
-        {/* Advanced Background Elements */}
+      {/* Apple-Inspired Revolutionary Platform Features */}
+      <section id="platform" className="relative py-24 px-6 lg:px-8 bg-gradient-to-b from-gray-50 via-white to-gray-50 overflow-hidden">
+        {/* Sophisticated Background System */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-40">
-            <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-violet-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-32 right-20 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-            <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-br from-pink-400/15 to-rose-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+          {/* Dynamic Mesh Gradient */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-violet-200/40 via-purple-100/20 to-transparent rounded-full blur-3xl animate-float" />
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-blue-200/40 via-indigo-100/20 to-transparent rounded-full blur-3xl animate-float-delayed" />
           </div>
           
-          {/* Grid Pattern */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDAsIDAsIDAsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+          {/* Premium Dot Grid */}
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(99,102,241,0.3) 1px, transparent 0)`,
+            backgroundSize: '24px 24px'
+          }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-24">
-            <div className="inline-flex items-center mb-8 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-600/20 rounded-full blur-2xl scale-150" />
-                <div className="relative bg-white/70 backdrop-blur-2xl border border-white/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-105">
-                  <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+        <div className="relative max-w-8xl mx-auto">
+          {/* Apple-Style Header */}
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent text-sm font-medium tracking-wider uppercase">
+                Revolutionary Platform
+              </div>
+            </div>
+            
+            <h2 className="text-5xl lg:text-7xl font-bold mb-6 tracking-tight">
+              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                Designed for the way
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                you create.
+              </span>
+            </h2>
+            
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
+              Four breakthrough features that transform how you work, think, and create in the digital age.
+            </p>
+          </div>
+
+          {/* Apple-Style Feature Layout */}
+          <div className="space-y-16">
+            
+            {/* Primary Feature - Full Width Hero */}
+            <div className="relative group">
+              <div className="bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div className="relative h-[600px] lg:h-[500px] flex flex-col lg:flex-row items-center">
+                  {/* Content Side */}
+                  <div className="flex-1 p-12 lg:p-16 text-white">
+                    <div className="max-w-lg">
+                      <div className="text-sm font-medium opacity-80 mb-4 tracking-wider uppercase">
+                        {platformFeatures[0].subtitle}
+                      </div>
+                      <h3 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                        {platformFeatures[0].title.split(' - ')[0]}
+                      </h3>
+                      <p className="text-xl opacity-90 mb-8 leading-relaxed">
+                        {platformFeatures[0].description}
+                      </p>
+                      
+                      {/* Feature List */}
+                      <div className="space-y-3 mb-8">
+                        {platformFeatures[0].features.slice(0, 3).map((feature, idx) => (
+                          <div key={idx} className="flex items-center space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                            <span className="text-white/90">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-8 py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center space-x-2">
+                        <span>Try {platformFeatures[0].title.split(' - ')[0]}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <span className="text-gray-800 font-semibold">Revolutionary Platform</span>
-                  <div className="flex space-x-1">
-                    <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" />
-                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  
+                  {/* Visual Side */}
+                  <div className="flex-1 relative h-full">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative">
+                        {/* Main Visual Element */}
+                        <div className="w-80 h-80 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 p-8 transform rotate-3 group-hover:rotate-6 transition-transform duration-700">
+                          <div className="w-full h-full rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center">
+                            <div className="text-white text-6xl">
+                              {platformFeatures[0].icon}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Floating Elements */}
+                        <div className="absolute -top-8 -right-8 w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center animate-float">
+                          <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-xl bg-white/15 backdrop-blur-xl border border-white/25 flex items-center justify-center animate-float-delayed">
+                          <Zap className="w-6 h-6 text-white" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <h2 className="text-6xl lg:text-8xl font-black mb-12 leading-none">
-              <span className="block bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 bg-clip-text text-transparent mb-4">
-                AI-Powered
-              </span>
-              <span className="block bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Excellence
-              </span>
-            </h2>
-            
-            <p className="text-2xl lg:text-3xl text-gray-700 max-w-5xl mx-auto font-light leading-relaxed">
-              Discover groundbreaking features that redefine digital creativity and 
-              <span className="text-gray-900 font-semibold"> transform your workflow forever.</span>
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {platformFeatures.map((feature, index) => (
-              <div 
-                key={feature.id}
-                className="group relative cursor-pointer"
-                onMouseEnter={() => setHoveredFeature(index)}
-                onMouseLeave={() => setHoveredFeature(null)}
-                onClick={() => handleNavigation(feature.link.substring(1))}
-              >
-                <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 overflow-hidden border border-white/40 group-hover:border-white/60 group-hover:bg-white/80 group-hover:-translate-y-2">
-                  
-                  {/* Premium Glass Header */}
-                  <div className="relative h-40 overflow-hidden">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-90`} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10" />
-                    
-                    {/* Floating Icon */}
-                    <div className="absolute top-6 left-6 p-4 bg-white/30 backdrop-blur-xl rounded-2xl border border-white/40 group-hover:scale-110 transition-all duration-500">
-                      <div className="text-white drop-shadow-lg">
-                        {feature.icon}
+            {/* Secondary Features - Two Column Layout */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {platformFeatures.slice(1, 3).map((feature, index) => (
+                <div key={feature.id} className="group">
+                  <div className="bg-white rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden hover:shadow-2xl transition-all duration-500">
+                    {/* Feature Header */}
+                    <div className={`relative h-64 bg-gradient-to-br ${feature.color} overflow-hidden`}>
+                      <div className="absolute inset-0 bg-black/10" />
+                      
+                      {/* Floating Icon */}
+                      <div className="absolute top-8 left-8 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <div className="text-white text-2xl">
+                          {feature.icon}
+                        </div>
+                      </div>
+                      
+                      {/* Ambient Elements */}
+                      <div className="absolute bottom-8 right-8 opacity-30">
+                        <div className="w-32 h-32 border-2 border-white/30 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
+                        <div className="absolute top-4 left-4 w-24 h-24 border border-white/20 rounded-full" />
                       </div>
                     </div>
                     
-                    {/* Decorative Elements */}
-                    <div className="absolute top-6 right-6 opacity-40">
-                      <div className="w-12 h-12 border-2 border-white/50 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
-                      <div className="absolute top-2 left-2 w-8 h-8 border border-white/30 rounded-full animate-ping" />
-                    </div>
-                    
-                    {/* Bottom Wave */}
-                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-r from-white/20 to-white/40 backdrop-blur-sm" style={{
-                      clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 0 50%)'
-                    }} />
-                  </div>
-
-                  <div className="p-8">
-                    {/* Title & Subtitle */}
-                    <div className="mb-8">
-                      <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 opacity-80">
+                    {/* Content */}
+                    <div className="p-8">
+                      <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
                         {feature.subtitle}
                       </div>
-                      <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight group-hover:text-gray-800">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
                         {feature.title.split(' - ')[0]}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed text-sm font-medium">
-                        {feature.description.substring(0, 100)}...
+                      <p className="text-gray-600 mb-6 leading-relaxed">
+                        {feature.description.substring(0, 150)}...
                       </p>
-                    </div>
-
-                    {/* Modern Feature Tags */}
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {feature.features.slice(0, 2).map((feat, idx) => (
-                        <div key={idx} className="bg-gray-100/80 backdrop-blur-sm border border-gray-200/50 rounded-full px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200/80 transition-colors">
-                          {feat.split(' ').slice(0, 2).join(' ')}
-                        </div>
-                      ))}
-                      <div className="bg-gradient-to-r from-violet-100 to-purple-100 border border-violet-200/50 rounded-full px-4 py-2 text-xs font-bold text-violet-800">
-                        +{feature.features.length - 2}
+                      
+                      {/* Key Features */}
+                      <div className="space-y-2 mb-6">
+                        {feature.features.slice(0, 2).map((feat, idx) => (
+                          <div key={idx} className="flex items-center space-x-3 text-sm text-gray-700">
+                            <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-gray-600 rounded-full" />
+                            </div>
+                            <span>{feat}</span>
+                          </div>
+                        ))}
                       </div>
+                      
+                      <button className="w-full bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl py-4 px-6 text-gray-900 font-medium transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Learn more</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
-
-                    {/* Premium CTA */}
-                    <div className="flex items-center justify-between group-hover:justify-center transition-all duration-500">
-                      <span className="text-gray-600 text-sm font-semibold group-hover:opacity-0 transition-opacity">Explore</span>
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300 flex items-center justify-center group-hover:bg-gradient-to-br group-hover:from-violet-500 group-hover:to-purple-600 group-hover:scale-110 group-hover:shadow-lg transition-all duration-500">
-                        <ArrowRight className="w-5 h-5 text-gray-700 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Shimmer Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-shimmer" />
                   </div>
                 </div>
+              ))}
+            </div>
 
-                {/* Revolutionary Interactive Preview */}
-                {hoveredFeature === index && (
-                  <div className="absolute -top-8 -right-8 w-80 h-64 z-30 animate-in fade-in slide-in-from-top-6 duration-700">
-                    {/* Main Preview Container */}
-                    <div className="relative w-full h-full bg-gray-950/95 backdrop-blur-3xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-                      {/* Dynamic Header with Feature Color */}
-                      <div className={`relative h-16 bg-gradient-to-r ${feature.color} overflow-hidden`}>
-                        <div className="absolute inset-0 bg-black/20" />
-                        
-                        {/* Animated Particles */}
-                        <div className="absolute inset-0">
-                          {[...Array(6)].map((_, i) => (
-                            <div
-                              key={i}
-                              className="absolute w-1 h-1 bg-white/60 rounded-full animate-pulse"
-                              style={{
-                                left: `${20 + i * 15}%`,
-                                top: `${30 + (i % 2) * 40}%`,
-                                animationDelay: `${i * 0.2}s`,
-                                animationDuration: '2s'
-                              }}
-                            />
-                          ))}
-                        </div>
-                        
-                        {/* Header Content */}
-                        <div className="relative flex items-center justify-between p-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center">
-                              <Sparkles className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="text-white font-bold text-sm">Live Preview</div>
-                          </div>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                            <div className="w-2 h-2 bg-white/60 rounded-full" />
-                            <div className="w-2 h-2 bg-white/40 rounded-full" />
-                          </div>
-                        </div>
+            {/* Tertiary Feature - Full Width Accent */}
+            <div className="relative group">
+              <div className="bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div className="relative h-[400px] flex items-center">
+                  <div className="w-full px-12 lg:px-16 text-center text-white">
+                    <div className="max-w-4xl mx-auto">
+                      <div className="text-sm font-medium opacity-80 mb-4 tracking-wider uppercase">
+                        {platformFeatures[3].subtitle}
                       </div>
-
-                      {/* Interactive Content Area */}
-                      <div className="p-6 space-y-4">
-                        {/* Feature Title with Animation */}
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg`}>
-                            <div className="text-white text-xs">
-                              {feature.icon}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-white font-bold text-sm">{feature.title.split(' - ')[0]}</div>
-                            <div className="text-gray-400 text-xs uppercase tracking-wider">{feature.subtitle}</div>
-                          </div>
-                        </div>
-
-                        {/* Feature Showcase */}
-                        <div className="space-y-3">
-                          {feature.features.slice(0, 3).map((feat, idx) => (
-                            <div 
-                              key={idx} 
-                              className="flex items-center space-x-3 group/item hover:bg-white/5 rounded-xl p-2 transition-all duration-300"
-                              style={{ animationDelay: `${idx * 0.1}s` }}
-                            >
-                              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-600/20 border border-violet-400/30 flex items-center justify-center group-hover/item:scale-110 transition-transform">
-                                <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="text-gray-300 text-xs font-medium">{feat}</div>
-                                <div className="w-full bg-gray-800 rounded-full h-1 mt-1">
-                                  <div 
-                                    className={`h-1 bg-gradient-to-r ${feature.color} rounded-full animate-pulse`}
-                                    style={{ 
-                                      width: `${60 + idx * 15}%`,
-                                      animationDelay: `${idx * 0.2}s`
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              <div className="text-gray-500 text-xs">●</div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Action Bar */}
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-                          <div className="flex space-x-2">
-                            {[...Array(3)].map((_, i) => (
-                              <div 
-                                key={i}
-                                className="w-8 h-6 bg-gray-800 rounded border border-gray-700 flex items-center justify-center"
-                              >
-                                <div className="w-3 h-1 bg-gray-600 rounded" />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-gray-400 text-xs">Try Now</div>
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
-                              <ArrowRight className="w-3 h-3 text-white" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Glow Effect */}
-                      <div className={`absolute inset-0 bg-gradient-to-t ${feature.color} opacity-5 pointer-events-none`} />
+                      <h3 className="text-4xl lg:text-5xl font-bold mb-6">
+                        {platformFeatures[3].title.split(' - ')[0]}
+                      </h3>
+                      <p className="text-xl opacity-90 mb-8 leading-relaxed max-w-2xl mx-auto">
+                        {platformFeatures[3].description.substring(0, 200)}...
+                      </p>
                       
-                      {/* Border Glow */}
-                      <div className={`absolute inset-0 rounded-3xl border border-transparent bg-gradient-to-r ${feature.color} opacity-20 pointer-events-none`} style={{
-                        mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                        maskComposite: 'subtract'
-                      }} />
-                    </div>
-
-                    {/* Floating Ambient Elements */}
-                    <div className="absolute -inset-4 pointer-events-none">
-                      {[...Array(8)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`absolute w-2 h-2 bg-gradient-to-r ${feature.color} rounded-full blur-sm animate-pulse`}
-                          style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${i * 0.3}s`,
-                            animationDuration: `${2 + Math.random() * 2}s`
-                          }}
-                        />
-                      ))}
+                      {/* Feature Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        {platformFeatures[3].features.slice(0, 3).map((feature, idx) => (
+                          <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 mx-auto">
+                              <div className="w-6 h-6 bg-white rounded-full" />
+                            </div>
+                            <div className="text-white/90 text-sm font-medium">{feature}</div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <button className="bg-white text-gray-900 rounded-full px-8 py-4 font-semibold hover:bg-gray-100 transition-all duration-300 inline-flex items-center space-x-2">
+                        <span>Get started</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                )}
+                  
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-8 right-8 text-white/20 text-9xl">
+                      {platformFeatures[3].icon}
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
