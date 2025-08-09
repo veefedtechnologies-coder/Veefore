@@ -13477,6 +13477,7 @@ Create a detailed growth strategy in JSON format:
       }
 
       const conversations = await storage.getChatConversations(userId, workspaceId);
+      console.log('[CHAT DEBUG] Sample conversation data:', JSON.stringify(conversations[0], null, 2));
       res.json(conversations);
     } catch (error: any) {
       console.error('[CHAT] Get conversations error:', error);
