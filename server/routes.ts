@@ -13547,23 +13547,35 @@ Create a detailed growth strategy in JSON format:
 
   app.post('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
     try {
+      console.log('[CHAT] Create conversation request:', { userId: req.user.id, body: req.body });
       const { content } = req.body;
       const userId = req.user.id;
-      const workspaceId = req.user.workspaceId || (await storage.getDefaultWorkspace(userId))?.id;
+      
+      console.log('[CHAT] Getting workspace for user:', userId);
+      const defaultWorkspace = await storage.getDefaultWorkspace(userId);
+      console.log('[CHAT] Default workspace found:', defaultWorkspace);
+      
+      const workspaceId = req.user.workspaceId || defaultWorkspace?.id;
+      console.log('[CHAT] Final workspaceId:', workspaceId);
 
       if (!workspaceId) {
+        console.log('[CHAT] No workspace found for user:', userId);
         return res.status(400).json({ error: 'No workspace found' });
       }
 
       if (!content?.trim()) {
+        console.log('[CHAT] No content provided');
         return res.status(400).json({ error: 'Message content is required' });
       }
 
       // Generate conversation title
+      console.log('[CHAT] Generating title for content:', content.trim());
       const { OpenAIService } = await import('./openai-service');
       const title = await OpenAIService.generateChatTitle(content.trim());
+      console.log('[CHAT] Generated title:', title);
 
       // Create new conversation
+      console.log('[CHAT] Creating conversation with:', { userId, workspaceId, title });
       const conversation = await storage.createChatConversation({
         userId,
         workspaceId,
@@ -13571,6 +13583,7 @@ Create a detailed growth strategy in JSON format:
         messageCount: 0,
         lastMessageAt: new Date()
       });
+      console.log('[CHAT] Created conversation:', conversation);
 
       // Create user message
       const userMessage = await storage.createChatMessage({
