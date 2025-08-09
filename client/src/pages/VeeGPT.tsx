@@ -11,22 +11,17 @@ import {
   Edit3,
   Calendar,
   ChevronDown,
-  Plus,
   MessageSquare,
   User,
   Bot,
   Paperclip,
   Edit,
   Search,
-  BookOpen,
   MoreHorizontal,
-  Settings,
   ChevronLeft,
   ChevronRight,
   Zap,
-  BarChart3,
-  History,
-  Share2
+  BarChart3
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -407,22 +402,6 @@ export default function VeeGPT() {
             <BarChart3 className="w-4 h-4 flex-shrink-0" />
             {!sidebarCollapsed && <span>Analytics</span>}
           </button>
-          
-          <button 
-            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            title={sidebarCollapsed ? "Templates" : ""}
-          >
-            <BookOpen className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Templates</span>}
-          </button>
-
-          <button 
-            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            title={sidebarCollapsed ? "Share & Export" : ""}
-          >
-            <Share2 className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Share & Export</span>}
-          </button>
         </div>
 
         {/* Conversations Section */}
@@ -433,22 +412,22 @@ export default function VeeGPT() {
                 Recent Chats
               </div>
             )}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {conversations.map((conversation) => (
                 <button
                   key={conversation.id}
                   onClick={() => selectConversation(conversation.id)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors group ${
+                  className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
                     currentConversationId === conversation.id
                       ? 'bg-gray-200 text-gray-900'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   title={sidebarCollapsed ? conversation.title : ""}
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <MessageSquare className="w-4 h-4 flex-shrink-0" />
                     {!sidebarCollapsed && (
-                      <div className="truncate">{conversation.title}</div>
+                      <div className="truncate text-base font-medium">{conversation.title}</div>
                     )}
                   </div>
                 </button>
