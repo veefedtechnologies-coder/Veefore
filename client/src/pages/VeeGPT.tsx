@@ -502,22 +502,16 @@ export default function VeeGPT() {
         setIsGenerating(true)
         // Update streaming content for real-time display - accumulate chunks
         if (data.messageId && data.content !== undefined) {
+          console.log('VeeGPT: PROCESSING CHUNK - MessageId:', data.messageId, 'Content:', `"${data.content}"`)
           setStreamingContent(prev => {
             const currentContent = prev[data.messageId] || ''
             const newContent = currentContent + data.content
             console.log('VeeGPT: STREAMING UPDATE - Message:', data.messageId, 'Current:', `"${currentContent}"`, 'Adding:', `"${data.content}"`, 'New Total:', `"${newContent}"`)
             
-            // Force React to re-render by creating a completely new object
-            const updated: {[key: number]: string} = {}
-            Object.keys(prev).forEach(key => {
-              const numKey = parseInt(key)
-              if (numKey !== data.messageId) {
-                updated[numKey] = prev[numKey]
-              }
-            })
-            updated[data.messageId] = newContent
-            
-            return updated
+            return {
+              ...prev,
+              [data.messageId]: newContent
+            }
           })
         } else {
           console.log('VeeGPT: CHUNK IGNORED - Missing messageId or content:', { messageId: data.messageId, content: data.content })
