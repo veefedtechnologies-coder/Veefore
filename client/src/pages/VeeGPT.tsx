@@ -30,6 +30,51 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
 
+// TypewriterText component for AI responses
+function TypewriterText({ text, speed = 30, onComplete }: { text: string, speed?: number, onComplete?: () => void }) {
+  const [displayedText, setDisplayedText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex])
+        setCurrentIndex(currentIndex + 1)
+      }, speed)
+      return () => clearTimeout(timer)
+    } else if (onComplete && currentIndex === text.length) {
+      onComplete()
+    }
+  }, [currentIndex, text, speed, onComplete])
+
+  // Reset when text changes (for new messages)
+  useEffect(() => {
+    setDisplayedText('')
+    setCurrentIndex(0)
+  }, [text])
+
+  return (
+    <div 
+      className="leading-relaxed"
+      style={{
+        wordWrap: 'break-word',
+        wordBreak: 'break-all',
+        overflowWrap: 'anywhere',
+        whiteSpace: 'pre-wrap',
+        maxWidth: '100%',
+        width: '100%',
+        hyphens: 'auto',
+        lineBreak: 'anywhere'
+      }}
+    >
+      {displayedText}
+      {currentIndex < text.length && (
+        <span className="animate-pulse">|</span>
+      )}
+    </div>
+  )
+}
+
 type ChatConversation = {
   id: number
   userId: string
@@ -247,6 +292,14 @@ export default function VeeGPT() {
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+  
+  // Auto-scroll during typewriter effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 500)
+    return () => clearInterval(timer)
   }, [messages])
 
   // Check if we have any conversations to determine initial state
@@ -668,21 +721,25 @@ export default function VeeGPT() {
                     overflowWrap: 'break-word',
                     maxWidth: '100%'
                   }}>
-                    <div 
-                      className="leading-relaxed"
-                      style={{
-                        wordWrap: 'break-word',
-                        wordBreak: 'break-all',
-                        overflowWrap: 'anywhere',
-                        whiteSpace: 'pre-wrap',
-                        maxWidth: '100%',
-                        width: '100%',
-                        hyphens: 'auto',
-                        lineBreak: 'anywhere'
-                      }}
-                    >
-                      {message.content}
-                    </div>
+                    {message.role === 'assistant' ? (
+                      <TypewriterText text={message.content} speed={25} />
+                    ) : (
+                      <div 
+                        className="leading-relaxed"
+                        style={{
+                          wordWrap: 'break-word',
+                          wordBreak: 'break-all',
+                          overflowWrap: 'anywhere',
+                          whiteSpace: 'pre-wrap',
+                          maxWidth: '100%',
+                          width: '100%',
+                          hyphens: 'auto',
+                          lineBreak: 'anywhere'
+                        }}
+                      >
+                        {message.content}
+                      </div>
+                    )}
                   </div>
                   <div className={`mt-2 text-xs text-gray-500 ${
                     message.role === 'user' ? 'text-right' : 'text-left'
