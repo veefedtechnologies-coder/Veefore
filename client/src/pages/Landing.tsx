@@ -567,71 +567,71 @@ const Landing = ({ onNavigate }: LandingProps) => {
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 text-gray-900 overflow-x-hidden">
       {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Animated gradient mesh */}
         <div 
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-20"
           style={{
             background: `
-              radial-gradient(circle at ${mousePosition.x * 0.1}% ${mousePosition.y * 0.1}%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at ${100 - mousePosition.x * 0.1}% ${100 - mousePosition.y * 0.1}%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.2) 0%, transparent 50%)
+              radial-gradient(circle at ${mousePosition.x * 0.1}% ${mousePosition.y * 0.1}%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at ${100 - mousePosition.x * 0.1}% ${100 - mousePosition.y * 0.1}%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%)
             `
           }}
         />
         
         {/* Floating geometric shapes */}
-        <div className="absolute top-20 left-20 w-32 h-32 opacity-10">
+        <div className="absolute top-20 left-20 w-32 h-32 opacity-5">
           <div 
-            className="w-full h-full border border-violet-500/30 rounded-3xl animate-spin"
+            className="w-full h-full border border-violet-300/40 rounded-3xl animate-spin"
             style={{ animationDuration: '20s' }}
           />
         </div>
-        <div className="absolute top-40 right-32 w-24 h-24 opacity-10">
+        <div className="absolute top-40 right-32 w-24 h-24 opacity-5">
           <div 
-            className="w-full h-full border border-blue-500/30 rounded-full animate-pulse"
+            className="w-full h-full border border-blue-300/40 rounded-full animate-pulse"
             style={{ animationDuration: '3s' }}
           />
         </div>
-        <div className="absolute bottom-32 left-40 w-20 h-20 opacity-10">
+        <div className="absolute bottom-32 left-40 w-20 h-20 opacity-5">
           <Triangle 
-            className="w-full h-full text-emerald-500/30 animate-bounce"
+            className="w-full h-full text-emerald-300/40 animate-bounce"
             style={{ animationDuration: '4s' }}
           />
         </div>
         
         {/* Grid overlay */}
         <div 
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-3"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px)
             `,
             backgroundSize: '50px 50px'
           }}
         />
       </div>
 
-      {/* Navigation - Premium Glass Design */}
+      {/* Navigation - Professional Light Design */}
       <nav className="fixed top-0 w-full z-50">
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-2xl border-b border-white/10" />
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/50 shadow-sm" />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition-opacity" />
-                <div className="relative w-12 h-12 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl flex items-center justify-center">
+                <div className="relative w-12 h-12 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   VeeFore
                 </span>
-                <span className="text-xs text-gray-400 -mt-1">AI Platform</span>
+                <span className="text-xs text-gray-500 -mt-1">AI Platform</span>
               </div>
             </div>
             
@@ -640,7 +640,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 <a 
                   key={item}
                   href={`#${item.toLowerCase()}`} 
-                  className="relative text-gray-300 hover:text-white transition-all duration-300 group text-sm font-medium"
+                  className="relative text-gray-600 hover:text-gray-900 transition-all duration-300 group text-sm font-medium"
                 >
                   {item}
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-blue-500 group-hover:w-full transition-all duration-300" />
@@ -651,13 +651,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
             <div className="flex items-center space-x-4">
               <Button 
                 variant="outline"
-                className="hidden sm:flex border border-white/20 text-white hover:bg-white/10 backdrop-blur-sm px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
+                className="hidden sm:flex border border-gray-300 text-gray-700 hover:bg-gray-50 backdrop-blur-sm px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
               >
                 Sign In
               </Button>
               <Button 
                 onClick={() => handleNavigation('veegpt')}
-                className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-2xl hover:shadow-violet-500/25 transition-all duration-300 group"
+                className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-violet-500/25 transition-all duration-300 group"
               >
                 <span className="relative z-10">Try VeeGPT</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -673,14 +673,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
         <div className="absolute inset-0">
           {/* Large gradient orbs */}
           <div 
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl animate-pulse"
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl animate-pulse"
             style={{ 
               transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
               animationDuration: '4s'
             }}
           />
           <div 
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl animate-pulse"
             style={{ 
               transform: `translate(${-mousePosition.x * 0.02}px, ${-mousePosition.y * 0.02}px)`,
               animationDuration: '6s',
@@ -688,7 +688,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             }}
           />
           <div 
-            className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-600/15 rounded-full blur-3xl animate-pulse"
+            className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-600/6 rounded-full blur-3xl animate-pulse"
             style={{ 
               transform: `translate(-50%, -50%) translate(${mousePosition.x * 0.01}px, ${mousePosition.y * 0.01}px)`,
               animationDuration: '8s',
@@ -701,13 +701,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
           {/* Premium Badge */}
           <div className="inline-flex items-center mb-8 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/50 to-blue-600/50 rounded-full blur" />
-              <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-8 py-4 flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-white/90 font-medium text-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-full blur" />
+              <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-gray-700 font-medium text-sm">
                   Now Available • Revolutionary AI Platform
                 </span>
-                <ArrowRight className="w-4 h-4 text-white/70 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
@@ -715,22 +715,22 @@ const Landing = ({ onNavigate }: LandingProps) => {
           {/* Hero Headline - Typography Excellence */}
           <div className="space-y-6 mb-12">
             <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black tracking-tight leading-none">
-              <span className="block bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                 The Future of
               </span>
-              <span className="block bg-gradient-to-r from-violet-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
                 Social Media
               </span>
-              <span className="block bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                 is Here
               </span>
             </h1>
           </div>
 
           {/* Subtitle */}
-          <p className="text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto mb-16 leading-relaxed font-light">
+          <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto mb-16 leading-relaxed font-light">
             Experience the next generation of AI-powered social media management. From intelligent chat assistance to professional video generation, 
-            <span className="text-white font-medium"> VeeFore transforms how you create, manage, and grow your digital presence.</span>
+            <span className="text-gray-900 font-semibold"> VeeFore transforms how you create, manage, and grow your digital presence.</span>
           </p>
 
           {/* CTA Buttons - Premium Design */}
@@ -749,11 +749,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             <Button 
               variant="outline"
-              className="group border-2 border-white/20 bg-white/5 backdrop-blur-xl text-white hover:bg-white/10 hover:border-white/30 px-12 py-5 text-lg font-semibold rounded-2xl transition-all duration-500"
+              className="group border-2 border-gray-200 bg-white/70 backdrop-blur-xl text-gray-700 hover:bg-white hover:border-gray-300 px-12 py-5 text-lg font-semibold rounded-2xl transition-all duration-500 shadow-lg"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                  <Play className="w-3 h-3 fill-white" />
+                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                  <Play className="w-3 h-3 fill-gray-600" />
                 </div>
                 <span>Watch Demo</span>
               </div>
@@ -838,13 +838,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Platform Features Overview - Redesigned */}
-      <section id="platform" className="relative py-32 px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">
+      {/* Platform Features Overview - Professional Light */}
+      <section id="platform" className="relative py-32 px-6 lg:px-8 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-50" />
-          <div className="absolute inset-0 opacity-20" style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(148 163 184 / 0.05)'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e")`
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-30" />
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(139 92 246 / 0.1)'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e")`
           }} />
         </div>
 
@@ -852,27 +852,27 @@ const Landing = ({ onNavigate }: LandingProps) => {
           <div className="text-center mb-24">
             <div className="inline-flex items-center mb-8 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-blue-600/20 rounded-full blur-xl" />
-                <div className="relative bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-full px-8 py-4 flex items-center space-x-3">
-                  <Layers className="w-5 h-5 text-violet-400" />
-                  <span className="text-white/90 font-medium">Complete AI Platform</span>
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-full blur-xl" />
+                <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-lg">
+                  <Layers className="w-5 h-5 text-violet-600" />
+                  <span className="text-gray-700 font-medium">Complete AI Platform</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 </div>
               </div>
             </div>
             
             <h2 className="text-6xl lg:text-8xl font-black mb-8 leading-none">
-              <span className="block bg-gradient-to-r from-white via-violet-200 to-white bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
                 All-in-One
               </span>
-              <span className="block bg-gradient-to-r from-violet-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
                 AI Solution
               </span>
             </h2>
             
-            <p className="text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto font-light leading-relaxed">
+            <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
               Everything you need for social media success in one powerful platform. From intelligent chat assistance to professional video generation, 
-              <span className="text-white font-medium"> analytics to automation.</span>
+              <span className="text-gray-900 font-semibold"> analytics to automation.</span>
             </p>
           </div>
 
@@ -893,7 +893,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-all duration-700 scale-105`} />
                 
                 {/* Main Card */}
-                <div className="relative bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden transition-all duration-700 group-hover:border-white/20 group-hover:bg-gray-800/50">
+                <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden transition-all duration-700 group-hover:border-gray-300/70 group-hover:bg-white/80 shadow-lg group-hover:shadow-xl">
                   {/* Top Gradient Bar */}
                   <div className={`h-1 bg-gradient-to-r ${feature.color}`} />
                   
@@ -909,36 +909,36 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
                     {/* Title & Subtitle */}
                     <div className="mb-6">
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:text-transparent group-hover:from-violet-400 group-hover:to-blue-400 transition-all duration-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:text-transparent group-hover:from-violet-600 group-hover:to-blue-600 transition-all duration-500">
                         {feature.title.split(' - ')[0]}
                       </h3>
-                      <p className="text-gray-400 text-sm font-medium tracking-wide uppercase">
+                      <p className="text-gray-500 text-sm font-medium tracking-wide uppercase">
                         {feature.subtitle}
                       </p>
                     </div>
 
                     {/* Description */}
-                    <p className="text-gray-300 mb-6 leading-relaxed text-sm">
+                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
                       {feature.description.substring(0, 120)}...
                     </p>
 
                     {/* Feature Pills */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {feature.features.slice(0, 2).map((feat, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
+                        <div key={idx} className="bg-gray-100 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-600">
                           {feat.split(' ').slice(0, 2).join(' ')}
                         </div>
                       ))}
-                      <div className="bg-violet-500/20 border border-violet-500/30 rounded-full px-3 py-1.5 text-xs text-violet-300">
+                      <div className="bg-violet-100 border border-violet-200 rounded-full px-3 py-1.5 text-xs text-violet-700">
                         +{feature.features.length - 2} more
                       </div>
                     </div>
 
                     {/* CTA */}
                     <div className="flex items-center justify-between">
-                      <span className="text-white/60 text-sm font-medium">Explore Feature</span>
-                      <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300">
-                        <ArrowRight className="w-4 h-4 text-white/70 group-hover:translate-x-0.5 transition-transform" />
+                      <span className="text-gray-500 text-sm font-medium">Explore Feature</span>
+                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center group-hover:bg-gray-200 group-hover:scale-110 transition-all duration-300">
+                        <ArrowRight className="w-4 h-4 text-gray-600 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
                   </div>
@@ -964,13 +964,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Comprehensive Features Section - Apple-style */}
-      <section id="features" className="relative py-32 px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900 to-black">
+      {/* Comprehensive Features Section - Professional Light */}
+      <section id="features" className="relative py-32 px-6 lg:px-8 bg-gradient-to-b from-gray-50 via-white to-gray-50">
         {/* Section Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl">
             <div className="w-full h-full rounded-full blur-3xl" style={{
-              background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%)'
+              background: 'radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, rgba(59, 130, 246, 0.03) 50%, transparent 100%)'
             }} />
           </div>
         </div>
@@ -979,27 +979,27 @@ const Landing = ({ onNavigate }: LandingProps) => {
           <div className="text-center mb-32">
             <div className="inline-flex items-center mb-8 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-full blur-xl" />
-                <div className="relative bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-full px-8 py-4 flex items-center space-x-3">
-                  <Wand2 className="w-5 h-5 text-purple-400" />
-                  <span className="text-white/90 font-medium">Advanced Platform Features</span>
-                  <Sparkle className="w-4 h-4 text-pink-400 animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full blur-xl" />
+                <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-lg">
+                  <Wand2 className="w-5 h-5 text-purple-600" />
+                  <span className="text-gray-700 font-medium">Advanced Platform Features</span>
+                  <Sparkle className="w-4 h-4 text-pink-600 animate-pulse" />
                 </div>
               </div>
             </div>
             
             <h2 className="text-6xl lg:text-8xl font-black mb-8 leading-none">
-              <span className="block bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
                 Enterprise-Grade
               </span>
-              <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-violet-600 bg-clip-text text-transparent">
                 Capabilities
               </span>
             </h2>
             
-            <p className="text-xl lg:text-2xl text-gray-300 max-w-5xl mx-auto font-light leading-relaxed">
+            <p className="text-xl lg:text-2xl text-gray-600 max-w-5xl mx-auto font-light leading-relaxed">
               Comprehensive breakdown of every advanced feature that makes VeeFore the most sophisticated, 
-              <span className="text-white font-medium"> AI-powered social media management platform</span> for modern businesses and agencies.
+              <span className="text-gray-900 font-semibold"> AI-powered social media management platform</span> for modern businesses and agencies.
             </p>
           </div>
 
