@@ -380,13 +380,8 @@ function App() {
                 />
               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
+              {/* Main Content Area - Full height without header */}
+              <div className="flex-1 h-screen overflow-hidden">
                 {/* Create Dropdown */}
                 {isCreateDropdownOpen && (
                   <CreateDropdown
@@ -396,10 +391,8 @@ function App() {
                   />
                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <VeeGPT />
-                </main>
+                {/* VeeGPT Full Height - No padding, no scrolling wrapper */}
+                <VeeGPT />
               </div>
             </div>
           </Route>
