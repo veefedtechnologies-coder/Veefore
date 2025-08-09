@@ -13795,32 +13795,110 @@ Create a detailed growth strategy in JSON format:
       });
       console.log('[CHAT] Created user message:', userMessage);
 
-      // Generate AI response
-      console.log('[CHAT] Generating AI response');
-      const chatHistory = [{ role: 'user' as const, content: content.trim() }];
-      const aiResponse = await OpenAIService.generateResponse(chatHistory);
-      console.log('[CHAT] Generated AI response:', aiResponse.substring(0, 100) + '...');
+      // Mark this conversation as actively generating
+      activeGenerations.set(conversation.id, true);
 
-      // Create AI message
-      console.log('[CHAT] Creating AI message');
-      const aiMessage = await storage.createChatMessage({
-        conversationId: conversation.id,
-        role: 'assistant',
-        content: aiResponse,
-        tokensUsed: Math.ceil(aiResponse.length / 4)
-      });
-      console.log('[CHAT] Created AI message:', aiMessage);
-
-      // Update conversation
-      console.log('[CHAT] Updating conversation');
+      // Update conversation to have 1 message (user message)
       await storage.updateChatConversation(conversation.id, {
         lastMessageAt: new Date(),
-        messageCount: 2
+        messageCount: 1
       });
-      console.log('[CHAT] Updated conversation successfully');
 
-      console.log('[CHAT] Sending response');
-      res.json({ conversation, userMessage, aiMessage });
+      // Return conversation and user message immediately for instant UI response
+      res.json({ 
+        conversation, 
+        userMessage,
+        streaming: true
+      });
+
+      // Start AI response generation in background using WebSocket streaming
+      setImmediate(async () => {
+        try {
+          const chatHistory = [{ role: 'user' as const, content: content.trim() }];
+          let aiResponseContent = '';
+
+          // Create placeholder AI message
+          const aiMessage = await storage.createChatMessage({
+            conversationId: conversation.id,
+            role: 'assistant',
+            content: ' ',
+            tokensUsed: 0
+          });
+
+          console.log(`[WEBSOCKET STREAM] Starting AI generation for new conversation ${conversation.id}, message ${aiMessage.id}`);
+
+          // Broadcast AI message start via WebSocket
+          (global as any).broadcastToConversation(conversation.id, {
+            type: 'aiMessageStart',
+            messageId: aiMessage.id,
+            conversationId: conversation.id
+          });
+
+          // Generate streaming AI response via WebSocket
+          const { OpenAIService } = await import('./openai-service');
+          
+          for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
+            // Check if generation was stopped
+            if (!activeGenerations.get(conversation.id)) {
+              console.log(`[WEBSOCKET STREAM] Generation stopped for conversation ${conversation.id}`);
+              break;
+            }
+
+            aiResponseContent += chunk;
+            
+            console.log(`[WEBSOCKET STREAM] Broadcasting chunk: "${chunk}" for message ${aiMessage.id}`);
+            
+            // Broadcast chunk immediately via WebSocket
+            (global as any).broadcastToConversation(conversation.id, {
+              type: 'chunk',
+              content: chunk,
+              messageId: aiMessage.id,
+              timestamp: Date.now()
+            });
+
+            // Add delay for visible streaming effect
+            await new Promise(resolve => setTimeout(resolve, 30));
+          }
+
+          // Update AI message with final content
+          if (aiResponseContent.trim()) {
+            await storage.updateChatMessage(aiMessage.id, {
+              content: aiResponseContent.trim(),
+              tokensUsed: Math.ceil(aiResponseContent.length / 4)
+            });
+          }
+
+          // Update conversation message count to 2
+          await storage.updateChatConversation(conversation.id, {
+            lastMessageAt: new Date(),
+            messageCount: 2
+          });
+
+          // Broadcast completion
+          (global as any).broadcastToConversation(conversation.id, {
+            type: 'complete',
+            messageId: aiMessage.id,
+            conversationId: conversation.id,
+            timestamp: Date.now()
+          });
+
+          console.log(`[WEBSOCKET STREAM] Completed AI generation for conversation ${conversation.id}`);
+          
+        } catch (error: any) {
+          console.error(`[WEBSOCKET STREAM] Error generating AI response for conversation ${conversation.id}:`, error);
+          
+          // Broadcast error via WebSocket
+          (global as any).broadcastToConversation(conversation.id, {
+            type: 'error',
+            error: 'Failed to generate AI response',
+            conversationId: conversation.id,
+            timestamp: Date.now()
+          });
+        } finally {
+          // Clean up active generation
+          activeGenerations.delete(conversation.id);
+        }
+      });
     } catch (error: any) {
       console.error('[CHAT] Create conversation error:', error);
       res.status(500).json({ error: 'Failed to create conversation' });

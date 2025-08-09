@@ -250,6 +250,11 @@ export default function VeeGPT() {
   // Create new conversation with streaming
   const createConversationMutation = useMutation({
     mutationFn: async (content: string) => {
+      // Set up streaming state before making the request
+      setIsGenerating(true)
+      console.log('VeeGPT: REF SET TO TRUE in createConversation')
+      isGeneratingRef.current = true
+
       // Create a new conversation with the initial message content
       const response = await apiRequest('/api/chat/conversations', {
         method: 'POST',
@@ -259,9 +264,11 @@ export default function VeeGPT() {
         }
       })
 
+      // Set conversation ID immediately so WebSocket events can be handled
       setCurrentConversationId(response.conversation.id)
       setHasSentFirstMessage(true)
       
+      // WebSocket should already be connected and will handle streaming
       return response
     },
     onMutate: async () => {
