@@ -107,6 +107,7 @@ export default function VeeGPT() {
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
   const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
   const [isGenerating, setIsGenerating] = useState(false)
+  const isGeneratingRef = useRef(false)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -197,6 +198,7 @@ export default function VeeGPT() {
   const handleStreamingMessage = async (content: string, conversationId: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
       setIsGenerating(true)
+      isGeneratingRef.current = true
       
       try {
         // Use same auth approach as apiRequest
@@ -257,6 +259,7 @@ export default function VeeGPT() {
             reject(error)
           } finally {
             setIsGenerating(false)
+            isGeneratingRef.current = false
             resolve({ success: true })
           }
         }
@@ -267,6 +270,7 @@ export default function VeeGPT() {
       } catch (error) {
         console.error('VeeGPT: Fetch error:', error)
         setIsGenerating(false)
+        isGeneratingRef.current = false
         reject(error)
       }
     })
@@ -274,6 +278,7 @@ export default function VeeGPT() {
 
   const handleStreamEvent = (data: any) => {
     console.log('VeeGPT: Stream event:', data)
+    console.log('VeeGPT: Current isGenerating state:', isGenerating)
 
     switch (data.type) {
       case 'userMessage':
@@ -296,6 +301,7 @@ export default function VeeGPT() {
 
       case 'chunk':
         // Update the AI message content in real-time
+        console.log('VeeGPT: Processing chunk, isGenerating should be true:', isGenerating, 'ref:', isGeneratingRef.current)
         if (data.messageId && data.content && currentConversationId) {
           updateMessageContentInCache(data.messageId, data.content)
         }
@@ -304,6 +310,7 @@ export default function VeeGPT() {
       case 'complete':
         // Generation completed
         setIsGenerating(false)
+        isGeneratingRef.current = false
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
@@ -323,6 +330,7 @@ export default function VeeGPT() {
       case 'error':
         console.error('VeeGPT: Stream error:', data.error)
         setIsGenerating(false)
+        isGeneratingRef.current = false
         break
     }
   }
@@ -367,6 +375,7 @@ export default function VeeGPT() {
     onError: (error) => {
       console.error('VeeGPT: Error sending streaming message:', error)
       setIsGenerating(false)
+      isGeneratingRef.current = false
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -414,6 +423,7 @@ export default function VeeGPT() {
     
     // Stop streaming immediately
     setIsGenerating(false)
+    isGeneratingRef.current = false
     if (currentEventSource) {
       currentEventSource.close()
       setCurrentEventSource(null)
