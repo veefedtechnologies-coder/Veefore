@@ -836,7 +836,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 </div>
                 
                 {/* Compact Platform Interface */}
-                <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-b-[2.5rem] min-h-[350px]">
+                <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-b-[2.5rem] min-h-[400px]">
                   {/* Compact Platform Header */}
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center space-x-3">
@@ -977,7 +977,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
                   
                   {/* Advanced Interactive Demo Controls */}
-                  <div className="mt-12 space-y-6">
+                  <div className="mt-8 space-y-6">
                     {/* Live Activity Feed */}
                     <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-6 shadow-lg">
                       <div className="flex items-center justify-between mb-4">
