@@ -487,9 +487,14 @@ export default function VeeGPT() {
                 height: '24px',
                 maxHeight: '120px',
                 lineHeight: '24px',
-                border: 'none',
-                background: 'transparent',
-                outline: 'none',
+                border: '0',
+                borderWidth: '0',
+                borderStyle: 'none',
+                background: 'none',
+                backgroundColor: 'transparent',
+                outline: '0',
+                outlineWidth: '0',
+                outlineStyle: 'none',
                 boxShadow: 'none',
                 resize: 'none',
                 padding: '0',
@@ -497,7 +502,10 @@ export default function VeeGPT() {
                 fontSize: '16px',
                 color: '#374151',
                 fontFamily: 'inherit',
-                borderRadius: '0'
+                borderRadius: '0',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none'
               }}
               rows={1}
             />
