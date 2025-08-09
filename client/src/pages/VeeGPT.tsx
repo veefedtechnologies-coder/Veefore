@@ -161,7 +161,7 @@ export default function VeeGPT() {
   // Welcome screen layout (when no conversation is active)
   if (!hasSentFirstMessage) {
     return (
-      <div className="h-screen w-screen bg-gray-50 flex flex-col items-center justify-center px-4 fixed inset-0">
+      <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-4xl">
           {/* Header */}
           <div className="text-center mb-10">
@@ -316,7 +316,7 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-screen w-screen bg-gray-50 flex fixed inset-0">
+    <div className="h-full w-full bg-gray-50 flex">
       {/* Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
         {/* Header */}
