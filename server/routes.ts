@@ -13568,15 +13568,21 @@ Create a detailed growth strategy in JSON format:
 
           aiResponseContent += chunk;
           
-          // Send chunk to client
+          // Send chunk to client with explicit logging
+          console.log(`[CHAT STREAM] Sending chunk: "${chunk}" for message ${aiMessage.id}`);
           res.write(`data: ${JSON.stringify({ 
             type: 'chunk', 
             content: chunk,
             messageId: aiMessage.id 
           })}\n\n`);
           
-          // Add delay to make streaming more visible (100ms between chunks)
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Force flush the response buffer to ensure chunk is sent immediately
+          if (res.flush) {
+            res.flush();
+          }
+          
+          // Add server-side delay between sends (300ms)
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
 
         // Update the AI message with complete content

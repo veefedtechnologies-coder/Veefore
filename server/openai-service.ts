@@ -75,8 +75,8 @@ Always provide practical, actionable advice tailored to content creation and soc
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
           yield content;
-          // Add delay to make streaming more visible (200ms for clear effect)
-          await new Promise(resolve => setTimeout(resolve, 200));
+          // Add significant delay to make streaming clearly visible (500ms)
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
     } catch (error) {
