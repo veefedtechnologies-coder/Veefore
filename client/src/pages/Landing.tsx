@@ -1308,7 +1308,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
           {/* Ultra-Modern Header */}
           <div className="text-center mb-24">
             <div className="inline-flex items-center justify-center mb-8 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-600/20 to-purple-600/20 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-400/20 via-slate-500/20 to-gray-600/20 rounded-full blur-2xl animate-pulse" />
               <div className="relative bg-gradient-to-r from-gray-50 to-white backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-3 shadow-2xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
@@ -1316,9 +1316,9 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     Next-Gen Platform
                   </span>
                   <div className="flex space-x-1">
-                    <div className="w-1 h-1 bg-violet-500 rounded-full animate-bounce" />
-                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
-                    <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                    <div className="w-1 h-1 bg-gray-600 rounded-full animate-bounce" />
+                    <div className="w-1 h-1 bg-gray-700 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                    <div className="w-1 h-1 bg-gray-800 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
                   </div>
                 </div>
               </div>
@@ -1329,7 +1329,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 Redefining
               </span>
               <span className="block">
-                <span className="bg-gradient-to-r from-violet-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
+                <span className="bg-gradient-to-r from-gray-700 via-gray-600 to-gray-800 bg-clip-text text-transparent animate-gradient">
                   Intelligence
                 </span>
               </span>
@@ -1345,10 +1345,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             {/* Primary Feature - Large Hero Card */}
             <div className="col-span-12 lg:col-span-8 group">
-              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 shadow-2xl">
+              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black shadow-2xl">
                 {/* Animated Background */}
                 <div className="absolute inset-0">
-                  <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 via-purple-600/30 to-blue-600/20 animate-gradient-shift" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-600/20 via-slate-600/30 to-gray-700/20 animate-gradient-shift" />
                   <div className="absolute inset-0 opacity-30">
                     {[...Array(20)].map((_, i) => (
                       <div
@@ -1436,7 +1436,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                             </div>
                           </div>
                           
-                          <div className="bg-violet-500/20 rounded-2xl p-4 border border-violet-400/20 ml-8">
+                          <div className="bg-gray-500/20 rounded-2xl p-4 border border-gray-400/20 ml-8">
                             <div className="text-white/90 text-sm">
                               Generate a viral TikTok script about AI
                             </div>
@@ -1455,17 +1455,17 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                       
                       {/* Floating Action Cards with Real Interface Preview */}
-                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
+                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
                         <img 
                           src="attached_assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png"
                           alt="VeeGPT Preview"
                           className="w-full h-full object-cover opacity-80"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 to-cyan-500/40 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-600/40 to-gray-700/40 flex items-center justify-center">
                           <Sparkles className="w-8 h-8 text-white" />
                         </div>
                       </div>
-                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-float-delayed-premium shadow-xl">
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center animate-float-delayed-premium shadow-xl">
                         <Zap className="w-6 h-6 text-white" />
                       </div>
                     </div>
@@ -1476,7 +1476,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* Secondary Feature - Tall Card */}
             <div className="col-span-12 lg:col-span-4 group">
-              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-600 shadow-2xl relative">
+              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-gray-800 via-slate-700 to-zinc-800 shadow-2xl relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 
                 <div className="relative h-full p-8 flex flex-col">
@@ -1513,7 +1513,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           <div className="flex items-center space-x-3">
                             <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full transition-all duration-1000"
+                                className="h-full bg-gradient-to-r from-gray-300 to-gray-400 rounded-full transition-all duration-1000"
                                 style={{ width: metric.value }}
                               />
                             </div>
