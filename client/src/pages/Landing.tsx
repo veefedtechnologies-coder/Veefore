@@ -2743,79 +2743,192 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Platform Integrations */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-gray-100 to-slate-100 rounded-full px-6 py-3 mb-8">
-              <Network className="w-5 h-5 text-gray-600 mr-2" />
-              <span className="text-gray-800 font-semibold">Platform Integrations</span>
+      {/* Revolutionary Platform Integrations - Apple-Inspired Premium Design */}
+      <section className="relative py-40 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Premium Dynamic Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+          {/* Apple-style Floating Orbs */}
+          <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-blue-300/20 to-indigo-400/20 rounded-full blur-3xl animate-float-slow-orb" />
+          <div className="absolute bottom-1/4 left-1/5 w-[400px] h-[400px] bg-gradient-to-r from-violet-300/15 to-purple-400/15 rounded-full blur-3xl animate-float-reverse-orb" />
+          <div className="absolute top-1/6 left-1/3 w-[300px] h-[300px] bg-gradient-to-r from-emerald-300/10 to-teal-400/10 rounded-full blur-2xl animate-morph-slow-orb" />
+          
+          {/* Neural Network Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <svg width="100%" height="100%" viewBox="0 0 1000 1000" className="animate-pulse-slow">
+              <defs>
+                <pattern id="integrationGrid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <circle cx="50" cy="50" r="2" fill="currentColor" opacity="0.3" />
+                  <circle cx="25" cy="25" r="1" fill="currentColor" opacity="0.2" />
+                  <circle cx="75" cy="75" r="1" fill="currentColor" opacity="0.2" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#integrationGrid)" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          {/* Revolutionary Header */}
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center bg-white/90 backdrop-blur-2xl rounded-full px-10 py-5 mb-10 border border-gray-200/60 shadow-2xl">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mr-4 animate-icon-float-integration">
+                <Network className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-gray-700 font-bold text-xl">Platform Integrations</span>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Connect Everything
+            
+            <h2 className="text-7xl lg:text-8xl font-bold mb-10 tracking-tight">
+              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                Connect
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift-premium">
+                Everything
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Seamless integration with all major social media platforms, business tools, and third-party services to create a unified workflow.
+            
+            <p className="text-2xl text-gray-600 max-w-5xl mx-auto leading-relaxed">
+              Seamless integration with all major social media platforms, business tools, and third-party services to create a unified, intelligent workflow ecosystem.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
-            {[
-              { name: "Instagram", users: "2B+" },
-              { name: "Facebook", users: "3B+" },
-              { name: "Twitter/X", users: "500M+" },
-              { name: "LinkedIn", users: "900M+" },
-              { name: "TikTok", users: "1B+" },
-              { name: "YouTube", users: "2.7B+" },
-              { name: "Pinterest", users: "450M+" },
-              { name: "Snapchat", users: "375M+" },
-              { name: "Reddit", users: "430M+" },
-              { name: "Discord", users: "150M+" },
-              { name: "Telegram", users: "700M+" },
-              { name: "WhatsApp", users: "2.8B+" }
-            ].map((platform, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center group">
-                <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Globe className="w-6 h-6 text-white" />
+          {/* Revolutionary Platform Cards Grid */}
+          <div className="mb-32">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
+              {[
+                { name: "Instagram", users: "2B+", gradient: "from-pink-500 to-rose-500", delay: "0s" },
+                { name: "Facebook", users: "3B+", gradient: "from-blue-500 to-indigo-500", delay: "0.2s" },
+                { name: "Twitter/X", users: "500M+", gradient: "from-gray-700 to-gray-900", delay: "0.4s" },
+                { name: "LinkedIn", users: "900M+", gradient: "from-blue-600 to-blue-700", delay: "0.6s" },
+                { name: "TikTok", users: "1B+", gradient: "from-gray-800 to-black", delay: "0.8s" },
+                { name: "YouTube", users: "2.7B+", gradient: "from-red-500 to-red-600", delay: "1s" },
+                { name: "Pinterest", users: "450M+", gradient: "from-red-400 to-pink-500", delay: "1.2s" },
+                { name: "Snapchat", users: "375M+", gradient: "from-yellow-400 to-yellow-500", delay: "1.4s" },
+                { name: "Reddit", users: "430M+", gradient: "from-orange-500 to-red-500", delay: "1.6s" },
+                { name: "Discord", users: "150M+", gradient: "from-indigo-500 to-purple-600", delay: "1.8s" },
+                { name: "Telegram", users: "700M+", gradient: "from-blue-400 to-cyan-500", delay: "2s" },
+                { name: "WhatsApp", users: "2.8B+", gradient: "from-green-400 to-emerald-500", delay: "2.2s" }
+              ].map((platform, index) => (
+                <div key={index} className="group relative">
+                  {/* Card Glass Morphism Background */}
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl transform transition-all duration-700 group-hover:scale-110 group-hover:shadow-3xl animate-integration-card-morph" style={{animationDelay: platform.delay}} />
+                  
+                  {/* Floating Particles for Each Card */}
+                  <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                    <div className={`absolute top-3 right-3 w-1.5 h-1.5 bg-gradient-to-r ${platform.gradient} rounded-full animate-platform-particles opacity-70`} />
+                    <div className={`absolute bottom-4 left-4 w-1 h-1 bg-gradient-to-r ${platform.gradient} rounded-full animate-platform-particles opacity-50`} style={{animationDelay: '3s'}} />
+                    <div className={`absolute top-1/2 right-4 w-0.5 h-0.5 bg-gradient-to-r ${platform.gradient} rounded-full animate-platform-particles opacity-60`} style={{animationDelay: '5s'}} />
+                  </div>
+                  
+                  {/* Card Content */}
+                  <div className="relative p-8 text-center">
+                    <div className={`w-16 h-16 bg-gradient-to-r ${platform.gradient} rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-xl transform transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 animate-icon-float-platform`} style={{animationDelay: platform.delay}}>
+                      <Globe className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-xl transition-all duration-300">{platform.name}</h3>
+                    <p className="text-sm text-gray-600 font-medium">{platform.users} users</p>
+                    
+                    {/* Hover Glow Effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${platform.gradient} opacity-0 group-hover:opacity-10 rounded-3xl transition-opacity duration-500`} />
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">{platform.name}</h3>
-                <p className="text-sm text-gray-600">{platform.users} users</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-lg p-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Business Tools Integration</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                  <Database className="w-8 h-8 text-white" />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">CRM Systems</h4>
-                <p className="text-gray-600 text-sm">Salesforce, HubSpot, Pipedrive, Zoho</p>
+          {/* Revolutionary Business Tools Section */}
+          <div className="relative">
+            {/* Premium Background Container */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-2xl rounded-[3rem] border border-white/50 shadow-3xl" />
+            
+            <div className="relative p-16">
+              <div className="text-center mb-16">
+                <h3 className="text-5xl lg:text-6xl font-bold mb-6">
+                  <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    Business Tools
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                    Ecosystem
+                  </span>
+                </h3>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Connect with enterprise-grade business tools to create a unified workflow that scales with your growth.
+                </p>
               </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                  <BarChart3 className="w-8 h-8 text-white" />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">Analytics</h4>
-                <p className="text-gray-600 text-sm">Google Analytics, Adobe Analytics, Mixpanel</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                {[
+                  { 
+                    name: "CRM Systems", 
+                    tools: "Salesforce, HubSpot, Pipedrive", 
+                    icon: Database, 
+                    gradient: "from-blue-500 to-indigo-600",
+                    bgGradient: "from-blue-50 to-indigo-50",
+                    delay: "0s"
+                  },
+                  { 
+                    name: "Analytics", 
+                    tools: "Google Analytics, Adobe Analytics", 
+                    icon: BarChart3, 
+                    gradient: "from-emerald-500 to-green-600",
+                    bgGradient: "from-emerald-50 to-green-50",
+                    delay: "0.3s"
+                  },
+                  { 
+                    name: "Automation", 
+                    tools: "Zapier, Make, Power Automate", 
+                    icon: Zap, 
+                    gradient: "from-violet-500 to-purple-600",
+                    bgGradient: "from-violet-50 to-purple-50",
+                    delay: "0.6s"
+                  },
+                  { 
+                    name: "E-commerce", 
+                    tools: "Shopify, WooCommerce, Magento", 
+                    icon: ShoppingCart, 
+                    gradient: "from-orange-500 to-red-500",
+                    bgGradient: "from-orange-50 to-red-50",
+                    delay: "0.9s"
+                  }
+                ].map((tool, index) => (
+                  <div key={index} className="group relative">
+                    {/* Card Background */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${tool.bgGradient} rounded-3xl border border-white/60 shadow-xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-2xl animate-business-tool-morph`} style={{animationDelay: tool.delay}} />
+                    
+                    {/* Floating Elements */}
+                    <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                      <div className={`absolute top-4 right-4 w-2 h-2 bg-gradient-to-r ${tool.gradient} rounded-full animate-tool-particles opacity-60`} />
+                      <div className={`absolute bottom-6 left-6 w-1.5 h-1.5 bg-gradient-to-r ${tool.gradient} rounded-full animate-tool-particles opacity-40`} style={{animationDelay: '4s'}} />
+                    </div>
+                    
+                    {/* Card Content */}
+                    <div className="relative p-10 text-center">
+                      <div className={`w-20 h-20 bg-gradient-to-r ${tool.gradient} rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 animate-icon-float-business`} style={{animationDelay: tool.delay}}>
+                        <tool.icon className="w-10 h-10 text-white" />
+                      </div>
+                      <h4 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-3xl transition-all duration-300">{tool.name}</h4>
+                      <p className="text-gray-600 leading-relaxed font-medium">{tool.tools}</p>
+                      
+                      {/* Connection Lines */}
+                      <div className={`absolute inset-0 bg-gradient-to-r ${tool.gradient} opacity-0 group-hover:opacity-5 rounded-3xl transition-opacity duration-500`} />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-white" />
+
+              {/* Revolutionary Connection Footer */}
+              <div className="text-center mt-20">
+                <div className="inline-flex items-center bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-full px-12 py-6 shadow-2xl">
+                  <div className="flex items-center space-x-4 text-white">
+                    <div className="w-4 h-4 bg-white/30 rounded-full animate-pulse" />
+                    <span className="font-bold text-lg">500+ Integrations Available</span>
+                    <div className="w-4 h-4 bg-white/30 rounded-full animate-pulse" style={{animationDelay: '1s'}} />
+                  </div>
                 </div>
-                <h4 className="font-bold text-gray-900 mb-2">Automation</h4>
-                <p className="text-gray-600 text-sm">Zapier, Make, Microsoft Power Automate</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                  <ShoppingCart className="w-8 h-8 text-white" />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">E-commerce</h4>
-                <p className="text-gray-600 text-sm">Shopify, WooCommerce, Magento, BigCommerce</p>
+                <p className="text-gray-600 mt-6 text-lg">
+                  With more platforms added every month through our open API ecosystem
+                </p>
               </div>
             </div>
           </div>
