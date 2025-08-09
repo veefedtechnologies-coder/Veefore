@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Mic, MicOff, Send, X, ChevronDown, MessageSquare, User, Bot, Paperclip, Edit, Search, MoreHorizontal, ChevronLeft, ChevronRight, Zap, BarChart3, Share, Archive, Trash2, Square } from 'lucide-react'
+import { Mic, MicOff, Send, X } from 'lucide-react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiRequest, queryClient } from '@/lib/queryClient'
 import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
@@ -31,10 +31,6 @@ export default function VeeGPT() {
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [inputText, setInputText] = useState('')
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [typewriterMessageIds, setTypewriterMessageIds] = useState(new Set<number>())
   const [isGenerating, setIsGenerating] = useState(false)
   const [currentEventSource, setCurrentEventSource] = useState<EventSource | null>(null)
   
@@ -329,13 +325,11 @@ export default function VeeGPT() {
     setHasSentFirstMessage(false)
     setInputText('')
     setIsGenerating(false)
-    setTypewriterMessageIds(new Set())
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
     setIsGenerating(false)
-    setTypewriterMessageIds(new Set())
   }
 
   // Auto-scroll to bottom when new messages arrive
@@ -343,139 +337,28 @@ export default function VeeGPT() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Check if there are any messages with typewriter animation
-  useEffect(() => {
-    if (messages) {
-      const latestAiMessage = messages
-        .filter((msg: any) => msg.role === 'assistant')
-        .pop()
-      
-      if (latestAiMessage && !typewriterMessageIds.has(latestAiMessage.id)) {
-        setTypewriterMessageIds(prev => new Set(prev).add(latestAiMessage.id))
-      }
-    }
-  }, [messages, typewriterMessageIds])
-
-  // Initialize conversation state when conversations load
-  useEffect(() => {
-    if (conversations && conversations.length > 0 && !currentConversationId) {
-      setHasSentFirstMessage(true)
-      setCurrentConversationId(conversations[0].id)
-    } else if (conversations && conversations.length === 0 && currentConversationId) {
-      setHasSentFirstMessage(false)
-      setCurrentConversationId(null)
-    }
-  }, [conversations, currentConversationId])
-
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-white">
-      {/* Sidebar */}
-      <div className={`bg-[#0f0f14] border-r border-gray-800/50 transition-all duration-300 ${
-        sidebarCollapsed ? 'w-16' : 'w-80'
-      }`}>
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800/50">
-          {!sidebarCollapsed && (
-            <div className="flex items-center gap-3">
-              <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8" />
-              <div>
-                <h1 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  VeeGPT
-                </h1>
-                <p className="text-xs text-gray-400">AI Assistant</p>
-              </div>
-            </div>
-          )}
-          
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 hover:bg-gray-800/50 rounded-lg transition-colors"
-          >
-            {sidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
-        </div>
-
-        {/* New Chat Button */}
-        {!sidebarCollapsed && (
-          <div className="p-4 border-b border-gray-800/50">
-            <button
-              onClick={startNewChat}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-sm font-medium"
-            >
-              <MessageSquare size={18} />
-              New Chat
-            </button>
-          </div>
-        )}
-
-        {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
-          {!sidebarCollapsed && conversations?.map((conversation: any) => (
-            <div
-              key={conversation.id}
-              className={`group relative cursor-pointer px-4 py-3 border-b border-gray-800/30 hover:bg-gray-800/30 transition-colors ${
-                currentConversationId === conversation.id ? 'bg-gray-800/50 border-l-2 border-l-blue-500' : ''
-              }`}
-              onClick={() => selectConversation(conversation.id)}
-              onMouseEnter={() => setHoveredChatId(conversation.id)}
-              onMouseLeave={() => setHoveredChatId(null)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-0.5">
-                  <MessageSquare size={16} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-200 truncate">
-                    {conversation.title || 'New Chat'}
-                  </h3>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {conversation.messageCount || 0} messages
-                  </p>
-                </div>
-                
-                {hoveredChatId === conversation.id && (
-                  <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-1 hover:bg-gray-700 rounded">
-                      <MoreHorizontal size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-800/50 bg-black/20 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            {sidebarCollapsed && (
-              <div className="flex items-center gap-3">
-                <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8" />
-                <div>
-                  <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    VeeGPT
-                  </h1>
-                  <p className="text-sm text-gray-400">AI Assistant</p>
-                </div>
-              </div>
-            )}
-          </div>
-          
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-lg transition-colors text-sm"
-              >
-                <Zap size={16} />
-                VeeGPT 4.0
-                <ChevronDown size={14} />
-              </button>
+            <img src={veeforeLogo} alt="VeeFore" className="w-8 h-8" />
+            <div>
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                VeeGPT
+              </h1>
+              <p className="text-sm text-gray-400">AI Assistant</p>
             </div>
           </div>
+          
+          <button
+            onClick={startNewChat}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-sm font-medium"
+          >
+            New Chat
+          </button>
         </div>
 
         {/* Messages or Welcome Screen */}
@@ -522,7 +405,7 @@ export default function VeeGPT() {
                 >
                   {message.role === 'assistant' && (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
-                      <Bot size={16} />
+                      AI
                     </div>
                   )}
                   
@@ -534,26 +417,13 @@ export default function VeeGPT() {
                     }`}
                   >
                     <div className="whitespace-pre-wrap break-words">
-                      {typewriterMessageIds.has(message.id) ? (
-                        <TypewriterText 
-                          text={message.content || '...'} 
-                          onComplete={() => {
-                            setTypewriterMessageIds(prev => {
-                              const newSet = new Set(prev)
-                              newSet.delete(message.id)
-                              return newSet
-                            })
-                          }}
-                        />
-                      ) : (
-                        message.content || '...'
-                      )}
+                      {message.content || '...'}
                     </div>
                   </div>
                   
                   {message.role === 'user' && (
                     <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-sm font-bold">
-                      <User size={16} />
+                      U
                     </div>
                   )}
                 </div>
@@ -575,10 +445,6 @@ export default function VeeGPT() {
               }}
             >
               <div className="flex items-end gap-3">
-                <button className="text-gray-400 hover:text-gray-300 transition-colors">
-                  <Paperclip size={20} />
-                </button>
-                
                 <input
                   ref={inputRef}
                   type="text"
@@ -587,7 +453,7 @@ export default function VeeGPT() {
                   onKeyPress={handleKeyPress}
                   placeholder="Message VeeGPT"
                   className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-400 resize-none min-h-[24px] text-base"
-                  disabled={createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || typewriterMessageIds.size > 0}
+                  disabled={createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating}
                   style={{
                     background: 'transparent',
                   }}
@@ -595,7 +461,7 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || typewriterMessageIds.size > 0) ? (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating) ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{
@@ -623,7 +489,7 @@ export default function VeeGPT() {
                     e.currentTarget.style.borderColor = '#ef4444'
                   }}
                 >
-                  <Square size={16} fill="currentColor" />
+                  <X size={16} />
                 </button>
               ) : (
                 <button
