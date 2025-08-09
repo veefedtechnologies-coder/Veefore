@@ -278,7 +278,6 @@ export default function VeeGPT() {
 
   const handleStreamEvent = (data: any) => {
     console.log('VeeGPT: Stream event:', data)
-    console.log('VeeGPT: Current isGenerating state:', isGenerating)
 
     switch (data.type) {
       case 'userMessage':
@@ -301,7 +300,6 @@ export default function VeeGPT() {
 
       case 'chunk':
         // Update the AI message content in real-time
-        console.log('VeeGPT: Processing chunk, isGenerating should be true:', isGenerating, 'ref:', isGeneratingRef.current)
         if (data.messageId && data.content && currentConversationId) {
           updateMessageContentInCache(data.messageId, data.content)
         }
@@ -1106,7 +1104,7 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating) ? (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current) ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{
