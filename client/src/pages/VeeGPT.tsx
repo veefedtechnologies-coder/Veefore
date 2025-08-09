@@ -571,25 +571,23 @@ export default function VeeGPT() {
               <div
                 key={message.id}
                 className={`flex space-x-4 ${
-                  message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
-                    : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
+                {message.role === 'assistant' && (
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500 text-white">
+                    <Bot className="w-4 h-4" />
+                  </div>
+                )}
+                <div className={`${
+                  message.role === 'user' 
+                    ? 'max-w-md ml-auto' 
+                    : 'flex-1'
                 }`}>
-                  {message.role === 'user' ? (
-                    <User className="w-5 h-5" />
-                  ) : (
-                    <Bot className="w-5 h-5" />
-                  )}
-                </div>
-                <div className={`flex-1 max-w-3xl`}>
-                  <div className={`px-6 py-4 rounded-2xl shadow-sm border ${
+                  <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-200 ml-auto max-w-2xl'
-                      : 'bg-white text-gray-900 border-gray-100'
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'bg-transparent text-gray-900'
                   }`}>
                     <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                   </div>
@@ -602,15 +600,20 @@ export default function VeeGPT() {
                     })}
                   </div>
                 </div>
+                {message.role === 'user' && (
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600 text-white">
+                    <User className="w-4 h-4" />
+                  </div>
+                )}
               </div>
             ))}
             {(createConversationMutation.isPending || sendMessageMutation.isPending) && (
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
-                  <Bot className="w-5 h-5 text-white" />
+              <div className="flex space-x-4 justify-start">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500 text-white">
+                  <Bot className="w-4 h-4" />
                 </div>
                 <div className="flex-1">
-                  <div className="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="bg-transparent px-4 py-3 rounded-2xl">
                     <div className="flex space-x-2">
                       <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
