@@ -74,6 +74,16 @@ div[data-pill-container]:hover {
   to { transform: rotate(360deg); }
 }
 
+/* Chat message text wrapping */
+.chat-message-content {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  hyphens: auto !important;
+  max-width: 100% !important;
+}
+
 /* Modern Dropdown Animations */
 @keyframes dropdown-enter {
   from {

@@ -589,7 +589,7 @@ export default function VeeGPT() {
                       ? 'bg-gray-200 text-gray-900'
                       : 'bg-transparent text-gray-900'
                   }`}>
-                    <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                    <div className="whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere chat-message-content">{message.content}</div>
                   </div>
                   <div className={`mt-2 text-xs text-gray-500 ${
                     message.role === 'user' ? 'text-right' : 'text-left'
