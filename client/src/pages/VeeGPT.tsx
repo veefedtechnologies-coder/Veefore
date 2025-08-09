@@ -768,20 +768,22 @@ export default function VeeGPT() {
         {/* Footer text positioned below the floating input */}
         <div style={{ 
           position: 'absolute',
-          bottom: '12px',
+          bottom: '20px',
           left: '50%',
           transform: 'translateX(-50%)',
           textAlign: 'center',
           pointerEvents: 'none',
-          zIndex: 999
+          zIndex: 1000
         }}>
           <div style={{ 
             fontSize: '12px', 
             color: '#9ca3af',
-            background: 'white',
-            backgroundColor: 'white',
-            padding: '4px 8px',
-            borderRadius: '4px'
+            background: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(229, 231, 235, 0.3)'
           }}>
             VeeGPT can make mistakes. Check important info.
           </div>
