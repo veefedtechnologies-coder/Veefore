@@ -346,7 +346,7 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current,
           eventType: 'chunk'
         })
-        // Trigger re-render to ensure stop button visibility during streaming
+        // Force re-render to show stop button during streaming chunks
         setRenderTrigger(prev => prev + 1)
         // Update the AI message content in real-time
         if (data.messageId && data.content && currentConversationId) {
@@ -1043,22 +1043,6 @@ export default function VeeGPT() {
                 )}
               </div>
             ))}
-            {(createConversationMutation.isPending || sendMessageMutation.isPending) && (
-              <div className="flex space-x-4 justify-start">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
-                  <Bot className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="bg-transparent px-4 py-3 rounded-2xl">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -1163,11 +1147,9 @@ export default function VeeGPT() {
               </div>
               
               {(() => {
-                // Show stop button when any generation is active
-                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || (isGeneratingRef.current && renderTrigger >= 0)
+                // Show stop button ONLY during actual streaming (not during initial loading)
+                const shouldShowStop = (isGenerating || isGeneratingRef.current) && renderTrigger >= 0
                 console.log('VeeGPT: Stop button visibility check:', {
-                  createPending: createConversationMutation.isPending,
-                  sendPending: sendMessageMutation.isPending,
                   isGenerating,
                   isGeneratingRef: isGeneratingRef.current,
                   renderTrigger,
