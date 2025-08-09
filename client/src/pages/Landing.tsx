@@ -1104,9 +1104,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
                               {/* Advanced Hover Preview */}
                               {selectedFeature === index && selectedFeature !== activeFeature && (
-                                <div className={`absolute top-0 z-50 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl w-72 ${
-                                  index % 4 >= 2 ? 'right-full mr-2' : 'left-full ml-2'
-                                }`}>
+                                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl">
                                   <div className="text-left">
                                     <h5 className="text-gray-900 font-semibold text-sm mb-2">{feature.title}</h5>
                                     <p className="text-gray-600 text-xs mb-3">{feature.description}</p>
@@ -1122,12 +1120,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
                                       Try {feature.title.split(' ')[0]}
                                     </button>
                                   </div>
-                                  {/* Arrow pointing to card */}
-                                  <div className={`absolute top-4 ${
-                                    index % 4 >= 2 
-                                      ? 'left-full w-0 h-0 border-t-8 border-b-8 border-l-8 border-t-transparent border-b-transparent border-l-white/95'
-                                      : 'right-full w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-white/95'
-                                  }`}></div>
                                 </div>
                               )}
                             </div>
