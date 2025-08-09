@@ -21,6 +21,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [scrollY, setScrollY] = useState(0)
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,6 +54,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
   const handleNavigation = (page: string) => {
     onNavigate(page)
+  }
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }))
   }
 
   // Core platform features with detailed descriptions
@@ -1043,9 +1051,32 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   </div>
                   
                   <div className="space-y-6">
-                    <h4 className="text-2xl font-bold text-gray-900 mb-6">Key Capabilities & Benefits</h4>
-                    <div className="grid grid-cols-1 gap-5">
-                      {feature.details.map((detail, idx) => (
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-2xl font-bold text-gray-900">Key Capabilities & Benefits</h4>
+                      <Button
+                        onClick={() => toggleSection(`feature-${index}`)}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400"
+                      >
+                        {expandedSections[`feature-${index}`] ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            Show More
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <div className={`grid grid-cols-1 gap-5 transition-all duration-500 overflow-hidden ${
+                      expandedSections[`feature-${index}`] ? 'max-h-none opacity-100' : 'max-h-32 opacity-80'
+                    }`}>
+                      {feature.details.slice(0, expandedSections[`feature-${index}`] ? feature.details.length : 3).map((detail, idx) => (
                         <div key={idx} className="flex items-start group">
                           <div className={`w-8 h-8 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300`}>
                             <Check className="w-4 h-4 text-white" />
@@ -1053,6 +1084,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           <span className="ml-4 text-gray-700 leading-relaxed font-medium">{detail}</span>
                         </div>
                       ))}
+                      {!expandedSections[`feature-${index}`] && feature.details.length > 3 && (
+                        <div className="text-center pt-4">
+                          <span className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
+                            +{feature.details.length - 3} more capabilities
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1104,14 +1142,46 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <p className="text-gray-600 mb-8 leading-relaxed text-lg">{feature.description}</p>
                   
                   <div className="space-y-4">
-                    {feature.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-start">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-3 h-3 text-white" />
+                    <div className="flex items-center justify-between mb-4">
+                      <Button
+                        onClick={() => toggleSection(`enterprise-${index}`)}
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-0"
+                      >
+                        {expandedSections[`enterprise-${index}`] ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            Show Less Features
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            Show All Features
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <div className={`space-y-4 transition-all duration-500 overflow-hidden ${
+                      expandedSections[`enterprise-${index}`] ? 'max-h-none' : 'max-h-40'
+                    }`}>
+                      {feature.features.slice(0, expandedSections[`enterprise-${index}`] ? feature.features.length : 3).map((feat, idx) => (
+                        <div key={idx} className="flex items-start">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="ml-4 text-gray-700 leading-relaxed">{feat}</span>
                         </div>
-                        <span className="ml-4 text-gray-700 leading-relaxed">{feat}</span>
-                      </div>
-                    ))}
+                      ))}
+                      {!expandedSections[`enterprise-${index}`] && feature.features.length > 3 && (
+                        <div className="text-center pt-2">
+                          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            +{feature.features.length - 3} more features
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1153,14 +1223,46 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <p className="text-gray-600 mb-8 leading-relaxed text-lg">{solution.description}</p>
                   
                   <div className="space-y-4">
-                    {solution.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-start">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-3 h-3 text-white" />
+                    <div className="flex items-center justify-between mb-4">
+                      <Button
+                        onClick={() => toggleSection(`industry-${index}`)}
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-0"
+                      >
+                        {expandedSections[`industry-${index}`] ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            View All Features
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <div className={`space-y-4 transition-all duration-500 overflow-hidden ${
+                      expandedSections[`industry-${index}`] ? 'max-h-none' : 'max-h-40'
+                    }`}>
+                      {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-start">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="ml-4 text-gray-700 leading-relaxed">{feature}</span>
                         </div>
-                        <span className="ml-4 text-gray-700 leading-relaxed">{feature}</span>
-                      </div>
-                    ))}
+                      ))}
+                      {!expandedSections[`industry-${index}`] && solution.features.length > 3 && (
+                        <div className="text-center pt-2">
+                          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            +{solution.features.length - 3} more
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mt-8">
