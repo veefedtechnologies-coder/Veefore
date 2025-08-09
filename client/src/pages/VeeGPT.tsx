@@ -314,9 +314,13 @@ export default function VeeGPT() {
         })
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
-        // Update the AI message content in real-time
-        if (data.messageId && data.content && currentConversationId) {
-          updateMessageContentInCache(data.messageId, data.content)
+        // Update streaming content for real-time display
+        if (data.messageId && data.content) {
+          console.log('VeeGPT: Updated streaming content for message', data.messageId, ':', data.content)
+          setStreamingContent(prev => ({
+            ...prev,
+            [data.messageId]: data.content
+          }))
         }
         break
 
@@ -944,7 +948,7 @@ export default function VeeGPT() {
                         }}
                       >
                         {streamingContent[message.id] !== undefined ? streamingContent[message.id] : message.content}
-                        {isGenerating && streamingContent[message.id] && (
+                        {isGenerating && streamingContent[message.id] !== undefined && (
                           <span className="animate-pulse text-gray-400">|</span>
                         )}
                       </div>
