@@ -1110,35 +1110,155 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </button>
                     </div>
                     
-                    {/* Interactive Tutorial Overlay */}
+                    {/* Revolutionary Interactive Demo Experience */}
                     {isInteractionActive && (
-                      <div className="bg-gradient-to-r from-violet-600/10 to-blue-600/10 backdrop-blur-xl border border-violet-200 rounded-2xl p-6 shadow-lg">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
-                            <Lightbulb className="w-5 h-5" />
+                      <div className="space-y-6">
+                        {/* Main Demo Interface */}
+                        <div className="bg-gradient-to-br from-violet-50 via-blue-50 to-emerald-50 backdrop-blur-xl border border-violet-200 rounded-3xl p-8 shadow-2xl">
+                          <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white shadow-lg">
+                                <Lightbulb className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <h4 className="text-gray-900 font-bold text-xl">Interactive Demo Mode Active</h4>
+                                <p className="text-gray-600 text-sm">Experience VeeFore's revolutionary AI platform in real-time</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                              <span className="text-green-600 font-medium text-sm">Live Demo</span>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h4 className="text-gray-900 font-bold mb-2">Interactive Demo Mode Active</h4>
-                            <p className="text-gray-700 text-sm mb-3">
-                              Click on any feature card above to explore that specific tool. Hover over elements to see live previews and interactions.
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {platformFeatures.slice(0, 4).map((feature, index) => (
-                                <button
-                                  key={feature.id}
-                                  onClick={() => {
-                                    setActiveFeature(index)
-                                    handleNavigation(feature.link.substring(1))
-                                  }}
-                                  className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-                                    activeFeature === index
-                                      ? `bg-gradient-to-r ${feature.color} text-white shadow-lg`
-                                      : 'bg-white/60 text-gray-700 hover:bg-white/80'
-                                  }`}
-                                >
-                                  {feature.title.split(' ')[0]}
-                                </button>
-                              ))}
+
+                          {/* Enhanced Feature Selection Grid */}
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            {platformFeatures.slice(0, 4).map((feature, index) => (
+                              <button
+                                key={feature.id}
+                                onClick={() => {
+                                  setActiveFeature(index)
+                                  handleNavigation(feature.link.substring(1))
+                                }}
+                                onMouseEnter={() => setSelectedFeature(index)}
+                                className={`group relative p-6 rounded-2xl border-2 transition-all duration-500 transform hover:scale-105 ${
+                                  activeFeature === index
+                                    ? `border-violet-300 bg-gradient-to-br ${feature.color.replace('from-', 'from-').replace('to-', 'to-')}/10 shadow-xl`
+                                    : 'border-gray-200 bg-white/70 hover:border-violet-200 hover:shadow-lg'
+                                }`}
+                              >
+                                <div className="flex flex-col items-center text-center space-y-4">
+                                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                                    {feature.icon}
+                                  </div>
+                                  <div>
+                                    <h3 className="text-gray-900 font-bold text-base mb-1">{feature.title.split(' ')[0]}</h3>
+                                    <p className="text-gray-600 text-xs">{feature.subtitle}</p>
+                                  </div>
+                                  {activeFeature === index && (
+                                    <div className="flex items-center space-x-2 text-violet-600 text-xs font-medium">
+                                      <Play className="w-3 h-3" />
+                                      <span>Active</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* Interactive Pulse Effect */}
+                                {activeFeature === index && (
+                                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-600/10 to-blue-600/10 animate-pulse" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Live Demo Instructions */}
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/50">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">1</div>
+                                <div>
+                                  <h5 className="text-gray-900 font-semibold mb-1">Explore Features</h5>
+                                  <p className="text-gray-600 text-sm">Click any feature card to launch and experience the actual platform functionality</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">2</div>
+                                <div>
+                                  <h5 className="text-gray-900 font-semibold mb-1">Real-time Interaction</h5>
+                                  <p className="text-gray-600 text-sm">All demo elements are fully interactive with live data and responsive animations</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center text-white text-sm font-bold">3</div>
+                                <div>
+                                  <h5 className="text-gray-900 font-semibold mb-1">Experience Power</h5>
+                                  <p className="text-gray-600 text-sm">See how VeeFore revolutionizes social media management with AI</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Advanced Demo Controls */}
+                        <div className="bg-white/70 backdrop-blur-xl border border-gray-200 rounded-2xl p-6 shadow-lg">
+                          <div className="flex items-center justify-between mb-4">
+                            <h5 className="text-gray-900 font-bold text-lg">Demo Experience Controls</h5>
+                            <div className="flex items-center space-x-2">
+                              <Activity className="w-4 h-4 text-emerald-500" />
+                              <span className="text-emerald-600 text-sm font-medium">Enhanced Mode</span>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Quick Actions */}
+                            <div className="space-y-3">
+                              <h6 className="text-gray-800 font-semibold text-sm">Quick Platform Access</h6>
+                              <div className="grid grid-cols-2 gap-3">
+                                {platformFeatures.slice(0, 4).map((feature, index) => (
+                                  <button
+                                    key={feature.id}
+                                    onClick={() => {
+                                      setActiveFeature(index)
+                                      handleNavigation(feature.link.substring(1))
+                                    }}
+                                    className={`p-3 rounded-xl text-xs font-medium transition-all duration-300 ${
+                                      selectedFeature === index
+                                        ? `bg-gradient-to-r ${feature.color} text-white shadow-lg transform scale-105`
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-4 h-4">{feature.icon}</div>
+                                      <span>{feature.title.split(' ')[0]}</span>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Live Performance Metrics */}
+                            <div className="space-y-3">
+                              <h6 className="text-gray-800 font-semibold text-sm">Demo Performance</h6>
+                              <div className="space-y-2">
+                                {[
+                                  { label: 'Demo Interactions', value: Math.floor(liveStats.conversations / 100), max: 50 },
+                                  { label: 'Features Explored', value: Math.floor(liveStats.contentGenerated / 200), max: 10 },
+                                  { label: 'Engagement Score', value: Math.floor(liveStats.analyticsViews / 150), max: 8 }
+                                ].map((metric, index) => (
+                                  <div key={index} className="flex items-center justify-between text-xs">
+                                    <span className="text-gray-600">{metric.label}</span>
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-20 bg-gray-200 rounded-full h-1.5">
+                                        <div 
+                                          className="h-1.5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 transition-all duration-1000"
+                                          style={{ width: `${(metric.value / metric.max) * 100}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-gray-900 font-medium w-8">{metric.value}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
