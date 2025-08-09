@@ -103,6 +103,7 @@ export default function VeeGPT() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
+  const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
   const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
@@ -283,10 +284,14 @@ export default function VeeGPT() {
     setCurrentConversationId(null)
     setHasSentFirstMessage(false)
     setInputText('')
+    // Clear typewriter state when starting new chat
+    setTypewriterMessageIds(new Set())
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
+    // Clear typewriter state when switching conversations
+    setTypewriterMessageIds(new Set())
   }
 
   // Auto-scroll to bottom when new messages arrive
@@ -294,13 +299,15 @@ export default function VeeGPT() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
   
-  // Auto-scroll during typewriter effect
+  // Track new AI messages for typewriter effect
   useEffect(() => {
-    const timer = setInterval(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, 500)
-    return () => clearInterval(timer)
-  }, [messages])
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage.role === 'assistant' && !typewriterMessageIds.has(lastMessage.id)) {
+        setTypewriterMessageIds(prev => new Set([...prev, lastMessage.id]))
+      }
+    }
+  }, [messages, typewriterMessageIds])
 
   // Check if we have any conversations to determine initial state
   useEffect(() => {
@@ -721,8 +728,35 @@ export default function VeeGPT() {
                     overflowWrap: 'break-word',
                     maxWidth: '100%'
                   }}>
-                    {message.role === 'assistant' ? (
-                      <TypewriterText text={message.content} speed={25} />
+                    {message.role === 'assistant' && typewriterMessageIds.has(message.id) ? (
+                      <TypewriterText 
+                        text={message.content} 
+                        speed={25}
+                        onComplete={() => {
+                          // Remove from typewriter set when animation completes
+                          setTypewriterMessageIds(prev => {
+                            const newSet = new Set(prev)
+                            newSet.delete(message.id)
+                            return newSet
+                          })
+                        }}
+                      />
+                    ) : message.role === 'assistant' ? (
+                      <div 
+                        className="leading-relaxed"
+                        style={{
+                          wordWrap: 'break-word',
+                          wordBreak: 'break-all',
+                          overflowWrap: 'anywhere',
+                          whiteSpace: 'pre-wrap',
+                          maxWidth: '100%',
+                          width: '100%',
+                          hyphens: 'auto',
+                          lineBreak: 'anywhere'
+                        }}
+                      >
+                        {message.content}
+                      </div>
                     ) : (
                       <div 
                         className="leading-relaxed"
