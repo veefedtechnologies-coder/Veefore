@@ -7,7 +7,7 @@ import {
   Network, Wand2, Palette, Music, Video, Image, FileText, Mic, Camera, Megaphone, Compass, 
   Map, Database, Code, Server, Cloud, Gauge, LineChart, PieChart, Activity, Headphones, 
   ShoppingCart, CreditCard, Wallet, ChevronRight, ExternalLink, Github, Twitter, MousePointer2,
-  Maximize2, Move3D, Sparkle, Waves, Orbit, Hexagon, Triangle, Circle
+  Maximize2, Move3D, Sparkle, Waves, Orbit, Hexagon, Triangle, Circle, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -1066,6 +1066,171 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                             <span className="text-green-600 font-medium text-xs">Live Demo</span>
+                          </div>
+                        </div>
+
+                        {/* Main App Screenshot/Demo Area */}
+                        <div className="bg-black/90 rounded-xl p-4 mb-6 border border-gray-200/20">
+                          <div className="flex items-center space-x-2 mb-3">
+                            <div className="flex space-x-1.5">
+                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <div className="bg-gray-800 rounded-lg px-3 py-1 flex-1">
+                              <span className="text-gray-400 text-xs">https://veefore.com/{platformFeatures[activeFeature].link.substring(1)}</span>
+                            </div>
+                          </div>
+                          
+                          {/* App Interface Preview */}
+                          <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 h-48 relative overflow-hidden">
+                            {/* VeeGPT Interface Preview */}
+                            {activeFeature === 0 && (
+                              <div className="h-full">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                      <MessageSquare className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="font-semibold text-gray-900">VeeGPT Chat</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500">AI Assistant Active</div>
+                                </div>
+                                
+                                <div className="space-y-3 h-32 overflow-hidden">
+                                  <div className="flex space-x-2">
+                                    <div className="w-6 h-6 bg-violet-100 rounded-full flex items-center justify-center">
+                                      <div className="w-2 h-2 bg-violet-600 rounded-full"></div>
+                                    </div>
+                                    <div className="bg-gray-100 rounded-lg p-2 flex-1">
+                                      <div className="text-xs text-gray-700">Create a social media strategy for my tech startup</div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex space-x-2">
+                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                      <Bot className="w-3 h-3 text-blue-600" />
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-2 flex-1">
+                                      <div className="text-xs text-gray-700">I'll help you create a comprehensive social media strategy...</div>
+                                      <div className="w-16 h-1 bg-blue-200 rounded mt-1 animate-pulse"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="absolute bottom-2 left-4 right-4">
+                                  <div className="bg-white border border-gray-200 rounded-lg p-2 flex items-center space-x-2">
+                                    <div className="text-xs text-gray-400 flex-1">Type your message...</div>
+                                    <Send className="w-3 h-3 text-gray-400" />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* AI Generation Interface */}
+                            {activeFeature === 1 && (
+                              <div className="h-full">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                      <Sparkles className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="font-semibold text-gray-900">AI Content Studio</span>
+                                  </div>
+                                  <div className="text-xs text-green-600 flex items-center space-x-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span>Generating</span>
+                                  </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-3 h-32">
+                                  <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-3">
+                                    <div className="text-xs font-medium text-gray-700 mb-2">Post Caption</div>
+                                    <div className="space-y-1">
+                                      <div className="w-full h-1 bg-purple-200 rounded"></div>
+                                      <div className="w-3/4 h-1 bg-purple-200 rounded"></div>
+                                      <div className="w-5/6 h-1 bg-purple-200 rounded animate-pulse"></div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg p-3">
+                                    <div className="text-xs font-medium text-gray-700 mb-2">Visual Content</div>
+                                    <div className="w-full h-16 bg-gradient-to-br from-blue-200 to-cyan-200 rounded flex items-center justify-center">
+                                      <Image className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Analytics Dashboard */}
+                            {activeFeature === 2 && (
+                              <div className="h-full">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                                      <TrendingUp className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="font-semibold text-gray-900">Analytics Dashboard</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500">Real-time Data</div>
+                                </div>
+                                
+                                <div className="grid grid-cols-3 gap-2 mb-3">
+                                  <div className="bg-green-50 rounded p-2 text-center">
+                                    <div className="text-xs text-green-600 font-medium">Engagement</div>
+                                    <div className="text-sm font-bold text-green-700">+23%</div>
+                                  </div>
+                                  <div className="bg-blue-50 rounded p-2 text-center">
+                                    <div className="text-xs text-blue-600 font-medium">Reach</div>
+                                    <div className="text-sm font-bold text-blue-700">12.5K</div>
+                                  </div>
+                                  <div className="bg-purple-50 rounded p-2 text-center">
+                                    <div className="text-xs text-purple-600 font-medium">Posts</div>
+                                    <div className="text-sm font-bold text-purple-700">48</div>
+                                  </div>
+                                </div>
+                                
+                                <div className="bg-gray-50 rounded-lg p-2 h-20 flex items-end space-x-1">
+                                  {[20, 35, 25, 45, 30, 55, 40, 60, 35, 50].map((height, i) => (
+                                    <div 
+                                      key={i} 
+                                      className="bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-sm flex-1 transition-all duration-1000"
+                                      style={{ height: `${height}%` }}
+                                    ></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Content Calendar */}
+                            {activeFeature === 3 && (
+                              <div className="h-full">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                                      <Calendar className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="font-semibold text-gray-900">Content Calendar</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500">August 2025</div>
+                                </div>
+                                
+                                <div className="grid grid-cols-7 gap-1 h-32">
+                                  {Array.from({ length: 21 }, (_, i) => (
+                                    <div key={i} className="bg-gray-50 rounded text-xs p-1 relative">
+                                      <div className="text-gray-500 text-xs">{i + 1}</div>
+                                      {[2, 5, 8, 12, 15, 18].includes(i) && (
+                                        <div className="w-1 h-1 bg-violet-500 rounded-full absolute bottom-1 right-1"></div>
+                                      )}
+                                      {[3, 9, 16].includes(i) && (
+                                        <div className="w-1 h-1 bg-green-500 rounded-full absolute bottom-1 right-1"></div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
