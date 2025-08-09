@@ -627,7 +627,7 @@ export default function VeeGPT() {
         {/* Truly floating transparent input - absolute position within chat area */}
         <div style={{ 
           position: 'absolute',
-          bottom: '60px',
+          bottom: '40px',
           left: '50%',
           transform: 'translateX(-50%)',
           width: '100%',
