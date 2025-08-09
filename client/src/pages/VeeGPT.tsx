@@ -471,75 +471,130 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* ChatGPT-style completely transparent input area */}
-        <div className="px-6 py-6" style={{ background: 'transparent' }}>
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3" style={{ background: 'transparent', border: 'none', padding: '12px 0' }}>
-              <button className="text-gray-500 hover:text-gray-700 p-2" style={{ background: 'transparent', border: 'none' }}>
-                <Paperclip className="w-5 h-5" />
-              </button>
-              
-              <div
-                ref={inputRef}
-                contentEditable
-                suppressContentEditableWarning
-                onInput={(e) => {
-                  const text = e.currentTarget.innerText
-                  setInputText(text)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSendMessage()
-                  }
-                }}
-                style={{
-                  flex: 1,
-                  minHeight: '24px',
-                  maxHeight: '120px',
-                  overflow: 'auto',
-                  outline: 'none',
-                  border: 'none',
-                  background: 'transparent',
-                  backgroundColor: 'transparent',
-                  color: '#374151',
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                  padding: '8px 0',
-                  margin: 0,
-                  boxShadow: 'none',
-                  borderRadius: 0
-                }}
-                data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
-              />
-              
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                className="p-2"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
-                  cursor: inputText.trim() ? 'pointer' : 'not-allowed'
-                }}
-              >
-                {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
-                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
-
-              <button className="text-gray-500 hover:text-gray-700 p-2" style={{ background: 'transparent', border: 'none' }}>
-                <Mic className="w-5 h-5" />
-              </button>
+        {/* Floating transparent input like ChatGPT - no containers */}
+        <div style={{ 
+          padding: '24px', 
+          background: 'none',
+          backgroundColor: 'transparent'
+        }}>
+          <div style={{ 
+            maxWidth: '48rem', 
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'none',
+            backgroundColor: 'transparent',
+            border: 'none',
+            outline: 'none'
+          }}>
+            <div style={{
+              background: 'none',
+              backgroundColor: 'transparent',
+              border: 'none',
+              outline: 'none',
+              padding: '6px',
+              cursor: 'pointer'
+            }}>
+              <Paperclip style={{ 
+                width: '20px', 
+                height: '20px',
+                color: '#6b7280'
+              }} />
             </div>
             
-            <div className="text-center mt-4">
-              <div className="text-xs text-gray-400">
-                VeeGPT can make mistakes. Check important info.
-              </div>
+            <div
+              ref={inputRef}
+              contentEditable
+              suppressContentEditableWarning
+              onInput={(e) => {
+                const text = e.currentTarget.innerText
+                setInputText(text)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSendMessage()
+                }
+              }}
+              style={{
+                flex: 1,
+                minHeight: '24px',
+                maxHeight: '120px',
+                overflow: 'auto',
+                outline: 'none',
+                border: 'none',
+                background: 'none',
+                backgroundColor: 'transparent',
+                color: '#374151',
+                fontSize: '16px',
+                lineHeight: '1.5',
+                padding: '8px 0',
+                margin: 0,
+                boxShadow: 'none',
+                borderRadius: 0,
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
+              data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
+            />
+            
+            <div
+              onClick={handleSendMessage}
+              style={{
+                background: 'none',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                padding: '6px',
+                cursor: inputText.trim() ? 'pointer' : 'not-allowed',
+                color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af'
+              }}
+            >
+              {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+                <div style={{ 
+                  width: '20px', 
+                  height: '20px', 
+                  border: '2px solid #9ca3af', 
+                  borderTop: '2px solid transparent', 
+                  borderRadius: '50%', 
+                  animation: 'spin 1s linear infinite' 
+                }} />
+              ) : (
+                <Send style={{ width: '20px', height: '20px' }} />
+              )}
+            </div>
+
+            <div style={{
+              background: 'none',
+              backgroundColor: 'transparent',
+              border: 'none',
+              outline: 'none',
+              padding: '6px',
+              cursor: 'pointer'
+            }}>
+              <Mic style={{ 
+                width: '20px', 
+                height: '20px',
+                color: '#6b7280'
+              }} />
+            </div>
+          </div>
+          
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: '16px',
+            background: 'none',
+            backgroundColor: 'transparent'
+          }}>
+            <div style={{ 
+              fontSize: '12px', 
+              color: '#9ca3af',
+              background: 'none',
+              backgroundColor: 'transparent'
+            }}>
+              VeeGPT can make mistakes. Check important info.
             </div>
           </div>
         </div>

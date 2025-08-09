@@ -4,31 +4,51 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ChatGPT-style completely transparent input field */
+/* Force complete transparency for ChatGPT-style floating input */
 div[contenteditable="true"] {
-  background: transparent !important;
+  background: none !important;
   background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
+  -webkit-background-composite: clear !important;
 }
 
 div[contenteditable="true"]:empty:before {
   content: attr(data-placeholder);
   color: #9ca3af;
   pointer-events: none;
-  background: transparent !important;
+  background: none !important;
+  background-color: transparent !important;
 }
 
 div[contenteditable="true"]:focus {
-  background: transparent !important;
+  background: none !important;
   background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+}
+
+/* Override any default styling from classes */
+.px-6, .py-6, .p-2, .text-gray-500, .hover\\:text-gray-700 {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* Spin animation for loading */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Modern Dropdown Animations */
