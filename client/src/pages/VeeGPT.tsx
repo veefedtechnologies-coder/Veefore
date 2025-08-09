@@ -472,7 +472,7 @@ export default function VeeGPT() {
         </div>
 
         {/* Floating transparent input like ChatGPT - no containers */}
-        <div style={{ 
+        <div className="veegpt-input-container" style={{ 
           padding: '24px', 
           background: 'none',
           backgroundColor: 'transparent'
