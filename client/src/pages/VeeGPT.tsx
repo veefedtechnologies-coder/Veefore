@@ -30,7 +30,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { getAuth } from 'firebase/auth'
-import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
+// import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png' // Commented out to fix build error
 
 // TypewriterText component for AI responses
 function TypewriterText({ text, speed = 30, onComplete }: { text: string, speed?: number, onComplete?: () => void }) {
@@ -113,10 +113,11 @@ export default function VeeGPT() {
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   
-  console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
+  // console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
 
   // No complex synchronization needed
 
@@ -162,7 +163,7 @@ export default function VeeGPT() {
       
       return newConv
     },
-    onMutate: async (content) => {
+    onMutate: async (content: string) => {
       // Show the user message immediately by transitioning to chat view
       setHasSentFirstMessage(true)
     },
@@ -170,11 +171,12 @@ export default function VeeGPT() {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.id, 'messages'] })
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       // Revert optimistic updates on error
       setHasSentFirstMessage(false)
       setCurrentConversationId(null)
       setIsGenerating(false)
+      console.log('VeeGPT: REF SET TO FALSE in createConversation mutation error')
       isGeneratingRef.current = false
       if (currentEventSource) {
         currentEventSource.close()
@@ -206,6 +208,7 @@ export default function VeeGPT() {
       
       // Set ref first for immediate availability
       isGeneratingRef.current = true
+      // Set ref for stop button visibility during streaming
       
       // Set state to trigger re-render and make stop button visible
       setIsGenerating(true)
@@ -215,10 +218,7 @@ export default function VeeGPT() {
       // Store resolve function for completion handler
       streamResolveRef.current = resolve
       
-      console.log('VeeGPT: Generation state set:', {
-        isGenerating: 'pending-state-update', 
-        isGeneratingRef: true
-      })
+      // Small delay to ensure state updates are processed
       
       // Small delay to ensure state update is processed
       await new Promise(resolve => setTimeout(resolve, 10))
@@ -233,7 +233,7 @@ export default function VeeGPT() {
         }
 
         const token = await user.getIdToken()
-        console.log('VeeGPT: Got auth token for streaming request')
+        // Got auth token, proceed with streaming request
 
         const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
           method: 'POST',
@@ -363,6 +363,7 @@ export default function VeeGPT() {
         setRenderTrigger(prev => prev + 1)
         // Delay ref reset to allow final render with stop button visible
         setTimeout(() => {
+          console.log('VeeGPT: REF SET TO FALSE in complete event timeout')
           isGeneratingRef.current = false
           setRenderTrigger(prev => prev + 1) // Trigger final cleanup render
         }, 100)
@@ -390,6 +391,7 @@ export default function VeeGPT() {
       case 'error':
         console.error('VeeGPT: Stream error:', data.error)
         setIsGenerating(false)
+        console.log('VeeGPT: REF SET TO FALSE in error event')
         isGeneratingRef.current = false
         break
     }
@@ -435,6 +437,7 @@ export default function VeeGPT() {
     onError: (error) => {
       console.error('VeeGPT: Error sending streaming message:', error)
       setIsGenerating(false)
+      console.log('VeeGPT: REF SET TO FALSE in sendMessage mutation error')
       isGeneratingRef.current = false
       if (currentEventSource) {
         currentEventSource.close()
@@ -483,6 +486,7 @@ export default function VeeGPT() {
     
     // Stop streaming immediately
     setIsGenerating(false)
+    console.log('VeeGPT: REF SET TO FALSE in handleStopGeneration')
     isGeneratingRef.current = false
     if (currentEventSource) {
       currentEventSource.close()
@@ -588,7 +592,7 @@ export default function VeeGPT() {
             }}
           >
             <textarea
-              ref={inputRef}
+              ref={textareaRef}
               value={inputText}
               onChange={(e) => {
                 setInputText(e.target.value)
@@ -948,12 +952,8 @@ export default function VeeGPT() {
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-transparent">
-                    <img 
-                      src={veeforeLogo} 
-                      alt="VeeFore AI" 
-                      className="w-6 h-6 object-contain"
-                    />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
+                    <Bot className="w-4 h-4 text-blue-600" />
                   </div>
                 )}
                 <div className={`${
@@ -1045,12 +1045,8 @@ export default function VeeGPT() {
             ))}
             {(createConversationMutation.isPending || sendMessageMutation.isPending) && (
               <div className="flex space-x-4 justify-start">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-transparent">
-                  <img 
-                    src={veeforeLogo} 
-                    alt="VeeFore AI" 
-                    className="w-6 h-6 object-contain"
-                  />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
+                  <Bot className="w-4 h-4 text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
@@ -1167,15 +1163,16 @@ export default function VeeGPT() {
               </div>
               
               {(() => {
-                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current
-                console.log('VeeGPT: Stop button visibility check:', {
-                  createPending: createConversationMutation.isPending,
-                  sendPending: sendMessageMutation.isPending,
-                  isGenerating,
-                  isGeneratingRef: isGeneratingRef.current,
-                  renderTrigger,
-                  shouldShowStop
-                })
+                // Show stop button when any generation is active
+                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || (isGeneratingRef.current && renderTrigger >= 0)
+                // console.log('VeeGPT: Stop button visibility check:', {
+                //   createPending: createConversationMutation.isPending,
+                //   sendPending: sendMessageMutation.isPending,
+                //   isGenerating,
+                //   isGeneratingRef: isGeneratingRef.current,
+                //   renderTrigger,
+                //   shouldShowStop
+                // })
                 return shouldShowStop
               })() ? (
                 <button
