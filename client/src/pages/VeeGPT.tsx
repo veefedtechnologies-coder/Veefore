@@ -66,7 +66,7 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
-  const [renderTrigger, setRenderTrigger] = useState(0)
+  // Removed renderTrigger - no longer needed
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -109,7 +109,10 @@ export default function VeeGPT() {
       // First create a new conversation
       const newConv = await apiRequest('/api/chat/conversations', {
         method: 'POST',
-        body: { title: 'New Chat' }
+        body: JSON.stringify({ title: 'New Chat' }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
 
       setCurrentConversationId(newConv.id)
@@ -120,7 +123,7 @@ export default function VeeGPT() {
       
       return newConv
     },
-    onMutate: async (content: string) => {
+    onMutate: async () => {
       // Show the user message immediately by transitioning to chat view
       setHasSentFirstMessage(true)
     },
@@ -128,7 +131,7 @@ export default function VeeGPT() {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.id, 'messages'] })
     },
-    onError: (err: Error) => {
+    onError: () => {
       // Revert optimistic updates on error
       setHasSentFirstMessage(false)
       setCurrentConversationId(null)
@@ -282,16 +285,22 @@ export default function VeeGPT() {
         break
 
       case 'aiMessageStart':
-        // Add AI message placeholder to cache immediately
+        // Add AI message placeholder to cache immediately with empty content
         if (currentConversationId && data.message) {
+          // Initialize streaming content for this message
+          setStreamingContent(prev => ({
+            ...prev,
+            [data.message.id]: ''
+          }))
+          
           queryClient.setQueryData(
             ['/api/chat/conversations', currentConversationId, 'messages'],
             (oldMessages: any[]) => {
-              if (!oldMessages) return [data.message]
+              if (!oldMessages) return [{ ...data.message, content: '' }]
               // Check if message already exists to avoid duplicates
               const messageExists = oldMessages.some(msg => msg.id === data.message.id)
               if (messageExists) return oldMessages
-              return [...oldMessages, data.message]
+              return [...oldMessages, { ...data.message, content: '' }]
             }
           )
         }
@@ -305,8 +314,6 @@ export default function VeeGPT() {
         })
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
-        // Force re-render to show stop button during streaming chunks
-        setRenderTrigger(prev => prev + 1)
         // Update the AI message content in real-time
         if (data.messageId && data.content && currentConversationId) {
           updateMessageContentInCache(data.messageId, data.content)
@@ -458,8 +465,8 @@ export default function VeeGPT() {
       setCurrentEventSource(null)
     }
     
-    // Also stop typewriter animations if any
-    setTypewriterMessageIds(new Set())
+    // Clear any streaming content
+    setStreamingContent({})
     
     // Call backend to stop generation
     if (currentConversationId) {
@@ -488,18 +495,14 @@ export default function VeeGPT() {
     setCurrentConversationId(null)
     setHasSentFirstMessage(false)
     setInputText('')
-    // Clear typewriter state when starting new chat
-    setTypewriterMessageIds(new Set())
-    // Reset message count tracking
-    setPreviousMessageCount(0)
+    // Clear streaming content when starting new chat
+    setStreamingContent({})
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
-    // Clear typewriter state when switching conversations
-    setTypewriterMessageIds(new Set())
-    // Reset message count tracking
-    setPreviousMessageCount(0)
+    // Clear streaming content when switching conversations
+    setStreamingContent({})
   }
 
   // Auto-scroll to bottom when new messages arrive
@@ -507,8 +510,7 @@ export default function VeeGPT() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
   
-  // Track the previous message count to detect truly new messages
-  const [previousMessageCount, setPreviousMessageCount] = useState(0)
+  // Removed previousMessageCount - no longer needed for streaming
   
   // No typewriter animation - streaming content updates in real-time
 
@@ -941,7 +943,7 @@ export default function VeeGPT() {
                           lineBreak: 'anywhere'
                         }}
                       >
-                        {streamingContent[message.id] || message.content}
+                        {streamingContent[message.id] !== undefined ? streamingContent[message.id] : message.content}
                         {isGenerating && streamingContent[message.id] && (
                           <span className="animate-pulse text-gray-400">|</span>
                         )}
