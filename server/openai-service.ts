@@ -92,19 +92,28 @@ Always provide practical, actionable advice tailored to content creation and soc
         messages: [
           {
             role: "system",
-            content: `Generate a short, descriptive title (max 35 characters) for a chat conversation based on the user's first message. The title should be concise, clear, and help users easily identify the conversation topic.
+            content: `Generate a unique, descriptive title (max 35 characters) for a chat conversation based on the user's first message. Create DISTINCT titles that help users differentiate between conversations.
 
 Rules:
 - Maximum 35 characters
 - No quotes or special formatting
-- Capture the main topic or intent
-- Be specific but brief
+- Be SPECIFIC and UNIQUE - avoid generic terms
+- Include key details to make each title distinctive
 - Use title case
+- Focus on the specific aspect or angle of the request
 
 Examples:
+"hi" → "General Chat"
+"hello" → "Quick Greeting" 
 "How to create engaging Instagram posts?" → "Instagram Post Creation"
 "I need help with my YouTube content strategy" → "YouTube Content Strategy"
-"What's the best way to grow followers?" → "Follower Growth Tips"`
+"What's the best way to grow followers?" → "Follower Growth Tips"
+"Give me some inspiration ideas" → "Creative Inspiration"
+"I need content inspiration" → "Content Brainstorming"
+"Help me with social media ideas" → "Social Media Planning"
+"What should I post today?" → "Daily Content Ideas"
+
+Make each title UNIQUE by focusing on specific words, context, or intent from the user's message.`
           },
           {
             role: "user",
@@ -112,7 +121,7 @@ Examples:
           }
         ],
         max_tokens: 30,
-        temperature: 0.5,
+        temperature: 0.8, // Higher temperature for more creative, unique titles
       });
 
       const title = response.choices[0]?.message?.content?.trim() || 'New Chat';

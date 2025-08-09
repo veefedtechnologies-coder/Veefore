@@ -55,6 +55,31 @@ type ChatMessage = {
   createdAt: Date
 }
 
+// Helper function to format last interaction date
+const formatLastInteractionDate = (dateString: string | Date | null) => {
+  if (!dateString) return 'No activity'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffHours = diffMs / (1000 * 60 * 60)
+  const diffDays = diffMs / (1000 * 60 * 60 * 24)
+  
+  if (diffHours < 1) {
+    return 'Just now'
+  } else if (diffHours < 24) {
+    return `${Math.floor(diffHours)}h ago`
+  } else if (diffDays < 7) {
+    return `${Math.floor(diffDays)}d ago`
+  } else {
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+    })
+  }
+}
+
 export default function VeeGPT() {
   console.log('VeeGPT component rendering')
   const [inputText, setInputText] = useState('')
@@ -1274,25 +1299,14 @@ export default function VeeGPT() {
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
                         <MessageSquare className="w-4 h-4 flex-shrink-0" />
                         {!sidebarCollapsed && (
-                          <div className="truncate text-base font-medium">
-                            {renamingChatId === conversation.id ? (
-                              <input
-                                type="text"
-                                value={newChatTitle}
-                                onChange={(e) => setNewChatTitle(e.target.value)}
-                                onBlur={() => {
-                                  if (newChatTitle.trim()) {
-                                    renameConversationMutation.mutate({
-                                      conversationId: conversation.id,
-                                      newTitle: newChatTitle.trim()
-                                    })
-                                  } else {
-                                    setRenamingChatId(null)
-                                    setNewChatTitle('')
-                                  }
-                                }}
-                                onKeyPress={(e) => {
-                                  if (e.key === 'Enter') {
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate text-base font-medium">
+                              {renamingChatId === conversation.id ? (
+                                <input
+                                  type="text"
+                                  value={newChatTitle}
+                                  onChange={(e) => setNewChatTitle(e.target.value)}
+                                  onBlur={() => {
                                     if (newChatTitle.trim()) {
                                       renameConversationMutation.mutate({
                                         conversationId: conversation.id,
@@ -1302,17 +1316,33 @@ export default function VeeGPT() {
                                       setRenamingChatId(null)
                                       setNewChatTitle('')
                                     }
-                                  } else if (e.key === 'Escape') {
-                                    setRenamingChatId(null)
-                                    setNewChatTitle('')
-                                  }
-                                }}
-                                className="w-full text-sm bg-white border border-gray-300 rounded px-2 py-1"
-                                autoFocus
-                              />
-                            ) : (
-                              conversation.title
-                            )}
+                                  }}
+                                  onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                      if (newChatTitle.trim()) {
+                                        renameConversationMutation.mutate({
+                                          conversationId: conversation.id,
+                                          newTitle: newChatTitle.trim()
+                                        })
+                                      } else {
+                                        setRenamingChatId(null)
+                                        setNewChatTitle('')
+                                      }
+                                    } else if (e.key === 'Escape') {
+                                      setRenamingChatId(null)
+                                      setNewChatTitle('')
+                                    }
+                                  }}
+                                  className="w-full text-sm bg-white border border-gray-300 rounded px-2 py-1"
+                                  autoFocus
+                                />
+                              ) : (
+                                conversation.title
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {formatLastInteractionDate(conversation.lastMessageAt || conversation.updatedAt)}
+                            </div>
                           </div>
                         )}
                       </div>
