@@ -209,11 +209,11 @@ export default function VeeGPT() {
     { icon: Calendar, text: "Draft a posting schedule for next month" }
   ]
 
-  // Fetch conversations  
+  // Fetch conversations - only if authenticated
   const { data: conversations = [] } = useQuery<ChatConversation[]>({
     queryKey: ['/api/chat/conversations'],
     queryFn: () => apiRequest('/api/chat/conversations'),
-    enabled: true // Always fetch conversations to show history
+    enabled: false // Disable for now to allow demo without auth
   })
 
   // Filter conversations based on search query
@@ -221,11 +221,11 @@ export default function VeeGPT() {
     conv.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // Fetch current conversation messages
+  // Fetch current conversation messages - only if authenticated
   const { data: messages = [] } = useQuery<ChatMessage[]>({
     queryKey: ['/api/chat/conversations', currentConversationId, 'messages'],
     queryFn: () => apiRequest(`/api/chat/conversations/${currentConversationId}/messages`),
-    enabled: !!currentConversationId
+    enabled: false // Disable for demo without auth
   })
 
   // Combine real messages, optimistic messages, and streaming messages for display
