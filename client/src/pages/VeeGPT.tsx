@@ -225,15 +225,23 @@ export default function VeeGPT() {
         const streamingMessageIds = Object.keys(prev).map(id => parseInt(id))
         const realMessageIds = messages.map(m => m.id)
         
+        console.log('VeeGPT: Checking streaming content cleanup:', {
+          streamingIds: streamingMessageIds,
+          realIds: realMessageIds,
+          isGenerating: isGeneratingRef.current
+        })
+        
         let hasChanges = false
         const updated = { ...prev }
         
         streamingMessageIds.forEach(streamingId => {
-          if (realMessageIds.includes(streamingId)) {
-            // This streaming message now exists as a real message, safe to clear streaming content
+          const realMessage = messages.find(m => m.id === streamingId)
+          // Only clear if the real message exists AND has actual content (not empty placeholder)
+          if (realMessage && realMessage.content && realMessage.content.trim() !== '') {
+            // This streaming message now exists as a real message with content, safe to clear streaming content
             delete updated[streamingId]
             hasChanges = true
-            console.log('VeeGPT: Cleared completed streaming content for message:', streamingId)
+            console.log('VeeGPT: Cleared completed streaming content for message:', streamingId, 'Real content length:', realMessage.content.length)
           }
         })
         
@@ -567,18 +575,9 @@ export default function VeeGPT() {
         console.log('VeeGPT: REF SET TO FALSE in complete event')
         isGeneratingRef.current = false
         
-        // Clear streaming content after a brief delay to allow final chunks to render
-        setTimeout(() => {
-          console.log('VeeGPT: Clearing streaming content after completion')
-          setStreamingContent(prev => {
-            if (data.messageId && prev[data.messageId]) {
-              const updated = { ...prev }
-              delete updated[data.messageId]
-              return updated
-            }
-            return prev
-          })
-        }, 100)
+        // Don't clear streaming content immediately - wait for backend queries to complete
+        // The useEffect will clear it once the real message loads from the backend
+        console.log('VeeGPT: Keeping streaming content until backend message loads')
         
         // Invalidate queries to get final message state from backend
         if (currentConversationId) {
