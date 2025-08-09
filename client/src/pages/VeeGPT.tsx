@@ -642,7 +642,7 @@ export default function VeeGPT() {
           {/* Pill-shaped transparent container */}
           <div style={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             gap: '12px',
             padding: '12px 16px',
             border: '1px solid rgba(209, 213, 219, 0.2)',
@@ -653,7 +653,8 @@ export default function VeeGPT() {
             WebkitBackdropFilter: 'blur(20px)',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
             transition: 'all 0.2s ease',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            minHeight: '44px'
           }}>
               <button style={{
                 background: 'transparent',
@@ -664,7 +665,8 @@ export default function VeeGPT() {
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                marginTop: '2px'
               }}>
                 <Paperclip style={{ 
                   width: '20px', 
@@ -677,7 +679,8 @@ export default function VeeGPT() {
                 flex: 1,
                 position: 'relative',
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'flex-start',
+                minHeight: '20px'
               }}>
                 <div
                   ref={inputRef}
@@ -697,14 +700,15 @@ export default function VeeGPT() {
                     width: '100%',
                     minHeight: '20px',
                     maxHeight: '120px',
-                    overflow: 'hidden',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
                     outline: 'none',
                     border: 'none',
                     background: 'transparent',
                     backgroundColor: 'transparent',
                     color: '#374151',
                     fontSize: '16px',
-                    lineHeight: '20px',
+                    lineHeight: '24px',
                     padding: '0',
                     margin: '0',
                     boxShadow: 'none',
@@ -712,7 +716,11 @@ export default function VeeGPT() {
                     WebkitAppearance: 'none',
                     MozAppearance: 'none',
                     appearance: 'none',
-                    position: 'relative'
+                    position: 'relative',
+                    wordWrap: 'break-word',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    overflowWrap: 'break-word'
                   }}
                   data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
                 />
@@ -731,7 +739,8 @@ export default function VeeGPT() {
                   color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  marginTop: '2px'
                 }}
               >
                 {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
