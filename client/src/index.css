@@ -1339,3 +1339,129 @@ body {
   border-color: rgba(203, 213, 225, 0.8);
   transform: translateY(-1px);
 }
+
+/* Premium Security Animations - Apple Style */
+@keyframes morph-premium-1 {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% { 
+    transform: scale(1.1) rotate(45deg);
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% { 
+    transform: scale(0.9) rotate(90deg);
+    border-radius: 70% 30% 40% 60% / 40% 70% 60% 30%;
+  }
+  75% { 
+    transform: scale(1.2) rotate(135deg);
+    border-radius: 40% 70% 60% 30% / 70% 40% 50% 60%;
+  }
+}
+
+@keyframes morph-premium-2 {
+  0%, 100% { 
+    transform: scale(1) rotate(180deg);
+    border-radius: 50% 50% 30% 70% / 30% 30% 70% 70%;
+  }
+  33% { 
+    transform: scale(1.3) rotate(240deg);
+    border-radius: 70% 30% 50% 50% / 60% 40% 60% 40%;
+  }
+  66% { 
+    transform: scale(0.8) rotate(300deg);
+    border-radius: 30% 70% 70% 30% / 50% 60% 40% 60%;
+  }
+}
+
+@keyframes float-premium {
+  0%, 100% { 
+    transform: translateY(0px) rotateX(0deg);
+  }
+  50% { 
+    transform: translateY(-20px) rotateX(10deg);
+  }
+}
+
+@keyframes float-delayed-premium {
+  0%, 100% { 
+    transform: translateY(0px) rotateY(0deg);
+  }
+  50% { 
+    transform: translateY(-15px) rotateY(10deg);
+  }
+}
+
+@keyframes particles-float {
+  0%, 100% { 
+    transform: translateY(0px) scale(1);
+  }
+  33% { 
+    transform: translateY(-10px) scale(1.05);
+  }
+  66% { 
+    transform: translateY(-5px) scale(0.95);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { 
+    background-position: 0% 50%;
+  }
+  50% { 
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes slow-pulse {
+  0%, 100% { 
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* Apple-style Glass Morphism */
+.glass-premium {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Animation Classes */
+.animate-morph-premium-1 {
+  animation: morph-premium-1 20s ease-in-out infinite;
+}
+
+.animate-morph-premium-2 {
+  animation: morph-premium-2 25s ease-in-out infinite;
+}
+
+.animate-float-premium {
+  animation: float-premium 6s ease-in-out infinite;
+}
+
+.animate-float-delayed-premium {
+  animation: float-delayed-premium 8s ease-in-out infinite 2s;
+}
+
+.animate-particles-float {
+  animation: particles-float 10s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+.animate-slow-pulse {
+  animation: slow-pulse 4s ease-in-out infinite;
+}

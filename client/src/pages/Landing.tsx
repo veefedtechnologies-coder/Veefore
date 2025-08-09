@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
-  Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Clock, Eye, Heart, Share2, 
-  DollarSign, Lightbulb, Rocket, Filter, Search, Bell, Settings, Upload, Download, Lock, 
-  Smartphone, Laptop, Monitor, Sparkles, Crown, Diamond, Layers, Infinity, Cpu, Brain, 
-  Network, Wand2, Palette, Music, Video, Image, FileText, Mic, Camera, Megaphone, Compass, 
-  Map, Database, Code, Server, Cloud, Gauge, LineChart, PieChart, Activity, Headphones, 
-  ShoppingCart, CreditCard, Wallet, ChevronRight, ExternalLink, Github, Twitter, MousePointer2,
-  Maximize2, Move3D, Sparkle, Waves, Orbit, Hexagon, Triangle, Circle, Send, MessageCircle
+  Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
+  Lightbulb, Settings, Lock, 
+  Sparkles, Crown, Cpu, Brain, 
+  Network, Wand2, Palette, Video, Image, Database, Code, Cloud, Activity, 
+  ShoppingCart, CreditCard, ExternalLink, Github, Twitter, MousePointer2,
+  Sparkle, Triangle, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -16,19 +15,13 @@ import VeeGPTInterface from '@assets/generated_images/VeeGPT_AI_Chat_Interface_9
 import VideoStudioInterface from '@assets/generated_images/AI_Video_Studio_Interface_c4227f2a.png'
 import AnalyticsInterface from '@assets/generated_images/Analytics_Dashboard_Interface_939945d5.png'
 import ContentStudioInterface from '@assets/generated_images/Content_Studio_Interface_840b3ab8.png'
-import AutomationInterface from '@assets/generated_images/Automation_Engine_Interface_13697c8b.png'
-import SocialInboxInterface from '@assets/generated_images/Social_Inbox_Interface_a646e794.png'
-import SmartCalendarInterface from '@assets/generated_images/Smart_Calendar_Interface_c382119b.png'
-import SocialListeningInterface from '@assets/generated_images/Social_Listening_Interface_921552eb.png'
 
 interface LandingProps {
   onNavigate: (view: string) => void
 }
 
 const Landing = ({ onNavigate }: LandingProps) => {
-  const [isVisible, setIsVisible] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
-  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [previewMode, setPreviewMode] = useState<'overview' | 'detailed'>('overview')
   const [isInteractionActive, setIsInteractionActive] = useState(false)
@@ -43,8 +36,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setIsVisible(true)
-    
     // Auto-cycle through features
     const featureInterval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 8)
@@ -269,84 +260,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
         "Content compliance checking for platform guidelines and brand safety requirements"
       ]
     },
-    {
-      title: "Smart Automation Engine - Advanced Workflow Intelligence",
-      description: "Transform your social media management with our sophisticated automation platform that goes beyond simple scheduling. Create intelligent workflows that respond to audience behavior, market conditions, and performance metrics in real-time.",
-      icon: <Zap className="w-16 h-16 text-yellow-500" />,
-      gradient: "from-yellow-500 via-orange-500 to-red-500",
-      image: AutomationInterface,
-      details: [
-        "Advanced rule-based automation with conditional logic, triggers, and complex workflow chains",
-        "AI-powered comment management with context-aware responses and sentiment analysis",
-        "Intelligent follower engagement with authentic interaction patterns and relationship building",
-        "Lead generation automation with CRM integration and qualification scoring",
-        "Crisis management protocols with automated escalation and reputation protection",
-        "Growth hacking automation using proven strategies for organic follower acquisition",
-        "Content curation workflows with quality filtering and brand alignment checking",
-        "Performance-based optimization that automatically adjusts strategies based on results",
-        "Cross-platform synchronization ensuring consistent messaging and timing across all networks",
-        "Audience segmentation automation with behavioral targeting and personalized messaging",
-        "Competitor monitoring with automated alerts for mentions, campaigns, and strategy changes",
-        "Influencer outreach automation with personalized messaging and relationship management",
-        "Event-triggered campaigns that respond to real-world events, trends, and opportunities",
-        "Advanced scheduling with dynamic timing optimization based on audience activity patterns",
-        "Workflow analytics with performance tracking and continuous improvement suggestions"
-      ]
-    },
-    {
-      title: "Unified Social Inbox - Enterprise Communication Hub",
-      description: "Centralize all your social media communications in one powerful inbox designed for teams and enterprises. Manage conversations, customer service, and community engagement with AI-powered efficiency and human-level quality.",
-      icon: <MessageSquare className="w-16 h-16 text-indigo-500" />,
-      gradient: "from-indigo-500 via-blue-500 to-purple-500",
-      image: SocialInboxInterface,
-      details: [
-        "Unified inbox aggregating messages from 20+ social platforms and communication channels",
-        "AI-powered message categorization with priority scoring and urgency detection",
-        "Automated response suggestions maintaining brand voice consistency and context awareness",
-        "Advanced customer service features with ticket creation and escalation workflows",
-        "Real-time sentiment analysis with mood tracking and customer satisfaction scoring",
-        "Team collaboration tools with message assignment, internal notes, and workload distribution",
-        "Response template library with dynamic personalization and smart suggestions",
-        "Performance analytics tracking response times, resolution rates, and customer satisfaction",
-        "Multi-language support with automatic translation and culturally appropriate responses",
-        "CRM integration with customer history, purchase data, and interaction tracking",
-        "Automated follow-up sequences for lead nurturing and customer retention",
-        "Crisis detection and management with escalation protocols and executive notifications",
-        "Knowledge base integration for consistent information sharing and FAQ automation",
-        "Advanced filtering and search capabilities with tag-based organization and custom views",
-        "Quality assurance tools with response monitoring and team performance evaluation"
-      ]
-    },
-    {
-      title: "Smart Calendar & Strategic Planning Platform",
-      description: "Master your content strategy with our intelligent calendar system that combines AI-powered optimization with comprehensive planning tools. Plan, schedule, and optimize your content for maximum impact across all platforms.",
-      icon: <Calendar className="w-16 h-16 text-green-500" />,
-      gradient: "from-green-500 via-emerald-500 to-teal-500",
-      image: SmartCalendarInterface,
-      details: [
-        "AI-optimized posting schedules based on audience behavior, platform algorithms, and engagement patterns",
-        "Advanced drag-and-drop calendar interface with bulk editing and multi-platform coordination",
-        "Content queue management with automatic conflict resolution and optimal distribution",
-        "Trending events and holiday integration with timely content suggestions and campaign ideas",
-        "Global time zone optimization for international audiences and market-specific timing",
-        "Content recycling engine for evergreen posts with performance-based resharing",
-        "Team collaboration features with approval workflows, content assignments, and deadline tracking",
-        "Emergency publishing capabilities for crisis management and real-time response",
-        "Campaign planning tools with milestone tracking and performance goal setting",
-        "Content gap analysis identifying opportunities for improved posting frequency and timing",
-        "Seasonal trend prediction with historical data analysis and future planning recommendations",
-        "Resource allocation planning for content creation and marketing budget optimization",
-        "Integration with content creation tools for seamless workflow from ideation to publication",
-        "Performance forecasting using historical data and market trends to predict campaign success",
-        "Advanced analytics showing optimal posting patterns and audience engagement windows"
-      ]
-    },
+
+
     {
       title: "Growth Engine - Advanced Audience Development Platform",
       description: "Accelerate your audience growth with our comprehensive platform that combines AI-driven strategies, competitive intelligence, and proven growth tactics to build engaged, high-value communities around your brand.",
       icon: <TrendingUp className="w-16 h-16 text-purple-500" />,
       gradient: "from-purple-500 via-pink-500 to-rose-500",
-      image: SocialListeningInterface,
+      image: AnalyticsInterface,
       details: [
         "AI-powered growth strategies customized for your industry, audience, and business objectives",
         "Comprehensive competitor analysis with strategy insights and opportunity identification",
@@ -367,69 +288,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
     }
   ]
 
-  // Additional comprehensive platform capabilities
-  const enterpriseFeatures = [
-    {
-      title: "Enterprise Security & Compliance",
-      description: "Bank-level security with comprehensive compliance features for enterprises and agencies managing sensitive client data.",
-      icon: <Shield className="w-12 h-12 text-blue-600" />,
-      features: [
-        "SOC 2 Type II compliance with annual audits",
-        "GDPR and CCPA compliance with data protection controls",
-        "Single Sign-On (SSO) integration with enterprise identity providers",
-        "Role-based access control with granular permissions",
-        "Data encryption at rest and in transit using AES-256",
-        "Audit logging with comprehensive activity tracking",
-        "IP whitelisting and VPN integration",
-        "Regular security assessments and penetration testing"
-      ]
-    },
-    {
-      title: "API & Integration Ecosystem",
-      description: "Powerful APIs and extensive integration capabilities for custom workflows and enterprise system connectivity.",
-      icon: <Code className="w-12 h-12 text-green-600" />,
-      features: [
-        "RESTful API with comprehensive documentation",
-        "Webhook support for real-time data synchronization",
-        "Zapier integration with 3000+ popular business tools",
-        "Custom integration development support",
-        "CRM integrations (Salesforce, HubSpot, Pipedrive)",
-        "Marketing automation platform connectivity",
-        "Analytics platform data export capabilities",
-        "Developer sandbox environment for testing"
-      ]
-    },
-    {
-      title: "Advanced Team Management",
-      description: "Sophisticated team collaboration and management features designed for agencies and large organizations.",
-      icon: <Users className="w-12 h-12 text-purple-600" />,
-      features: [
-        "Unlimited team members with role-based permissions",
-        "Client workspace separation with branded environments",
-        "Advanced approval workflows with custom review processes",
-        "Team performance analytics and productivity insights",
-        "Resource allocation and capacity planning tools",
-        "Time tracking and billing integration capabilities",
-        "Custom notification systems and communication channels",
-        "Training resources and onboarding automation"
-      ]
-    },
-    {
-      title: "White-Label & Reseller Program",
-      description: "Complete white-label solutions for agencies and resellers to offer VeeFore under their own brand.",
-      icon: <Award className="w-12 h-12 text-orange-600" />,
-      features: [
-        "Fully customizable branding with your logo and colors",
-        "Custom domain hosting with SSL certificates",
-        "Reseller pricing tiers with volume discounts",
-        "Marketing materials and sales support",
-        "Technical support for your clients",
-        "Revenue sharing opportunities",
-        "Co-marketing program participation",
-        "Priority feature development consideration"
-      ]
-    }
-  ]
+
 
   // Industry-specific solutions
   const industrySolutions = [
@@ -664,7 +523,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </div>
             
             <div className="hidden lg:flex items-center space-x-10">
-              {['Features', 'Platform', 'Pricing', 'Solutions'].map((item, index) => (
+              {['Features', 'Platform', 'Pricing', 'Solutions'].map((item) => (
                 <a 
                   key={item}
                   href={`#${item.toLowerCase()}`} 
@@ -1978,83 +1837,309 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Enterprise Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full px-6 py-3 mb-8">
-              <Shield className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-blue-800 font-semibold">Enterprise Solutions</span>
+      {/* Revolutionary Enterprise Security Section - Apple Premium Design */}
+      <section className="relative py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 overflow-hidden">
+        {/* Premium Background Elements */}
+        <div className="absolute inset-0">
+          {/* Floating Security Orbs */}
+          <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-10 animate-morph-premium-1" style={{
+            background: 'radial-gradient(circle, #3b82f6, #1d4ed8, #1e40af)',
+            filter: 'blur(40px)',
+          }} />
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-8 animate-morph-premium-2" style={{
+            background: 'radial-gradient(circle, #10b981, #059669, #047857)',
+            filter: 'blur(60px)',
+          }} />
+          
+          {/* Neural Security Grid */}
+          <div className="absolute inset-0 opacity-5">
+            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <pattern id="security-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+                  <circle cx="5" cy="5" r="1" fill="currentColor" opacity="0.3"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#security-grid)" className="text-blue-600" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          {/* Revolutionary Header with Apple-style Animation */}
+          <div className="text-center mb-24">
+            <div className="relative inline-flex items-center mb-8">
+              <div className="glass-premium rounded-full px-8 py-4 backdrop-blur-xl border border-white/30">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center animate-float-premium">
+                    <Shield className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-gray-700 font-semibold tracking-wide">Enterprise Security & Compliance</span>
+                </div>
+              </div>
+              
+              {/* Floating Security Icons */}
+              <div className="absolute -top-4 -right-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center animate-float-delayed-premium shadow-xl">
+                <Lock className="w-6 h-6 text-white" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center animate-float-premium shadow-xl">
+                <Check className="w-5 h-5 text-white" />
+              </div>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Built for Scale & Security
+            
+            <h2 className="text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
+              <span className="bg-gradient-to-r from-gray-900 via-blue-900 to-emerald-900 bg-clip-text text-transparent">
+                Bank-Level Security
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Advanced enterprise features designed for large organizations, agencies, and businesses requiring maximum security, compliance, and scalability.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Comprehensive enterprise-grade security with advanced compliance features for organizations managing sensitive client data and high-stakes social media operations.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {enterpriseFeatures.map((feature, index) => (
-              <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200">
-                <div className="p-10">
-                  <div className="flex items-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-6">
-                      {feature.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-8 leading-relaxed text-lg">{feature.description}</p>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <Button
-                        onClick={() => toggleSection(`enterprise-${index}`)}
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-0"
-                      >
-                        {expandedSections[`enterprise-${index}`] ? (
-                          <>
-                            <ChevronUp className="w-4 h-4" />
-                            Show Less Features
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="w-4 h-4" />
-                            Show All Features
-                          </>
-                        )}
-                      </Button>
+          {/* Revolutionary Bento Grid Security Layout */}
+          <div className="grid grid-cols-12 gap-8">
+            {/* Main Security Card - Enterprise Security */}
+            <div className="col-span-12 lg:col-span-8 group">
+              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 shadow-2xl relative card-premium">
+                {/* Dynamic Security Waves */}
+                <div className="absolute inset-0 opacity-20">
+                  <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="securityWave" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.3" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,30 Q25,10 50,30 T100,30 L100,70 Q75,90 50,70 T0,70 Z" fill="url(#securityWave)" className="animate-float-premium" />
+                  </svg>
+                </div>
+                
+                <div className="relative h-full p-10 flex flex-col lg:flex-row items-center">
+                  <div className="flex-1 mb-8 lg:mb-0">
+                    <div className="flex items-center space-x-4 mb-8">
+                      <div className="w-20 h-20 rounded-3xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Shield className="w-10 h-10 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-blue-200 text-sm font-bold uppercase tracking-wider mb-2">
+                          ENTERPRISE SECURITY
+                        </div>
+                        <h3 className="text-white text-3xl font-bold">
+                          Advanced Protection Suite
+                        </h3>
+                      </div>
                     </div>
                     
-                    <div className={`space-y-4 transition-all duration-500 overflow-hidden ${
-                      expandedSections[`enterprise-${index}`] ? 'max-h-none' : 'max-h-40'
-                    }`}>
-                      {feature.features.slice(0, expandedSections[`enterprise-${index}`] ? feature.features.length : 3).map((feat, idx) => (
-                        <div key={idx} className="flex items-start">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-white" />
+                    <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+                      Bank-level security with comprehensive compliance features for enterprises and agencies managing sensitive client data across multiple social platforms.
+                    </p>
+                    
+                    {/* Premium Security Features Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+                      {[
+                        { icon: Check, label: "SOC 2 Type II Compliance", detail: "Annual audits" },
+                        { icon: Lock, label: "End-to-End Encryption", detail: "256-bit AES" },
+                        { icon: Shield, label: "GDPR & CCPA Ready", detail: "Data protection" },
+                        { icon: Eye, label: "Single Sign-On (SSO)", detail: "Enterprise identity" }
+                      ].map((feature, idx) => (
+                        <div key={idx} className="flex items-center space-x-3 glass-premium rounded-xl p-4">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center">
+                            <feature.icon className="w-4 h-4 text-white" />
                           </div>
-                          <span className="ml-4 text-gray-700 leading-relaxed">{feat}</span>
+                          <div>
+                            <div className="text-white font-semibold text-sm">{feature.label}</div>
+                            <div className="text-blue-200 text-xs">{feature.detail}</div>
+                          </div>
                         </div>
                       ))}
-                      {!expandedSections[`enterprise-${index}`] && feature.features.length > 3 && (
-                        <div className="text-center pt-2">
-                          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                            +{feature.features.length - 3} more features
-                          </span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button className="button-premium glass-premium border border-white/20 rounded-2xl px-8 py-4 text-white font-semibold hover:bg-white/10 transition-all duration-300 flex items-center space-x-3">
+                        <span>Explore Security Features</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                      <div className="text-blue-200 text-sm">Trusted by Fortune 500</div>
+                    </div>
+                  </div>
+                  
+                  {/* Apple-style Security Visualization */}
+                  <div className="flex-1 relative hidden lg:flex items-center justify-center">
+                    <div className="relative">
+                      {/* Central Security Hub */}
+                      <div className="w-40 h-40 rounded-full glass-premium border-2 border-white/30 flex items-center justify-center">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center animate-float-premium">
+                          <Lock className="w-12 h-12 text-white" />
                         </div>
-                      )}
+                      </div>
+                      
+                      {/* Orbiting Security Elements */}
+                      {[
+                        { icon: Shield, angle: 0, radius: 80, color: "from-blue-400 to-indigo-500" },
+                        { icon: Check, angle: 72, radius: 80, color: "from-emerald-400 to-green-500" },
+                        { icon: Eye, angle: 144, radius: 80, color: "from-purple-400 to-pink-500" },
+                        { icon: Lock, angle: 216, radius: 80, color: "from-cyan-400 to-blue-500" },
+                        { icon: Settings, angle: 288, radius: 80, color: "from-yellow-400 to-orange-500" }
+                      ].map((element, idx) => (
+                        <div
+                          key={idx}
+                          className="absolute w-16 h-16 rounded-2xl glass-premium border border-white/20 flex items-center justify-center animate-particles-float"
+                          style={{
+                            left: `calc(50% + ${Math.cos(element.angle * Math.PI / 180) * element.radius}px - 32px)`,
+                            top: `calc(50% + ${Math.sin(element.angle * Math.PI / 180) * element.radius}px - 32px)`,
+                            animationDelay: `${idx * 0.8}s`
+                          }}
+                        >
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${element.color} flex items-center justify-center`}>
+                            <element.icon className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* API Integration Card */}
+            <div className="col-span-12 lg:col-span-4 group">
+              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-white/10 animate-gradient-shift" />
+                
+                <div className="relative h-full p-8 flex flex-col">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <div className="w-16 h-16 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <Network className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-emerald-200 text-xs font-bold uppercase tracking-wider">
+                        API ECOSYSTEM
+                      </div>
+                      <h3 className="text-white text-xl font-bold">
+                        Integration Suite
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-emerald-100 mb-6 leading-relaxed">
+                      Powerful APIs and extensive integration capabilities for custom workflows and enterprise system connectivity.
+                    </p>
+                    
+                    {/* API Features */}
+                    <div className="space-y-3 mb-6">
+                      {[
+                        "RESTful API with comprehensive documentation",
+                        "Webhook support for real-time data synchronization", 
+                        "Zapier integration with 3000+ popular business tools",
+                        "Custom enterprise connectors available"
+                      ].map((feature, idx) => (
+                        <div key={idx} className="flex items-start space-x-3">
+                          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-emerald-100 text-sm leading-relaxed">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* API Visualization */}
+                    <div className="mb-6 relative">
+                      <div className="grid grid-cols-3 gap-2">
+                        {[...Array(9)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="aspect-square rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 animate-slow-pulse"
+                            style={{
+                              animationDelay: `${i * 0.2}s`
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button className="w-full button-premium glass-premium border border-white/20 rounded-2xl py-4 text-white font-semibold hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <span>View API Docs</span>
+                    <Code className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row - Additional Enterprise Features */}
+            <div className="col-span-12 lg:col-span-6 group">
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-shift" />
+                
+                <div className="relative h-full p-8 flex items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Users className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-purple-200 text-xs font-bold uppercase tracking-wider">
+                          TEAM MANAGEMENT
+                        </div>
+                        <h3 className="text-white text-2xl font-bold">
+                          Advanced Collaboration
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <p className="text-purple-100 mb-6 leading-relaxed">
+                      Sophisticated team management with role-based permissions, workflow automation, and collaborative content creation tools.
+                    </p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button className="button-premium glass-premium border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/10 transition-all duration-300 flex items-center space-x-2">
+                        <span>Manage Teams</span>
+                        <Users className="w-4 h-4" />
+                      </button>
+                      <div className="text-purple-200 text-sm">Multi-workspace support</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 lg:col-span-6 group">
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-orange-600 via-red-600 to-pink-700 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-transparent animate-gradient-shift" />
+                
+                <div className="relative h-full p-8 flex items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Crown className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-orange-200 text-xs font-bold uppercase tracking-wider">
+                          WHITE-LABEL
+                        </div>
+                        <h3 className="text-white text-2xl font-bold">
+                          Reseller Program
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <p className="text-orange-100 mb-6 leading-relaxed">
+                      Complete white-label solution with custom branding, dedicated infrastructure, and comprehensive reseller support programs.
+                    </p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button className="button-premium glass-premium border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/10 transition-all duration-300 flex items-center space-x-2">
+                        <span>Partner Program</span>
+                        <Crown className="w-4 h-4" />
+                      </button>
+                      <div className="text-orange-200 text-sm">Custom branding</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
