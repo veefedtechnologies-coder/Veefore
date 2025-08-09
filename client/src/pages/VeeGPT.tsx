@@ -627,7 +627,7 @@ export default function VeeGPT() {
         {/* Truly floating transparent input - absolute position within chat area */}
         <div style={{ 
           position: 'absolute',
-          bottom: '24px',
+          bottom: '60px',
           left: '50%',
           transform: 'translateX(-50%)',
           width: '100%',
@@ -768,12 +768,12 @@ export default function VeeGPT() {
         {/* Footer text positioned below the floating input */}
         <div style={{ 
           position: 'absolute',
-          bottom: '20px',
+          bottom: '16px',
           left: '50%',
           transform: 'translateX(-50%)',
           textAlign: 'center',
           pointerEvents: 'none',
-          zIndex: 1000
+          zIndex: 999
         }}>
           <div style={{ 
             fontSize: '12px', 
