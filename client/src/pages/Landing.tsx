@@ -1659,14 +1659,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </div>
 
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-indigo-50 to-purple-50 border border-gray-200 shadow-2xl relative card-premium">
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-indigo-50/20 to-transparent animate-gradient-shift" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-pink-50 to-rose-50 border border-gray-200 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-pink-50/20 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <div className="text-indigo-600 text-xl">
+                      <div className="w-14 h-14 rounded-2xl bg-pink-100 border border-pink-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <div className="text-pink-600 text-xl">
                           {detailedFeatures[3].icon}
                         </div>
                       </div>
@@ -1692,8 +1692,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         "Multi-platform Publishing"
                       ].map((step, idx) => (
                         <div key={idx} className="flex items-center space-x-3">
-                          <div className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center">
-                            <span className="text-indigo-600 text-xs font-bold">{idx + 1}</span>
+                          <div className="w-6 h-6 rounded-lg bg-pink-100 border border-pink-200 flex items-center justify-center">
+                            <span className="text-pink-600 text-xs font-bold">{idx + 1}</span>
                           </div>
                           <span className="text-gray-700 text-sm">{step}</span>
                         </div>
@@ -1701,7 +1701,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                      <button className="bg-indigo-600 hover:bg-indigo-700 border border-indigo-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
+                      <button className="bg-pink-600 hover:bg-pink-700 border border-pink-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
                         <span>Create Content</span>
                         <Sparkles className="w-4 h-4" />
                       </button>
@@ -1719,10 +1719,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                         />
                       </div>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center animate-float-premium shadow-lg">
+                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center animate-float-premium shadow-lg">
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
-                      <div className="absolute -bottom-2 -left-2 w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-delayed-premium shadow-lg">
+                      <div className="absolute -bottom-2 -left-2 w-6 h-6 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center animate-float-delayed-premium shadow-lg">
                         <Zap className="w-3 h-3 text-white" />
                       </div>
                     </div>
