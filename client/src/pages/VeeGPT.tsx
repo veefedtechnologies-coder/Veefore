@@ -471,11 +471,11 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* ChatGPT-style input at bottom */}
-        <div className="border-t bg-white px-6 py-6">
+        {/* ChatGPT-style completely transparent input area */}
+        <div className="px-6 py-6" style={{ background: 'transparent' }}>
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-3xl shadow-sm">
-              <button className="text-gray-500 hover:text-gray-700 p-1">
+            <div className="flex items-center gap-3" style={{ background: 'transparent', border: 'none', padding: '12px 0' }}>
+              <button className="text-gray-500 hover:text-gray-700 p-2" style={{ background: 'transparent', border: 'none' }}>
                 <Paperclip className="w-5 h-5" />
               </button>
               
@@ -493,18 +493,36 @@ export default function VeeGPT() {
                     handleSendMessage()
                   }
                 }}
-                className="flex-1 min-h-6 max-h-32 overflow-auto outline-none text-gray-900 text-base"
+                style={{
+                  flex: 1,
+                  minHeight: '24px',
+                  maxHeight: '120px',
+                  overflow: 'auto',
+                  outline: 'none',
+                  border: 'none',
+                  background: 'transparent',
+                  backgroundColor: 'transparent',
+                  color: '#374151',
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                  padding: '8px 0',
+                  margin: 0,
+                  boxShadow: 'none',
+                  borderRadius: 0
+                }}
                 data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
               />
               
               <button
                 onClick={handleSendMessage}
                 disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                className={`p-1 ${
-                  inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending
-                    ? 'text-gray-900 hover:text-gray-700'
-                    : 'text-gray-400 cursor-not-allowed'
-                }`}
+                className="p-2"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
+                  cursor: inputText.trim() ? 'pointer' : 'not-allowed'
+                }}
               >
                 {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
                   <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
@@ -513,7 +531,7 @@ export default function VeeGPT() {
                 )}
               </button>
 
-              <button className="text-gray-500 hover:text-gray-700 p-1">
+              <button className="text-gray-500 hover:text-gray-700 p-2" style={{ background: 'transparent', border: 'none' }}>
                 <Mic className="w-5 h-5" />
               </button>
             </div>
