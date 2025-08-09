@@ -66,8 +66,8 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
-  // Removed renderTrigger - no longer needed
-  const [currentEventSource, setCurrentEventSource] = useState<any>(null)
+  // WebSocket for real-time streaming
+  const wsRef = useRef<WebSocket | null>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -76,7 +76,82 @@ export default function VeeGPT() {
   
   // console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
 
-  // No complex synchronization needed
+  // WebSocket connection management
+  useEffect(() => {
+    // Connect to WebSocket server (same port as HTTP server with WebSocket upgrade)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const wsUrl = `${protocol}//${window.location.hostname}:5000`
+    
+    console.log('[WebSocket] Connecting to:', wsUrl)
+    const ws = new WebSocket(wsUrl)
+    
+    ws.onopen = () => {
+      console.log('[WebSocket] Connected for streaming')
+      wsRef.current = ws
+    }
+    
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('[WebSocket] Received:', data)
+        
+        if (data.type === 'aiMessageStart') {
+          console.log(`[WebSocket] AI message started: ${data.messageId}`)
+          setStreamingContent(prev => ({ ...prev, [data.messageId]: '' }))
+          setIsGenerating(true)
+          isGeneratingRef.current = true
+        } else if (data.type === 'chunk') {
+          console.log(`[WebSocket] Chunk received for message ${data.messageId}: "${data.content}"`)
+          setStreamingContent(prev => ({
+            ...prev,
+            [data.messageId]: (prev[data.messageId] || '') + data.content
+          }))
+        } else if (data.type === 'complete') {
+          console.log(`[WebSocket] Generation complete for message ${data.messageId}`)
+          setIsGenerating(false)
+          isGeneratingRef.current = false
+          setStreamingContent(prev => {
+            const updated = { ...prev }
+            delete updated[data.messageId]
+            return updated
+          })
+          queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+        } else if (data.type === 'error') {
+          console.error('[WebSocket] Error:', data.error)
+          setIsGenerating(false)
+          isGeneratingRef.current = false
+        }
+      } catch (error) {
+        console.error('[WebSocket] Parse error:', error)
+      }
+    }
+    
+    ws.onclose = () => {
+      console.log('[WebSocket] Connection closed')
+      wsRef.current = null
+    }
+    
+    ws.onerror = (error) => {
+      console.error('[WebSocket] Error:', error)
+    }
+    
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close()
+      }
+    }
+  }, [queryClient])
+
+  // Subscribe to conversation when it changes
+  useEffect(() => {
+    if (currentConversationId && wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: 'subscribe',
+        conversationId: currentConversationId
+      }))
+      console.log(`[WebSocket] Subscribed to conversation ${currentConversationId}`)
+    }
+  }, [currentConversationId])
 
   const quickPrompts = [
     { icon: Lightbulb, text: "Inspire me!" },
@@ -138,10 +213,6 @@ export default function VeeGPT() {
       setIsGenerating(false)
       console.log('VeeGPT: REF SET TO FALSE in createConversation mutation error')
       isGeneratingRef.current = false
-      if (currentEventSource) {
-        currentEventSource.close()
-        setCurrentEventSource(null)
-      }
     }
   })
 
@@ -161,118 +232,60 @@ export default function VeeGPT() {
     }
   })
 
-  // Streaming helper functions
+  // WebSocket-based message sending (simplified)
   const handleStreamingMessage = async (content: string, conversationId: number): Promise<any> => {
-    return new Promise(async (resolve, reject) => {
-      console.log('VeeGPT: Setting generation state to TRUE')
+    console.log('[WebSocket] Sending message via WebSocket streaming')
+    
+    // Add user message optimistically
+    const tempUserMessage = {
+      id: Date.now(), // temporary ID
+      conversationId,
+      role: 'user' as const,
+      content: content.trim(),
+      tokensUsed: 0,
+      createdAt: new Date().toISOString()
+    }
+    
+    queryClient.setQueryData(
+      ['/api/chat/conversations', conversationId, 'messages'],
+      (old: any) => old ? [...old, tempUserMessage] : [tempUserMessage]
+    )
+    
+    try {
+      // Use same auth approach as apiRequest
+      const auth = getAuth()
+      const user = auth.currentUser
       
-      // Add user message to cache immediately (optimistic update)
-      const tempUserMessage = {
-        id: Date.now(), // temporary ID
-        conversationId,
-        role: 'user' as const,
-        content: content.trim(),
-        tokensUsed: 0,
-        createdAt: new Date().toISOString()
+      if (!user) {
+        throw new Error('Please sign in to continue')
       }
-      
-      queryClient.setQueryData(
-        ['/api/chat/conversations', conversationId, 'messages'],
-        (old: any) => old ? [...old, tempUserMessage] : [tempUserMessage]
-      )
-      
-      // Set ref first for immediate availability
-      isGeneratingRef.current = true
-      // Set ref for stop button visibility during streaming
-      
-      // Set state to trigger re-render and make stop button visible
-      setIsGenerating(true)
-      
 
-      
-      // Store resolve function for completion handler
-      streamResolveRef.current = resolve
-      
-      // Small delay to ensure state updates are processed
-      
-      // Small delay to ensure state update is processed
-      await new Promise(resolve => setTimeout(resolve, 10))
-      
-      try {
-        // Use same auth approach as apiRequest
-        const auth = getAuth()
-        const user = auth.currentUser
-        
-        if (!user) {
-          throw new Error('Please sign in to continue')
-        }
+      const token = await user.getIdToken()
 
-        const token = await user.getIdToken()
-        // Got auth token, proceed with streaming request
+      // Send message to server (response will be streamed via WebSocket)
+      const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ content })
+      })
 
-        const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ content })
-        })
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-
-        if (!response.body) {
-          throw new Error('No response body')
-        }
-
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-
-        const readStream = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read()
-              
-              if (done) break
-
-              const chunk = decoder.decode(value, { stream: true })
-              const lines = chunk.split('\n')
-
-              for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                  try {
-                    const data = JSON.parse(line.slice(6))
-                    console.log('VeeGPT: Received stream event:', data)
-                    handleStreamEvent(data)
-                  } catch (e) {
-                    console.log('VeeGPT: Parse error for line:', line)
-                    // Ignore parse errors for incomplete data
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            console.error('VeeGPT: Stream reading error:', error)
-            setIsGenerating(false)
-            isGeneratingRef.current = false
-            streamResolveRef.current = null
-            reject(error)
-          }
-        }
-
-        readStream()
-        setCurrentEventSource({ close: () => reader.cancel() })
-
-      } catch (error) {
-        console.error('VeeGPT: Fetch error:', error)
-        setIsGenerating(false)
-        isGeneratingRef.current = false
-        streamResolveRef.current = null
-        reject(error)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-    })
+
+      const result = await response.json()
+      console.log('[WebSocket] Message sent, streaming will happen via WebSocket')
+      return result
+
+    } catch (error) {
+      console.error('[WebSocket] Send message error:', error)
+      setIsGenerating(false)
+      isGeneratingRef.current = false
+      throw error
+    }
   }
 
   const handleStreamEvent = (data: any) => {
@@ -437,10 +450,7 @@ export default function VeeGPT() {
       setIsGenerating(false)
       console.log('VeeGPT: REF SET TO FALSE in sendMessage mutation error')
       isGeneratingRef.current = false
-      if (currentEventSource) {
-        currentEventSource.close()
-        setCurrentEventSource(null)
-      }
+
     }
   })
 
@@ -486,10 +496,6 @@ export default function VeeGPT() {
     setIsGenerating(false)
     console.log('VeeGPT: REF SET TO FALSE in handleStopGeneration')
     isGeneratingRef.current = false
-    if (currentEventSource) {
-      currentEventSource.close()
-      setCurrentEventSource(null)
-    }
     
     // Clear any streaming content
     setStreamingContent({})

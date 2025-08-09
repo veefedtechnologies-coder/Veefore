@@ -238,6 +238,62 @@ app.use((req, res, next) => {
   
   const server = await registerRoutes(app, storage, upload);
 
+  // Set up WebSocket server for real-time chat streaming
+  const { createServer } = await import('http');
+  const { WebSocketServer } = await import('ws');
+  
+  const httpServer = createServer(app);
+  const wss = new WebSocketServer({ server: httpServer });
+  
+  // Store WebSocket connections by conversation ID
+  const wsConnections = new Map<number, Set<any>>();
+  
+  wss.on('connection', (ws, req) => {
+    console.log('[WebSocket] New client connected for chat streaming');
+    
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message.toString());
+        console.log('[WebSocket] Received:', data);
+        
+        if (data.type === 'subscribe' && data.conversationId) {
+          const convId = parseInt(data.conversationId);
+          if (!wsConnections.has(convId)) {
+            wsConnections.set(convId, new Set());
+          }
+          wsConnections.get(convId)!.add(ws);
+          console.log(`[WebSocket] Client subscribed to conversation ${convId}`);
+          
+          ws.send(JSON.stringify({ type: 'subscribed', conversationId: convId }));
+        }
+      } catch (error) {
+        console.error('[WebSocket] Parse error:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      // Remove from all conversations
+      for (const connections of wsConnections.values()) {
+        connections.delete(ws);
+      }
+      console.log('[WebSocket] Client disconnected');
+    });
+  });
+  
+  // Function to broadcast to all clients in a conversation
+  global.broadcastToConversation = (conversationId: number, data: any) => {
+    const connections = wsConnections.get(conversationId);
+    if (connections) {
+      const message = JSON.stringify(data);
+      connections.forEach(ws => {
+        if (ws.readyState === 1) { // WebSocket.OPEN
+          ws.send(message);
+          console.log(`[WebSocket] Broadcasted to conversation ${conversationId}:`, data.type);
+        }
+      });
+    }
+  };
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -382,11 +438,9 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  
+  // Use HTTP server with WebSocket support instead of Express server directly
+  httpServer.listen(port, "0.0.0.0", () => {
+    log(`serving on port ${port} with WebSocket support`);
   });
 })();

@@ -13495,8 +13495,48 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Global conversation state for stop functionality
+  // Global conversation state for stop functionality and streaming
   const activeGenerations = new Map<number, boolean>();
+  const streamingData = new Map<number, { chunks: string[], currentIndex: number, messageId: number }>();
+
+  // Polling endpoint for streaming chunks (alternative to SSE)
+  app.get('/api/chat/stream/:conversationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const convId = parseInt(conversationId);
+      const streamData = streamingData.get(convId);
+      
+      if (!streamData) {
+        return res.json({ chunks: [], complete: true });
+      }
+      
+      const { chunks, currentIndex, messageId } = streamData;
+      
+      // Return next chunk if available
+      if (currentIndex < chunks.length) {
+        const chunk = chunks[currentIndex];
+        streamingData.set(convId, { chunks, currentIndex: currentIndex + 1, messageId });
+        
+        console.log(`[STREAMING POLL] Conversation ${convId} - Sending chunk ${currentIndex + 1}/${chunks.length}: "${chunk}"`);
+        
+        return res.json({
+          type: 'chunk',
+          content: chunk,
+          messageId,
+          index: currentIndex + 1,
+          total: chunks.length,
+          complete: currentIndex + 1 >= chunks.length
+        });
+      } else {
+        // Streaming complete
+        streamingData.delete(convId);
+        return res.json({ type: 'complete', messageId, complete: true });
+      }
+    } catch (error: any) {
+      console.error('[STREAMING POLL] Error:', error);
+      res.status(500).json({ error: 'Streaming poll failed' });
+    }
+  });
 
   app.post('/api/chat/conversations/:conversationId/messages', requireAuth, async (req: any, res: Response) => {
     try {
@@ -13509,7 +13549,7 @@ Create a detailed growth strategy in JSON format:
         return res.status(400).json({ error: 'Message content is required' });
       }
 
-      console.log(`[CHAT STREAM] Starting streaming response for conversation ${convId}`);
+      console.log(`[WEBSOCKET STREAM] Starting streaming response for conversation ${convId}`);
 
       // Create user message
       const userMessage = await storage.createChatMessage({
@@ -13522,122 +13562,108 @@ Create a detailed growth strategy in JSON format:
       // Mark this conversation as actively generating
       activeGenerations.set(convId, true);
 
-      // Set up SSE headers
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control',
-        'X-Accel-Buffering': 'no', // Disable nginx buffering
-        'Transfer-Encoding': 'chunked' // Force chunked encoding
+      // Return user message immediately
+      res.json({ 
+        type: 'userMessage', 
+        message: userMessage,
+        conversationId: convId
       });
 
-      // Send user message first
-      res.write(`data: ${JSON.stringify({ type: 'userMessage', message: userMessage })}\n\n`);
+      // Start AI response generation in background using WebSocket
+      setImmediate(async () => {
+        try {
+          // Get conversation history for AI context
+          const messages = await storage.getChatMessages(convId);
+          const chatHistory = messages.map(msg => ({
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content
+          }));
 
-      // Get conversation history for AI context
-      const messages = await storage.getChatMessages(convId);
-      const chatHistory = messages.map(msg => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content
-      }));
+          let aiResponseContent = '';
 
-      let aiResponseContent = '';
-      let aiMessage: any = null;
+          // Create placeholder AI message
+          const aiMessage = await storage.createChatMessage({
+            conversationId: convId,
+            role: 'assistant',
+            content: ' ',
+            tokensUsed: 0
+          });
 
-      try {
-        // Create placeholder AI message with initial content
-        aiMessage = await storage.createChatMessage({
-          conversationId: convId,
-          role: 'assistant',
-          content: ' ',
-          tokensUsed: 0
-        });
+          console.log(`[WEBSOCKET STREAM] Starting AI generation for conversation ${convId}, message ${aiMessage.id}`);
 
-        // Send AI message creation event
-        res.write(`data: ${JSON.stringify({ type: 'aiMessageStart', messageId: aiMessage.id })}\n\n`);
-
-        // Generate streaming AI response
-        const { OpenAIService } = await import('./openai-service');
-        
-        for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
-          // Check if generation was stopped
-          if (!activeGenerations.get(convId)) {
-            console.log(`[CHAT STREAM] Generation stopped for conversation ${convId}`);
-            break;
-          }
-
-          aiResponseContent += chunk;
-          
-          // Send chunk to client with explicit logging and timestamp
-          const timestamp = Date.now();
-          console.log(`[CHAT STREAM] [${timestamp}] Sending chunk: "${chunk}" for message ${aiMessage.id}`);
-          
-          const chunkData = JSON.stringify({ 
-            type: 'chunk', 
-            content: chunk,
+          // Broadcast AI message start via WebSocket
+          (global as any).broadcastToConversation(convId, {
+            type: 'aiMessageStart',
             messageId: aiMessage.id,
-            timestamp // Add timestamp to track client arrival time
+            conversationId: convId
           });
-          
-          res.write(`data: ${chunkData}\n\n`);
-          
-          // Force immediate flush with multiple methods
-          if (res.flush) res.flush();
-          if (res.socket && res.socket.write) {
-            res.socket.write('');
-          }
-          // Force socket flush
-          if (res.socket && res.socket.flush) {
-            res.socket.flush();
-          }
-          
-          console.log(`[CHAT STREAM] [${timestamp}] Chunk sent, waiting...`);
-          
-          // Increase delay to ensure chunks arrive separately (500ms)
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          console.log(`[CHAT STREAM] [${Date.now()}] Wait complete, processing next chunk`);
-        }
 
-        // Update the AI message with complete content
-        if (aiMessage) {
-          const finalContent = aiResponseContent || 'I apologize, but I was unable to generate a response.';
-          await storage.updateChatMessage(aiMessage.id, {
-            content: finalContent,
-            tokensUsed: Math.ceil(finalContent.length / 4)
+          // Generate streaming AI response via WebSocket
+          const { OpenAIService } = await import('./openai-service');
+          
+          for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
+            // Check if generation was stopped
+            if (!activeGenerations.get(convId)) {
+              console.log(`[WEBSOCKET STREAM] Generation stopped for conversation ${convId}`);
+              break;
+            }
+
+            aiResponseContent += chunk;
+            
+            console.log(`[WEBSOCKET STREAM] Broadcasting chunk: "${chunk}" for message ${aiMessage.id}`);
+            
+            // Broadcast chunk immediately via WebSocket
+            (global as any).broadcastToConversation(convId, {
+              type: 'chunk',
+              content: chunk,
+              messageId: aiMessage.id,
+              timestamp: Date.now()
+            });
+
+            // Add delay for visible streaming effect
+            await new Promise(resolve => setTimeout(resolve, 800));
+          }
+
+          // Update the AI message with complete content
+          if (aiMessage) {
+            const finalContent = aiResponseContent || 'I apologize, but I was unable to generate a response.';
+            await storage.updateChatMessage(aiMessage.id, {
+              content: finalContent,
+              tokensUsed: Math.ceil(finalContent.length / 4)
+            });
+
+            // Broadcast completion via WebSocket
+            (global as any).broadcastToConversation(convId, {
+              type: 'complete',
+              messageId: aiMessage.id,
+              finalContent
+            });
+          }
+
+        } catch (error: any) {
+          console.error('[WEBSOCKET STREAM] AI generation error:', error);
+          
+          if (aiMessage) {
+            await storage.updateChatMessage(aiMessage.id, {
+              content: 'I apologize, but I encountered an error while generating a response.',
+              tokensUsed: 20
+            });
+          }
+
+          // Broadcast error via WebSocket
+          (global as any).broadcastToConversation(convId, {
+            type: 'error',
+            error: 'Failed to generate response'
           });
+        } finally {
+          // Mark generation as complete
+          activeGenerations.set(convId, false);
         }
-
-        // Update conversation last message time and count
-        await storage.updateChatConversation(convId, {
-          lastMessageAt: new Date(),
-          messageCount: messages.length + 2
-        });
-
-        // Send completion event
-        res.write(`data: ${JSON.stringify({ 
-          type: 'complete',
-          messageId: aiMessage?.id,
-          finalContent: aiResponseContent
-        })}\n\n`);
-
-      } catch (error) {
-        console.error('[CHAT STREAM] AI generation error:', error);
-        res.write(`data: ${JSON.stringify({ 
-          type: 'error', 
-          error: 'Failed to generate AI response' 
-        })}\n\n`);
-      } finally {
-        // Clean up
-        activeGenerations.delete(convId);
-        res.end();
-      }
+      });
 
     } catch (error: any) {
-      console.error('[CHAT] Send message error:', error);
-      res.status(500).json({ error: 'Failed to send message' });
+      console.error('[CHAT] Create message error:', error);
+      res.status(500).json({ error: 'Failed to create message' });
     }
   });
 
