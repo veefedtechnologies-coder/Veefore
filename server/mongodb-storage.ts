@@ -357,6 +357,7 @@ const AutomationRuleSchema = new mongoose.Schema({
 
 // VeeGPT Chat schemas  
 const ChatConversationSchema = new mongoose.Schema({
+  id: { type: Number, unique: true },
   userId: { type: String, required: true },
   workspaceId: { type: String, required: true },
   title: { type: String, required: true, default: "New chat" },
@@ -367,7 +368,8 @@ const ChatConversationSchema = new mongoose.Schema({
 });
 
 const ChatMessageSchema = new mongoose.Schema({
-  conversationId: { type: String, required: true },
+  id: { type: Number, unique: true },
+  conversationId: { type: Number, required: true },
   role: { type: String, required: true, enum: ['user', 'assistant'] },
   content: { type: String, required: true },
   tokensUsed: { type: Number, default: 0 },
@@ -4550,14 +4552,19 @@ export class MongoStorage implements IStorage {
 
   async createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation> {
     await this.connect();
+    
+    // Generate a unique numeric ID based on timestamp and random component
+    const numericId = Date.now() % 1000000000 + Math.floor(Math.random() * 1000);
+    
     const doc = new ChatConversationModel({
       ...conversation,
+      id: numericId,
       createdAt: new Date(),
       updatedAt: new Date()
     });
     const saved = await doc.save();
     return {
-      id: parseInt(saved._id.toString().slice(-8), 16), // Convert ObjectId to number
+      id: saved.id,
       userId: saved.userId,
       workspaceId: saved.workspaceId,
       title: saved.title,
@@ -4584,14 +4591,19 @@ export class MongoStorage implements IStorage {
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
     await this.connect();
+    
+    // Generate a unique numeric ID
+    const numericId = Date.now() % 1000000000 + Math.floor(Math.random() * 1000);
+    
     const doc = new ChatMessageModel({
       ...message,
+      id: numericId,
       createdAt: new Date()
     });
     const saved = await doc.save();
     return {
-      id: parseInt(saved._id.toString().slice(-8), 16), // Convert ObjectId to number
-      conversationId: parseInt(saved.conversationId),
+      id: saved.id,
+      conversationId: saved.conversationId,
       role: saved.role,
       content: saved.content,
       tokensUsed: saved.tokensUsed,
