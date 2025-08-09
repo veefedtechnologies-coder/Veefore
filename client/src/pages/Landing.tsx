@@ -19,7 +19,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
-  const [scrollY, setScrollY] = useState(0)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const heroRef = useRef<HTMLDivElement>(null)
 
@@ -30,17 +29,9 @@ const Landing = ({ onNavigate }: LandingProps) => {
     const interval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 8)
     }, 4000)
-
-    // Scroll tracking for parallax effects only
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
-
-    window.addEventListener('scroll', handleScroll)
     
     return () => {
       clearInterval(interval)
-      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
