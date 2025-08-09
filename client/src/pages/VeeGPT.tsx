@@ -108,6 +108,7 @@ export default function VeeGPT() {
   const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
+  const streamResolveRef = useRef<((value: any) => void) | null>(null)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -200,6 +201,9 @@ export default function VeeGPT() {
       setIsGenerating(true)
       isGeneratingRef.current = true
       
+      // Store resolve function for completion handler
+      streamResolveRef.current = resolve
+      
       try {
         // Use same auth approach as apiRequest
         const auth = getAuth()
@@ -256,11 +260,10 @@ export default function VeeGPT() {
             }
           } catch (error) {
             console.error('VeeGPT: Stream reading error:', error)
-            reject(error)
-          } finally {
             setIsGenerating(false)
             isGeneratingRef.current = false
-            resolve({ success: true })
+            streamResolveRef.current = null
+            reject(error)
           }
         }
 
@@ -271,6 +274,7 @@ export default function VeeGPT() {
         console.error('VeeGPT: Fetch error:', error)
         setIsGenerating(false)
         isGeneratingRef.current = false
+        streamResolveRef.current = null
         reject(error)
       }
     })
@@ -321,7 +325,9 @@ export default function VeeGPT() {
 
       case 'complete':
         console.log('VeeGPT: Streaming message completed')
-        // Generation completed - this will be handled in the try/finally block
+        // Generation completed - reset generation state
+        setIsGenerating(false)
+        isGeneratingRef.current = false
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
@@ -335,6 +341,11 @@ export default function VeeGPT() {
             queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
           })
           queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+        }
+        // Resolve the streaming Promise
+        if (streamResolveRef.current) {
+          streamResolveRef.current({ success: true })
+          streamResolveRef.current = null
         }
         break
 
