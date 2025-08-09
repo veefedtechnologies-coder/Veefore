@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
@@ -2144,93 +2144,211 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Industry Solutions Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-purple-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full px-6 py-3 mb-8">
-              <Target className="w-5 h-5 text-indigo-600 mr-2" />
-              <span className="text-indigo-800 font-semibold">Industry-Specific Solutions</span>
+      {/* Revolutionary Industry Solutions - Apple-Inspired Premium Design */}
+      <section className="relative py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-slate-50 overflow-hidden">
+        {/* Premium Background Elements */}
+        <div className="absolute inset-0">
+          {/* Floating Industry Orbs */}
+          <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-5 animate-morph-premium-1" style={{
+            background: 'radial-gradient(circle, #6366f1, #8b5cf6, #a855f7)',
+            filter: 'blur(80px)',
+          }} />
+          <div className="absolute bottom-32 right-1/3 w-80 h-80 rounded-full opacity-8 animate-morph-premium-2" style={{
+            background: 'radial-gradient(circle, #06b6d4, #0891b2, #0e7490)',
+            filter: 'blur(60px)',
+          }} />
+          
+          {/* Neural Network Grid */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <pattern id="industry-grid" width="8" height="8" patternUnits="userSpaceOnUse">
+                  <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.3"/>
+                  <circle cx="4" cy="4" r="0.8" fill="currentColor" opacity="0.4" className="animate-slow-pulse"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#industry-grid)" className="text-indigo-600" />
+            </svg>
+          </div>
+
+          {/* Floating Elements */}
+          <div className="absolute top-1/4 right-1/4 w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full animate-float-premium opacity-40" />
+          <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-float-delayed-premium opacity-30" />
+          <div className="absolute top-1/2 left-1/5 w-4 h-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full animate-particles-float opacity-20" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          {/* Revolutionary Header with Apple-style Typography */}
+          <div className="text-center mb-24">
+            <div className="relative inline-flex items-center mb-8">
+              <div className="glass-premium rounded-full px-8 py-4 backdrop-blur-xl border border-white/30">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center animate-float-premium">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-gray-700 font-semibold tracking-wide">Industry-Specific Solutions</span>
+                </div>
+              </div>
+              
+              {/* Floating Industry Icons */}
+              <div className="absolute -top-6 -right-6 w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-delayed-premium shadow-xl">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+              <div className="absolute -bottom-4 -left-8 w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center animate-float-premium shadow-lg">
+                <Cpu className="w-5 h-5 text-white" />
+              </div>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Tailored for Your Industry
+            
+            <h2 className="text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
+              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                Tailored for Your
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">
+                Industry
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Specialized features and workflows designed for specific industries, ensuring compliance, optimization, and best practices for your business sector.
+            
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Specialized features and workflows designed for specific industries, ensuring compliance, 
+              optimization, and best practices for your business sector.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Revolutionary Industry Cards - Apple Ecosystem Style */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {industrySolutions.map((solution, index) => (
-              <div key={index} className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 group">
-                <div className="p-10">
-                  <div className="flex items-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300">
-                      {solution.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{solution.industry}</h3>
-                    </div>
+              <div 
+                key={index} 
+                className="group relative overflow-hidden"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
+                {/* Main Card with Premium Glass Effect */}
+                <div className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-700 group-hover:-translate-y-2 overflow-hidden">
+                  {/* Premium Gradient Border */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-purple-500/10 rounded-[2.5rem] p-[1px]">
+                    <div className="h-full w-full bg-white rounded-[2.4rem]" />
                   </div>
-                  <p className="text-gray-600 mb-8 leading-relaxed text-lg">{solution.description}</p>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <Button
-                        onClick={() => toggleSection(`industry-${index}`)}
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-0"
-                      >
-                        {expandedSections[`industry-${index}`] ? (
-                          <>
-                            <ChevronUp className="w-4 h-4" />
-                            Show Less
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="w-4 h-4" />
-                            View All Features
-                          </>
-                        )}
-                      </Button>
+                  {/* Floating Orb Background */}
+                  <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-700 animate-morph-premium-1" style={{
+                    background: `radial-gradient(circle, ${index === 0 ? '#3b82f6' : index === 1 ? '#ef4444' : index === 2 ? '#6b7280' : '#8b5cf6'}, transparent)`,
+                  }} />
+                  
+                  <div className="relative p-12">
+                    {/* Industry Icon with Advanced Animation */}
+                    <div className="flex items-start justify-between mb-10">
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-white to-gray-50 border border-gray-200 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+                            {React.cloneElement(solution.icon, { 
+                              className: "w-8 h-8 text-white",
+                              style: { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }
+                            })}
+                          </div>
+                        </div>
+                        
+                        {/* Floating Particles */}
+                        <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-particles-float opacity-60" />
+                        <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-float-delayed-premium opacity-40" />
+                      </div>
+                      
+                      {/* Industry Badge */}
+                      <div className="px-4 py-2 bg-gradient-to-r from-indigo-100 to-violet-100 rounded-full border border-indigo-200">
+                        <span className="text-indigo-700 text-sm font-semibold">#{index + 1}</span>
+                      </div>
                     </div>
                     
-                    <div className={`space-y-4 transition-all duration-500 overflow-hidden ${
-                      expandedSections[`industry-${index}`] ? 'max-h-none' : 'max-h-40'
-                    }`}>
-                      {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 3).map((feature, idx) => (
-                        <div key={idx} className="flex items-start">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-3 h-3 text-white" />
+                    {/* Content */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-indigo-900 transition-colors duration-500">
+                          {solution.industry}
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed text-lg">{solution.description}</p>
+                      </div>
+                      
+                      {/* Feature Preview with Modern Design */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Button
+                            onClick={() => toggleSection(`industry-${index}`)}
+                            variant="ghost"
+                            className="flex items-center gap-3 text-gray-600 hover:text-indigo-600 p-0 group/btn"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-indigo-100 to-violet-100 flex items-center justify-center group-hover/btn:scale-110 transition-transform duration-300">
+                              {expandedSections[`industry-${index}`] ? (
+                                <ChevronUp className="w-4 h-4 text-indigo-600" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-indigo-600" />
+                              )}
+                            </div>
+                            <span className="font-semibold">
+                              {expandedSections[`industry-${index}`] ? 'Show Less' : 'View All Features'}
+                            </span>
+                          </Button>
+                          
+                          <div className="px-3 py-1 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full">
+                            <span className="text-emerald-700 text-sm font-medium">{solution.features.length} Features</span>
                           </div>
-                          <span className="ml-4 text-gray-700 leading-relaxed">{feature}</span>
                         </div>
-                      ))}
-                      {!expandedSections[`industry-${index}`] && solution.features.length > 3 && (
-                        <div className="text-center pt-2">
-                          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                            +{solution.features.length - 3} more
-                          </span>
+                        
+                        <div className={`space-y-4 transition-all duration-700 overflow-hidden ${
+                          expandedSections[`industry-${index}`] ? 'max-h-none opacity-100' : 'max-h-48 opacity-90'
+                        }`}>
+                          {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 3).map((feature, idx) => (
+                            <div 
+                              key={idx} 
+                              className="flex items-start group/feature hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 rounded-xl p-3 -mx-3 transition-all duration-300"
+                            >
+                              <div className="w-7 h-7 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover/feature:scale-110 transition-transform duration-300 shadow-lg">
+                                <Check className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="ml-4 text-gray-700 leading-relaxed group-hover/feature:text-gray-900 transition-colors duration-300 font-medium">
+                                {feature}
+                              </span>
+                            </div>
+                          ))}
+                          
+                          {!expandedSections[`industry-${index}`] && solution.features.length > 3 && (
+                            <div className="text-center pt-4">
+                              <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full border border-gray-300 shadow-sm">
+                                <span className="text-gray-600 font-medium">+{solution.features.length - 3} more features</span>
+                                <ArrowRight className="w-4 h-4 ml-2 text-gray-500" />
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
+                      
+                      {/* CTA Button with Premium Styling */}
+                      <div className="pt-6">
+                        <Button className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 group/cta">
+                          <span>Explore {solution.industry} Solutions</span>
+                          <ArrowRight className="w-5 h-5 ml-2 group-hover/cta:translate-x-1 transition-transform duration-300" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <Button 
-                      variant="outline"
-                      className="border-2 border-violet-200 text-violet-700 hover:bg-violet-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300"
-                    >
-                      Learn More About {solution.industry}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Bottom CTA Section */}
+          <div className="text-center mt-20">
+            <div className="glass-premium rounded-3xl px-8 py-6 backdrop-blur-xl border border-white/30 inline-flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center animate-float-premium">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <h4 className="text-lg font-bold text-gray-900">Don't see your industry?</h4>
+                <p className="text-gray-600">Contact us for custom industry solutions</p>
+              </div>
+              <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                Contact Sales
+              </Button>
+            </div>
           </div>
         </div>
       </section>
