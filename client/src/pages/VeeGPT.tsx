@@ -786,14 +786,17 @@ export default function VeeGPT() {
                       </div>
                     )}
                   </div>
-                  <div className={`mt-2 text-xs text-gray-500 ${
-                    message.role === 'user' ? 'text-right' : 'text-left'
-                  }`}>
-                    {new Date(message.createdAt).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </div>
+                  {/* Hide timestamp during typewriter animation for AI messages */}
+                  {!(message.role === 'assistant' && typewriterMessageIds.has(message.id)) && (
+                    <div className={`mt-2 text-xs text-gray-500 ${
+                      message.role === 'user' ? 'text-right' : 'text-left'
+                    }`}>
+                      {new Date().toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
+                  )}
                 </div>
                 {message.role === 'user' && (
                   <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600 text-white">
