@@ -768,7 +768,7 @@ export default function VeeGPT() {
         {/* Footer text positioned below the floating input */}
         <div style={{ 
           position: 'absolute',
-          bottom: '16px',
+          bottom: '12px',
           left: '50%',
           transform: 'translateX(-50%)',
           textAlign: 'center',
