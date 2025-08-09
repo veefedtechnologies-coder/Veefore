@@ -169,7 +169,7 @@ export interface IStorage {
   getDmMessages(conversationId: number | string, limit?: number): Promise<any[]>;
 
   // VeeGPT Chat operations
-  getChatConversations(userId: number, workspaceId: number): Promise<ChatConversation[]>;
+  getChatConversations(userId: string, workspaceId?: string): Promise<ChatConversation[]>;
   getChatConversation(id: number): Promise<ChatConversation | undefined>;
   createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation>;
   updateChatConversation(id: number, updates: Partial<ChatConversation>): Promise<ChatConversation>;

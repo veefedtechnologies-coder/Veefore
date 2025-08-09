@@ -4534,12 +4534,16 @@ export class MongoStorage implements IStorage {
   }
 
   // VeeGPT Chat Methods
-  async getChatConversations(userId: string): Promise<ChatConversation[]> {
+  async getChatConversations(userId: string, workspaceId?: string): Promise<ChatConversation[]> {
     await this.connect();
-    const conversations = await ChatConversationModel.find({ userId })
+    const query: any = { userId };
+    if (workspaceId) {
+      query.workspaceId = workspaceId;
+    }
+    const conversations = await ChatConversationModel.find(query)
       .sort({ updatedAt: -1 });
     return conversations.map(doc => ({
-      id: parseInt(doc._id.toString().slice(-8), 16), // Convert ObjectId to number
+      id: doc.id, // Use the stored numeric ID
       userId: doc.userId,
       workspaceId: doc.workspaceId,
       title: doc.title,
@@ -4575,13 +4579,13 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  async getChatMessages(conversationId: string): Promise<ChatMessage[]> {
+  async getChatMessages(conversationId: number): Promise<ChatMessage[]> {
     await this.connect();
     const messages = await ChatMessageModel.find({ conversationId })
       .sort({ createdAt: 1 });
     return messages.map(doc => ({
-      id: parseInt(doc._id.toString().slice(-8), 16), // Convert ObjectId to number
-      conversationId: parseInt(doc.conversationId),
+      id: doc.id, // Use the stored numeric ID
+      conversationId: doc.conversationId,
       role: doc.role,
       content: doc.content,
       tokensUsed: doc.tokensUsed,

@@ -50,11 +50,11 @@ export default function VeeGPT() {
     { icon: Calendar, text: "Draft a posting schedule for next month" }
   ]
 
-  // Fetch conversations
+  // Fetch conversations  
   const { data: conversations = [] } = useQuery<ChatConversation[]>({
     queryKey: ['/api/chat/conversations'],
     queryFn: () => apiRequest('/api/chat/conversations'),
-    enabled: hasSentFirstMessage
+    enabled: true // Always fetch conversations to show history
   })
 
   // Fetch current conversation messages
@@ -152,11 +152,11 @@ export default function VeeGPT() {
 
   // Check if we have any conversations to determine initial state
   useEffect(() => {
-    if (conversations.length > 0 && !currentConversationId && !hasSentFirstMessage) {
+    if (conversations.length > 0 && !currentConversationId) {
       setHasSentFirstMessage(true)
       setCurrentConversationId(conversations[0].id)
     }
-  }, [conversations, currentConversationId, hasSentFirstMessage])
+  }, [conversations, currentConversationId])
 
   // Welcome screen layout (when no conversation is active)
   if (!hasSentFirstMessage) {
