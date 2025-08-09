@@ -286,6 +286,12 @@ export default function VeeGPT() {
   }
 
   const handleStopGeneration = async () => {
+    console.log('VeeGPT: Stopping generation and typewriter animations')
+    
+    // Stop all typewriter animations immediately
+    setTypewriterMessageIds(new Set())
+    
+    // If there's an active conversation, also call the backend to stop generation
     if (currentConversationId) {
       console.log('VeeGPT: Stopping generation for conversation:', currentConversationId)
       try {
@@ -956,7 +962,7 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending || typewriterMessageIds.size > 0) ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{
