@@ -19,7 +19,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [scrollY, setScrollY] = useState(0)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const heroRef = useRef<HTMLDivElement>(null)
@@ -32,22 +31,15 @@ const Landing = ({ onNavigate }: LandingProps) => {
       setActiveFeature(prev => (prev + 1) % 8)
     }, 4000)
 
-    // Mouse tracking for interactive effects
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
-
-    // Scroll tracking for parallax effects
+    // Scroll tracking for parallax effects only
     const handleScroll = () => {
       setScrollY(window.scrollY)
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('scroll', handleScroll)
     
     return () => {
       clearInterval(interval)
-      window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
@@ -583,8 +575,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
           className="absolute inset-0 opacity-20"
           style={{
             background: `
-              radial-gradient(circle at ${mousePosition.x * 0.1}% ${mousePosition.y * 0.1}%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at ${100 - mousePosition.x * 0.1}% ${100 - mousePosition.y * 0.1}%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
               radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%)
             `
           }}
@@ -681,27 +673,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
         <div className="absolute inset-0">
           {/* Large gradient orbs */}
           <div 
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl animate-pulse"
-            style={{ 
-              transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
-              animationDuration: '4s'
-            }}
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl animate-morph-1"
           />
           <div 
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl animate-pulse"
-            style={{ 
-              transform: `translate(${-mousePosition.x * 0.02}px, ${-mousePosition.y * 0.02}px)`,
-              animationDuration: '6s',
-              animationDelay: '2s'
-            }}
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl animate-morph-2"
           />
           <div 
-            className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-600/6 rounded-full blur-3xl animate-pulse"
-            style={{ 
-              transform: `translate(-50%, -50%) translate(${mousePosition.x * 0.01}px, ${mousePosition.y * 0.01}px)`,
-              animationDuration: '8s',
-              animationDelay: '4s'
-            }}
+            className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-600/6 rounded-full blur-3xl animate-morph-3 transform -translate-x-1/2 -translate-y-1/2"
           />
         </div>
 
@@ -776,7 +754,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
               <div 
                 className="relative mx-auto"
                 style={{
-                  transform: `rotateX(${scrollY * 0.01}deg) rotateY(${(mousePosition.x - window.innerWidth / 2) * 0.01}deg)`
+                  transform: `rotateX(${scrollY * 0.005}deg)`
                 }}
               >
                 <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
@@ -936,12 +914,12 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     {[...Array(20)].map((_, i) => (
                       <div
                         key={i}
-                        className="absolute w-2 h-2 bg-white rounded-full animate-float"
+                        className="absolute w-2 h-2 bg-white rounded-full animate-slow-float"
                         style={{
                           left: `${Math.random() * 100}%`,
                           top: `${Math.random() * 100}%`,
-                          animationDelay: `${i * 0.5}s`,
-                          animationDuration: `${4 + Math.random() * 4}s`
+                          animationDelay: `${i * 2}s`,
+                          animationDuration: `${12 + Math.random() * 8}s`
                         }}
                       />
                     ))}
@@ -1160,12 +1138,12 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       {[...Array(8)].map((_, i) => (
                         <div
                           key={i}
-                          className="absolute bottom-0 bg-gradient-to-t from-white/60 to-white/20 rounded-t-lg animate-pulse"
+                          className="absolute bottom-0 bg-gradient-to-t from-white/60 to-white/20 rounded-t-lg animate-slow-pulse"
                           style={{
                             left: `${i * 12}%`,
                             width: '8%',
                             height: `${30 + Math.random() * 70}%`,
-                            animationDelay: `${i * 0.2}s`
+                            animationDelay: `${i * 1.5}s`
                           }}
                         />
                       ))}
