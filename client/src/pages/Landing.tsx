@@ -86,7 +86,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
       subtitle: "ChatGPT-like Interface",
       description: "Advanced conversational AI that understands context, generates content, and provides strategic insights. Built specifically for social media creators and marketers.",
       image: "/api/placeholder/600/400",
-      icon: <Bot className="w-8 h-8" />,
+      icon: (
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+          <Bot className="w-5 h-5 text-white" />
+        </div>
+      ),
       color: "from-violet-500 to-purple-600",
       features: ["Real-time streaming responses", "Context-aware conversations", "Content generation", "Strategy assistance", "Multi-platform insights"],
       link: "/veegpt"
@@ -97,7 +101,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
       subtitle: "Professional Video Creation",
       description: "Revolutionary AI video creation with automated script writing, scene generation, voiceovers, and professional editing. Create viral content in minutes.",
       image: "/api/placeholder/600/400",
-      icon: <Video className="w-8 h-8" />,
+      icon: (
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+          <Video className="w-5 h-5 text-white" />
+        </div>
+      ),
       color: "from-blue-500 to-cyan-500",
       features: ["AI script generation", "Automated scene creation", "Professional voiceovers", "Smart editing", "Multi-format export"],
       link: "/video-generator"
@@ -108,7 +116,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
       subtitle: "Performance Analytics",
       description: "Comprehensive analytics dashboard with real-time metrics, engagement tracking, competitor analysis, and predictive insights for growth optimization.",
       image: "/api/placeholder/600/400",
-      icon: <BarChart3 className="w-8 h-8" />,
+      icon: (
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+          <BarChart3 className="w-5 h-5 text-white" />
+        </div>
+      ),
       color: "from-emerald-500 to-teal-600",
       features: ["Real-time metrics", "Engagement tracking", "Competitor analysis", "Growth predictions", "ROI insights"],
       link: "/analytics"
@@ -119,7 +131,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
       subtitle: "AI Content Generation",
       description: "Intelligent content creation with trend analysis, audience insights, and automated optimization. Generate posts, captions, and campaigns that convert.",
       image: "/api/placeholder/600/400",
-      icon: <Palette className="w-8 h-8" />,
+      icon: (
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+          <Palette className="w-5 h-5 text-white" />
+        </div>
+      ),
       color: "from-pink-500 to-rose-500",
       features: ["AI content generation", "Trend analysis", "Audience targeting", "A/B testing", "Performance optimization"],
       link: "/content-studio"
@@ -175,7 +191,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
     {
       title: "VeeGPT - Advanced AI Chat Assistant & Strategic Intelligence",
       description: "Experience the next generation of AI-powered social media assistance with VeeGPT, our flagship conversational AI that combines the power of GPT-4 with specialized social media expertise. Unlike generic chatbots, VeeGPT understands your brand, analyzes your audience, and provides contextual insights that drive real business growth.",
-      icon: <Bot className="w-16 h-16 text-violet-500" />,
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+          <Bot className="w-8 h-8 text-white" />
+        </div>
+      ),
       gradient: "from-violet-500 via-purple-500 to-indigo-500",
       image: VeeGPTInterface,
       details: [
@@ -196,7 +216,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
     {
       title: "Cosmos AI Video Studio - Professional Video Generation Platform",
       description: "Transform your video content strategy with Cosmos, our revolutionary AI video generation engine that creates broadcast-quality videos in minutes. From concept to final edit, Cosmos handles every aspect of video production using cutting-edge AI models and professional-grade automation.",
-      icon: <Video className="w-16 h-16 text-blue-500" />,
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg">
+          <Video className="w-8 h-8 text-white" />
+        </div>
+      ),
       gradient: "from-blue-500 via-cyan-500 to-teal-500",
       image: VideoStudioInterface,
       details: [
@@ -219,7 +243,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
     {
       title: "Analytics Pro - Enterprise-Grade Performance Intelligence",
       description: "Unlock the full potential of your social media data with Analytics Pro, our comprehensive business intelligence platform that transforms raw metrics into actionable growth strategies. Built for enterprises and agencies managing multiple accounts and complex campaigns.",
-      icon: <BarChart3 className="w-16 h-16 text-emerald-500" />,
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+          <BarChart3 className="w-8 h-8 text-white" />
+        </div>
+      ),
       gradient: "from-emerald-500 via-green-500 to-teal-500",
       image: AnalyticsInterface,
       details: [
@@ -243,7 +271,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
     {
       title: "Content Studio - AI-Powered Creative Intelligence Platform",
       description: "Revolutionize your content creation process with Content Studio, our advanced AI platform that combines creativity with data-driven insights. Generate high-converting content that resonates with your audience while maintaining your unique brand voice and style.",
-      icon: <Palette className="w-16 h-16 text-pink-500" />,
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
+          <Palette className="w-8 h-8 text-white" />
+        </div>
+      ),
       gradient: "from-pink-500 via-rose-500 to-red-500",
       image: ContentStudioInterface,
       details: [
