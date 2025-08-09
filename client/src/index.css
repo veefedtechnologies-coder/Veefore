@@ -4,9 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force complete transparency for ChatGPT-style floating input */
+/* ChatGPT-style pill-shaped transparent input container */
 div[contenteditable="true"] {
-  background: none !important;
+  background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   border: none !important;
@@ -17,19 +17,18 @@ div[contenteditable="true"] {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
-  -webkit-background-composite: clear !important;
 }
 
 div[contenteditable="true"]:empty:before {
   content: attr(data-placeholder);
   color: #9ca3af;
   pointer-events: none;
-  background: none !important;
+  background: transparent !important;
   background-color: transparent !important;
 }
 
 div[contenteditable="true"]:focus {
-  background: none !important;
+  background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   border: none !important;
@@ -37,6 +36,12 @@ div[contenteditable="true"]:focus {
   box-shadow: none !important;
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;
+}
+
+/* Pill-shaped container hover effects */
+div[data-pill-container]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Override any default styling from classes and containers */

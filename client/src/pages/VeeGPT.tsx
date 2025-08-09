@@ -471,114 +471,133 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* Floating transparent input like ChatGPT - no containers */}
-        <div className="veegpt-input-container" style={{ 
+        {/* ChatGPT-style pill-shaped transparent input container */}
+        <div style={{ 
           padding: '24px', 
-          background: 'none',
+          background: 'transparent',
           backgroundColor: 'transparent'
         }}>
           <div style={{ 
             maxWidth: '48rem', 
-            margin: '0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            background: 'none',
-            backgroundColor: 'transparent',
-            border: 'none',
-            outline: 'none'
+            margin: '0 auto'
           }}>
+            {/* Pill-shaped transparent container */}
             <div style={{
-              background: 'none',
-              backgroundColor: 'transparent',
-              border: 'none',
-              outline: 'none',
-              padding: '6px',
-              cursor: 'pointer'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 16px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '25px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s ease'
             }}>
-              <Paperclip style={{ 
-                width: '20px', 
-                height: '20px',
-                color: '#6b7280'
-              }} />
-            </div>
-            
-            <div
-              ref={inputRef}
-              contentEditable
-              suppressContentEditableWarning
-              onInput={(e) => {
-                const text = e.currentTarget.innerText
-                setInputText(text)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  handleSendMessage()
-                }
-              }}
-              style={{
-                flex: 1,
-                minHeight: '24px',
-                maxHeight: '120px',
-                overflow: 'auto',
-                outline: 'none',
-                border: 'none',
-                background: 'none',
-                backgroundColor: 'transparent',
-                color: '#374151',
-                fontSize: '16px',
-                lineHeight: '1.5',
-                padding: '8px 0',
-                margin: 0,
-                boxShadow: 'none',
-                borderRadius: 0,
-                WebkitAppearance: 'none',
-                MozAppearance: 'none',
-                appearance: 'none'
-              }}
-              data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
-            />
-            
-            <div
-              onClick={handleSendMessage}
-              style={{
-                background: 'none',
+              <button style={{
+                background: 'transparent',
                 backgroundColor: 'transparent',
                 border: 'none',
                 outline: 'none',
-                padding: '6px',
-                cursor: inputText.trim() ? 'pointer' : 'not-allowed',
-                color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af'
-              }}
-            >
-              {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
-                <div style={{ 
+                padding: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Paperclip style={{ 
                   width: '20px', 
-                  height: '20px', 
-                  border: '2px solid #9ca3af', 
-                  borderTop: '2px solid transparent', 
-                  borderRadius: '50%', 
-                  animation: 'spin 1s linear infinite' 
+                  height: '20px',
+                  color: '#6b7280'
                 }} />
-              ) : (
-                <Send style={{ width: '20px', height: '20px' }} />
-              )}
-            </div>
+              </button>
+              
+              <div
+                ref={inputRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={(e) => {
+                  const text = e.currentTarget.innerText
+                  setInputText(text)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSendMessage()
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  minHeight: '24px',
+                  maxHeight: '120px',
+                  overflow: 'auto',
+                  outline: 'none',
+                  border: 'none',
+                  background: 'transparent',
+                  backgroundColor: 'transparent',
+                  color: '#374151',
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                  padding: '4px 0',
+                  margin: 0,
+                  boxShadow: 'none',
+                  borderRadius: 0,
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+                data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
+              />
+              
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
+                style={{
+                  background: 'transparent',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  padding: '4px',
+                  cursor: inputText.trim() ? 'pointer' : 'not-allowed',
+                  color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+                  <div style={{ 
+                    width: '20px', 
+                    height: '20px', 
+                    border: '2px solid #9ca3af', 
+                    borderTop: '2px solid transparent', 
+                    borderRadius: '50%', 
+                    animation: 'spin 1s linear infinite' 
+                  }} />
+                ) : (
+                  <Send style={{ width: '20px', height: '20px' }} />
+                )}
+              </button>
 
-            <div style={{
-              background: 'none',
-              backgroundColor: 'transparent',
-              border: 'none',
-              outline: 'none',
-              padding: '6px',
-              cursor: 'pointer'
-            }}>
-              <Mic style={{ 
-                width: '20px', 
-                height: '20px',
-                color: '#6b7280'
-              }} />
+              <button style={{
+                background: 'transparent',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                padding: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Mic style={{ 
+                  width: '20px', 
+                  height: '20px',
+                  color: '#6b7280'
+                }} />
+              </button>
             </div>
           </div>
           
