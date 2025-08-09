@@ -3123,58 +3123,150 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-violet-50 to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-6 py-3 mb-8">
-              <Star className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-blue-800 font-semibold">Early Validation</span>
+      {/* Premium Testimonials - Apple Inspired */}
+      <section id="testimonials" className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Dynamic Background with Mesh Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-300/20 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/20 via-transparent to-transparent"></div>
+        </div>
+        
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-violet-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-48 h-48 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Premium Header */}
+          <div className="text-center mb-24">
+            {/* Glassmorphism Badge */}
+            <div className="inline-flex items-center backdrop-blur-xl bg-white/70 border border-white/20 rounded-2xl px-8 py-4 mb-12 shadow-2xl">
+              <div className="relative mr-4">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full flex items-center justify-center">
+                  <Star className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div className="absolute inset-0 w-6 h-6 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full animate-ping opacity-20"></div>
+              </div>
+              <span className="text-slate-700 font-semibold text-lg tracking-wide">Validated by Industry Leaders</span>
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Trusted by Experts
+            
+            {/* Apple-Style Typography */}
+            <h2 className="text-6xl lg:text-8xl font-black mb-8 leading-[0.9] tracking-tight">
+              <span className="block bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
+                Trusted by
+              </span>
+              <span className="block bg-gradient-to-r from-blue-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+                Innovation
+              </span>
+              <span className="block bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+                Leaders
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Validated by industry experts and early beta testers who believe in the future of AI-powered social media.
+            
+            <p className="text-xl lg:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-light">
+              Validated by visionary experts and pioneering beta testers who recognize the transformative potential of AI-powered social media management.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Premium Testimonials Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                <div className="p-8">
-                  {/* Rating */}
-                  <div className="flex space-x-1 mb-6">
+              <div 
+                key={index} 
+                className="group relative"
+                style={{
+                  animationDelay: `${index * 200}ms`,
+                  animation: 'fadeInUp 0.8s ease-out forwards'
+                }}
+              >
+                {/* Background Glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-blue-600/20 rounded-3xl blur-lg group-hover:blur-xl transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                
+                {/* Main Card */}
+                <div className="relative backdrop-blur-xl bg-white/80 border border-white/20 rounded-3xl p-8 lg:p-10 shadow-2xl hover:shadow-3xl transition-all duration-700 group-hover:-translate-y-2">
+                  {/* Premium Quote Icon */}
+                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                    <div className="text-white text-2xl font-bold">"</div>
+                  </div>
+                  
+                  {/* Rating with Animation */}
+                  <div className="flex space-x-2 mb-8">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <div 
+                        key={i} 
+                        className="relative"
+                        style={{ animationDelay: `${(index * 200) + (i * 100)}ms` }}
+                      >
+                        <Star className="w-6 h-6 fill-amber-400 text-amber-400 drop-shadow-md animate-bounce" />
+                        <div className="absolute inset-0 w-6 h-6 fill-amber-300 text-amber-300 animate-ping opacity-20"></div>
+                      </div>
                     ))}
                   </div>
 
-                  {/* Content */}
-                  <p className="text-gray-700 mb-6 leading-relaxed italic">
-                    "{testimonial.content}"
-                  </p>
+                  {/* Content with Elegant Typography */}
+                  <blockquote className="text-slate-700 mb-8 text-lg lg:text-xl leading-relaxed font-medium italic">
+                    <span className="text-3xl text-violet-500 leading-none mr-1">"</span>
+                    {testimonial.content}
+                    <span className="text-3xl text-violet-500 leading-none ml-1">"</span>
+                  </blockquote>
 
-                  {/* Author */}
+                  {/* Author with Premium Styling */}
                   <div className="flex items-center">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover mr-4"
-                    />
-                    <div>
-                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                      <div className="text-sm text-gray-600">{testimonial.role}</div>
-                      <div className="text-sm text-violet-600 font-medium">{testimonial.company}</div>
+                    <div className="relative mr-5">
+                      {/* Avatar with Gradient Border */}
+                      <div className="w-16 h-16 p-0.5 bg-gradient-to-r from-violet-500 to-blue-500 rounded-2xl">
+                        <img 
+                          src={testimonial.avatar} 
+                          alt={testimonial.name}
+                          className="w-full h-full rounded-[14px] object-cover"
+                        />
+                      </div>
+                      {/* Status Indicator */}
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-3 border-white rounded-full shadow-lg"></div>
                     </div>
+                    
+                    <div className="flex-1">
+                      <div className="font-bold text-slate-900 text-lg mb-1">{testimonial.name}</div>
+                      <div className="text-slate-600 text-sm font-medium mb-1">{testimonial.role}</div>
+                      <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-violet-100 to-blue-100 text-violet-700 text-xs font-semibold rounded-full">
+                        {testimonial.company}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Subtle Verification Badge */}
+                  <div className="absolute top-6 right-6 flex items-center space-x-1 text-green-600">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium">Verified</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          
+          {/* Premium Stats Row */}
+          <div className="mt-24 grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { value: "50+", label: "Industry Experts", icon: "👥" },
+              { value: "95%", label: "Satisfaction Rate", icon: "⭐" },
+              { value: "24/7", label: "Expert Support", icon: "🚀" },
+              { value: "Beta", label: "Early Access", icon: "🔥" }
+            ].map((stat, index) => (
+              <div 
+                key={index} 
+                className="text-center group cursor-pointer"
+                style={{ animationDelay: `${1000 + (index * 100)}ms` }}
+              >
+                <div className="backdrop-blur-xl bg-white/60 border border-white/20 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1">
+                  <div className="text-3xl mb-2">{stat.icon}</div>
+                  <div className="text-3xl lg:text-4xl font-black text-slate-900 mb-1">{stat.value}</div>
+                  <div className="text-slate-600 font-medium text-sm">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+        
+
       </section>
 
       {/* CTA Section */}
