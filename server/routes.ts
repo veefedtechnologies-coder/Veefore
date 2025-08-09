@@ -13621,7 +13621,7 @@ Create a detailed growth strategy in JSON format:
             });
 
             // Add delay for visible streaming effect
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 30));
           }
 
           // Update the AI message with complete content
