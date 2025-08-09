@@ -3127,17 +3127,17 @@ const Landing = ({ onNavigate }: LandingProps) => {
       <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-violet-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full px-6 py-3 mb-8">
-              <Star className="w-5 h-5 text-yellow-600 mr-2" />
-              <span className="text-yellow-800 font-semibold">Customer Success</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-6 py-3 mb-8">
+              <Star className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-blue-800 font-semibold">Early Validation</span>
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Loved by Thousands
+                Trusted by Experts
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join thousands of satisfied customers who have transformed their social media presence with VeeFore.
+              Validated by industry experts and early beta testers who believe in the future of AI-powered social media.
             </p>
           </div>
 
