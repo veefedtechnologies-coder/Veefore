@@ -166,6 +166,21 @@ export default function VeeGPT() {
     return new Promise(async (resolve, reject) => {
       console.log('VeeGPT: Setting generation state to TRUE')
       
+      // Add user message to cache immediately (optimistic update)
+      const tempUserMessage = {
+        id: Date.now(), // temporary ID
+        conversationId,
+        role: 'user' as const,
+        content: content.trim(),
+        tokensUsed: 0,
+        createdAt: new Date().toISOString()
+      }
+      
+      queryClient.setQueryData(
+        ['/api/chat/conversations', conversationId, 'messages'],
+        (old: any) => old ? [...old, tempUserMessage] : [tempUserMessage]
+      )
+      
       // Set ref first for immediate availability
       isGeneratingRef.current = true
       // Set ref for stop button visibility during streaming

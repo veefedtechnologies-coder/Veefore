@@ -13568,21 +13568,29 @@ Create a detailed growth strategy in JSON format:
 
           aiResponseContent += chunk;
           
-          // Send chunk to client with explicit logging
-          console.log(`[CHAT STREAM] Sending chunk: "${chunk}" for message ${aiMessage.id}`);
-          res.write(`data: ${JSON.stringify({ 
+          // Send chunk to client with explicit logging and timestamp
+          const timestamp = Date.now();
+          console.log(`[CHAT STREAM] [${timestamp}] Sending chunk: "${chunk}" for message ${aiMessage.id}`);
+          
+          const chunkData = JSON.stringify({ 
             type: 'chunk', 
             content: chunk,
-            messageId: aiMessage.id 
-          })}\n\n`);
+            messageId: aiMessage.id,
+            timestamp // Add timestamp to track client arrival time
+          });
           
-          // Force flush the response buffer to ensure chunk is sent immediately
-          if (res.flush) {
-            res.flush();
-          }
+          res.write(`data: ${chunkData}\n\n`);
           
-          // Add server-side delay between sends (300ms)
-          await new Promise(resolve => setTimeout(resolve, 300));
+          // Multiple flush attempts to force immediate send
+          if (res.flush) res.flush();
+          if (res.socket?.write) res.socket.write('');
+          
+          console.log(`[CHAT STREAM] [${timestamp}] Chunk sent, waiting 1 second...`);
+          
+          // Add massive server-side delay between sends (1000ms = 1 second)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          console.log(`[CHAT STREAM] [${Date.now()}] Wait complete, processing next chunk`);
         }
 
         // Update the AI message with complete content
