@@ -601,9 +601,11 @@ export default function VeeGPT() {
     if (textareaRef.current) {
       textareaRef.current.focus()
       textareaRef.current.value = prompt
+      // Auto-resize textarea to fit content
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = Math.max(48, textareaRef.current.scrollHeight) + 'px'
     }
-    // Send the message directly with the prompt text
-    handleSendMessageWithContent(prompt)
+    // Don't send automatically - just populate the input field
   }
 
   const handleSendMessageWithContent = async (content?: string) => {
@@ -684,20 +686,22 @@ export default function VeeGPT() {
   // No typewriter animation - streaming content updates in real-time
 
   // Initialize with first conversation if user has existing chats (but only on first load)
+  // This ensures consistent behavior between refresh and new chat
   useEffect(() => {
-    if (conversations.length > 0 && !currentConversationId && !hasUserStartedNewChat) {
+    if (conversations.length > 0 && !currentConversationId && !hasUserStartedNewChat && !hasSentFirstMessage) {
       setHasSentFirstMessage(true)
       setCurrentConversationId(conversations[0].id)
     }
-  }, [conversations, currentConversationId])
+  }, [conversations, currentConversationId, hasUserStartedNewChat, hasSentFirstMessage])
 
 
 
   // Welcome screen layout (when no conversation is active)
-  // Show sidebar if conversations exist, hide only for first-time users or when no conversations
+  // Always show sidebar if conversations exist, regardless of whether it's a new chat or refresh
   const shouldShowSidebar = conversations.length > 0
   
-  if (!hasSentFirstMessage) {
+  // Show welcome screen when starting a new chat or when no conversation is selected
+  if (!hasSentFirstMessage || (hasUserStartedNewChat && !currentConversationId)) {
     return (
       <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
         {/* Sidebar - show if conversations exist */}
