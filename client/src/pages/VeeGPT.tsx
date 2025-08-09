@@ -1096,7 +1096,7 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || typewriterMessageIds.size > 0) ? (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating) ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{
