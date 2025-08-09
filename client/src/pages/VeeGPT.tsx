@@ -250,22 +250,19 @@ export default function VeeGPT() {
   // Create new conversation with streaming
   const createConversationMutation = useMutation({
     mutationFn: async (content: string) => {
-      // First create a new conversation
-      const newConv = await apiRequest('/api/chat/conversations', {
+      // Create a new conversation with the initial message content
+      const response = await apiRequest('/api/chat/conversations', {
         method: 'POST',
-        body: JSON.stringify({ title: 'New Chat' }),
+        body: JSON.stringify({ content }),
         headers: {
           'Content-Type': 'application/json'
         }
       })
 
-      setCurrentConversationId(newConv.id)
+      setCurrentConversationId(response.conversation.id)
       setHasSentFirstMessage(true)
       
-      // Then send the message with streaming
-      await handleStreamingMessage(content, newConv.id)
-      
-      return newConv
+      return response
     },
     onMutate: async () => {
       // Show the user message immediately by transitioning to chat view
@@ -273,7 +270,7 @@ export default function VeeGPT() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.id, 'messages'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.conversation.id, 'messages'] })
     },
     onError: () => {
       // Revert optimistic updates on error
@@ -567,38 +564,7 @@ export default function VeeGPT() {
   })
 
   const handleSendMessage = async () => {
-    if (!inputText.trim()) return
-    
-    const content = inputText.trim()
-    console.log('VeeGPT: Sending message:', content)
-    setInputText('')
-    
-    // Clear contenteditable div
-    if (inputRef.current) {
-      inputRef.current.innerText = ''
-    }
-    
-    try {
-      if (!hasSentFirstMessage || !currentConversationId) {
-        // Create new conversation
-        console.log('VeeGPT: Creating new conversation')
-        await createConversationMutation.mutateAsync(content)
-      } else {
-        // Send message to existing conversation
-        console.log('VeeGPT: Sending to existing conversation:', currentConversationId)
-        await sendMessageMutation.mutateAsync({ 
-          conversationId: currentConversationId, 
-          content 
-        })
-      }
-    } catch (error) {
-      console.error('VeeGPT: Error sending message:', error)
-      // Restore input text if there was an error
-      setInputText(content)
-      if (inputRef.current) {
-        inputRef.current.innerText = content
-      }
-    }
+    await handleSendMessageWithContent()
   }
 
   const handleStopGeneration = async () => {
@@ -634,6 +600,58 @@ export default function VeeGPT() {
     setInputText(prompt)
     if (textareaRef.current) {
       textareaRef.current.focus()
+      textareaRef.current.value = prompt
+    }
+    // Send the message directly with the prompt text
+    handleSendMessageWithContent(prompt)
+  }
+
+  const handleSendMessageWithContent = async (content?: string) => {
+    const messageContent = content || inputText.trim()
+    
+    if (!messageContent) {
+      console.log('VeeGPT: No message content to send')
+      return
+    }
+
+    console.log('VeeGPT: Sending message:', messageContent)
+    
+    // Clear input immediately
+    setInputText('')
+    
+    // Clear contenteditable div if using it
+    if (inputRef.current) {
+      inputRef.current.innerText = ''
+    }
+    
+    // Clear textarea
+    if (textareaRef.current) {
+      textareaRef.current.value = ''
+    }
+    
+    try {
+      if (!hasSentFirstMessage || !currentConversationId) {
+        // Create new conversation
+        console.log('VeeGPT: Creating new conversation')
+        await createConversationMutation.mutateAsync(messageContent)
+      } else {
+        // Send message to existing conversation
+        console.log('VeeGPT: Sending to existing conversation:', currentConversationId)
+        await sendMessageMutation.mutateAsync({ 
+          conversationId: currentConversationId, 
+          content: messageContent 
+        })
+      }
+    } catch (error) {
+      console.error('VeeGPT: Error sending message:', error)
+      // Restore input text if there was an error
+      setInputText(messageContent)
+      if (inputRef.current) {
+        inputRef.current.innerText = messageContent
+      }
+      if (textareaRef.current) {
+        textareaRef.current.value = messageContent
+      }
     }
   }
 
