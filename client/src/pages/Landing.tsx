@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
@@ -6,7 +6,7 @@ import {
   Sparkles, Crown, Cpu, Brain, 
   Network, Wand2, Palette, Video, Image, Database, Code, Cloud, Activity, 
   ShoppingCart, CreditCard, ExternalLink, Github, Twitter, MousePointer2,
-  Sparkle, Triangle, Send, PlayCircle
+  Sparkle, Triangle, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -291,102 +291,66 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
 
   // Industry-specific solutions
-  const revolutionaryIndustrySolutions = [
+  const industrySolutions = [
     {
       industry: "E-commerce & Retail",
-      subtitle: "Revenue Acceleration Engine",
-      description: "Next-generation AI-powered commerce platform with predictive analytics and real-time optimization.",
-      icon: <ShoppingCart className="w-16 h-16" />,
-      gradientFrom: "from-blue-600",
-      gradientTo: "to-cyan-400",
-      hoverColor: "hover:from-blue-700 hover:to-cyan-500",
-      particles: ["💎", "🛍️", "📊"],
-      metrics: { growth: "+347%", conversion: "8.2%", roi: "12.4x" },
+      description: "Specialized tools for product promotion, sales conversion, and customer retention in the retail sector.",
+      icon: <ShoppingCart className="w-12 h-12 text-blue-500" />,
       features: [
-        "🧠 AI-Powered Product Recommendation Engine",
-        "🎯 Dynamic Pricing & Inventory Optimization", 
-        "🚀 Automated Cross-Platform Sales Funnels",
-        "📈 Real-Time Customer Journey Analytics",
-        "🤖 Conversational Commerce AI Assistant",
-        "🎨 Auto-Generated Product Visual Content",
-        "🔮 Predictive Demand Forecasting",
-        "💫 Personalized Shopping Experience Creator"
-      ],
-      liveDemo: true,
-      aiPowered: true,
-      trending: true
+        "Product catalog integration with automated posting",
+        "Shopping tag automation for Instagram and Facebook",
+        "Inventory-based content scheduling",
+        "Customer review management and showcase",
+        "Seasonal campaign automation",
+        "Abandoned cart recovery campaigns",
+        "Influencer partnership management",
+        "Sales attribution and ROI tracking"
+      ]
     },
     {
       industry: "Healthcare & Wellness",
-      subtitle: "Digital Health Revolution",
-      description: "HIPAA-compliant AI health platform with advanced patient engagement and medical content automation.",
-      icon: <Heart className="w-16 h-16" />,
-      gradientFrom: "from-red-500",
-      gradientTo: "to-pink-400",
-      hoverColor: "hover:from-red-600 hover:to-pink-500",
-      particles: ["💊", "🩺", "❤️"],
-      metrics: { engagement: "+285%", compliance: "100%", satisfaction: "9.7/10" },
+      description: "Compliant social media management with specialized features for healthcare professionals and wellness brands.",
+      icon: <Heart className="w-12 h-12 text-red-500" />,
       features: [
-        "🏥 HIPAA-Compliant AI Content Generator",
-        "📋 Automated Patient Education Workflows",
-        "🔬 Medical Research Integration & Insights",
-        "📱 Telehealth Appointment Automation",
-        "🎯 Personalized Health Journey Mapping",
-        "📊 Population Health Analytics Dashboard",
-        "🤝 Provider-Patient Communication Hub",
-        "🛡️ Advanced Privacy & Security Controls"
-      ],
-      liveDemo: true,
-      aiPowered: true,
-      secure: true
+        "HIPAA-compliant content management",
+        "Medical content review workflows",
+        "Patient education content library",
+        "Appointment booking integration",
+        "Health awareness campaign automation",
+        "Professional credibility building tools",
+        "Community health engagement features",
+        "Regulatory compliance monitoring"
+      ]
     },
     {
       industry: "Professional Services",
-      subtitle: "Authority & Influence Platform",
-      description: "Executive-grade thought leadership platform with AI-powered reputation management and client acquisition.",
-      icon: <Building2 className="w-16 h-16" />,
-      gradientFrom: "from-slate-600",
-      gradientTo: "to-gray-400",
-      hoverColor: "hover:from-slate-700 hover:to-gray-500",
-      particles: ["🏆", "📈", "💼"],
-      metrics: { authority: "+425%", leads: "+298%", revenue: "+185%" },
+      description: "Build authority and generate leads for consulting, legal, financial, and other professional service firms.",
+      icon: <Building2 className="w-12 h-12 text-gray-600" />,
       features: [
-        "🎖️ AI-Powered Thought Leadership Engine",
-        "🎯 Intelligent Lead Scoring & Nurturing",
-        "📚 Industry Expertise Content Library",
-        "🤝 Client Success Story Automation",
-        "🎤 Speaking Engagement Opportunity Finder",
-        "📊 Professional Network Growth Analytics",
-        "🔍 Competitive Intelligence Dashboard",
-        "💡 Strategic Market Positioning Tools"
-      ],
-      liveDemo: true,
-      aiPowered: true,
-      premium: true
+        "Thought leadership content automation",
+        "Client testimonial showcase tools",
+        "Industry expertise demonstration",
+        "Lead qualification and nurturing",
+        "Professional network building",
+        "Speaking engagement promotion",
+        "Case study content creation",
+        "Industry trend commentary automation"
+      ]
     },
     {
       industry: "Technology & SaaS",
-      subtitle: "Developer-First Growth Engine",
-      description: "Cutting-edge developer-focused platform with automated technical content and community building.",
-      icon: <Cpu className="w-16 h-16" />,
-      gradientFrom: "from-violet-600",
-      gradientTo: "to-purple-400",
-      hoverColor: "hover:from-violet-700 hover:to-purple-500",
-      particles: ["🚀", "💻", "⚡"],
-      metrics: { adoption: "+445%", community: "50K+", deployments: "1M+" },
+      description: "Growth-focused features for technology companies, startups, and SaaS businesses looking to scale.",
+      icon: <Cpu className="w-12 h-12 text-purple-500" />,
       features: [
-        "👨‍💻 AI Code Documentation Generator",
-        "🎯 Developer Community Engagement Automation",
-        "📦 API Integration & Webhook Management",
-        "🔄 Automated Release Notes & Changelogs",
-        "🧪 Beta Testing Program Management",
-        "📊 Feature Adoption Analytics & Insights",
-        "🤖 Technical Support Chatbot Integration",
-        "🌐 Multi-Platform Developer Outreach"
-      ],
-      liveDemo: true,
-      aiPowered: true,
-      trending: true
+        "Product update announcement automation",
+        "Developer community engagement",
+        "Technical content optimization",
+        "User onboarding content sequences",
+        "Feature adoption tracking and promotion",
+        "Beta testing community management",
+        "Integration partner showcasing",
+        "Technical documentation promotion"
+      ]
     }
   ]
 
@@ -2180,273 +2144,93 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Revolutionary Industry Solutions - Apple-Inspired Premium Design */}
-      <section className="relative py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-slate-50 overflow-hidden">
-        {/* Premium Background Elements */}
-        <div className="absolute inset-0">
-          {/* Floating Industry Orbs */}
-          <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-5 animate-morph-premium-1" style={{
-            background: 'radial-gradient(circle, #6366f1, #8b5cf6, #a855f7)',
-            filter: 'blur(80px)',
-          }} />
-          <div className="absolute bottom-32 right-1/3 w-80 h-80 rounded-full opacity-8 animate-morph-premium-2" style={{
-            background: 'radial-gradient(circle, #06b6d4, #0891b2, #0e7490)',
-            filter: 'blur(60px)',
-          }} />
-          
-          {/* Neural Network Grid */}
-          <div className="absolute inset-0 opacity-[0.02]">
-            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <defs>
-                <pattern id="industry-grid" width="8" height="8" patternUnits="userSpaceOnUse">
-                  <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.3"/>
-                  <circle cx="4" cy="4" r="0.8" fill="currentColor" opacity="0.4" className="animate-slow-pulse"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#industry-grid)" className="text-indigo-600" />
-            </svg>
-          </div>
-
-          {/* Floating Elements */}
-          <div className="absolute top-1/4 right-1/4 w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full animate-float-premium opacity-40" />
-          <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-float-delayed-premium opacity-30" />
-          <div className="absolute top-1/2 left-1/5 w-4 h-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full animate-particles-float opacity-20" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto">
-          {/* Revolutionary Header with Apple-style Typography */}
-          <div className="text-center mb-24">
-            <div className="relative inline-flex items-center mb-8">
-              <div className="glass-premium rounded-full px-8 py-4 backdrop-blur-xl border border-white/30">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center animate-float-premium">
-                    <Target className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-gray-700 font-semibold tracking-wide">Industry-Specific Solutions</span>
-                </div>
-              </div>
-              
-              {/* Floating Industry Icons */}
-              <div className="absolute -top-6 -right-6 w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-delayed-premium shadow-xl">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <div className="absolute -bottom-4 -left-8 w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center animate-float-premium shadow-lg">
-                <Cpu className="w-5 h-5 text-white" />
-              </div>
+      {/* Industry Solutions Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full px-6 py-3 mb-8">
+              <Target className="w-5 h-5 text-indigo-600 mr-2" />
+              <span className="text-indigo-800 font-semibold">Industry-Specific Solutions</span>
             </div>
-            
-            <h2 className="text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
-              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
-                Tailored for Your
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">
-                Industry
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Tailored for Your Industry
               </span>
             </h2>
-            
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Specialized features and workflows designed for specific industries, ensuring compliance, 
-              optimization, and best practices for your business sector.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Specialized features and workflows designed for specific industries, ensuring compliance, optimization, and best practices for your business sector.
             </p>
           </div>
 
-          {/* Revolutionary Industry Cards - Apple Ecosystem Style */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {revolutionaryIndustrySolutions.map((solution, index) => (
-              <div 
-                key={index} 
-                className="group relative overflow-hidden industry-card-hover"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                {/* Optimized Card Container */}
-                <div className={`relative bg-gradient-to-br ${solution.gradientFrom} ${solution.gradientTo} ${solution.hoverColor} backdrop-blur-xl rounded-[2.5rem] border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:-translate-y-2 group-hover:scale-[1.01] overflow-hidden`}>
-                  
-                  {/* Simple Background Pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="w-full h-full bg-gradient-to-br from-white/20 to-transparent" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {industrySolutions.map((solution, index) => (
+              <div key={index} className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 group">
+                <div className="p-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300">
+                      {solution.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{solution.industry}</h3>
+                    </div>
                   </div>
-
-                  {/* Simplified Status Badges */}
-                  <div className="absolute top-6 right-6 flex flex-col gap-2">
-                    {solution.liveDemo && (
-                      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        ● LIVE DEMO
-                      </div>
-                    )}
-                    {solution.aiPowered && (
-                      <div className="bg-violet-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        AI-POWERED
-                      </div>
-                    )}
-                    {solution.trending && (
-                      <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        TRENDING
-                      </div>
-                    )}
-                    {solution.secure && (
-                      <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        SECURE
-                      </div>
-                    )}
-                    {solution.premium && (
-                      <div className="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        PREMIUM
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Simplified Visual Elements */}
+                  <p className="text-gray-600 mb-8 leading-relaxed text-lg">{solution.description}</p>
                   
-                  <div className="relative p-10 text-white">
-                    {/* Optimized Icon with Simple Effect */}
-                    <div className="flex items-start justify-between mb-8">
-                      <div className="relative">
-                        <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-lg border border-white/30 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl">
-                          <div className="w-16 h-16 rounded-xl bg-white/90 flex items-center justify-center">
-                            {React.cloneElement(solution.icon, { 
-                              className: "text-gray-800"
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Real-Time Metrics Dashboard */}
-                      <div className="flex flex-col gap-3">
-                        {Object.entries(solution.metrics).map(([key, value]) => (
-                          <div key={key} className="bg-white/30 backdrop-blur-sm rounded-2xl px-4 py-2 border border-white/40">
-                            <div className="flex justify-between items-center">
-                              <span className="text-white/90 text-sm font-medium capitalize">{key}</span>
-                              <span className="text-white font-bold text-lg">{value}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <Button
+                        onClick={() => toggleSection(`industry-${index}`)}
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 p-0"
+                      >
+                        {expandedSections[`industry-${index}`] ? (
+                          <>
+                            <ChevronUp className="w-4 h-4" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-4 h-4" />
+                            View All Features
+                          </>
+                        )}
+                      </Button>
                     </div>
                     
-                    {/* Revolutionary Content Header */}
-                    <div className="space-y-8">
-                      <div>
-                        <h3 className="text-4xl font-bold text-white mb-2 group-hover:scale-105 transition-transform duration-500">
-                          {solution.industry}
-                        </h3>
-                        <h4 className="text-xl font-semibold text-white/80 mb-4">
-                          {solution.subtitle}
-                        </h4>
-                        <p className="text-white/90 leading-relaxed text-lg font-medium">{solution.description}</p>
-                      </div>
-                      
-                      {/* Revolutionary AI-Powered Features Grid */}
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <Button
-                            onClick={() => toggleSection(`industry-${index}`)}
-                            variant="ghost"
-                            className="flex items-center gap-3 text-white/80 hover:text-white p-0 group/btn bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/20"
-                          >
-                            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover/btn:scale-110 transition-transform duration-300">
-                              {expandedSections[`industry-${index}`] ? (
-                                <ChevronUp className="w-4 h-4 text-white" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4 text-white" />
-                              )}
-                            </div>
-                            <span className="font-semibold">
-                              {expandedSections[`industry-${index}`] ? 'Hide Features' : 'Explore AI Features'}
-                            </span>
-                          </Button>
-                          
-                          <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                            <span className="text-white font-bold text-sm">{solution.features.length} AI Tools</span>
+                    <div className={`space-y-4 transition-all duration-500 overflow-hidden ${
+                      expandedSections[`industry-${index}`] ? 'max-h-none' : 'max-h-40'
+                    }`}>
+                      {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-start">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
                           </div>
+                          <span className="ml-4 text-gray-700 leading-relaxed">{feature}</span>
                         </div>
-                        
-                        <div className={`grid grid-cols-1 gap-4 transition-all duration-700 overflow-hidden ${
-                          expandedSections[`industry-${index}`] ? 'max-h-none opacity-100' : 'max-h-80 opacity-95'
-                        }`}>
-                          {solution.features.slice(0, expandedSections[`industry-${index}`] ? solution.features.length : 4).map((feature, idx) => (
-                            <div 
-                              key={idx} 
-                              className="group/feature bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 cursor-pointer"
-                              onMouseEnter={() => setSelectedFeature(index * 100 + idx)}
-                              onMouseLeave={() => setSelectedFeature(null)}
-                            >
-                              <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-white/90 flex items-center justify-center flex-shrink-0 group-hover/feature:scale-110 transition-transform duration-300 shadow-lg">
-                                  <Zap className="w-5 h-5 text-gray-800" />
-                                </div>
-                                <div className="flex-1">
-                                  <span className="text-white font-medium leading-relaxed block">
-                                    {feature}
-                                  </span>
-                                  {selectedFeature === index * 100 + idx && (
-                                    <div className="mt-2 text-white/70 text-sm animate-fade-in">
-                                      Advanced AI-powered automation with real-time optimization
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="opacity-0 group-hover/feature:opacity-100 transition-opacity duration-300">
-                                  <ArrowRight className="w-4 h-4 text-white" />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          
-                          {!expandedSections[`industry-${index}`] && solution.features.length > 4 && (
-                            <div className="text-center pt-2">
-                              <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30 hover:bg-white/30 transition-all duration-300 cursor-pointer">
-                                <span className="text-white font-medium">+{solution.features.length - 4} more AI tools</span>
-                                <Sparkles className="w-4 h-4 ml-2 text-white animate-pulse" />
-                              </div>
-                            </div>
-                          )}
+                      ))}
+                      {!expandedSections[`industry-${index}`] && solution.features.length > 3 && (
+                        <div className="text-center pt-2">
+                          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            +{solution.features.length - 3} more
+                          </span>
                         </div>
-                      </div>
-                      
-                      {/* Revolutionary Interactive CTA */}
-                      <div className="pt-8 space-y-4">
-                        <Button 
-                          onClick={() => handleNavigation('veegpt')}
-                          className="w-full bg-white/20 backdrop-blur-lg hover:bg-white/30 border border-white/40 hover:border-white/60 text-white font-bold py-6 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 group/cta animate-button-premium-glow"
-                        >
-                          <div className="flex items-center justify-center gap-4">
-                            <div className="w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center group-hover/cta:scale-110 transition-transform duration-300">
-                              <PlayCircle className="w-5 h-5 text-white" />
-                            </div>
-                            <span className="text-lg">Experience {solution.industry} AI</span>
-                            <div className="w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center group-hover/cta:translate-x-2 transition-transform duration-300">
-                              <ArrowRight className="w-5 h-5 text-white" />
-                            </div>
-                          </div>
-                        </Button>
-                        
-                        {/* Live Demo Badge */}
-                        <div className="flex items-center justify-center gap-2 text-white/80">
-                          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                          <span className="text-sm font-medium">Live demo available • No signup required</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <Button 
+                      variant="outline"
+                      className="border-2 border-violet-200 text-violet-700 hover:bg-violet-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+                    >
+                      Learn More About {solution.industry}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-          
-          {/* Bottom CTA Section */}
-          <div className="text-center mt-20">
-            <div className="glass-premium rounded-3xl px-8 py-6 backdrop-blur-xl border border-white/30 inline-flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 flex items-center justify-center animate-float-premium">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-left">
-                <h4 className="text-lg font-bold text-gray-900">Don't see your industry?</h4>
-                <p className="text-gray-600">Contact us for custom industry solutions</p>
-              </div>
-              <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                Contact Sales
-              </Button>
-            </div>
           </div>
         </div>
       </section>
