@@ -75,8 +75,8 @@ Always provide practical, actionable advice tailored to content creation and soc
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
           yield content;
-          // Increase delay to ensure visible streaming (500ms)
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Fast ChatGPT-like streaming speed
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
       }
     } catch (error) {
