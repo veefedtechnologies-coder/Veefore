@@ -632,7 +632,9 @@ export default function VeeGPT() {
 
   const handleQuickPrompt = (prompt: string) => {
     setInputText(prompt)
-    inputRef.current?.focus()
+    if (textareaRef.current) {
+      textareaRef.current.focus()
+    }
   }
 
   const startNewChat = () => {
@@ -674,155 +676,376 @@ export default function VeeGPT() {
 
 
   // Welcome screen layout (when no conversation is active)
+  // Show sidebar if conversations exist, hide only for first-time users or when no conversations
+  const shouldShowSidebar = conversations.length > 0
+  
   if (!hasSentFirstMessage) {
     return (
-      <div className="h-full w-full bg-gray-50 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-4xl">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-semibold text-gray-900 mb-3">
-              How can VeeGPT help?
-              <span className="ml-3 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded">
-                Beta
-              </span>
-            </h1>
-          </div>
-
-          {/* Main Input */}
-          <div 
-            className="owlygpt-chatbox bg-white rounded-2xl shadow-sm mb-8"
-            style={{
-              border: '1px solid #d1d5db',
-              borderRadius: '16px',
-              boxSizing: 'border-box'
-            }}
-          >
-            <textarea
-              ref={textareaRef}
-              value={inputText}
-              onChange={(e) => {
-                setInputText(e.target.value)
-                // Auto-resize textarea
-                const textarea = e.target as HTMLTextAreaElement
-                textarea.style.height = 'auto'
-                textarea.style.height = Math.max(48, textarea.scrollHeight) + 'px'
-              }}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask VeeGPT a question"
-              className="w-full px-5 py-3 text-gray-900 placeholder-gray-500 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 focus:border-0 outline-none overflow-hidden"
-              style={{ 
-                fontSize: '16px',
-                height: '48px',
-                lineHeight: '24px',
-                border: 'none',
-                boxShadow: 'none',
-                wordBreak: 'break-all',
-                overflowWrap: 'anywhere',
-                whiteSpace: 'pre-wrap'
-              }}
-              rows={1}
-            />
-            
-            {/* Input Controls */}
-            <div className="flex items-center justify-between px-5 pb-4">
-              <div className="flex items-center space-x-3">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+      <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
+        {/* Sidebar - show if conversations exist */}
+        {shouldShowSidebar && (
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
+            {/* Top Logo/Brand with Toggle */}
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-md flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  {!sidebarCollapsed && <span className="text-lg font-medium text-gray-900">VeeGPT</span>}
+                </div>
+                <button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <Mic className="w-4 h-4" />
-                </Button>
-                
-                <div className="flex items-center space-x-3">
-                  <button 
-                    className="flex items-center space-x-2 px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
-                    onClick={() => {/* Handle brand voice dropdown */}}
-                  >
-                    <span className="text-base font-semibold">Brand voice</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                  
-                  <button 
-                    className="flex items-center px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
-                  >
-                    <span className="text-base font-semibold">Image generation</span>
-                  </button>
+                  {sidebarCollapsed ? (
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                  ) : (
+                    <ChevronLeft className="w-4 h-4 text-gray-600" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Menu */}
+            <div className="px-3 pb-4 space-y-2">
+              <button
+                onClick={startNewChat}
+                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm bg-gray-100 text-gray-900 rounded-lg"
+                title={sidebarCollapsed ? "New chat" : ""}
+              >
+                <Edit className="w-4 h-4 flex-shrink-0" />
+                {!sidebarCollapsed && <span>New chat</span>}
+              </button>
+              
+              <button 
+                onClick={() => setShowSearchInput(!showSearchInput)}
+                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title={sidebarCollapsed ? "Search chats" : ""}
+              >
+                <Search className="w-4 h-4 flex-shrink-0" />
+                {!sidebarCollapsed && <span>Search chats</span>}
+              </button>
+            </div>
+
+            {/* Search Input */}
+            {showSearchInput && !sidebarCollapsed && (
+              <div className="px-3 pb-4">
+                <input
+                  type="text"
+                  placeholder="Search conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* Conversations Section */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-3">
+                {!sidebarCollapsed && (
+                  <div className="text-xs font-medium text-gray-500 mb-2 px-3">
+                    Recent Chats
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {filteredConversations.map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      className="relative"
+                      onMouseEnter={() => setHoveredChatId(conversation.id)}
+                      onMouseLeave={() => {
+                        setHoveredChatId(null)
+                        if (dropdownOpen === conversation.id) {
+                          setTimeout(() => setDropdownOpen(null), 200)
+                        }
+                      }}
+                    >
+                      <button
+                        onClick={() => selectConversation(conversation.id)}
+                        className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
+                          currentConversationId === conversation.id
+                            ? 'bg-gray-200 text-gray-900'
+                            : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            {renamingChatId === conversation.id ? (
+                              <input
+                                type="text"
+                                value={newChatTitle}
+                                onChange={(e) => setNewChatTitle(e.target.value)}
+                                onBlur={() => {
+                                  if (newChatTitle.trim()) {
+                                    renameChatMutation.mutate({
+                                      conversationId: conversation.id,
+                                      title: newChatTitle.trim()
+                                    })
+                                  }
+                                  setRenamingChatId(null)
+                                  setNewChatTitle('')
+                                }}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    if (newChatTitle.trim()) {
+                                      renameChatMutation.mutate({
+                                        conversationId: conversation.id,
+                                        title: newChatTitle.trim()
+                                      })
+                                    }
+                                    setRenamingChatId(null)
+                                    setNewChatTitle('')
+                                  }
+                                }}
+                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm"
+                                autoFocus
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              <div className="font-medium truncate">{conversation.title}</div>
+                            )}
+                            {!sidebarCollapsed && renamingChatId !== conversation.id && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                {new Date(conversation.lastMessageAt).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
+                          {(hoveredChatId === conversation.id || dropdownOpen === conversation.id) && !sidebarCollapsed && renamingChatId !== conversation.id && (
+                            <div className="relative ml-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
+                                }}
+                                className="p-1 hover:bg-gray-200 rounded"
+                              >
+                                <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                              </button>
+                              
+                              {dropdownOpen === conversation.id && (
+                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setRenamingChatId(conversation.id)
+                                      setNewChatTitle(conversation.title)
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                    <span>Rename</span>
+                                  </button>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      archiveConversationMutation.mutate(conversation.id)
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                                  >
+                                    <Archive className="w-4 h-4" />
+                                    <span>Archive</span>
+                                  </button>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                                        deleteConversationMutation.mutate(conversation.id)
+                                      }
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <Button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || createConversationMutation.isPending}
-                className={`p-2 rounded-lg transition-all duration-300 ${
-                  inputText.trim()
-                    ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                    : 'bg-gray-200 text-gray-400'
-                }`}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+            </div>
+
+            {/* Bottom User Section */}
+            <div className="p-3 border-t border-gray-200">
+              <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+                <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                {!sidebarCollapsed && (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">Arpit Choudhary</div>
+                      <div className="text-xs text-gray-500">Business Plan</div>
+                    </div>
+                    <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                  </>
+                )}
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Quick Prompts */}
-          <div className="space-y-3">
-            {/* First Row - 4 buttons */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              {quickPrompts.slice(0, 4).map((prompt, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleQuickPrompt(prompt.text)}
-                  className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
-                >
-                  <prompt.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-base font-semibold">
-                    {prompt.text}
-                  </span>
-                </button>
-              ))}
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4">
+          <div className="w-full max-w-4xl">
+            {/* Header */}
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-semibold text-gray-900 mb-3">
+                How can VeeGPT help?
+                <span className="ml-3 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded">
+                  Beta
+                </span>
+              </h1>
             </div>
+
+            {/* Main Input */}
+            <div 
+              className="owlygpt-chatbox bg-white rounded-2xl shadow-sm mb-8"
+              style={{
+                border: '1px solid #d1d5db',
+                borderRadius: '16px',
+                boxSizing: 'border-box'
+              }}
+            >
+              <textarea
+                ref={textareaRef}
+                value={inputText}
+                onChange={(e) => {
+                  setInputText(e.target.value)
+                  // Auto-resize textarea
+                  const textarea = e.target as HTMLTextAreaElement
+                  textarea.style.height = 'auto'
+                  textarea.style.height = Math.max(48, textarea.scrollHeight) + 'px'
+                }}
+                onKeyDown={handleKeyPress}
+                placeholder="Ask VeeGPT a question"
+                className="w-full px-5 py-3 text-gray-900 placeholder-gray-500 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 focus:border-0 outline-none overflow-hidden"
+                style={{ 
+                  fontSize: '16px',
+                  height: '48px',
+                  lineHeight: '24px',
+                  border: 'none',
+                  boxShadow: 'none',
+                  wordBreak: 'break-all',
+                  overflowWrap: 'anywhere',
+                  whiteSpace: 'pre-wrap'
+                }}
+                rows={1}
+              />
             
-            {/* Second Row - 3 buttons */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              {quickPrompts.slice(4, 7).map((prompt, index) => (
-                <button
-                  key={index + 4}
-                  onClick={() => handleQuickPrompt(prompt.text)}
-                  className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+              {/* Input Controls */}
+              <div className="flex items-center justify-between px-5 pb-4">
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                  >
+                    <Mic className="w-4 h-4" />
+                  </Button>
+                  
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      className="flex items-center space-x-2 px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
+                      onClick={() => {/* Handle brand voice dropdown */}}
+                    >
+                      <span className="text-base font-semibold">Brand voice</span>
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    
+                    <button 
+                      className="flex items-center px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
+                    >
+                      <span className="text-base font-semibold">Image generation</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!inputText.trim() || createConversationMutation.isPending}
+                  className={`p-2 rounded-lg transition-all duration-300 ${
+                    inputText.trim()
+                      ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                      : 'bg-gray-200 text-gray-400'
+                  }`}
                 >
-                  <prompt.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-base font-semibold">
-                    {prompt.text}
-                  </span>
-                </button>
-              ))}
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-            
-            {/* Third Row - 1 button */}
-            <div className="flex justify-center">
-              {quickPrompts[7] && (() => {
-                const IconComponent = quickPrompts[7].icon;
-                return (
+
+            {/* Quick Prompts */}
+            <div className="space-y-3">
+              {/* First Row - 4 buttons */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {quickPrompts.slice(0, 4).map((prompt, index) => (
                   <button
-                    onClick={() => handleQuickPrompt(quickPrompts[7].text)}
+                    key={index}
+                    onClick={() => handleQuickPrompt(prompt.text)}
                     className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
                   >
-                    <IconComponent className="w-4 h-4 flex-shrink-0" />
+                    <prompt.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-base font-semibold">
-                      {quickPrompts[7].text}
+                      {prompt.text}
                     </span>
                   </button>
-                );
-              })()}
+                ))}
+              </div>
+              
+              {/* Second Row - 3 buttons */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {quickPrompts.slice(4, 7).map((prompt, index) => (
+                  <button
+                    key={index + 4}
+                    onClick={() => handleQuickPrompt(prompt.text)}
+                    className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                  >
+                    <prompt.icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-base font-semibold">
+                      {prompt.text}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              
+              {/* Third Row - 1 button */}
+              <div className="flex justify-center">
+                {quickPrompts[7] && (() => {
+                  const IconComponent = quickPrompts[7].icon;
+                  return (
+                    <button
+                      onClick={() => handleQuickPrompt(quickPrompts[7].text)}
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                    >
+                      <IconComponent className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-base font-semibold">
+                        {quickPrompts[7].text}
+                      </span>
+                    </button>
+                  );
+                })()}
+              </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="text-center mt-10">
-            <p className="text-sm text-gray-500">
-              VeeGPT can make mistakes. Check important info.
-            </p>
+            {/* Footer */}
+            <div className="text-center mt-10">
+              <p className="text-sm text-gray-500">
+                VeeGPT can make mistakes. Check important info.
+              </p>
+            </div>
           </div>
         </div>
       </div>
