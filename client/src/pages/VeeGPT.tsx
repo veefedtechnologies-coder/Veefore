@@ -74,6 +74,8 @@ export default function VeeGPT() {
   // WebSocket for real-time streaming
   const wsRef = useRef<WebSocket | null>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
+  // Optimistic messages to show immediately while request is processing
+  const [optimisticMessages, setOptimisticMessages] = useState<ChatMessage[]>([])
   const inputRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -229,13 +231,18 @@ export default function VeeGPT() {
     enabled: !!currentConversationId
   })
 
-  // Add temporary streaming messages to the display
-  const displayMessages = [...messages]
+  // Combine real messages, optimistic messages, and streaming messages for display
+  let displayMessages = [...messages]
+  
+  // Add optimistic messages first (for new conversations)
+  if (optimisticMessages.length > 0 && !currentConversationId) {
+    displayMessages = [...optimisticMessages]
+  }
   
   // Add temporary streaming message if we have streaming content for a message not in the list
   Object.keys(streamingContent).forEach(messageId => {
     const numericMessageId = parseInt(messageId)
-    if (!messages.some(msg => msg.id === numericMessageId)) {
+    if (!displayMessages.some(msg => msg.id === numericMessageId)) {
       displayMessages.push({
         id: numericMessageId,
         conversationId: currentConversationId || 0,
@@ -276,6 +283,8 @@ export default function VeeGPT() {
       setHasSentFirstMessage(true)
     },
     onSuccess: (data) => {
+      // Clear optimistic messages since real conversation is now created
+      setOptimisticMessages([])
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.conversation.id, 'messages'] })
     },
@@ -284,6 +293,7 @@ export default function VeeGPT() {
       setHasSentFirstMessage(false)
       setCurrentConversationId(null)
       setIsGenerating(false)
+      setOptimisticMessages([])
       console.log('VeeGPT: REF SET TO FALSE in createConversation mutation error')
       isGeneratingRef.current = false
     }
@@ -625,7 +635,26 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
-    // Clear input immediately
+    // Immediately show optimistic UI updates to prevent blank page
+    if (!hasSentFirstMessage) {
+      // For new conversations, immediately transition to chat view
+      setHasSentFirstMessage(true)
+      
+      // Add optimistic user message to display immediately
+      const optimisticUserMessage = {
+        id: Date.now(), // Temporary ID
+        conversationId: 0, // Will be updated when real conversation is created
+        role: 'user' as const,
+        content: messageContent,
+        tokensUsed: 0,
+        createdAt: new Date()
+      }
+      
+      // Store optimistic message temporarily
+      setOptimisticMessages([optimisticUserMessage])
+    }
+    
+    // Clear input immediately after showing optimistic update
     setInputText('')
     
     // Clear contenteditable div if using it
@@ -639,7 +668,7 @@ export default function VeeGPT() {
     }
     
     try {
-      if (!hasSentFirstMessage || !currentConversationId) {
+      if (!currentConversationId) {
         // Create new conversation
         console.log('VeeGPT: Creating new conversation')
         await createConversationMutation.mutateAsync(messageContent)
@@ -661,6 +690,12 @@ export default function VeeGPT() {
       if (textareaRef.current) {
         textareaRef.current.value = messageContent
       }
+      
+      // Revert optimistic updates on error
+      if (!currentConversationId) {
+        setHasSentFirstMessage(false)
+        setOptimisticMessages([])
+      }
     }
   }
 
@@ -673,14 +708,16 @@ export default function VeeGPT() {
     setShowSearchInput(false)
     setRenamingChatId(null)
     setNewChatTitle('')
-    // Clear streaming content when starting new chat
+    // Clear streaming content and optimistic messages when starting new chat
     setStreamingContent({})
+    setOptimisticMessages([])
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
-    // Clear streaming content when switching conversations
+    // Clear streaming content and optimistic messages when switching conversations
     setStreamingContent({})
+    setOptimisticMessages([])
   }
 
   // Auto-scroll to bottom when new messages arrive
