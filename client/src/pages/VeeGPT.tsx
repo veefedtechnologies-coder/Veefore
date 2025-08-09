@@ -24,7 +24,8 @@ import {
   BarChart3,
   Share,
   Archive,
-  Trash2
+  Trash2,
+  Square
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -189,6 +190,22 @@ export default function VeeGPT() {
     }
   })
 
+  // Stop generation mutation
+  const stopGenerationMutation = useMutation({
+    mutationFn: async (conversationId: number) => {
+      const response = await apiRequest(`/api/chat/conversations/${conversationId}/stop`, {
+        method: 'POST'
+      })
+      return response
+    },
+    onSuccess: () => {
+      // Refresh messages to get the truncated response
+      if (currentConversationId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] })
+      }
+    }
+  })
+
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async ({ conversationId, content }: { conversationId: number, content: string }) => {
@@ -264,6 +281,17 @@ export default function VeeGPT() {
       setInputText(content)
       if (inputRef.current) {
         inputRef.current.innerText = content
+      }
+    }
+  }
+
+  const handleStopGeneration = async () => {
+    if (currentConversationId) {
+      console.log('VeeGPT: Stopping generation for conversation:', currentConversationId)
+      try {
+        await stopGenerationMutation.mutateAsync(currentConversationId)
+      } catch (error) {
+        console.error('VeeGPT: Error stopping generation:', error)
       }
     }
   }
@@ -928,36 +956,47 @@ export default function VeeGPT() {
                 />
               </div>
               
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || createConversationMutation.isPending || sendMessageMutation.isPending}
-                style={{
-                  background: 'transparent',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  padding: '4px',
-                  cursor: inputText.trim() ? 'pointer' : 'not-allowed',
-                  color: inputText.trim() && !createConversationMutation.isPending && !sendMessageMutation.isPending ? '#1f2937' : '#9ca3af',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: '2px'
-                }}
-              >
-                {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
-                  <div style={{ 
-                    width: '20px', 
-                    height: '20px', 
-                    border: '2px solid #9ca3af', 
-                    borderTop: '2px solid transparent', 
-                    borderRadius: '50%', 
-                    animation: 'spin 1s linear infinite' 
-                  }} />
-                ) : (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending) ? (
+                <button
+                  onClick={handleStopGeneration}
+                  style={{
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '2px'
+                  }}
+                  title="Stop generation"
+                >
+                  <Square style={{ width: '18px', height: '18px' }} />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputText.trim()}
+                  style={{
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    padding: '4px',
+                    cursor: inputText.trim() ? 'pointer' : 'not-allowed',
+                    color: inputText.trim() ? '#1f2937' : '#9ca3af',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '2px'
+                  }}
+                >
                   <Send style={{ width: '20px', height: '20px' }} />
-                )}
-              </button>
+                </button>
+              )}
 
               <button style={{
                 background: 'transparent',

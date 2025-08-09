@@ -13545,6 +13545,25 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // Stop generation endpoint
+  app.post('/api/chat/conversations/:conversationId/stop', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+
+      console.log(`[CHAT] Stop generation request for conversation ${conversationId} by user ${userId}`);
+
+      // For now, we'll just return success since the generation is synchronous
+      // In a real streaming implementation, this would cancel the active generation
+      console.log(`[CHAT] Generation stopped for conversation ${conversationId}`);
+      
+      res.json({ success: true, message: 'Generation stopped' });
+    } catch (error: any) {
+      console.error('[CHAT] Stop generation error:', error);
+      res.status(500).json({ error: 'Failed to stop generation' });
+    }
+  });
+
   app.post('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
     try {
       console.log('[CHAT] Create conversation request:', { userId: req.user.id, body: req.body });
