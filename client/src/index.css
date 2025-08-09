@@ -1465,3 +1465,189 @@ body {
 .animate-slow-pulse {
   animation: slow-pulse 4s ease-in-out infinite;
 }
+
+/* Revolutionary Industry Solutions - Apple-Inspired Animations */
+
+/* 3D hover shadows for cards */
+.shadow-3xl {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 20px 40px -8px rgba(99, 102, 241, 0.1),
+    0 10px 20px -4px rgba(139, 92, 246, 0.08);
+}
+
+/* Advanced morphing animations for industry cards */
+@keyframes morph-industry-card {
+  0%, 100% {
+    border-radius: 2.5rem;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    border-radius: 2.8rem 2.2rem 2.5rem 2.5rem;
+    transform: scale(1.01) rotate(0.5deg);
+  }
+  50% {
+    border-radius: 2.3rem 2.7rem 2.4rem 2.6rem;
+    transform: scale(1.02) rotate(-0.3deg);
+  }
+  75% {
+    border-radius: 2.6rem 2.4rem 2.7rem 2.3rem;
+    transform: scale(1.01) rotate(0.2deg);
+  }
+}
+
+/* Industry-specific gradient animations */
+@keyframes industry-gradient-1 {
+  0%, 100% { 
+    background: radial-gradient(circle at 20% 80%, #3b82f6 0%, #1d4ed8 50%, transparent 100%);
+  }
+  33% { 
+    background: radial-gradient(circle at 60% 20%, #2563eb 0%, #1e40af 50%, transparent 100%);
+  }
+  66% { 
+    background: radial-gradient(circle at 80% 60%, #1d4ed8 0%, #1e3a8a 50%, transparent 100%);
+  }
+}
+
+@keyframes industry-gradient-2 {
+  0%, 100% { 
+    background: radial-gradient(circle at 80% 20%, #ef4444 0%, #dc2626 50%, transparent 100%);
+  }
+  33% { 
+    background: radial-gradient(circle at 20% 80%, #f87171 0%, #ef4444 50%, transparent 100%);
+  }
+  66% { 
+    background: radial-gradient(circle at 60% 40%, #dc2626 0%, #b91c1c 50%, transparent 100%);
+  }
+}
+
+@keyframes industry-gradient-3 {
+  0%, 100% { 
+    background: radial-gradient(circle at 40% 60%, #6b7280 0%, #4b5563 50%, transparent 100%);
+  }
+  33% { 
+    background: radial-gradient(circle at 80% 30%, #9ca3af 0%, #6b7280 50%, transparent 100%);
+  }
+  66% { 
+    background: radial-gradient(circle at 30% 70%, #4b5563 0%, #374151 50%, transparent 100%);
+  }
+}
+
+@keyframes industry-gradient-4 {
+  0%, 100% { 
+    background: radial-gradient(circle at 70% 30%, #8b5cf6 0%, #7c3aed 50%, transparent 100%);
+  }
+  33% { 
+    background: radial-gradient(circle at 30% 70%, #a855f7 0%, #8b5cf6 50%, transparent 100%);
+  }
+  66% { 
+    background: radial-gradient(circle at 60% 80%, #7c3aed 0%, #6d28d9 50%, transparent 100%);
+  }
+}
+
+/* Floating icon animations with Apple-style physics */
+@keyframes icon-float-industry {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-12px) translateX(4px) scale(1.05) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-20px) translateX(-2px) scale(1.08) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(-15px) translateX(6px) scale(1.06) rotate(3deg);
+  }
+}
+
+/* Particle system for industry cards */
+@keyframes industry-particles {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(0.8) rotate(0deg);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translateY(-30px) translateX(20px) scale(1.2) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-60px) translateX(-10px) scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-40px) translateX(30px) scale(1.3) rotate(270deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80px) translateX(0px) scale(0.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Interactive hover effects for industry features */
+@keyframes feature-highlight {
+  0%, 100% {
+    background: linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%);
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Advanced button hover effects */
+@keyframes button-premium-glow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(99, 102, 241, 0.3),
+      0 0 0 0 rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 8px 40px rgba(99, 102, 241, 0.4),
+      0 0 0 8px rgba(99, 102, 241, 0.1);
+  }
+}
+
+/* Apply new animations to industry section elements */
+.animate-industry-card-morph {
+  animation: morph-industry-card 20s ease-in-out infinite;
+}
+
+.animate-icon-float-industry {
+  animation: icon-float-industry 8s ease-in-out infinite;
+}
+
+.animate-industry-particles {
+  animation: industry-particles 15s linear infinite;
+}
+
+.animate-feature-highlight {
+  animation: feature-highlight 2s ease-in-out;
+}
+
+.animate-button-premium-glow {
+  animation: button-premium-glow 3s ease-in-out infinite;
+}
+
+/* Custom utility classes for industry solutions */
+.industry-card-hover:hover .animate-morph-premium-1 {
+  animation-play-state: paused;
+}
+
+.industry-card-hover:hover .animate-float-premium {
+  animation-duration: 3s;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  .shadow-3xl {
+    box-shadow: 
+      0 15px 30px -8px rgba(0, 0, 0, 0.2),
+      0 10px 20px -4px rgba(99, 102, 241, 0.08);
+  }
+}
