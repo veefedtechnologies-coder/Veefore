@@ -2443,7 +2443,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             {/* Advanced AI Models Card */}
             <div className="group relative">
               {/* Card Background with Glass Morphism */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-purple-50/30 to-violet-50/50 rounded-3xl backdrop-blur-xl border border-purple-200/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" />
               
               {/* Floating Particles */}
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
@@ -2483,7 +2483,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             {/* Cloud Infrastructure Card */}
             <div className="group relative">
               {/* Card Background with Glass Morphism */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '5s'}} />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-blue-50/30 to-cyan-50/50 rounded-3xl backdrop-blur-xl border border-blue-200/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '5s'}} />
               
               {/* Floating Particles */}
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
@@ -2523,7 +2523,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             {/* Security & Privacy Card */}
             <div className="group relative">
               {/* Card Background with Glass Morphism */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 rounded-3xl backdrop-blur-xl border border-white/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '10s'}} />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-green-50/30 to-emerald-50/50 rounded-3xl backdrop-blur-xl border border-green-200/30 shadow-2xl transform transition-all duration-700 group-hover:scale-105 group-hover:shadow-3xl animate-industry-card-morph" style={{animationDelay: '10s'}} />
               
               {/* Floating Particles */}
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
