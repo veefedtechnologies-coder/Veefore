@@ -658,154 +658,218 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </nav>
 
-      {/* Hero Section - Apple-inspired Design */}
+      {/* Revolutionary Hero Section - World-Class Premium Design */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden">
-        {/* Hero Background Effects */}
+        {/* Revolutionary Background System */}
         <div className="absolute inset-0">
-          {/* Large gradient orbs */}
-          <div 
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl animate-morph-1"
-          />
-          <div 
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl animate-morph-2"
-          />
-          <div 
-            className="absolute top-1/2 left-1/2 w-80 h-80 bg-emerald-600/6 rounded-full blur-3xl animate-morph-3 transform -translate-x-1/2 -translate-y-1/2"
-          />
+          {/* Dynamic Neural Network Grid */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <svg className="w-full h-full" viewBox="0 0 1000 1000">
+              <defs>
+                <pattern id="neural-grid" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+                  <circle cx="25" cy="25" r="1" fill="currentColor" className="text-violet-600">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="6s" repeatCount="indefinite" />
+                  </circle>
+                  <line x1="25" y1="25" x2="75" y2="25" stroke="currentColor" strokeWidth="0.5" className="text-blue-600" opacity="0.2">
+                    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="8s" repeatCount="indefinite" />
+                  </line>
+                  <line x1="25" y1="25" x2="25" y2="75" stroke="currentColor" strokeWidth="0.5" className="text-emerald-600" opacity="0.2">
+                    <animate attributeName="opacity" values="0.1;0.5;0.1" dur="7s" repeatCount="indefinite" begin="2s" />
+                  </line>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#neural-grid)" />
+            </svg>
+          </div>
+
+          {/* Advanced Morphing Gradient Orbs */}
+          <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-gradient-to-br from-violet-600/10 via-purple-600/8 to-blue-600/6 rounded-full blur-3xl animate-morph-1" />
+          <div className="absolute bottom-20 right-20 w-[600px] h-[600px] bg-gradient-to-br from-blue-600/8 via-cyan-600/10 to-emerald-600/6 rounded-full blur-3xl animate-morph-2" />
+          <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-emerald-600/6 via-teal-600/8 to-cyan-600/5 rounded-full blur-3xl animate-morph-3 transform -translate-x-1/2 -translate-y-1/2" />
+          
+          {/* Premium Light Rays */}
+          <div className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-violet-600/20 via-transparent to-transparent transform -translate-x-1/2" />
+          <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-600/10 to-transparent transform -translate-y-1/2" />
+          
+          {/* Floating Geometric Elements */}
+          <div className="absolute top-32 left-1/4 w-24 h-24 border border-violet-300/20 rounded-2xl rotate-45 animate-slow-float" />
+          <div className="absolute bottom-40 right-1/3 w-16 h-16 border border-blue-300/20 rounded-full animate-slow-pulse" />
+          <div className="absolute top-2/3 left-1/6 w-20 h-20 border border-emerald-300/20 rounded-xl rotate-12 animate-slow-float" style={{ animationDelay: '3s' }} />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto text-center">
-          {/* Premium Badge */}
-          <div className="inline-flex items-center mb-8 group">
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
+          {/* Ultra-Premium Status Badge */}
+          <div className="inline-flex items-center mb-12 group cursor-pointer">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-full blur" />
-              <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-lg">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-gray-700 font-medium text-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-blue-600/20 rounded-full blur-xl animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-full blur-2xl" />
+              <div className="relative bg-white/80 backdrop-blur-3xl border border-gray-200/60 rounded-full px-10 py-5 flex items-center space-x-4 shadow-2xl group-hover:shadow-violet-500/20 transition-all duration-700">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-3 h-3 bg-green-500 rounded-full animate-ping opacity-20" />
+                </div>
+                <span className="text-gray-800 font-semibold text-base tracking-wide">
                   Now Available • Revolutionary AI Platform
                 </span>
-                <ArrowRight className="w-4 h-4 text-gray-600 group-hover:translate-x-1 transition-transform" />
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center">
+                  <ArrowRight className="w-3 h-3 text-white group-hover:translate-x-0.5 transition-transform duration-300" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Hero Headline - Typography Excellence */}
-          <div className="space-y-6 mb-12">
-            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black tracking-tight leading-none">
-              <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                The Future of
-              </span>
-              <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                Social Media
-              </span>
-              <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                is Here
-              </span>
-            </h1>
+          {/* World-Class Typography System */}
+          <div className="space-y-8 mb-16">
+            <div className="relative">
+              {/* Text Background Glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/5 via-blue-600/5 to-emerald-600/5 blur-3xl scale-110" />
+              
+              <h1 className="relative text-6xl sm:text-7xl lg:text-9xl xl:text-[10rem] font-black tracking-[-0.02em] leading-[0.85]">
+                <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-4">
+                  The Future of
+                </span>
+                <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] mb-4">
+                  Social Media
+                </span>
+                <span className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                  is Here
+                </span>
+              </h1>
+              
+              {/* Subtitle with Premium Styling */}
+              <div className="mt-12 max-w-5xl mx-auto">
+                <p className="text-2xl lg:text-3xl text-gray-600 leading-relaxed font-light tracking-wide">
+                  Experience the next generation of 
+                  <span className="relative mx-2">
+                    <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent font-semibold">
+                      AI-powered social media management.
+                    </span>
+                    <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-violet-600 to-blue-600 opacity-30" />
+                  </span>
+                  From intelligent chat assistance to professional video generation, VeeFore transforms how you create, manage, and grow your digital presence.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto mb-16 leading-relaxed font-light">
-            Experience the next generation of AI-powered social media management. From intelligent chat assistance to professional video generation, 
-            <span className="text-gray-900 font-semibold"> VeeFore transforms how you create, manage, and grow your digital presence.</span>
-          </p>
-
-          {/* CTA Buttons - Premium Design */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
+          {/* Premium CTA System */}
+          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
             <Button 
               onClick={() => handleNavigation('veegpt')}
-              className="group relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-12 py-5 text-lg font-semibold rounded-2xl shadow-2xl hover:shadow-violet-500/25 transition-all duration-500 transform hover:-translate-y-1 hover:scale-105"
+              className="group relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 hover:from-violet-500 hover:via-purple-500 hover:to-blue-500 text-white px-16 py-6 text-xl font-bold rounded-3xl shadow-2xl hover:shadow-violet-500/30 transition-all duration-700 transform hover:-translate-y-2 hover:scale-105 border border-white/10"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative flex items-center space-x-3">
-                <Bot className="w-6 h-6" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              <div className="relative flex items-center space-x-4">
+                <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Bot className="w-5 h-5" />
+                </div>
                 <span>Experience VeeGPT</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
               </div>
             </Button>
             
             <Button 
               variant="outline"
-              className="group border-2 border-gray-200 bg-white/70 backdrop-blur-xl text-gray-700 hover:bg-white hover:border-gray-300 px-12 py-5 text-lg font-semibold rounded-2xl transition-all duration-500 shadow-lg"
+              className="group border-2 border-gray-300 bg-white/80 backdrop-blur-3xl text-gray-800 hover:bg-white hover:border-gray-400 px-16 py-6 text-xl font-bold rounded-3xl transition-all duration-700 shadow-xl hover:shadow-2xl"
             >
-              <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                  <Play className="w-3 h-3 fill-gray-600" />
+              <div className="flex items-center space-x-4">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                  <Play className="w-4 h-4 fill-gray-700 ml-0.5" />
                 </div>
                 <span>Watch Demo</span>
               </div>
             </Button>
           </div>
 
-          {/* Interactive Platform Preview */}
-          <div className="relative max-w-7xl mx-auto perspective-1000">
-            {/* Floating feature cards */}
-            <div className="relative">
-              {/* Main preview window */}
-              <div 
-                className="relative mx-auto"
-              >
-                <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-                  {/* Browser-style header */}
-                  <div className="bg-gradient-to-r from-gray-900 to-black px-6 py-4 border-b border-white/10">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex space-x-2">
-                          <div className="w-3 h-3 bg-red-500 rounded-full" />
-                          <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-                          <div className="w-3 h-3 bg-green-500 rounded-full" />
-                        </div>
-                        <div className="text-white/70 text-sm font-medium">VeeFore AI Platform</div>
+          {/* Revolutionary 3D Platform Preview */}
+          <div className="relative max-w-8xl mx-auto perspective-1000">
+            <div className="relative transform rotate-x-12 hover:rotate-x-6 transition-transform duration-1000">
+              {/* Premium Device Frame */}
+              <div className="relative bg-gradient-to-b from-gray-900 via-black to-gray-900 rounded-[3rem] p-3 shadow-2xl">
+                {/* Screen Reflection */}
+                <div className="absolute inset-3 bg-gradient-to-br from-white/10 via-transparent to-white/5 rounded-[2.5rem] pointer-events-none" />
+                
+                {/* Device Header */}
+                <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-8 py-6 rounded-t-[2.5rem] border-b border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex space-x-2">
+                        <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg" />
+                        <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-lg" />
+                        <div className="w-4 h-4 bg-green-500 rounded-full shadow-lg" />
                       </div>
-                      <div className="text-white/50 text-xs">✨ Live Preview</div>
+                      <div className="text-white/80 text-lg font-semibold">VeeFore AI Platform</div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-white/60 text-sm">Live Preview</span>
                     </div>
                   </div>
-                  
-                  {/* Platform content */}
-                  <div className="p-8">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                      {platformFeatures.slice(0, 4).map((feature, index) => (
-                        <div 
-                          key={feature.id}
-                          className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-500 cursor-pointer animate-slow-float"
-                          style={{
-                            animationDelay: `${index * 2}s`
-                          }}
-                        >
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                            {feature.icon}
+                </div>
+                
+                {/* Platform Interface */}
+                <div className="bg-gradient-to-br from-gray-50 to-white p-12 rounded-b-[2.5rem] min-h-[500px]">
+                  {/* Feature Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    {platformFeatures.slice(0, 4).map((feature, index) => (
+                      <div 
+                        key={feature.id}
+                        className="group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-700 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
+                        style={{
+                          animationDelay: `${index * 200}ms`
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        <div className="relative">
+                          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
+                            <div className="text-white text-xl">
+                              {feature.icon}
+                            </div>
                           </div>
-                          <h3 className="text-white font-semibold mb-2 text-sm">{feature.title.split(' ')[0]}</h3>
-                          <p className="text-gray-400 text-xs leading-relaxed">{feature.subtitle}</p>
-                          <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          
+                          <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title.split(' ')[0]}</h3>
+                          <p className="text-gray-600 text-sm leading-relaxed">{feature.subtitle}</p>
+                          
+                          <div className="mt-6 flex items-center text-gray-500 text-xs group-hover:text-gray-700 transition-colors">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+                            Ready to use
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                        
+                        <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Floating feature indicators */}
-              <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-                <div className="bg-black/60 backdrop-blur-xl border border-white/20 rounded-2xl px-8 py-4">
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${platformFeatures[activeFeature].color} flex items-center justify-center text-white shadow-lg`}>
+              {/* Floating Status Indicator */}
+              <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
+                <div className="bg-black/80 backdrop-blur-3xl border border-white/20 rounded-3xl px-10 py-6 shadow-2xl">
+                  <div className="flex items-center space-x-6">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${platformFeatures[activeFeature].color} flex items-center justify-center text-white shadow-xl`}>
                       {platformFeatures[activeFeature].icon}
                     </div>
                     <div>
-                      <div className="text-white font-bold text-sm">{platformFeatures[activeFeature].title}</div>
-                      <div className="text-gray-400 text-xs">{platformFeatures[activeFeature].subtitle}</div>
+                      <div className="text-white font-bold text-lg">{platformFeatures[activeFeature].title}</div>
+                      <div className="text-gray-400 text-sm">{platformFeatures[activeFeature].subtitle}</div>
                     </div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse" />
+          {/* Premium Scroll Indicator */}
+          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+            <div className="flex flex-col items-center space-y-4 animate-bounce">
+              <div className="text-gray-500 text-sm font-medium">Explore More</div>
+              <div className="w-8 h-12 border-2 border-gray-300 rounded-full flex justify-center">
+                <div className="w-1.5 h-4 bg-gradient-to-b from-violet-600 to-blue-600 rounded-full mt-2 animate-pulse" />
+              </div>
             </div>
           </div>
         </div>

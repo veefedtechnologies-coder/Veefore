@@ -258,13 +258,28 @@ div[contenteditable="true"].transparent-input {
   animation: morph-3 30s ease-in-out infinite;
 }
 
-/* Gradient animation */
+/* Advanced Gradient Animations */
 @keyframes gradient-shift {
   0%, 100% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes premium-gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
   }
 }
 
@@ -275,7 +290,53 @@ div[contenteditable="true"].transparent-input {
 
 .animate-gradient {
   background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
+  animation: premium-gradient 4s ease infinite;
+}
+
+.animate-premium-gradient {
+  background-size: 400% 400%;
+  animation: premium-gradient 6s ease infinite;
+}
+
+/* 3D Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-x-12 {
+  transform: rotateX(12deg);
+}
+
+.rotate-x-6 {
+  transform: rotateX(6deg);
+}
+
+/* Premium Animation Enhancements */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Advanced Background Animations */
+@keyframes neural-pulse {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-neural-pulse {
+  animation: neural-pulse 4s ease-in-out infinite;
 }
 
 /* Typing animation */
