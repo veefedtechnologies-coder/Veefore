@@ -234,11 +234,18 @@ export default function VeeGPT() {
   // Combine real messages, optimistic messages, and streaming messages for display
   let displayMessages = [...messages]
   
-  // Add optimistic messages first (for new conversations)
-  if (optimisticMessages.length > 0 && !currentConversationId) {
+  // Add optimistic messages if we have them and either no conversation ID or no real messages yet
+  if (optimisticMessages.length > 0 && (!currentConversationId || messages.length === 0)) {
     displayMessages = [...optimisticMessages]
   }
   
+  // Clear optimistic messages when real messages have loaded (prevents flashing)
+  useEffect(() => {
+    if (currentConversationId && messages.length > 0 && optimisticMessages.length > 0) {
+      setOptimisticMessages([])
+    }
+  }, [currentConversationId, messages.length, optimisticMessages.length])
+
   // Add temporary streaming message if we have streaming content for a message not in the list
   Object.keys(streamingContent).forEach(messageId => {
     const numericMessageId = parseInt(messageId)
@@ -294,8 +301,7 @@ export default function VeeGPT() {
       setHasSentFirstMessage(true)
     },
     onSuccess: (data) => {
-      // Clear optimistic messages since real conversation is now created
-      setOptimisticMessages([])
+      // Don't clear optimistic messages immediately - let them show until real messages load
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.conversation.id, 'messages'] })
     },
