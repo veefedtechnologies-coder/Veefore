@@ -23,11 +23,20 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
 
   // Add auth token if user is authenticated
   if (user) {
-    const token = await user.getIdToken()
-    headers = {
-      ...headers,
-      'Authorization': `Bearer ${token}`,
+    try {
+      const token = await user.getIdToken()
+      headers = {
+        ...headers,
+        'Authorization': `Bearer ${token}`,
+      }
+      console.log('API Request with auth token to:', url)
+    } catch (error) {
+      console.error('Failed to get Firebase auth token:', error)
+      throw new Error('Authentication failed - please refresh the page')
     }
+  } else {
+    console.error('No authenticated user found for API request:', url)
+    throw new Error('Please sign in to continue')
   }
 
   const response = await fetch(url, {
@@ -37,6 +46,7 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorData = await response.text()
+    console.error('API Error:', response.status, response.statusText, errorData)
     throw new Error(`${response.status}: ${response.statusText} - ${errorData}`)
   }
 

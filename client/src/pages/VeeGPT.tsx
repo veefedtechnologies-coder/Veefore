@@ -96,17 +96,26 @@ export default function VeeGPT() {
     if (!inputText.trim()) return
     
     const content = inputText.trim()
+    console.log('VeeGPT: Sending message:', content)
     setInputText('')
     
-    if (!hasSentFirstMessage || !currentConversationId) {
-      // Create new conversation
-      await createConversationMutation.mutateAsync(content)
-    } else {
-      // Send message to existing conversation
-      await sendMessageMutation.mutateAsync({ 
-        conversationId: currentConversationId, 
-        content 
-      })
+    try {
+      if (!hasSentFirstMessage || !currentConversationId) {
+        // Create new conversation
+        console.log('VeeGPT: Creating new conversation')
+        await createConversationMutation.mutateAsync(content)
+      } else {
+        // Send message to existing conversation
+        console.log('VeeGPT: Sending to existing conversation:', currentConversationId)
+        await sendMessageMutation.mutateAsync({ 
+          conversationId: currentConversationId, 
+          content 
+        })
+      }
+    } catch (error) {
+      console.error('VeeGPT: Error sending message:', error)
+      // Restore input text if there was an error
+      setInputText(content)
     }
   }
 

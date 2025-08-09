@@ -355,6 +355,23 @@ const AutomationRuleSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// VeeGPT Chat schemas  
+const ChatConversationSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  userId: { type: String, required: true },
+  title: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const ChatMessageSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  conversationId: { type: String, required: true },
+  content: { type: String, required: true },
+  role: { type: String, required: true, enum: ['user', 'assistant'] },
+  createdAt: { type: Date, default: Date.now }
+});
+
 // Admin schemas
 const AdminSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -560,6 +577,10 @@ const CreativeBriefModel = mongoose.model('CreativeBrief', CreativeBriefSchema);
 const ContentRepurposeModel = mongoose.model('ContentRepurpose', ContentRepurposeSchema);
 const CompetitorAnalysisModel = mongoose.model('CompetitorAnalysis', CompetitorAnalysisSchema);
 const DmTemplateModel = mongoose.model('DmTemplate', DmTemplateSchema, 'dm_templates');
+
+// VeeGPT Chat Models
+const ChatConversationModel = mongoose.model('ChatConversation', ChatConversationSchema);
+const ChatMessageModel = mongoose.model('ChatMessage', ChatMessageSchema);
 
 export class MongoStorage implements IStorage {
   private isConnected = false;
@@ -4506,6 +4527,66 @@ export class MongoStorage implements IStorage {
     await this.connect();
     const result = await ContentModel.deleteMany({});
     return result.deletedCount || 0;
+  }
+
+  // VeeGPT Chat Methods
+  async getChatConversations(userId: string): Promise<ChatConversation[]> {
+    await this.connect();
+    const conversations = await ChatConversationModel.find({ userId })
+      .sort({ updatedAt: -1 });
+    return conversations.map(doc => ({
+      id: doc.id,
+      userId: doc.userId,
+      title: doc.title,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt
+    }));
+  }
+
+  async createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation> {
+    await this.connect();
+    const doc = new ChatConversationModel({
+      ...conversation,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    const saved = await doc.save();
+    return {
+      id: saved.id,
+      userId: saved.userId,
+      title: saved.title,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt
+    };
+  }
+
+  async getChatMessages(conversationId: string): Promise<ChatMessage[]> {
+    await this.connect();
+    const messages = await ChatMessageModel.find({ conversationId })
+      .sort({ createdAt: 1 });
+    return messages.map(doc => ({
+      id: doc.id,
+      conversationId: doc.conversationId,
+      content: doc.content,
+      role: doc.role,
+      createdAt: doc.createdAt
+    }));
+  }
+
+  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    await this.connect();
+    const doc = new ChatMessageModel({
+      ...message,
+      createdAt: new Date()
+    });
+    const saved = await doc.save();
+    return {
+      id: saved.id,
+      conversationId: saved.conversationId,
+      content: saved.content,
+      role: saved.role,
+      createdAt: saved.createdAt
+    };
   }
 }
 
