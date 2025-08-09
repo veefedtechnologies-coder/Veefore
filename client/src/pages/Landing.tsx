@@ -1489,7 +1489,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       {/* Floating Action Cards with Real Interface Preview */}
                       <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
                         <img 
-                          src="/attached_assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png"
+                          src={VeeGPTInterface}
                           alt="VeeGPT Preview"
                           className="w-full h-full object-cover opacity-80"
                         />
@@ -1714,7 +1714,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     <div className="relative">
                       <div className="w-32 h-20 rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-lg">
                         <img 
-                          src="/attached_assets/generated_images/Content_Studio_Interface_840b3ab8.png"
+                          src={ContentStudioInterface}
                           alt="Content Studio Interface"
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                         />
