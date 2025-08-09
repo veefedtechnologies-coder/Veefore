@@ -412,7 +412,7 @@ export default function VeeGPT() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white">
+        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8">
             {messages.map((message) => (
               <div
@@ -471,31 +471,34 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* ChatGPT-style pill-shaped transparent input container */}
+        {/* Truly floating transparent input - fixed position */}
         <div style={{ 
-          padding: '24px', 
-          background: 'transparent',
-          backgroundColor: 'transparent'
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: '48rem',
+          padding: '0 24px',
+          pointerEvents: 'none',
+          zIndex: 1000
         }}>
-          <div style={{ 
-            maxWidth: '48rem', 
-            margin: '0 auto'
+          {/* Pill-shaped transparent container */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 16px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '25px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.2s ease',
+            pointerEvents: 'auto'
           }}>
-            {/* Pill-shaped transparent container */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 16px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '25px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease'
-            }}>
               <button style={{
                 background: 'transparent',
                 backgroundColor: 'transparent',
@@ -599,22 +602,25 @@ export default function VeeGPT() {
                 }} />
               </button>
             </div>
-          </div>
-          
+        </div>
+        
+        {/* Footer text positioned above the floating input */}
+        <div style={{ 
+          position: 'fixed',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          textAlign: 'center',
+          pointerEvents: 'none',
+          zIndex: 999
+        }}>
           <div style={{ 
-            textAlign: 'center', 
-            marginTop: '16px',
+            fontSize: '12px', 
+            color: '#9ca3af',
             background: 'none',
             backgroundColor: 'transparent'
           }}>
-            <div style={{ 
-              fontSize: '12px', 
-              color: '#9ca3af',
-              background: 'none',
-              backgroundColor: 'transparent'
-            }}>
-              VeeGPT can make mistakes. Check important info.
-            </div>
+            VeeGPT can make mistakes. Check important info.
           </div>
         </div>
       </div>
