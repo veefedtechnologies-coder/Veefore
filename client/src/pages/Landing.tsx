@@ -1905,7 +1905,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
           <div className="grid grid-cols-12 gap-8">
             {/* Main Security Card - Enterprise Security */}
             <div className="col-span-12 lg:col-span-8 group">
-              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 shadow-2xl relative card-premium">
+              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-white via-gray-50 to-blue-50 border border-gray-200 shadow-2xl relative card-premium">
                 {/* Dynamic Security Waves */}
                 <div className="absolute inset-0 opacity-20">
                   <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -1922,20 +1922,20 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 <div className="relative h-full p-10 flex flex-col lg:flex-row items-center">
                   <div className="flex-1 mb-8 lg:mb-0">
                     <div className="flex items-center space-x-4 mb-8">
-                      <div className="w-20 h-20 rounded-3xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <Shield className="w-10 h-10 text-white" />
+                      <div className="w-20 h-20 rounded-3xl bg-blue-100 border border-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Shield className="w-10 h-10 text-blue-600" />
                       </div>
                       <div>
-                        <div className="text-blue-200 text-sm font-bold uppercase tracking-wider mb-2">
+                        <div className="text-gray-600 text-sm font-bold uppercase tracking-wider mb-2">
                           ENTERPRISE SECURITY
                         </div>
-                        <h3 className="text-white text-3xl font-bold">
+                        <h3 className="text-gray-900 text-3xl font-bold">
                           Advanced Protection Suite
                         </h3>
                       </div>
                     </div>
                     
-                    <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+                    <p className="text-gray-700 text-lg mb-8 leading-relaxed">
                       Bank-level security with comprehensive compliance features for enterprises and agencies managing sensitive client data across multiple social platforms.
                     </p>
                     
@@ -1947,24 +1947,24 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         { icon: Shield, label: "GDPR & CCPA Ready", detail: "Data protection" },
                         { icon: Eye, label: "Single Sign-On (SSO)", detail: "Enterprise identity" }
                       ].map((feature, idx) => (
-                        <div key={idx} className="flex items-center space-x-3 glass-premium rounded-xl p-4">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center">
+                        <div key={idx} className="flex items-center space-x-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                             <feature.icon className="w-4 h-4 text-white" />
                           </div>
                           <div>
-                            <div className="text-white font-semibold text-sm">{feature.label}</div>
-                            <div className="text-blue-200 text-xs">{feature.detail}</div>
+                            <div className="text-gray-900 font-semibold text-sm">{feature.label}</div>
+                            <div className="text-gray-600 text-xs">{feature.detail}</div>
                           </div>
                         </div>
                       ))}
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                      <button className="button-premium glass-premium border border-white/20 rounded-2xl px-8 py-4 text-white font-semibold hover:bg-white/10 transition-all duration-300 flex items-center space-x-3">
+                      <button className="bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-2xl px-8 py-4 text-white font-semibold transition-all duration-300 flex items-center space-x-3 shadow-lg">
                         <span>Explore Security Features</span>
                         <ArrowRight className="w-5 h-5" />
                       </button>
-                      <div className="text-blue-200 text-sm">Trusted by Fortune 500</div>
+                      <div className="text-gray-600 text-sm">Trusted by Fortune 500</div>
                     </div>
                   </div>
                   
@@ -1972,8 +1972,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <div className="flex-1 relative hidden lg:flex items-center justify-center">
                     <div className="relative">
                       {/* Central Security Hub */}
-                      <div className="w-40 h-40 rounded-full glass-premium border-2 border-white/30 flex items-center justify-center">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center animate-float-premium">
+                      <div className="w-40 h-40 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-lg">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-float-premium">
                           <Lock className="w-12 h-12 text-white" />
                         </div>
                       </div>
@@ -1988,7 +1988,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       ].map((element, idx) => (
                         <div
                           key={idx}
-                          className="absolute w-16 h-16 rounded-2xl glass-premium border border-white/20 flex items-center justify-center animate-particles-float"
+                          className="absolute w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center animate-particles-float shadow-lg"
                           style={{
                             left: `calc(50% + ${Math.cos(element.angle * Math.PI / 180) * element.radius}px - 32px)`,
                             top: `calc(50% + ${Math.sin(element.angle * Math.PI / 180) * element.radius}px - 32px)`,
@@ -2008,26 +2008,26 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* API Integration Card */}
             <div className="col-span-12 lg:col-span-4 group">
-              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 shadow-2xl relative card-premium">
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-white/10 animate-gradient-shift" />
+              <div className="h-full min-h-[420px] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-white via-green-50 to-emerald-50 border border-gray-200 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-green-50/20 to-emerald-50/20 animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex flex-col">
                   <div className="flex items-center space-x-4 mb-6">
-                    <div className="w-16 h-16 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <Network className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 rounded-2xl bg-green-100 border border-green-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <Network className="w-8 h-8 text-green-600" />
                     </div>
                     <div>
-                      <div className="text-emerald-200 text-xs font-bold uppercase tracking-wider">
+                      <div className="text-gray-600 text-xs font-bold uppercase tracking-wider">
                         API ECOSYSTEM
                       </div>
-                      <h3 className="text-white text-xl font-bold">
+                      <h3 className="text-gray-900 text-xl font-bold">
                         Integration Suite
                       </h3>
                     </div>
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-center">
-                    <p className="text-emerald-100 mb-6 leading-relaxed">
+                    <p className="text-gray-700 mb-6 leading-relaxed">
                       Powerful APIs and extensive integration capabilities for custom workflows and enterprise system connectivity.
                     </p>
                     
@@ -2040,10 +2040,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         "Custom enterprise connectors available"
                       ].map((feature, idx) => (
                         <div key={idx} className="flex items-start space-x-3">
-                          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <Check className="w-3 h-3 text-white" />
                           </div>
-                          <span className="text-emerald-100 text-sm leading-relaxed">{feature}</span>
+                          <span className="text-gray-700 text-sm leading-relaxed">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -2054,7 +2054,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         {[...Array(9)].map((_, i) => (
                           <div
                             key={i}
-                            className="aspect-square rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 animate-slow-pulse"
+                            className="aspect-square rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 border border-green-200 animate-slow-pulse"
                             style={{
                               animationDelay: `${i * 0.2}s`
                             }}
@@ -2064,7 +2064,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                   </div>
                   
-                  <button className="w-full button-premium glass-premium border border-white/20 rounded-2xl py-4 text-white font-semibold hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-2">
+                  <button className="w-full bg-green-600 hover:bg-green-700 border border-green-700 rounded-2xl py-4 text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg">
                     <span>View API Docs</span>
                     <Code className="w-4 h-4" />
                   </button>
