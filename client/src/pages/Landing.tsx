@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Clock, Eye, Heart, Share2, Trending, DollarSign, Lightbulb, Rocket, Filter, Search, Bell, Settings, Upload, Download, Lock, Smartphone, Laptop, Monitor, Sparkles, Crown, Diamond, Layers, Infinity, Cpu, Brain, Network, Wand2, Palette, Music, Video, Image, FileText, Mic, Camera, Megaphone, Compass, Map, Database, Code, Server, Cloud, Gauge, LineChart, PieChart, Activity, Headphones, ShoppingCart, CreditCard, Wallet, ChevronRight, ExternalLink, Github, Twitter } from 'lucide-react'
+import { 
+  ChevronDown, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
+  Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Clock, Eye, Heart, Share2, 
+  DollarSign, Lightbulb, Rocket, Filter, Search, Bell, Settings, Upload, Download, Lock, 
+  Smartphone, Laptop, Monitor, Sparkles, Crown, Diamond, Layers, Infinity, Cpu, Brain, 
+  Network, Wand2, Palette, Music, Video, Image, FileText, Mic, Camera, Megaphone, Compass, 
+  Map, Database, Code, Server, Cloud, Gauge, LineChart, PieChart, Activity, Headphones, 
+  ShoppingCart, CreditCard, Wallet, ChevronRight, ExternalLink, Github, Twitter
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import veeGptImage from '@assets/generated_images/VeeGPT_chat_interface_mockup_787cf02f.png'
-import videoGenImage from '@assets/generated_images/AI_video_generator_interface_afe92185.png'
-import analyticsImage from '@assets/generated_images/Social_media_analytics_dashboard_6db9ea53.png'
-import contentImage from '@assets/generated_images/Content_creation_interface_bfe4cd5e.png'
 
 interface LandingProps {
   onNavigate: (view: string) => void
@@ -14,7 +18,6 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
-  const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
     setIsVisible(true)
@@ -23,116 +26,314 @@ const Landing = ({ onNavigate }: LandingProps) => {
     const interval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 8)
     }, 4000)
-
-    // Scroll effect
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
     
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return () => clearInterval(interval)
   }, [])
 
   const handleNavigation = (page: string) => {
     onNavigate(page)
   }
 
-  // Modern feature showcase with real screenshots
+  // Core platform features with detailed descriptions
   const platformFeatures = [
     {
       id: "veegpt",
-      title: "VeeGPT",
-      subtitle: "AI Chat Assistant",
-      description: "Conversational AI that understands context, generates content, and helps with strategy. ChatGPT-like interface designed for creators.",
-      image: veeGptImage,
+      title: "VeeGPT - AI Chat Assistant",
+      subtitle: "ChatGPT-like Interface",
+      description: "Advanced conversational AI that understands context, generates content, and provides strategic insights. Built specifically for social media creators and marketers.",
+      image: "/api/placeholder/600/400",
       icon: <Bot className="w-8 h-8" />,
       color: "from-violet-500 to-purple-600",
-      features: ["Real-time streaming responses", "Context-aware conversations", "Content generation", "Strategy assistance"],
+      features: ["Real-time streaming responses", "Context-aware conversations", "Content generation", "Strategy assistance", "Multi-platform insights"],
       link: "/veegpt"
     },
     {
       id: "video-gen",
-      title: "AI Video Studio",
-      subtitle: "Cosmos Video Generator",
-      description: "Professional AI video creation with automated scripts, scenes, voiceovers, and editing. Create viral content in minutes.",
-      image: videoGenImage,
+      title: "AI Video Studio - Cosmos Generator",
+      subtitle: "Professional Video Creation",
+      description: "Revolutionary AI video creation with automated script writing, scene generation, voiceovers, and professional editing. Create viral content in minutes.",
+      image: "/api/placeholder/600/400",
       icon: <Video className="w-8 h-8" />,
       color: "from-blue-500 to-cyan-500",
-      features: ["AI script generation", "Automated scene creation", "Professional voiceovers", "Smart editing"],
+      features: ["AI script generation", "Automated scene creation", "Professional voiceovers", "Smart editing", "Multi-format export"],
       link: "/video-generator"
     },
     {
       id: "analytics",
-      title: "Analytics Pro",
-      subtitle: "Deep Performance Insights",
-      description: "Comprehensive analytics dashboard with real-time metrics, engagement tracking, and predictive insights for growth optimization.",
-      image: analyticsImage,
+      title: "Analytics Pro - Deep Insights",
+      subtitle: "Performance Analytics",
+      description: "Comprehensive analytics dashboard with real-time metrics, engagement tracking, competitor analysis, and predictive insights for growth optimization.",
+      image: "/api/placeholder/600/400",
       icon: <BarChart3 className="w-8 h-8" />,
       color: "from-emerald-500 to-teal-600",
-      features: ["Real-time metrics", "Engagement tracking", "Growth predictions", "ROI analysis"],
+      features: ["Real-time metrics", "Engagement tracking", "Competitor analysis", "Growth predictions", "ROI insights"],
       link: "/analytics"
     },
     {
       id: "content",
-      title: "Content Studio",
-      subtitle: "Smart Content Creation",
-      description: "AI-powered content creation suite with intelligent scheduling, hashtag optimization, and multi-platform publishing.",
-      image: contentImage,
+      title: "Content Studio - Smart Creation",
+      subtitle: "AI Content Generation",
+      description: "Intelligent content creation with trend analysis, audience insights, and automated optimization. Generate posts, captions, and campaigns that convert.",
+      image: "/api/placeholder/600/400",
       icon: <Palette className="w-8 h-8" />,
-      color: "from-orange-500 to-pink-500",
-      features: ["Smart scheduling", "Hashtag optimization", "Multi-platform", "Brand consistency"],
-      link: "/create"
+      color: "from-pink-500 to-rose-500",
+      features: ["AI content generation", "Trend analysis", "Audience targeting", "A/B testing", "Performance optimization"],
+      link: "/content-studio"
     },
     {
       id: "automation",
-      title: "Smart Automation",
-      subtitle: "Intelligent Workflows",
-      description: "Advanced automation engine for comments, DMs, engagement, and audience growth with AI-powered responses.",
+      title: "Smart Automation - Workflows",
+      subtitle: "Intelligent Automation",
+      description: "Advanced automation engine for social media workflows, comment responses, DM management, and engagement optimization across all platforms.",
       image: "/api/placeholder/600/400",
       icon: <Zap className="w-8 h-8" />,
       color: "from-yellow-500 to-orange-500",
-      features: ["Comment automation", "DM responses", "Engagement boost", "Audience growth"],
+      features: ["Workflow automation", "Smart responses", "Engagement optimization", "Multi-platform sync", "Custom triggers"],
       link: "/automation"
     },
     {
       id: "inbox",
-      title: "Unified Inbox",
-      subtitle: "Social Conversations",
-      description: "Centralized inbox for all social media interactions with AI-powered response suggestions and priority management.",
+      title: "Unified Inbox - Conversations",
+      subtitle: "Social Communication",
+      description: "Manage all social conversations from one powerful inbox. AI-powered message categorization, priority sorting, and team collaboration.",
       image: "/api/placeholder/600/400",
       icon: <MessageSquare className="w-8 h-8" />,
       color: "from-indigo-500 to-purple-500",
-      features: ["Unified conversations", "AI responses", "Priority sorting", "Team collaboration"],
+      features: ["Unified conversations", "AI responses", "Priority sorting", "Team collaboration", "Sentiment analysis"],
       link: "/inbox"
     },
     {
       id: "calendar",
-      title: "Smart Calendar",
-      subtitle: "Content Planning",
-      description: "Intelligent content calendar with optimal posting times, trend integration, and collaborative planning tools.",
+      title: "Smart Calendar - Planning",
+      subtitle: "Content Scheduling",
+      description: "Intelligent content calendar with optimal posting times, trend integration, bulk scheduling, and collaborative planning tools for teams.",
       image: "/api/placeholder/600/400",
       icon: <Calendar className="w-8 h-8" />,
       color: "from-green-500 to-emerald-500",
-      features: ["Optimal timing", "Trend integration", "Team planning", "Content queue"],
-      link: "/plan"
+      features: ["Optimal timing", "Trend integration", "Bulk scheduling", "Team planning", "Content queue"],
+      link: "/calendar"
     },
     {
       id: "growth",
-      title: "Growth Engine",
-      subtitle: "Audience Building",
-      description: "AI-driven audience growth strategies with competitor analysis, influencer discovery, and engagement optimization.",
+      title: "Growth Engine - Audience Building",
+      subtitle: "Growth Strategies",
+      description: "AI-driven audience growth strategies with competitor analysis, influencer discovery, hashtag optimization, and engagement tactics.",
       image: "/api/placeholder/600/400",
       icon: <TrendingUp className="w-8 h-8" />,
       color: "from-pink-500 to-rose-500",
-      features: ["Growth strategies", "Competitor analysis", "Influencer discovery", "Engagement optimization"],
+      features: ["Growth strategies", "Competitor analysis", "Influencer discovery", "Hashtag optimization", "Engagement tactics"],
       link: "/growth"
     }
   ]
 
+  // Detailed feature sections with comprehensive information
+  const detailedFeatures = [
+    {
+      title: "AI-Powered Content Creation & Video Generation",
+      description: "Transform your content strategy with our revolutionary AI content creation suite. Generate high-quality posts, captions, scripts, and professional videos using advanced AI models. Our Cosmos Video Generator creates stunning visual content with automated scene selection, voiceover generation, and smart editing capabilities.",
+      icon: <Wand2 className="w-16 h-16 text-blue-500" />,
+      gradient: "from-blue-500 via-purple-500 to-pink-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Advanced AI content generation using GPT-4 and custom models",
+        "Professional video creation with automated script writing and scene generation",
+        "Multi-format content optimization for different social platforms",
+        "Brand voice consistency across all generated content",
+        "Trending topic integration and viral content prediction",
+        "Custom template library with industry-specific content frameworks",
+        "Real-time content performance prediction and optimization suggestions",
+        "Automated hashtag research and audience targeting recommendations"
+      ]
+    },
+    {
+      title: "Advanced Analytics & Performance Insights",
+      description: "Make data-driven decisions with our comprehensive analytics platform. Track performance across all social media channels, analyze competitor strategies, monitor engagement patterns, and get actionable insights to optimize your social media ROI and growth trajectory.",
+      icon: <BarChart3 className="w-16 h-16 text-purple-500" />,
+      gradient: "from-purple-500 via-blue-500 to-cyan-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Real-time performance tracking across all major social platforms",
+        "Advanced engagement analytics with demographic breakdowns",
+        "Competitor benchmarking and gap analysis tools",
+        "Custom report building with white-label options",
+        "Automated performance alerts and optimization recommendations",
+        "Cross-platform analytics consolidation and unified reporting",
+        "ROI tracking and campaign attribution analysis",
+        "Predictive analytics for content performance and audience growth"
+      ]
+    },
+    {
+      title: "Smart Scheduling & Intelligent Calendar Management",
+      description: "Schedule content at optimal times with AI-powered timing recommendations. Our intelligent calendar learns your audience behavior, suggests trending dates, and automates content distribution across all platforms for maximum reach and engagement.",
+      icon: <Calendar className="w-16 h-16 text-green-500" />,
+      gradient: "from-green-500 via-teal-500 to-blue-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "AI-optimized posting time recommendations based on audience activity",
+        "Bulk scheduling with advanced drag-and-drop calendar interface",
+        "Content queue management with automatic conflict resolution",
+        "Trending events and holiday calendar integration",
+        "Time zone optimization for global audience targeting",
+        "Content recycling and evergreen post automation",
+        "Team collaboration with approval workflows and content assignments",
+        "Emergency posting and crisis management tools"
+      ]
+    },
+    {
+      title: "Unified Inbox & Customer Engagement Hub",
+      description: "Manage all your social conversations from one powerful inbox. Automate responses, prioritize messages, and maintain consistent customer service across all platforms with AI-powered message categorization and suggested replies.",
+      icon: <MessageSquare className="w-16 h-16 text-orange-500" />,
+      gradient: "from-orange-500 via-red-500 to-pink-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Unified inbox for all social media messages and comments",
+        "AI-powered message categorization and priority scoring",
+        "Automated response suggestions with brand voice consistency",
+        "Customer service ticket integration and escalation workflows",
+        "Sentiment analysis and crisis detection for immediate alerts",
+        "Team collaboration with message assignment and tracking",
+        "Response templates and canned message libraries",
+        "Performance tracking for response times and customer satisfaction"
+      ]
+    },
+    {
+      title: "Multi-Platform Publishing & Social Media Management",
+      description: "Manage Instagram, Facebook, Twitter, LinkedIn, YouTube, TikTok, Pinterest, and more from one unified dashboard. Cross-post content, maintain brand consistency, and adapt formats automatically for each platform's unique requirements.",
+      icon: <Globe className="w-16 h-16 text-indigo-500" />,
+      gradient: "from-indigo-500 via-purple-500 to-pink-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Support for 20+ major social media platforms and emerging networks",
+        "Intelligent content adaptation for platform-specific formats and requirements",
+        "Cross-platform publishing with single-click distribution",
+        "Platform-specific optimization for maximum reach and engagement",
+        "Account health monitoring and compliance checking",
+        "Centralized asset library with advanced search and tagging",
+        "Brand guidelines enforcement across all platforms",
+        "Automated content versioning for different platform specifications"
+      ]
+    },
+    {
+      title: "Advanced Automation & Workflow Intelligence",
+      description: "Automate repetitive tasks and create intelligent workflows that respond to audience behavior, engage with followers, manage comments, and grow your social presence 24/7 while maintaining authentic brand interactions.",
+      icon: <Zap className="w-16 h-16 text-yellow-500" />,
+      gradient: "from-yellow-500 via-orange-500 to-red-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Smart automation rules with conditional logic and triggers",
+        "Automated comment management and response generation",
+        "Follower engagement automation with authentic interaction patterns",
+        "Lead generation workflows with CRM integration",
+        "Crisis management automation with escalation protocols",
+        "Growth hacking automation for follower acquisition",
+        "Content curation automation with quality filtering",
+        "Performance-based automation adjustments and optimization"
+      ]
+    }
+  ]
+
+  // Pricing tiers with detailed features
+  const pricingTiers = [
+    {
+      name: "Starter",
+      price: "$29",
+      period: "/month",
+      description: "Perfect for individual creators and small businesses getting started with AI-powered social media management.",
+      features: [
+        "VeeGPT AI Assistant with 100 conversations/month",
+        "Basic content generation (50 posts/month)",
+        "2 social media accounts",
+        "Basic analytics and reporting",
+        "Email support",
+        "Content calendar for 1 month ahead",
+        "Basic automation rules (5 active rules)",
+        "Standard video generation (10 videos/month)"
+      ],
+      buttonText: "Start Free Trial",
+      popular: false,
+      color: "from-blue-500 to-blue-600"
+    },
+    {
+      name: "Professional",
+      price: "$79",
+      period: "/month",
+      description: "Ideal for growing businesses, agencies, and serious content creators who need advanced features and higher limits.",
+      features: [
+        "Unlimited VeeGPT conversations",
+        "Advanced content generation (500 posts/month)",
+        "10 social media accounts",
+        "Advanced analytics with competitor insights",
+        "Priority support + dedicated account manager",
+        "Content calendar for 3 months ahead",
+        "Advanced automation rules (50 active rules)",
+        "Professional video generation (100 videos/month)",
+        "Team collaboration (5 team members)",
+        "White-label reporting",
+        "API access",
+        "Custom integrations"
+      ],
+      buttonText: "Start Professional",
+      popular: true,
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      name: "Enterprise",
+      price: "$199",
+      period: "/month",
+      description: "For large organizations, agencies, and enterprises requiring maximum capabilities, unlimited usage, and custom solutions.",
+      features: [
+        "Unlimited everything - VeeGPT, content, videos",
+        "Unlimited social media accounts",
+        "Enterprise analytics with custom dashboards",
+        "24/7 premium support + dedicated success manager",
+        "Unlimited content planning and scheduling",
+        "Unlimited automation rules and workflows",
+        "Custom AI model training on your data",
+        "Unlimited team members and workspaces",
+        "Full white-label solutions",
+        "Custom API development",
+        "On-premise deployment options",
+        "Advanced security and compliance features",
+        "Custom integrations and workflows",
+        "Dedicated infrastructure and priority processing"
+      ],
+      buttonText: "Contact Sales",
+      popular: false,
+      color: "from-gold-500 to-yellow-600"
+    }
+  ]
+
+  // Testimonials from satisfied users
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Social Media Manager at TechCorp",
+      avatar: "/api/placeholder/60/60",
+      content: "VeeFore transformed our social media strategy completely. The AI content generation saves us 20+ hours per week, and our engagement rates have increased by 300%. The video generation feature is absolutely game-changing!",
+      rating: 5,
+      company: "TechCorp"
+    },
+    {
+      name: "Marcus Chen",
+      role: "Digital Marketing Agency Owner",
+      avatar: "/api/placeholder/60/60",
+      content: "As an agency managing 50+ client accounts, VeeFore's automation and analytics features are essential. The unified inbox alone saves us countless hours, and clients love the detailed reporting and professional video content we can now produce.",
+      rating: 5,
+      company: "Chen Digital"
+    },
+    {
+      name: "Emma Rodriguez",
+      role: "E-commerce Brand Manager",
+      avatar: "/api/placeholder/60/60",
+      content: "The ROI from VeeFore is incredible. Our social media-driven sales increased by 250% in just 3 months. The AI understands our brand voice perfectly, and the automated customer service responses maintain our quality standards 24/7.",
+      rating: 5,
+      company: "Fashion Forward"
+    }
+  ]
+
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      {/* Modern Navigation */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-200/50 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -149,6 +350,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#platform" className="text-gray-600 hover:text-gray-900 transition-colors">Platform</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Reviews</a>
               <Button 
                 onClick={() => handleNavigation('veegpt')}
                 className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
@@ -160,13 +362,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </nav>
 
-      {/* Hero Section - Ultra Modern */}
+      {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-violet-300/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000"></div>
-          <div className="absolute top-40 left-1/2 w-60 h-60 bg-cyan-300/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-4000"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 left-1/2 w-60 h-60 bg-cyan-300/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -174,7 +376,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             {/* Badge */}
             <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-blue-100 rounded-full px-6 py-3 mb-8 border border-violet-200/50">
               <Rocket className="w-5 h-5 text-violet-600 mr-2" />
-              <span className="text-violet-800 font-semibold">Launching Soon • AI-Powered Social Media Platform</span>
+              <span className="text-violet-800 font-semibold">Launching Soon • Complete AI-Powered Social Media Platform</span>
             </div>
 
             {/* Main Heading */}
@@ -184,13 +386,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
               </span>
               <br />
               <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-                Social Media
+                Social Media Management
               </span>
             </h1>
 
             <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
-              Revolutionary AI platform that automates content creation, video generation, analytics, and audience growth. 
-              Built for creators, businesses, and agencies who want to dominate social media.
+              Revolutionary AI platform that combines chat assistance, video generation, analytics, automation, and content creation. 
+              Built for creators, businesses, and agencies who want to dominate social media with intelligent automation.
             </p>
 
             {/* CTA Buttons */}
@@ -200,18 +402,18 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-10 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
               >
                 <Bot className="w-6 h-6 mr-3" />
-                Try VeeGPT Now
+                Try VeeGPT Now - Free
               </Button>
               <Button 
                 variant="outline"
                 className="border-2 border-gray-300 hover:border-violet-300 text-gray-700 hover:text-violet-700 px-10 py-4 text-lg font-semibold rounded-xl hover:bg-violet-50 transition-all duration-300"
               >
                 <Play className="w-6 h-6 mr-3" />
-                Watch Demo
+                Watch Demo Video
               </Button>
             </div>
 
-            {/* Platform Preview - Featured Interface */}
+            {/* Platform Preview */}
             <div className="relative max-w-6xl mx-auto">
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200/50 overflow-hidden">
                 <div className="bg-gradient-to-r from-violet-600 to-blue-600 px-6 py-4 flex items-center space-x-3">
@@ -220,7 +422,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                     <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                   </div>
-                  <span className="text-white font-semibold">VeeFore AI Platform</span>
+                  <span className="text-white font-semibold">VeeFore AI Platform - All Features</span>
                 </div>
                 <div className="p-2">
                   <img 
@@ -248,64 +450,82 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Platform Features Grid - Modern Cards */}
-      <section id="platform" className="py-24 px-4 sm:px-6 lg:px-8 bg-white/50">
+      {/* Platform Features Overview */}
+      <section id="platform" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-violet-100 rounded-full px-6 py-3 mb-8">
-              <Cpu className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-blue-800 font-semibold">Complete AI Platform</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-6 py-3 mb-8">
+              <Layers className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-blue-800 font-semibold">Complete Platform</span>
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Everything You Need
+                All-in-One Solution
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From AI chat assistance to professional video generation - all integrated into one powerful platform
+              Everything you need for social media success in one powerful platform. From AI chat to video generation, analytics to automation.
             </p>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
             {platformFeatures.map((feature, index) => (
               <div
                 key={feature.id}
-                className={`group relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl border border-gray-200/50 hover:border-violet-200 transition-all duration-500 hover:-translate-y-2 cursor-pointer ${
+                className={`group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-500 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${
                   hoveredFeature === index ? 'scale-105' : ''
                 }`}
                 onMouseEnter={() => setHoveredFeature(index)}
                 onMouseLeave={() => setHoveredFeature(null)}
-                onClick={() => handleNavigation(feature.link.replace('/', ''))}
+                onClick={() => handleNavigation(feature.link.substring(1))}
               >
-                {/* Icon */}
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
-                </div>
-
+                {/* Gradient Background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                
                 {/* Content */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-sm text-gray-500 mb-4 font-medium">{feature.subtitle}</p>
-                <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
+                <div className="relative p-8">
+                  {/* Icon */}
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    {feature.icon}
+                  </div>
 
-                {/* Features List */}
-                <div className="space-y-2 mb-6">
-                  {feature.features.map((feat, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-gray-600">{feat}</span>
-                    </div>
-                  ))}
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-violet-600 group-hover:to-blue-600 transition-all duration-500">
+                    {feature.title}
+                  </h3>
+
+                  {/* Subtitle */}
+                  <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wide">
+                    {feature.subtitle}
+                  </p>
+
+                  {/* Description */}
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    {feature.description}
+                  </p>
+
+                  {/* Features List */}
+                  <div className="space-y-2 mb-6">
+                    {feature.features.slice(0, 3).map((feat, idx) => (
+                      <div key={idx} className="flex items-center">
+                        <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                        <span className="text-sm text-gray-600">{feat}</span>
+                      </div>
+                    ))}
+                    {feature.features.length > 3 && (
+                      <div className="text-sm text-gray-500">+{feature.features.length - 3} more features</div>
+                    )}
+                  </div>
+
+                  {/* CTA */}
+                  <div className="flex items-center text-violet-600 font-semibold group-hover:text-violet-700 transition-colors">
+                    <span>Explore {feature.title.split(' ')[0]}</span>
+                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
 
-                {/* CTA */}
-                <div className="flex items-center text-violet-600 font-semibold group-hover:text-violet-700 transition-colors">
-                  <span>Explore {feature.title}</span>
-                  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </div>
-
-                {/* Preview Image */}
-                <div className="absolute inset-x-4 -top-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                {/* Hover Preview */}
+                <div className="absolute inset-x-4 -top-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                   <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
                     <img 
                       src={feature.image} 
@@ -320,57 +540,215 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Why Choose VeeFore Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-violet-50 to-blue-50">
+      {/* Detailed Features Section */}
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-purple-100 rounded-full px-6 py-3 mb-8">
-              <Crown className="w-5 h-5 text-violet-600 mr-2" />
-              <span className="text-violet-800 font-semibold">Why VeeFore?</span>
+            <div className="inline-flex items-center bg-gradient-to-r from-purple-100 to-pink-100 rounded-full px-6 py-3 mb-8">
+              <Wand2 className="w-5 h-5 text-purple-600 mr-2" />
+              <span className="text-purple-800 font-semibold">Advanced Features</span>
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Built for Scale
+                Comprehensive Capabilities
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The only platform that combines AI chat, video generation, analytics, and automation in one unified system
+              Detailed breakdown of every feature and capability that makes VeeFore the most advanced social media management platform available.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* AI-First */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-violet-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Brain className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI-First Platform</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Every feature is powered by advanced AI. From VeeGPT chat to automated video generation, we use cutting-edge models to deliver results.
-              </p>
-            </div>
+          <div className="space-y-24">
+            {detailedFeatures.map((feature, index) => (
+              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-16`}>
+                {/* Image/Visual */}
+                <div className="lg:w-1/2">
+                  <div className="relative">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-3xl opacity-20 blur-3xl scale-105`}></div>
+                    <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+                      <div className="p-8 text-center">
+                        <div className="mb-6">
+                          {feature.icon}
+                        </div>
+                        <img 
+                          src={feature.image} 
+                          alt={feature.title}
+                          className="w-full h-64 object-cover rounded-2xl"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            {/* All-in-One */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Layers className="w-10 h-10 text-white" />
+                {/* Content */}
+                <div className="lg:w-1/2">
+                  <h3 className="text-4xl font-bold text-gray-900 mb-6">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                    {feature.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    {feature.details.map((detail, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="ml-4 text-gray-700 leading-relaxed">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Complete Solution</h3>
-              <p className="text-gray-600 leading-relaxed">
-                No need for multiple tools. Content creation, video generation, analytics, automation, and chat assistance all in one platform.
-              </p>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Enterprise Ready */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl flex items-center justify-center mx-auto mb-8">
-                <Shield className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Enterprise Ready</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Built for teams and agencies. Role management, collaboration tools, white-label options, and enterprise-grade security.
-              </p>
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-full px-6 py-3 mb-8">
+              <CreditCard className="w-5 h-5 text-green-600 mr-2" />
+              <span className="text-green-800 font-semibold">Transparent Pricing</span>
             </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Choose Your Plan
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Flexible pricing options designed to scale with your business. Start free and upgrade as you grow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {pricingTiers.map((tier, index) => (
+              <div
+                key={index}
+                className={`relative bg-white rounded-3xl shadow-lg hover:shadow-2xl border transition-all duration-500 overflow-hidden ${
+                  tier.popular 
+                    ? 'border-violet-200 ring-4 ring-violet-100 transform scale-105' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {tier.popular && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="bg-gradient-to-r from-violet-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
+                      Most Popular
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-8">
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
+                    <div className="mb-4">
+                      <span className="text-5xl font-bold text-gray-900">{tier.price}</span>
+                      <span className="text-gray-600">{tier.period}</span>
+                    </div>
+                    <p className="text-gray-600 leading-relaxed">{tier.description}</p>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-4 mb-8">
+                    {tier.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="ml-3 text-gray-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button
+                    className={`w-full py-4 text-lg font-semibold rounded-xl transition-all duration-300 ${
+                      tier.popular
+                        ? 'bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                    }`}
+                  >
+                    {tier.buttonText}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Additional Info */}
+          <div className="text-center mt-16">
+            <p className="text-gray-600 mb-4">All plans include 14-day free trial • No credit card required • Cancel anytime</p>
+            <div className="flex justify-center space-x-8 text-sm text-gray-500">
+              <div className="flex items-center">
+                <Shield className="w-4 h-4 mr-2" />
+                <span>SOC 2 Compliant</span>
+              </div>
+              <div className="flex items-center">
+                <Lock className="w-4 h-4 mr-2" />
+                <span>Bank-Level Security</span>
+              </div>
+              <div className="flex items-center">
+                <Award className="w-4 h-4 mr-2" />
+                <span>99.9% Uptime SLA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-violet-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full px-6 py-3 mb-8">
+              <Star className="w-5 h-5 text-yellow-600 mr-2" />
+              <span className="text-yellow-800 font-semibold">Customer Success</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Loved by Thousands
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of satisfied customers who have transformed their social media presence with VeeFore.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                <div className="p-8">
+                  {/* Rating */}
+                  <div className="flex space-x-1 mb-6">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  {/* Content */}
+                  <p className="text-gray-700 mb-6 leading-relaxed italic">
+                    "{testimonial.content}"
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center">
+                    <img 
+                      src={testimonial.avatar} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                      <div className="text-sm text-gray-600">{testimonial.role}</div>
+                      <div className="text-sm text-violet-600 font-medium">{testimonial.company}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -398,7 +776,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
               className="bg-white text-violet-600 hover:bg-gray-50 px-12 py-4 text-lg font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 border-2 border-white"
             >
               <Bot className="w-6 h-6 mr-3" />
-              Start with VeeGPT
+              Start with VeeGPT Free
             </Button>
             <Button 
               variant="outline"
@@ -410,7 +788,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
           </div>
 
           <div className="mt-12 text-blue-100">
-            <p className="text-lg">🚀 Join thousands of creators already using VeeFore</p>
+            <p className="text-lg">🚀 Join thousands of creators already transforming their social media with VeeFore</p>
           </div>
         </div>
       </section>
@@ -427,19 +805,29 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 </div>
                 <span className="text-2xl font-bold">VeeFore</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
-                The future of social media management. AI-powered platform for creators, businesses, and agencies.
+              <p className="text-gray-400 leading-relaxed mb-6">
+                The future of social media management. AI-powered platform for creators, businesses, and agencies who want to dominate social media.
               </p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Twitter className="w-6 h-6" />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Github className="w-6 h-6" />
+                </a>
+              </div>
             </div>
 
-            {/* Product */}
+            {/* Platform */}
             <div>
               <h4 className="font-bold text-lg mb-6">Platform</h4>
               <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">VeeGPT</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">VeeGPT AI Assistant</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Video Studio</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Automation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Analytics Pro</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Content Studio</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Smart Automation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Unified Inbox</a></li>
               </ul>
             </div>
 
@@ -447,34 +835,35 @@ const Landing = ({ onNavigate }: LandingProps) => {
             <div>
               <h4 className="font-bold text-lg mb-6">Company</h4>
               <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Press Kit</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Partner Program</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Affiliate Program</a></li>
               </ul>
             </div>
 
-            {/* Legal */}
+            {/* Support */}
             <div>
-              <h4 className="font-bold text-lg mb-6">Legal</h4>
+              <h4 className="font-bold text-lg mb-6">Support & Legal</h4>
               <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">API Reference</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GDPR</a></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400">© 2025 VeeFore. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Github className="w-6 h-6" />
-              </a>
+            <div className="flex space-x-6 mt-4 md:mt-0 text-sm text-gray-400">
+              <span>SOC 2 Compliant</span>
+              <span>GDPR Ready</span>
+              <span>99.9% Uptime</span>
             </div>
           </div>
         </div>
