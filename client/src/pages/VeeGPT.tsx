@@ -410,7 +410,7 @@ export default function VeeGPT() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-white relative">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8">
@@ -471,9 +471,9 @@ export default function VeeGPT() {
           </div>
         </div>
 
-        {/* Truly floating transparent input - fixed position */}
+        {/* Truly floating transparent input - absolute position within chat area */}
         <div style={{ 
-          position: 'fixed',
+          position: 'absolute',
           bottom: '24px',
           left: '50%',
           transform: 'translateX(-50%)',
@@ -614,7 +614,7 @@ export default function VeeGPT() {
         
         {/* Footer text positioned above the floating input */}
         <div style={{ 
-          position: 'fixed',
+          position: 'absolute',
           bottom: '100px',
           left: '50%',
           transform: 'translateX(-50%)',
