@@ -20,6 +20,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [activeFeature, setActiveFeature] = useState(0)
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
+  const [previewMode, setPreviewMode] = useState<'overview' | 'detailed'>('overview')
+  const [isInteractionActive, setIsInteractionActive] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -808,19 +810,32 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   </div>
                 </div>
                 
-                {/* Platform Interface */}
+                {/* Interactive Platform Interface */}
                 <div className="bg-gradient-to-br from-gray-50 to-white p-12 rounded-b-[2.5rem] min-h-[500px]">
-                  {/* Feature Grid */}
+                  {/* Feature Grid - Interactive */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                     {platformFeatures.slice(0, 4).map((feature, index) => (
                       <div 
                         key={feature.id}
+                        onClick={() => handleNavigation(feature.link.substring(1))}
                         className="group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-gray-100 hover:border-gray-200 transition-all duration-700 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
                         style={{
                           animationDelay: `${index * 200}ms`
                         }}
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/50 to-white rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        {/* Interactive Hover Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 via-blue-600/5 to-emerald-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+                          <div className="bg-white/90 backdrop-blur-xl rounded-2xl px-6 py-3 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                                <ArrowRight className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="text-gray-800 font-semibold text-sm">Try {feature.title.split(' ')[0]}</span>
+                            </div>
+                          </div>
+                        </div>
                         
                         <div className="relative">
                           <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg`}>
@@ -832,9 +847,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title.split(' ')[0]}</h3>
                           <p className="text-gray-600 text-sm leading-relaxed">{feature.subtitle}</p>
                           
-                          <div className="mt-6 flex items-center text-gray-500 text-xs group-hover:text-gray-700 transition-colors">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                            Ready to use
+                          <div className="mt-6 flex items-center justify-between">
+                            <div className="flex items-center text-gray-500 text-xs group-hover:text-gray-700 transition-colors">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
+                              Ready to use
+                            </div>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <ExternalLink className="w-4 h-4 text-gray-400" />
+                            </div>
                           </div>
                         </div>
                         
@@ -842,21 +862,138 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Advanced Interactive Demo Controls */}
+                  <div className="mt-12 space-y-6">
+                    {/* Live Activity Feed */}
+                    <div className="bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-6 shadow-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                          <span className="text-gray-700 text-sm font-bold">Live Platform Activity</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button 
+                            onClick={() => setPreviewMode('overview')}
+                            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                              previewMode === 'overview' 
+                                ? 'bg-violet-600 text-white shadow-lg' 
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            Overview
+                          </button>
+                          <button 
+                            onClick={() => setPreviewMode('detailed')}
+                            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                              previewMode === 'detailed' 
+                                ? 'bg-violet-600 text-white shadow-lg' 
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            Detailed
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        {[
+                          { label: 'AI Conversations', value: '2,847', trend: '+12%', color: 'text-violet-600' },
+                          { label: 'Content Generated', value: '1,203', trend: '+24%', color: 'text-blue-600' },
+                          { label: 'Analytics Views', value: '856', trend: '+8%', color: 'text-emerald-600' },
+                          { label: 'Active Users', value: '342', trend: '+15%', color: 'text-pink-600' }
+                        ].map((stat, index) => (
+                          <div key={index} className="bg-white/60 rounded-xl p-4 backdrop-blur-sm">
+                            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                            <div className="text-xs text-gray-600 mb-1">{stat.label}</div>
+                            <div className={`text-xs font-semibold ${stat.color}`}>{stat.trend}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Interactive Action Center */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button 
+                        onClick={() => handleNavigation('veegpt')}
+                        className="group bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-violet-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Bot className="w-5 h-5" />
+                          <span>Start with VeeGPT</span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+                      
+                      <button 
+                        onClick={() => setIsInteractionActive(!isInteractionActive)}
+                        className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <MousePointer2 className="w-5 h-5" />
+                          <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
+                        </div>
+                      </button>
+                    </div>
+                    
+                    {/* Interactive Tutorial Overlay */}
+                    {isInteractionActive && (
+                      <div className="bg-gradient-to-r from-violet-600/10 to-blue-600/10 backdrop-blur-xl border border-violet-200 rounded-2xl p-6 shadow-lg">
+                        <div className="flex items-start space-x-4">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
+                            <Lightbulb className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-gray-900 font-bold mb-2">Interactive Demo Mode Active</h4>
+                            <p className="text-gray-700 text-sm mb-3">
+                              Click on any feature card above to explore that specific tool. Hover over elements to see live previews and interactions.
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {platformFeatures.slice(0, 4).map((feature, index) => (
+                                <button
+                                  key={feature.id}
+                                  onClick={() => {
+                                    setActiveFeature(index)
+                                    handleNavigation(feature.link.substring(1))
+                                  }}
+                                  className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                                    activeFeature === index
+                                      ? `bg-gradient-to-r ${feature.color} text-white shadow-lg`
+                                      : 'bg-white/60 text-gray-700 hover:bg-white/80'
+                                  }`}
+                                >
+                                  {feature.title.split(' ')[0]}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Floating Status Indicator */}
+              {/* Interactive Status Indicator */}
               <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2">
-                <div className="bg-black/80 backdrop-blur-3xl border border-white/20 rounded-3xl px-10 py-6 shadow-2xl">
+                <div className="bg-black/80 backdrop-blur-3xl border border-white/20 rounded-3xl px-10 py-6 shadow-2xl group cursor-pointer hover:bg-black/90 transition-all duration-500">
                   <div className="flex items-center space-x-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${platformFeatures[activeFeature].color} flex items-center justify-center text-white shadow-xl`}>
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${platformFeatures[activeFeature].color} flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform duration-300`}>
                       {platformFeatures[activeFeature].icon}
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <div className="text-white font-bold text-lg">{platformFeatures[activeFeature].title}</div>
                       <div className="text-gray-400 text-sm">{platformFeatures[activeFeature].subtitle}</div>
                     </div>
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                      <button 
+                        onClick={() => handleNavigation(platformFeatures[activeFeature].link.substring(1))}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-2 text-white text-sm font-medium"
+                      >
+                        Try Now
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
