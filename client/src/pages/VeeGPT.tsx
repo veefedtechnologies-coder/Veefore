@@ -765,10 +765,10 @@ export default function VeeGPT() {
             </div>
         </div>
         
-        {/* Footer text positioned above the floating input */}
+        {/* Footer text positioned below the floating input */}
         <div style={{ 
           position: 'absolute',
-          bottom: '100px',
+          bottom: '12px',
           left: '50%',
           transform: 'translateX(-50%)',
           textAlign: 'center',
@@ -778,8 +778,10 @@ export default function VeeGPT() {
           <div style={{ 
             fontSize: '12px', 
             color: '#9ca3af',
-            background: 'none',
-            backgroundColor: 'transparent'
+            background: 'white',
+            backgroundColor: 'white',
+            padding: '4px 8px',
+            borderRadius: '4px'
           }}>
             VeeGPT can make mistakes. Check important info.
           </div>
