@@ -835,27 +835,27 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   </div>
                 </div>
                 
-                {/* Ultra-Realistic Platform Interface */}
-                <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-b-[2.5rem] min-h-[600px]">
-                  {/* Real-time Platform Header */}
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
-                        <Zap className="w-5 h-5" />
+                {/* Compact Platform Interface */}
+                <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-b-[2.5rem] min-h-[350px]">
+                  {/* Compact Platform Header */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
+                        <Zap className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-gray-900 font-bold text-lg">VeeFore Dashboard</h3>
-                        <p className="text-gray-500 text-sm">Live Platform Preview • {currentTime.toLocaleTimeString()}</p>
+                        <h3 className="text-gray-900 font-bold text-base">VeeFore Dashboard</h3>
+                        <p className="text-gray-500 text-xs">Live Platform Preview • {currentTime.toLocaleTimeString()}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-green-600 text-sm font-medium">Online</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-green-600 text-xs font-medium">Online</span>
                     </div>
                   </div>
 
-                  {/* Detailed Feature Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {/* Compact Feature Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                     {platformFeatures.slice(0, 4).map((feature, index) => (
                       <div 
                         key={feature.id}
@@ -865,40 +865,40 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         }}
                         onMouseEnter={() => setSelectedFeature(index)}
                         onMouseLeave={() => setSelectedFeature(null)}
-                        className={`group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl border transition-all duration-500 cursor-pointer transform hover:-translate-y-1 ${
+                        className={`group relative bg-white rounded-xl p-4 shadow-md hover:shadow-lg border transition-all duration-300 cursor-pointer transform hover:-translate-y-1 ${
                           selectedFeature === index 
                             ? 'border-violet-200 shadow-violet-100/50 scale-105' 
                             : 'border-gray-100 hover:border-gray-200'
                         }`}
                       >
-                        {/* Feature Status Bar */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                        {/* Compact Feature Header */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                             {feature.icon}
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          <div className="flex items-center space-x-1">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                             <span className="text-xs text-gray-500">Live</span>
                           </div>
                         </div>
                         
-                        <h3 className="text-gray-900 font-bold text-base mb-2">{feature.title.split(' ')[0]}</h3>
-                        <p className="text-gray-600 text-xs mb-4 leading-relaxed">{feature.subtitle}</p>
+                        <h3 className="text-gray-900 font-bold text-sm mb-1">{feature.title.split(' ')[0]}</h3>
+                        <p className="text-gray-600 text-xs mb-3">{feature.subtitle}</p>
                         
-                        {/* Real-time Activity Indicator */}
-                        <div className="space-y-2">
+                        {/* Compact Activity Indicator */}
+                        <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-gray-500">Activity</span>
                             <span className="text-gray-700 font-medium">
-                              {index === 0 && `${Math.floor(liveStats.conversations / 100)}% usage`}
-                              {index === 1 && `${Math.floor(liveStats.contentGenerated / 50)} videos`}
-                              {index === 2 && `${Math.floor(liveStats.analyticsViews / 40)} views`}
-                              {index === 3 && `${Math.floor(liveStats.activeUsers / 20)} posts`}
+                              {index === 0 && `${Math.floor(liveStats.conversations / 100)}%`}
+                              {index === 1 && `${Math.floor(liveStats.contentGenerated / 50)}`}
+                              {index === 2 && `${Math.floor(liveStats.analyticsViews / 40)}`}
+                              {index === 3 && `${Math.floor(liveStats.activeUsers / 20)}`}
                             </span>
                           </div>
-                          <div className="w-full bg-gray-100 rounded-full h-1.5">
+                          <div className="w-full bg-gray-100 rounded-full h-1">
                             <div 
-                              className={`h-1.5 rounded-full bg-gradient-to-r ${feature.color} transition-all duration-1000`}
+                              className={`h-1 rounded-full bg-gradient-to-r ${feature.color} transition-all duration-1000`}
                               style={{ 
                                 width: `${45 + (index * 15) + Math.sin(Date.now() / 2000 + index) * 10}%` 
                               }}
@@ -906,10 +906,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           </div>
                         </div>
 
-                        {/* Interactive Action Button */}
-                        <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <button className={`w-full py-2 px-4 rounded-xl bg-gradient-to-r ${feature.color} text-white text-xs font-medium hover:shadow-lg transition-all duration-300`}>
-                            Launch {feature.title.split(' ')[0]}
+                        {/* Compact Action Button */}
+                        <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <button className={`w-full py-1.5 px-3 rounded-lg bg-gradient-to-r ${feature.color} text-white text-xs font-medium hover:shadow-md transition-all duration-300`}>
+                            Launch
                           </button>
                         </div>
                         
@@ -921,17 +921,17 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     ))}
                   </div>
 
-                  {/* Live Analytics Dashboard */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-gray-900 font-bold text-base">Real-Time Platform Analytics</h4>
-                      <div className="flex items-center space-x-2">
-                        <Activity className="w-4 h-4 text-green-500" />
-                        <span className="text-green-600 text-sm font-medium">Live</span>
+                  {/* Compact Analytics Dashboard */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-gray-900 font-bold text-sm">Real-Time Analytics</h4>
+                      <div className="flex items-center space-x-1">
+                        <Activity className="w-3 h-3 text-green-500" />
+                        <span className="text-green-600 text-xs font-medium">Live</span>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                       {[
                         { 
                           label: 'AI Conversations', 
@@ -962,11 +962,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           bgColor: 'bg-pink-50'
                         }
                       ].map((stat, index) => (
-                        <div key={index} className={`${stat.bgColor} rounded-xl p-4 border border-white/50`}>
-                          <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                          <div className="text-xs text-gray-600 mb-2">{stat.label}</div>
+                        <div key={index} className={`${stat.bgColor} rounded-lg p-3 border border-white/50`}>
+                          <div className="text-lg font-bold text-gray-900 mb-1">{stat.value}</div>
+                          <div className="text-xs text-gray-600 mb-1">{stat.label}</div>
                           <div className={`text-xs font-semibold ${stat.color} flex items-center space-x-1`}>
-                            <TrendingUp className="w-3 h-3" />
+                            <TrendingUp className="w-2 h-2" />
                             <span>{stat.trend}</span>
                           </div>
                         </div>
@@ -974,68 +974,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                   </div>
 
-                  {/* Live Activity Feed */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-gray-900 font-bold text-base">Recent Platform Activity</h4>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        <span className="text-gray-500 text-xs">Live updates</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {[
-                        {
-                          user: "Sarah Chen",
-                          action: "Generated AI video using Cosmos Studio",
-                          time: "2 minutes ago",
-                          type: "video",
-                          color: "text-blue-600"
-                        },
-                        {
-                          user: "Marketing Team",
-                          action: "Analyzed performance metrics in Analytics Pro",
-                          time: "5 minutes ago",
-                          type: "analytics",
-                          color: "text-emerald-600"
-                        },
-                        {
-                          user: "Alex Rodriguez",
-                          action: "Started conversation with VeeGPT",
-                          time: "8 minutes ago",
-                          type: "chat",
-                          color: "text-violet-600"
-                        },
-                        {
-                          user: "Content Creator",
-                          action: "Published social media campaign",
-                          time: "12 minutes ago",
-                          type: "content",
-                          color: "text-pink-600"
-                        }
-                      ].map((activity, index) => (
-                        <div key={index} className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-white/60 transition-colors">
-                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-r ${
-                            activity.type === 'video' ? 'from-blue-500 to-cyan-500' :
-                            activity.type === 'analytics' ? 'from-emerald-500 to-teal-600' :
-                            activity.type === 'chat' ? 'from-violet-500 to-purple-600' :
-                            'from-pink-500 to-rose-500'
-                          } flex items-center justify-center text-white`}>
-                            {activity.type === 'video' && <Video className="w-4 h-4" />}
-                            {activity.type === 'analytics' && <BarChart3 className="w-4 h-4" />}
-                            {activity.type === 'chat' && <MessageSquare className="w-4 h-4" />}
-                            {activity.type === 'content' && <Palette className="w-4 h-4" />}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-900 text-sm font-medium">{activity.user}</p>
-                            <p className="text-gray-600 text-xs">{activity.action}</p>
-                          </div>
-                          <div className="text-gray-500 text-xs">{activity.time}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                   
                   {/* Advanced Interactive Demo Controls */}
                   <div className="mt-12 space-y-6">
