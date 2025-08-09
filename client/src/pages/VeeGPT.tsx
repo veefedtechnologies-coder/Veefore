@@ -286,12 +286,16 @@ export default function VeeGPT() {
     setInputText('')
     // Clear typewriter state when starting new chat
     setTypewriterMessageIds(new Set())
+    // Reset message count tracking
+    setPreviousMessageCount(0)
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
     // Clear typewriter state when switching conversations
     setTypewriterMessageIds(new Set())
+    // Reset message count tracking
+    setPreviousMessageCount(0)
   }
 
   // Auto-scroll to bottom when new messages arrive
@@ -299,15 +303,22 @@ export default function VeeGPT() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
   
-  // Track new AI messages for typewriter effect
+  // Track the previous message count to detect truly new messages
+  const [previousMessageCount, setPreviousMessageCount] = useState(0)
+  
+  // Track new AI messages for typewriter effect (only for truly new messages)
   useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1]
-      if (lastMessage.role === 'assistant' && !typewriterMessageIds.has(lastMessage.id)) {
-        setTypewriterMessageIds(prev => new Set([...prev, lastMessage.id]))
+    if (messages.length > previousMessageCount) {
+      // Only animate if this is a new message (not loaded from database)
+      const newMessages = messages.slice(previousMessageCount)
+      const newAIMessage = newMessages.find(msg => msg.role === 'assistant')
+      
+      if (newAIMessage && !typewriterMessageIds.has(newAIMessage.id)) {
+        setTypewriterMessageIds(prev => new Set([...prev, newAIMessage.id]))
       }
     }
-  }, [messages, typewriterMessageIds])
+    setPreviousMessageCount(messages.length)
+  }, [messages, typewriterMessageIds, previousMessageCount])
 
   // Check if we have any conversations to determine initial state
   useEffect(() => {
