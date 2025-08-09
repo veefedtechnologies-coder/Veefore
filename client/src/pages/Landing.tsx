@@ -2074,35 +2074,35 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* Bottom Row - Additional Enterprise Features */}
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 shadow-2xl relative card-premium">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-shift" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-indigo-50 to-purple-50 border border-gray-200 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-50/20 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <Users className="w-7 h-7 text-white" />
+                      <div className="w-14 h-14 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Users className="w-7 h-7 text-indigo-600" />
                       </div>
                       <div>
-                        <div className="text-purple-200 text-xs font-bold uppercase tracking-wider">
+                        <div className="text-gray-600 text-xs font-bold uppercase tracking-wider">
                           TEAM MANAGEMENT
                         </div>
-                        <h3 className="text-white text-2xl font-bold">
+                        <h3 className="text-gray-900 text-2xl font-bold">
                           Advanced Collaboration
                         </h3>
                       </div>
                     </div>
                     
-                    <p className="text-purple-100 mb-6 leading-relaxed">
+                    <p className="text-gray-700 mb-6 leading-relaxed">
                       Sophisticated team management with role-based permissions, workflow automation, and collaborative content creation tools.
                     </p>
                     
                     <div className="flex items-center space-x-4">
-                      <button className="button-premium glass-premium border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/10 transition-all duration-300 flex items-center space-x-2">
+                      <button className="bg-indigo-600 hover:bg-indigo-700 border border-indigo-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
                         <span>Manage Teams</span>
                         <Users className="w-4 h-4" />
                       </button>
-                      <div className="text-purple-200 text-sm">Multi-workspace support</div>
+                      <div className="text-gray-600 text-sm">Multi-workspace support</div>
                     </div>
                   </div>
                 </div>
@@ -2110,35 +2110,35 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </div>
 
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-orange-600 via-red-600 to-pink-700 shadow-2xl relative card-premium">
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-transparent animate-gradient-shift" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-orange-50 to-red-50 border border-gray-200 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-orange-50/20 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl glass-premium border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <Crown className="w-7 h-7 text-white" />
+                      <div className="w-14 h-14 rounded-2xl bg-orange-100 border border-orange-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Crown className="w-7 h-7 text-orange-600" />
                       </div>
                       <div>
-                        <div className="text-orange-200 text-xs font-bold uppercase tracking-wider">
+                        <div className="text-gray-600 text-xs font-bold uppercase tracking-wider">
                           WHITE-LABEL
                         </div>
-                        <h3 className="text-white text-2xl font-bold">
+                        <h3 className="text-gray-900 text-2xl font-bold">
                           Reseller Program
                         </h3>
                       </div>
                     </div>
                     
-                    <p className="text-orange-100 mb-6 leading-relaxed">
+                    <p className="text-gray-700 mb-6 leading-relaxed">
                       Complete white-label solution with custom branding, dedicated infrastructure, and comprehensive reseller support programs.
                     </p>
                     
                     <div className="flex items-center space-x-4">
-                      <button className="button-premium glass-premium border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/10 transition-all duration-300 flex items-center space-x-2">
+                      <button className="bg-orange-600 hover:bg-orange-700 border border-orange-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
                         <span>Partner Program</span>
                         <Crown className="w-4 h-4" />
                       </button>
-                      <div className="text-orange-200 text-sm">Custom branding</div>
+                      <div className="text-gray-600 text-sm">Custom branding</div>
                     </div>
                   </div>
                 </div>
