@@ -2939,94 +2939,185 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-full px-6 py-3 mb-8">
-              <CreditCard className="w-5 h-5 text-green-600 mr-2" />
-              <span className="text-green-800 font-semibold">Transparent Pricing</span>
+      {/* Revolutionary Pricing Section - Apple-Inspired Premium Design */}
+      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Dynamic Premium Background with Floating Orbs */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+          {/* Large Floating Orbs */}
+          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl animate-float-slow-orb" />
+          <div className="absolute bottom-32 right-20 w-80 h-80 bg-gradient-to-br from-purple-400/15 to-pink-500/15 rounded-full blur-3xl animate-float-reverse-orb" />
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-br from-cyan-300/10 to-blue-400/10 rounded-full blur-2xl animate-morph-slow-orb" />
+          
+          {/* Neural Network Pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 10 L80 30 L80 70 L50 90 L20 70 L20 30 Z' fill='none' stroke='%23000' stroke-width='0.5'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%23000'/%3E%3C/svg%3E")`,
+            backgroundSize: '100px 100px'
+          }} />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Revolutionary Header Section */}
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center bg-white/70 backdrop-blur-xl rounded-full px-8 py-4 mb-12 border border-white/40 shadow-2xl animate-gradient-shift-premium" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,250,251,0.9), rgba(243,244,246,0.8))'}}>
+              <div className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full mr-3 animate-pulse" />
+              <CreditCard className="w-6 h-6 text-slate-700 mr-3" />
+              <span className="text-slate-800 font-bold text-lg">Premium Pricing Plans</span>
+              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full ml-3 animate-pulse" style={{animationDelay: '1s'}} />
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Choose Your Plan
+            
+            <h2 className="text-6xl lg:text-8xl font-black mb-12 leading-tight">
+              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 bg-clip-text text-transparent drop-shadow-sm">
+                Choose Your
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Perfect Plan
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Flexible pricing options designed to scale with your business. Start free and upgrade as you grow.
+            
+            <p className="text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-medium">
+              Experience the future of social media management with our 
+              <span className="text-blue-600 font-bold"> revolutionary AI-powered platform</span>. 
+              Start your journey today and scale seamlessly as you grow.
             </p>
+            
+            {/* Floating Price Preview Particles */}
+            <div className="relative mt-16">
+              <div className="absolute top-0 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-platform-particles opacity-60" />
+              <div className="absolute top-8 right-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full animate-platform-particles opacity-70" style={{animationDelay: '2s'}} />
+              <div className="absolute bottom-4 left-1/2 w-1 h-1 bg-indigo-400 rounded-full animate-platform-particles opacity-50" style={{animationDelay: '4s'}} />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Revolutionary 3D Premium Pricing Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-24">
             {pricingTiers.map((tier, index) => (
-              <div
-                key={index}
-                className={`relative bg-white rounded-3xl shadow-lg hover:shadow-2xl border transition-all duration-500 overflow-hidden ${
-                  tier.popular 
-                    ? 'border-violet-200 ring-4 ring-violet-100 transform scale-105' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                {tier.popular && (
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="bg-gradient-to-r from-violet-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold">
-                      Most Popular
-                    </div>
-                  </div>
-                )}
-
-                <div className="p-8">
-                  {/* Header */}
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
-                    <div className="mb-4">
-                      <span className="text-5xl font-bold text-gray-900">{tier.price}</span>
-                      <span className="text-gray-600">{tier.period}</span>
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">{tier.description}</p>
+              <div key={index} className="group relative">
+                {/* Card 3D Container with Perspective */}
+                <div className="relative transform-gpu perspective-1000">
+                  {/* Glass Morphism Background with Advanced Effects */}
+                  <div className={`absolute inset-0 bg-white/90 backdrop-blur-2xl rounded-3xl border transition-all duration-700 shadow-2xl animate-integration-card-morph ${
+                    tier.popular 
+                      ? 'border-blue-200/50 ring-4 ring-blue-100/50 transform scale-105 shadow-blue-500/20' 
+                      : 'border-white/60 group-hover:border-slate-200/80 group-hover:shadow-3xl'
+                  }`} style={{animationDelay: `${index * 0.2}s`}} />
+                  
+                  {/* Premium Floating Particles for Each Card */}
+                  <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                    <div className={`absolute top-6 right-6 w-3 h-3 bg-gradient-to-r ${tier.popular ? 'from-blue-400 to-purple-500' : 'from-slate-300 to-slate-400'} rounded-full animate-platform-particles opacity-70`} />
+                    <div className={`absolute bottom-8 left-8 w-2 h-2 bg-gradient-to-r ${tier.popular ? 'from-purple-400 to-pink-500' : 'from-slate-400 to-slate-500'} rounded-full animate-platform-particles opacity-50`} style={{animationDelay: '3s'}} />
+                    <div className={`absolute top-1/2 right-8 w-1.5 h-1.5 bg-gradient-to-r ${tier.popular ? 'from-indigo-400 to-blue-500' : 'from-slate-300 to-slate-400'} rounded-full animate-platform-particles opacity-60`} style={{animationDelay: '5s'}} />
                   </div>
 
-                  {/* Features */}
-                  <div className="space-y-4 mb-8">
-                    {tier.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-start">
-                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="ml-3 text-gray-700">{feature}</span>
+                  {/* Popular Badge with Advanced Styling */}
+                  {tier.popular && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
+                      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full text-sm font-bold shadow-2xl border-4 border-white/50 backdrop-blur-sm animate-pulse-slow">
+                        <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">✨ Most Popular ✨</span>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
 
-                  {/* CTA Button */}
-                  <Button
-                    className={`w-full py-4 text-lg font-semibold rounded-xl transition-all duration-300 ${
-                      tier.popular
-                        ? 'bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                    }`}
-                  >
-                    {tier.buttonText}
-                  </Button>
+                  {/* Card Content with Premium Spacing */}
+                  <div className="relative p-12 text-center transform transition-all duration-500 group-hover:scale-105">
+                    {/* Plan Name with Advanced Typography */}
+                    <h3 className={`text-3xl font-black mb-6 ${
+                      tier.popular 
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
+                        : 'text-slate-900'
+                    }`}>
+                      {tier.name}
+                    </h3>
+                    
+                    {/* Revolutionary Price Display */}
+                    <div className="mb-8 relative">
+                      <div className={`text-7xl font-black mb-2 ${
+                        tier.popular 
+                          ? 'bg-gradient-to-r from-slate-900 via-blue-700 to-purple-700 bg-clip-text text-transparent' 
+                          : 'text-slate-900'
+                      }`}>
+                        {tier.price}
+                      </div>
+                      <div className="text-lg text-slate-500 font-medium">{tier.period}</div>
+                      
+                      {/* Price Glow Effect for Popular Plan */}
+                      {tier.popular && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 blur-2xl rounded-full transform scale-150 -z-10" />
+                      )}
+                    </div>
+                    
+                    {/* Description with Premium Styling */}
+                    <p className="text-slate-600 leading-relaxed text-lg font-medium mb-10 max-w-sm mx-auto">
+                      {tier.description}
+                    </p>
+
+                    {/* Premium Feature List */}
+                    <div className="space-y-5 mb-12 text-left">
+                      {tier.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-start group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${idx * 50}ms`}}>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                            tier.popular 
+                              ? 'bg-gradient-to-r from-blue-500 to-purple-500' 
+                              : 'bg-gradient-to-r from-slate-400 to-slate-500'
+                          }`}>
+                            <Check className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          <span className="ml-4 text-slate-700 font-medium text-lg">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Revolutionary CTA Button */}
+                    <Button
+                      className={`w-full py-6 text-xl font-bold rounded-2xl transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-1 shadow-xl ${
+                        tier.popular
+                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white shadow-2xl hover:shadow-blue-500/30 border-2 border-white/20'
+                          : 'bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-900 hover:shadow-2xl border-2 border-slate-200'
+                      }`}
+                    >
+                      <span className="relative z-10">{tier.buttonText}</span>
+                      {tier.popular && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-2xl" />
+                      )}
+                    </Button>
+                    
+                    {/* Premium Hover Glow Effect */}
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-20 rounded-3xl transition-opacity duration-500 ${
+                      tier.popular 
+                        ? 'bg-gradient-to-br from-blue-400 to-purple-500' 
+                        : 'bg-gradient-to-br from-slate-300 to-slate-400'
+                    }`} />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Additional Info */}
-          <div className="text-center mt-16">
-            <p className="text-gray-600 mb-4">All plans include 14-day free trial • No credit card required • Cancel anytime</p>
-            <div className="flex justify-center space-x-8 text-sm text-gray-500">
-              <div className="flex items-center">
-                <Shield className="w-4 h-4 mr-2" />
-                <span>SOC 2 Compliant</span>
-              </div>
-              <div className="flex items-center">
-                <Lock className="w-4 h-4 mr-2" />
-                <span>Bank-Level Security</span>
-              </div>
-              <div className="flex items-center">
-                <Award className="w-4 h-4 mr-2" />
-                <span>99.9% Uptime SLA</span>
-              </div>
+          {/* Revolutionary Additional Info Section */}
+          <div className="text-center">
+            {/* Trust Badges with Glass Morphism */}
+            <div className="inline-flex bg-white/80 backdrop-blur-xl rounded-2xl px-8 py-6 mb-8 border border-white/40 shadow-2xl">
+              <p className="text-slate-600 text-lg font-medium">
+                <span className="text-emerald-600 font-bold">✨ 14-day free trial</span> • 
+                <span className="text-blue-600 font-bold mx-2">No credit card required</span> • 
+                <span className="text-purple-600 font-bold">Cancel anytime</span>
+              </p>
+            </div>
+            
+            {/* Premium Security Badges */}
+            <div className="flex justify-center flex-wrap gap-8 text-slate-600">
+              {[
+                { icon: Shield, text: "SOC 2 Compliant", color: "from-emerald-500 to-green-600" },
+                { icon: Lock, text: "Bank-Level Security", color: "from-blue-500 to-indigo-600" },
+                { icon: Award, text: "99.9% Uptime SLA", color: "from-purple-500 to-pink-600" }
+              ].map((badge, index) => (
+                <div key={index} className="flex items-center group cursor-pointer">
+                  <div className={`w-10 h-10 bg-gradient-to-r ${badge.color} rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <badge.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-lg group-hover:text-slate-800 transition-colors duration-300">{badge.text}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
