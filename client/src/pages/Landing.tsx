@@ -1508,13 +1508,13 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* Secondary Feature - Tall Card */}
             <div className="col-span-12 lg:col-span-4 group">
-              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-blue-50 to-indigo-50 border border-gray-200 shadow-2xl relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-50/20 to-transparent" />
+              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-blue-50 to-cyan-50 border border-gray-200 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-50/20 to-transparent" />
                 
                 <div className="relative h-full p-8 flex flex-col">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <div className="text-blue-600 text-2xl">
+                    <div className="w-16 h-16 rounded-2xl bg-cyan-100 border border-cyan-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-cyan-600 text-2xl">
                         {detailedFeatures[1].icon}
                       </div>
                     </div>
@@ -1540,12 +1540,12 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         { label: "Professional Voiceover", value: "92%" },
                         { label: "Scene Creation", value: "88%" }
                       ].map((metric, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-100">
+                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-cyan-50 border border-cyan-100">
                           <span className="text-gray-700 text-sm font-medium">{metric.label}</span>
                           <div className="flex items-center space-x-3">
                             <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-1000"
+                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-1000"
                                 style={{ width: metric.value }}
                               />
                             </div>
@@ -1556,7 +1556,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                   </div>
                   
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-2xl py-4 text-white font-medium transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg">
+                  <button className="w-full bg-cyan-600 hover:bg-cyan-700 border border-cyan-700 rounded-2xl py-4 text-white font-medium transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg">
                     <span>Explore Video Studio</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
@@ -1588,14 +1588,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
             {/* Tertiary Features - Wide Cards with Premium Design */}
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-gray-50 to-blue-50 border border-gray-200 shadow-2xl relative card-premium">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50/20 to-transparent animate-gradient-shift" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-white via-green-50 to-emerald-50 border border-gray-200 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-50/20 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <div className="text-blue-600 text-xl">
+                      <div className="w-14 h-14 rounded-2xl bg-green-100 border border-green-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <div className="text-green-600 text-xl">
                           {detailedFeatures[2].icon}
                         </div>
                       </div>
@@ -1621,7 +1621,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         { label: "Reports", value: "50+" },
                         { label: "Accuracy", value: "99%" }
                       ].map((stat, idx) => (
-                        <div key={idx} className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+                        <div key={idx} className="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
                           <div className="text-gray-900 font-bold text-lg">{stat.value}</div>
                           <div className="text-gray-600 text-xs">{stat.label}</div>
                         </div>
@@ -1629,7 +1629,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                      <button className="bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
+                      <button className="bg-green-600 hover:bg-green-700 border border-green-700 rounded-xl px-6 py-3 text-white font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg">
                         <span>View Analytics</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
@@ -1643,7 +1643,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       {[...Array(8)].map((_, i) => (
                         <div
                           key={i}
-                          className="absolute bottom-0 bg-gradient-to-t from-blue-400 to-blue-200 rounded-t-lg animate-slow-pulse"
+                          className="absolute bottom-0 bg-gradient-to-t from-green-400 to-emerald-200 rounded-t-lg animate-slow-pulse"
                           style={{
                             left: `${i * 12}%`,
                             width: '8%',
