@@ -68,6 +68,7 @@ export interface IStorage {
   getSocialAccountsByWorkspace(workspaceId: number | string): Promise<SocialAccount[]>;
   getAllSocialAccounts(): Promise<SocialAccount[]>;
   getSocialAccountByPlatform(workspaceId: number | string, platform: string): Promise<SocialAccount | undefined>;
+  getSocialAccountByPageId(pageId: string): Promise<SocialAccount | undefined>;
   getSocialConnections(userId: number): Promise<SocialAccount[]>;
   createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount>;
   updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount>;

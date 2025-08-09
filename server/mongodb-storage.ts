@@ -511,6 +511,18 @@ const CompetitorAnalysisSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// DM Template Schema for Instagram comment webhook automation
+const DmTemplateSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true },
+  messageText: { type: String, required: true },
+  buttonText: { type: String, required: true },
+  buttonUrl: { type: String, required: true },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WaitlistUserModel = mongoose.model('WaitlistUser', WaitlistUserSchema);
@@ -547,6 +559,7 @@ const FeedbackMessageModel = mongoose.model('FeedbackMessage', FeedbackMessageSc
 const CreativeBriefModel = mongoose.model('CreativeBrief', CreativeBriefSchema);
 const ContentRepurposeModel = mongoose.model('ContentRepurpose', ContentRepurposeSchema);
 const CompetitorAnalysisModel = mongoose.model('CompetitorAnalysis', CompetitorAnalysisSchema);
+const DmTemplateModel = mongoose.model('DmTemplate', DmTemplateSchema, 'dm_templates');
 
 export class MongoStorage implements IStorage {
   private isConnected = false;
@@ -1198,6 +1211,34 @@ export class MongoStorage implements IStorage {
     const account = await SocialAccountModel.findOne({ workspaceId: workspaceId.toString(), platform });
     console.log(`[MONGODB DEBUG] Found social account:`, account ? `${account.platform} @${account.username}` : 'none');
     return account ? this.convertSocialAccount(account) : undefined;
+  }
+
+  async getSocialAccountByPageId(pageId: string): Promise<SocialAccount | undefined> {
+    await this.connect();
+    console.log(`[MONGODB DEBUG] getSocialAccountByPageId called with pageId: ${pageId}`);
+    
+    try {
+      const account = await SocialAccountModel.findOne({ 
+        pageId: pageId,
+        platform: 'instagram',
+        isActive: true 
+      });
+      
+      console.log(`[MONGODB DEBUG] Found account by pageId:`, account ? 'Yes' : 'No');
+      
+      if (account) {
+        console.log(`[MONGODB DEBUG] Account details:`, {
+          id: account._id,
+          username: account.username,
+          workspaceId: account.workspaceId
+        });
+      }
+      
+      return account ? this.convertSocialAccount(account) : undefined;
+    } catch (error) {
+      console.error(`[MONGODB DEBUG] getSocialAccountByPageId error:`, error);
+      return undefined;
+    }
   }
 
   async getSocialConnections(userId: number | string): Promise<SocialAccount[]> {

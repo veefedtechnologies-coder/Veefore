@@ -12,6 +12,7 @@ import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
 import { InstagramAutomation } from "./instagram-automation";
 import { InstagramWebhookHandler } from "./instagram-webhook";
+import { InstagramCommentWebhookHandler } from "./instagram-comment-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 import { videoShortenerAI } from './video-shortener-ai';
@@ -70,6 +71,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const instagramDirectSync = new InstagramDirectSync(storage);
   const instagramAutomation = new InstagramAutomation(storage);
   const webhookHandler = new InstagramWebhookHandler(storage);
+  const commentWebhookHandler = new InstagramCommentWebhookHandler(storage);
   const creditService = new CreditService();
   const enhancedDMService = new EnhancedAutoDMService(storage as any);
   const dashboardCache = new DashboardCache(storage);
@@ -7062,6 +7064,119 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.get('/webhook/instagram', async (req, res) => {
     console.log('[WEBHOOK] Instagram webhook verification request');
     await webhookHandler.handleVerification(req, res);
+  });
+
+  // Instagram Comment Webhook Routes for DM Automation
+  app.get('/webhook/instagram-comments', async (req, res) => {
+    console.log('[COMMENT WEBHOOK] Instagram comment webhook verification request');
+    await commentWebhookHandler.handleVerification(req, res);
+  });
+
+  app.post('/webhook/instagram-comments', async (req, res) => {
+    console.log('[COMMENT WEBHOOK] Instagram comment webhook event received');
+    await commentWebhookHandler.handleWebhookEvent(req, res);
+  });
+
+  // Test webhook system endpoint
+  app.post('/api/test-instagram-webhook', requireAuth, async (req, res) => {
+    await commentWebhookHandler.testWebhookSystem(req, res);
+  });
+
+  // DM Template Management Routes
+  app.post('/api/dm-templates', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId, messageText, buttonText, buttonUrl } = req.body;
+
+      // Verify user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      const userOwnsWorkspace = workspace.userId.toString() === user.id.toString() || 
+                               workspace.userId.toString() === user.firebaseUid;
+      
+      if (!userOwnsWorkspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const template = await commentWebhookHandler.createDmTemplate(
+        user.id.toString(),
+        workspaceId,
+        messageText,
+        buttonText,
+        buttonUrl
+      );
+
+      res.json(template);
+    } catch (error: any) {
+      console.error('[DM TEMPLATE] Error creating template:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/dm-templates/:workspaceId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.workspaceId;
+
+      // Verify user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      const userOwnsWorkspace = workspace.userId.toString() === user.id.toString() || 
+                               workspace.userId.toString() === user.firebaseUid;
+      
+      if (!userOwnsWorkspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const template = await commentWebhookHandler.getActiveDmTemplate(workspaceId);
+      res.json(template);
+    } catch (error: any) {
+      console.error('[DM TEMPLATE] Error fetching template:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put('/api/dm-templates/:workspaceId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspaceId = req.params.workspaceId;
+      const { messageText, buttonText, buttonUrl } = req.body;
+
+      // Verify user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+
+      const userOwnsWorkspace = workspace.userId.toString() === user.id.toString() || 
+                               workspace.userId.toString() === user.firebaseUid;
+      
+      if (!userOwnsWorkspace) {
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
+      const template = await commentWebhookHandler.updateDmTemplate(
+        workspaceId,
+        messageText,
+        buttonText,
+        buttonUrl
+      );
+
+      if (!template) {
+        return res.status(404).json({ error: 'Template not found' });
+      }
+
+      res.json(template);
+    } catch (error: any) {
+      console.error('[DM TEMPLATE] Error updating template:', error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // OLD WEBHOOK ENDPOINTS - REPLACED BY NEW SYSTEM
