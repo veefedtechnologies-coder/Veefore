@@ -126,108 +126,322 @@ const Landing = ({ onNavigate }: LandingProps) => {
     }
   ]
 
-  // Detailed feature sections with comprehensive information
+  // Comprehensive feature sections with extensive detail
   const detailedFeatures = [
     {
-      title: "AI-Powered Content Creation & Video Generation",
-      description: "Transform your content strategy with our revolutionary AI content creation suite. Generate high-quality posts, captions, scripts, and professional videos using advanced AI models. Our Cosmos Video Generator creates stunning visual content with automated scene selection, voiceover generation, and smart editing capabilities.",
-      icon: <Wand2 className="w-16 h-16 text-blue-500" />,
-      gradient: "from-blue-500 via-purple-500 to-pink-500",
+      title: "VeeGPT - Advanced AI Chat Assistant & Strategic Intelligence",
+      description: "Experience the next generation of AI-powered social media assistance with VeeGPT, our flagship conversational AI that combines the power of GPT-4 with specialized social media expertise. Unlike generic chatbots, VeeGPT understands your brand, analyzes your audience, and provides contextual insights that drive real business growth.",
+      icon: <Bot className="w-16 h-16 text-violet-500" />,
+      gradient: "from-violet-500 via-purple-500 to-indigo-500",
       image: "/api/placeholder/600/400",
       details: [
-        "Advanced AI content generation using GPT-4 and custom models",
-        "Professional video creation with automated script writing and scene generation",
-        "Multi-format content optimization for different social platforms",
-        "Brand voice consistency across all generated content",
-        "Trending topic integration and viral content prediction",
-        "Custom template library with industry-specific content frameworks",
-        "Real-time content performance prediction and optimization suggestions",
-        "Automated hashtag research and audience targeting recommendations"
+        "Real-time streaming responses with ChatGPT-like interface optimized for social media workflows",
+        "Advanced context awareness that remembers your brand voice, audience preferences, and campaign history",
+        "Strategic content planning with AI-generated content calendars and campaign strategies",
+        "Competitive analysis and market research capabilities with actionable insights",
+        "Custom AI model training on your specific industry and audience data",
+        "Multi-language support with localized content recommendations for global audiences",
+        "Integration with all platform features for seamless workflow optimization",
+        "Voice and text input capabilities for hands-free content creation and strategy development",
+        "Advanced prompt engineering with industry-specific templates and frameworks",
+        "Real-time trend analysis and viral content prediction algorithms",
+        "Personalized growth strategies based on your current metrics and industry benchmarks",
+        "Crisis management guidance with real-time reputation monitoring and response suggestions"
       ]
     },
     {
-      title: "Advanced Analytics & Performance Insights",
-      description: "Make data-driven decisions with our comprehensive analytics platform. Track performance across all social media channels, analyze competitor strategies, monitor engagement patterns, and get actionable insights to optimize your social media ROI and growth trajectory.",
-      icon: <BarChart3 className="w-16 h-16 text-purple-500" />,
-      gradient: "from-purple-500 via-blue-500 to-cyan-500",
+      title: "Cosmos AI Video Studio - Professional Video Generation Platform",
+      description: "Transform your video content strategy with Cosmos, our revolutionary AI video generation engine that creates broadcast-quality videos in minutes. From concept to final edit, Cosmos handles every aspect of video production using cutting-edge AI models and professional-grade automation.",
+      icon: <Video className="w-16 h-16 text-blue-500" />,
+      gradient: "from-blue-500 via-cyan-500 to-teal-500",
       image: "/api/placeholder/600/400",
       details: [
-        "Real-time performance tracking across all major social platforms",
-        "Advanced engagement analytics with demographic breakdowns",
-        "Competitor benchmarking and gap analysis tools",
-        "Custom report building with white-label options",
-        "Automated performance alerts and optimization recommendations",
-        "Cross-platform analytics consolidation and unified reporting",
-        "ROI tracking and campaign attribution analysis",
-        "Predictive analytics for content performance and audience growth"
+        "Advanced script generation using GPT-4 with viral content optimization and storytelling frameworks",
+        "Automated scene creation with AI-generated visuals, animations, and professional transitions",
+        "Professional voiceover generation with 200+ realistic voices in 50+ languages and accents",
+        "Smart video editing with automatic pacing, music selection, and visual effects",
+        "Multi-format export optimization for all social platforms (vertical, square, horizontal)",
+        "Brand asset integration with automatic logo placement and color scheme consistency",
+        "Template library with 500+ pre-designed video frameworks for every industry",
+        "Real-time collaboration tools for team-based video production and approval workflows",
+        "Advanced AI image generation for custom scenes, backgrounds, and product visualizations",
+        "Automated subtitle generation with styling options and multi-language support",
+        "Performance analytics integration to optimize video content based on engagement data",
+        "Custom music composition using AI with royalty-free licensing and mood-based selection",
+        "Green screen replacement and advanced visual effects powered by machine learning",
+        "Batch processing capabilities for creating multiple video variations from single scripts"
       ]
     },
     {
-      title: "Smart Scheduling & Intelligent Calendar Management",
-      description: "Schedule content at optimal times with AI-powered timing recommendations. Our intelligent calendar learns your audience behavior, suggests trending dates, and automates content distribution across all platforms for maximum reach and engagement.",
-      icon: <Calendar className="w-16 h-16 text-green-500" />,
-      gradient: "from-green-500 via-teal-500 to-blue-500",
+      title: "Analytics Pro - Enterprise-Grade Performance Intelligence",
+      description: "Unlock the full potential of your social media data with Analytics Pro, our comprehensive business intelligence platform that transforms raw metrics into actionable growth strategies. Built for enterprises and agencies managing multiple accounts and complex campaigns.",
+      icon: <BarChart3 className="w-16 h-16 text-emerald-500" />,
+      gradient: "from-emerald-500 via-green-500 to-teal-500",
       image: "/api/placeholder/600/400",
       details: [
-        "AI-optimized posting time recommendations based on audience activity",
-        "Bulk scheduling with advanced drag-and-drop calendar interface",
-        "Content queue management with automatic conflict resolution",
-        "Trending events and holiday calendar integration",
-        "Time zone optimization for global audience targeting",
-        "Content recycling and evergreen post automation",
-        "Team collaboration with approval workflows and content assignments",
-        "Emergency posting and crisis management tools"
+        "Real-time dashboard with customizable widgets tracking 200+ social media metrics across all platforms",
+        "Advanced audience demographics analysis with psychographic profiling and behavior prediction",
+        "Comprehensive competitor intelligence with automated benchmarking and market share analysis",
+        "ROI attribution modeling with multi-touch campaign attribution and conversion tracking",
+        "Predictive analytics using machine learning to forecast performance and identify growth opportunities",
+        "Custom report builder with 50+ templates and white-label branding for client presentations",
+        "Automated alert system for performance anomalies, viral content detection, and crisis monitoring",
+        "Cross-platform analytics consolidation with unified KPI tracking and goal management",
+        "Advanced cohort analysis for understanding user lifecycle and retention patterns",
+        "Sentiment analysis with emotion detection and brand perception monitoring",
+        "Influencer performance tracking with reach, engagement, and conversion analytics",
+        "Campaign performance optimization with A/B testing insights and recommendation engine",
+        "Data export capabilities with API access for custom integrations and business intelligence tools",
+        "Historical data analysis with trend identification and seasonal pattern recognition",
+        "Team performance analytics with individual contributor metrics and productivity insights"
       ]
     },
     {
-      title: "Unified Inbox & Customer Engagement Hub",
-      description: "Manage all your social conversations from one powerful inbox. Automate responses, prioritize messages, and maintain consistent customer service across all platforms with AI-powered message categorization and suggested replies.",
-      icon: <MessageSquare className="w-16 h-16 text-orange-500" />,
-      gradient: "from-orange-500 via-red-500 to-pink-500",
+      title: "Content Studio - AI-Powered Creative Intelligence Platform",
+      description: "Revolutionize your content creation process with Content Studio, our advanced AI platform that combines creativity with data-driven insights. Generate high-converting content that resonates with your audience while maintaining your unique brand voice and style.",
+      icon: <Palette className="w-16 h-16 text-pink-500" />,
+      gradient: "from-pink-500 via-rose-500 to-red-500",
       image: "/api/placeholder/600/400",
       details: [
-        "Unified inbox for all social media messages and comments",
-        "AI-powered message categorization and priority scoring",
-        "Automated response suggestions with brand voice consistency",
-        "Customer service ticket integration and escalation workflows",
-        "Sentiment analysis and crisis detection for immediate alerts",
-        "Team collaboration with message assignment and tracking",
-        "Response templates and canned message libraries",
-        "Performance tracking for response times and customer satisfaction"
+        "Advanced content generation using multiple AI models (GPT-4, Claude, custom fine-tuned models)",
+        "Brand voice training with tone analysis and consistency enforcement across all content",
+        "Trend prediction engine analyzing millions of social posts to identify emerging opportunities",
+        "Visual content creation with AI-generated images, graphics, and custom illustrations",
+        "Content optimization engine with engagement prediction and performance scoring",
+        "Industry-specific templates and frameworks for 50+ business categories and niches",
+        "Multi-platform adaptation with automatic content formatting for each social network",
+        "Hashtag research and optimization with trending analysis and reach prediction",
+        "Content calendar integration with strategic planning and campaign coordination",
+        "A/B testing framework for optimizing headlines, copy, and creative elements",
+        "User-generated content curation with automated discovery and licensing assistance",
+        "Content repurposing engine that transforms single ideas into multiple format variations",
+        "Collaborative workspace with team editing, approval workflows, and version control",
+        "Performance feedback loop that learns from your best-performing content to improve future suggestions",
+        "Content compliance checking for platform guidelines and brand safety requirements"
       ]
     },
     {
-      title: "Multi-Platform Publishing & Social Media Management",
-      description: "Manage Instagram, Facebook, Twitter, LinkedIn, YouTube, TikTok, Pinterest, and more from one unified dashboard. Cross-post content, maintain brand consistency, and adapt formats automatically for each platform's unique requirements.",
-      icon: <Globe className="w-16 h-16 text-indigo-500" />,
-      gradient: "from-indigo-500 via-purple-500 to-pink-500",
-      image: "/api/placeholder/600/400",
-      details: [
-        "Support for 20+ major social media platforms and emerging networks",
-        "Intelligent content adaptation for platform-specific formats and requirements",
-        "Cross-platform publishing with single-click distribution",
-        "Platform-specific optimization for maximum reach and engagement",
-        "Account health monitoring and compliance checking",
-        "Centralized asset library with advanced search and tagging",
-        "Brand guidelines enforcement across all platforms",
-        "Automated content versioning for different platform specifications"
-      ]
-    },
-    {
-      title: "Advanced Automation & Workflow Intelligence",
-      description: "Automate repetitive tasks and create intelligent workflows that respond to audience behavior, engage with followers, manage comments, and grow your social presence 24/7 while maintaining authentic brand interactions.",
+      title: "Smart Automation Engine - Advanced Workflow Intelligence",
+      description: "Transform your social media management with our sophisticated automation platform that goes beyond simple scheduling. Create intelligent workflows that respond to audience behavior, market conditions, and performance metrics in real-time.",
       icon: <Zap className="w-16 h-16 text-yellow-500" />,
       gradient: "from-yellow-500 via-orange-500 to-red-500",
       image: "/api/placeholder/600/400",
       details: [
-        "Smart automation rules with conditional logic and triggers",
-        "Automated comment management and response generation",
-        "Follower engagement automation with authentic interaction patterns",
-        "Lead generation workflows with CRM integration",
-        "Crisis management automation with escalation protocols",
-        "Growth hacking automation for follower acquisition",
-        "Content curation automation with quality filtering",
-        "Performance-based automation adjustments and optimization"
+        "Advanced rule-based automation with conditional logic, triggers, and complex workflow chains",
+        "AI-powered comment management with context-aware responses and sentiment analysis",
+        "Intelligent follower engagement with authentic interaction patterns and relationship building",
+        "Lead generation automation with CRM integration and qualification scoring",
+        "Crisis management protocols with automated escalation and reputation protection",
+        "Growth hacking automation using proven strategies for organic follower acquisition",
+        "Content curation workflows with quality filtering and brand alignment checking",
+        "Performance-based optimization that automatically adjusts strategies based on results",
+        "Cross-platform synchronization ensuring consistent messaging and timing across all networks",
+        "Audience segmentation automation with behavioral targeting and personalized messaging",
+        "Competitor monitoring with automated alerts for mentions, campaigns, and strategy changes",
+        "Influencer outreach automation with personalized messaging and relationship management",
+        "Event-triggered campaigns that respond to real-world events, trends, and opportunities",
+        "Advanced scheduling with dynamic timing optimization based on audience activity patterns",
+        "Workflow analytics with performance tracking and continuous improvement suggestions"
+      ]
+    },
+    {
+      title: "Unified Social Inbox - Enterprise Communication Hub",
+      description: "Centralize all your social media communications in one powerful inbox designed for teams and enterprises. Manage conversations, customer service, and community engagement with AI-powered efficiency and human-level quality.",
+      icon: <MessageSquare className="w-16 h-16 text-indigo-500" />,
+      gradient: "from-indigo-500 via-blue-500 to-purple-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "Unified inbox aggregating messages from 20+ social platforms and communication channels",
+        "AI-powered message categorization with priority scoring and urgency detection",
+        "Automated response suggestions maintaining brand voice consistency and context awareness",
+        "Advanced customer service features with ticket creation and escalation workflows",
+        "Real-time sentiment analysis with mood tracking and customer satisfaction scoring",
+        "Team collaboration tools with message assignment, internal notes, and workload distribution",
+        "Response template library with dynamic personalization and smart suggestions",
+        "Performance analytics tracking response times, resolution rates, and customer satisfaction",
+        "Multi-language support with automatic translation and culturally appropriate responses",
+        "CRM integration with customer history, purchase data, and interaction tracking",
+        "Automated follow-up sequences for lead nurturing and customer retention",
+        "Crisis detection and management with escalation protocols and executive notifications",
+        "Knowledge base integration for consistent information sharing and FAQ automation",
+        "Advanced filtering and search capabilities with tag-based organization and custom views",
+        "Quality assurance tools with response monitoring and team performance evaluation"
+      ]
+    },
+    {
+      title: "Smart Calendar & Strategic Planning Platform",
+      description: "Master your content strategy with our intelligent calendar system that combines AI-powered optimization with comprehensive planning tools. Plan, schedule, and optimize your content for maximum impact across all platforms.",
+      icon: <Calendar className="w-16 h-16 text-green-500" />,
+      gradient: "from-green-500 via-emerald-500 to-teal-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "AI-optimized posting schedules based on audience behavior, platform algorithms, and engagement patterns",
+        "Advanced drag-and-drop calendar interface with bulk editing and multi-platform coordination",
+        "Content queue management with automatic conflict resolution and optimal distribution",
+        "Trending events and holiday integration with timely content suggestions and campaign ideas",
+        "Global time zone optimization for international audiences and market-specific timing",
+        "Content recycling engine for evergreen posts with performance-based resharing",
+        "Team collaboration features with approval workflows, content assignments, and deadline tracking",
+        "Emergency publishing capabilities for crisis management and real-time response",
+        "Campaign planning tools with milestone tracking and performance goal setting",
+        "Content gap analysis identifying opportunities for improved posting frequency and timing",
+        "Seasonal trend prediction with historical data analysis and future planning recommendations",
+        "Resource allocation planning for content creation and marketing budget optimization",
+        "Integration with content creation tools for seamless workflow from ideation to publication",
+        "Performance forecasting using historical data and market trends to predict campaign success",
+        "Advanced analytics showing optimal posting patterns and audience engagement windows"
+      ]
+    },
+    {
+      title: "Growth Engine - Advanced Audience Development Platform",
+      description: "Accelerate your audience growth with our comprehensive platform that combines AI-driven strategies, competitive intelligence, and proven growth tactics to build engaged, high-value communities around your brand.",
+      icon: <TrendingUp className="w-16 h-16 text-purple-500" />,
+      gradient: "from-purple-500 via-pink-500 to-rose-500",
+      image: "/api/placeholder/600/400",
+      details: [
+        "AI-powered growth strategies customized for your industry, audience, and business objectives",
+        "Comprehensive competitor analysis with strategy insights and opportunity identification",
+        "Influencer discovery and relationship management with performance tracking and ROI analysis",
+        "Advanced hashtag optimization with trending analysis, reach prediction, and engagement scoring",
+        "Community building tools with engagement tactics and relationship nurturing automation",
+        "Viral content engineering using data-driven insights and proven viral mechanics",
+        "Audience targeting with psychographic profiling and lookalike audience generation",
+        "Cross-platform growth coordination ensuring consistent expansion across all networks",
+        "Conversion optimization tools turning followers into customers and brand advocates",
+        "Reputation management with brand mention monitoring and sentiment tracking",
+        "Partnership opportunity identification with collaboration potential scoring",
+        "Content amplification strategies maximizing reach through strategic timing and targeting",
+        "Growth experiment framework with A/B testing and performance optimization",
+        "Market expansion analysis identifying new audience segments and geographic opportunities",
+        "Long-term growth planning with milestone tracking and strategic roadmap development"
+      ]
+    }
+  ]
+
+  // Additional comprehensive platform capabilities
+  const enterpriseFeatures = [
+    {
+      title: "Enterprise Security & Compliance",
+      description: "Bank-level security with comprehensive compliance features for enterprises and agencies managing sensitive client data.",
+      icon: <Shield className="w-12 h-12 text-blue-600" />,
+      features: [
+        "SOC 2 Type II compliance with annual audits",
+        "GDPR and CCPA compliance with data protection controls",
+        "Single Sign-On (SSO) integration with enterprise identity providers",
+        "Role-based access control with granular permissions",
+        "Data encryption at rest and in transit using AES-256",
+        "Audit logging with comprehensive activity tracking",
+        "IP whitelisting and VPN integration",
+        "Regular security assessments and penetration testing"
+      ]
+    },
+    {
+      title: "API & Integration Ecosystem",
+      description: "Powerful APIs and extensive integration capabilities for custom workflows and enterprise system connectivity.",
+      icon: <Code className="w-12 h-12 text-green-600" />,
+      features: [
+        "RESTful API with comprehensive documentation",
+        "Webhook support for real-time data synchronization",
+        "Zapier integration with 3000+ popular business tools",
+        "Custom integration development support",
+        "CRM integrations (Salesforce, HubSpot, Pipedrive)",
+        "Marketing automation platform connectivity",
+        "Analytics platform data export capabilities",
+        "Developer sandbox environment for testing"
+      ]
+    },
+    {
+      title: "Advanced Team Management",
+      description: "Sophisticated team collaboration and management features designed for agencies and large organizations.",
+      icon: <Users className="w-12 h-12 text-purple-600" />,
+      features: [
+        "Unlimited team members with role-based permissions",
+        "Client workspace separation with branded environments",
+        "Advanced approval workflows with custom review processes",
+        "Team performance analytics and productivity insights",
+        "Resource allocation and capacity planning tools",
+        "Time tracking and billing integration capabilities",
+        "Custom notification systems and communication channels",
+        "Training resources and onboarding automation"
+      ]
+    },
+    {
+      title: "White-Label & Reseller Program",
+      description: "Complete white-label solutions for agencies and resellers to offer VeeFore under their own brand.",
+      icon: <Award className="w-12 h-12 text-orange-600" />,
+      features: [
+        "Fully customizable branding with your logo and colors",
+        "Custom domain hosting with SSL certificates",
+        "Reseller pricing tiers with volume discounts",
+        "Marketing materials and sales support",
+        "Technical support for your clients",
+        "Revenue sharing opportunities",
+        "Co-marketing program participation",
+        "Priority feature development consideration"
+      ]
+    }
+  ]
+
+  // Industry-specific solutions
+  const industrySolutions = [
+    {
+      industry: "E-commerce & Retail",
+      description: "Specialized tools for product promotion, sales conversion, and customer retention in the retail sector.",
+      icon: <ShoppingCart className="w-12 h-12 text-blue-500" />,
+      features: [
+        "Product catalog integration with automated posting",
+        "Shopping tag automation for Instagram and Facebook",
+        "Inventory-based content scheduling",
+        "Customer review management and showcase",
+        "Seasonal campaign automation",
+        "Abandoned cart recovery campaigns",
+        "Influencer partnership management",
+        "Sales attribution and ROI tracking"
+      ]
+    },
+    {
+      industry: "Healthcare & Wellness",
+      description: "Compliant social media management with specialized features for healthcare professionals and wellness brands.",
+      icon: <Heart className="w-12 h-12 text-red-500" />,
+      features: [
+        "HIPAA-compliant content management",
+        "Medical content review workflows",
+        "Patient education content library",
+        "Appointment booking integration",
+        "Health awareness campaign automation",
+        "Professional credibility building tools",
+        "Community health engagement features",
+        "Regulatory compliance monitoring"
+      ]
+    },
+    {
+      industry: "Professional Services",
+      description: "Build authority and generate leads for consulting, legal, financial, and other professional service firms.",
+      icon: <Building2 className="w-12 h-12 text-gray-600" />,
+      features: [
+        "Thought leadership content automation",
+        "Client testimonial showcase tools",
+        "Industry expertise demonstration",
+        "Lead qualification and nurturing",
+        "Professional network building",
+        "Speaking engagement promotion",
+        "Case study content creation",
+        "Industry trend commentary automation"
+      ]
+    },
+    {
+      industry: "Technology & SaaS",
+      description: "Growth-focused features for technology companies, startups, and SaaS businesses looking to scale.",
+      icon: <Cpu className="w-12 h-12 text-purple-500" />,
+      features: [
+        "Product update announcement automation",
+        "Developer community engagement",
+        "Technical content optimization",
+        "User onboarding content sequences",
+        "Feature adoption tracking and promotion",
+        "Beta testing community management",
+        "Integration partner showcasing",
+        "Technical documentation promotion"
       ]
     }
   ]
@@ -540,68 +754,417 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Detailed Features Section */}
+      {/* Comprehensive Features Section */}
       <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <div className="inline-flex items-center bg-gradient-to-r from-purple-100 to-pink-100 rounded-full px-6 py-3 mb-8">
               <Wand2 className="w-5 h-5 text-purple-600 mr-2" />
-              <span className="text-purple-800 font-semibold">Advanced Features</span>
+              <span className="text-purple-800 font-semibold">Advanced Platform Features</span>
             </div>
             <h2 className="text-5xl lg:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Comprehensive Capabilities
+                Enterprise-Grade Capabilities
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Detailed breakdown of every feature and capability that makes VeeFore the most advanced social media management platform available.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Comprehensive breakdown of every advanced feature and capability that makes VeeFore the most sophisticated, AI-powered social media management platform for modern businesses and agencies.
             </p>
           </div>
 
-          <div className="space-y-24">
+          <div className="space-y-32">
             {detailedFeatures.map((feature, index) => (
-              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-16`}>
-                {/* Image/Visual */}
+              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-20`}>
+                {/* Visual Section */}
                 <div className="lg:w-1/2">
                   <div className="relative">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-3xl opacity-20 blur-3xl scale-105`}></div>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-3xl opacity-20 blur-3xl scale-110`}></div>
                     <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
                       <div className="p-8 text-center">
-                        <div className="mb-6">
+                        <div className="mb-8">
                           {feature.icon}
                         </div>
-                        <img 
-                          src={feature.image} 
-                          alt={feature.title}
-                          className="w-full h-64 object-cover rounded-2xl"
-                        />
+                        <div className="mb-6">
+                          <img 
+                            src={feature.image} 
+                            alt={feature.title}
+                            className="w-full h-72 object-cover rounded-2xl shadow-lg"
+                          />
+                        </div>
+                        <div className={`h-2 bg-gradient-to-r ${feature.gradient} rounded-full`}></div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Content */}
+                {/* Content Section */}
                 <div className="lg:w-1/2">
-                  <h3 className="text-4xl font-bold text-gray-900 mb-6">
-                    {feature.title}
-                  </h3>
-                  <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <div className="mb-6">
+                    <div className={`inline-flex items-center bg-gradient-to-r ${feature.gradient} bg-opacity-10 rounded-full px-4 py-2 mb-4`}>
+                      <span className="text-sm font-semibold text-gray-700">Feature #{index + 1}</span>
+                    </div>
+                    <h3 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                      {feature.title}
+                    </h3>
+                    <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
                   
-                  <div className="grid grid-cols-1 gap-4">
-                    {feature.details.map((detail, idx) => (
+                  <div className="space-y-6">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-6">Key Capabilities & Benefits</h4>
+                    <div className="grid grid-cols-1 gap-5">
+                      {feature.details.map((detail, idx) => (
+                        <div key={idx} className="flex items-start group">
+                          <div className={`w-8 h-8 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300`}>
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="ml-4 text-gray-700 leading-relaxed font-medium">{detail}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-10">
+                    <Button 
+                      className={`bg-gradient-to-r ${feature.gradient} text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300`}
+                    >
+                      Explore {feature.title.split(' ')[0]} Features
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise Features Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full px-6 py-3 mb-8">
+              <Shield className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-blue-800 font-semibold">Enterprise Solutions</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Built for Scale & Security
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Advanced enterprise features designed for large organizations, agencies, and businesses requiring maximum security, compliance, and scalability.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {enterpriseFeatures.map((feature, index) => (
+              <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200">
+                <div className="p-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-6">
+                      {feature.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-8 leading-relaxed text-lg">{feature.description}</p>
+                  
+                  <div className="space-y-4">
+                    {feature.features.map((feat, idx) => (
                       <div key={idx} className="flex items-start">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                           <Check className="w-3 h-3 text-white" />
                         </div>
-                        <span className="ml-4 text-gray-700 leading-relaxed">{detail}</span>
+                        <span className="ml-4 text-gray-700 leading-relaxed">{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Industry Solutions Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full px-6 py-3 mb-8">
+              <Target className="w-5 h-5 text-indigo-600 mr-2" />
+              <span className="text-indigo-800 font-semibold">Industry-Specific Solutions</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Tailored for Your Industry
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Specialized features and workflows designed for specific industries, ensuring compliance, optimization, and best practices for your business sector.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {industrySolutions.map((solution, index) => (
+              <div key={index} className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-200 group">
+                <div className="p-10">
+                  <div className="flex items-center mb-8">
+                    <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 group-hover:scale-110 transition-transform duration-300">
+                      {solution.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{solution.industry}</h3>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-8 leading-relaxed text-lg">{solution.description}</p>
+                  
+                  <div className="space-y-4">
+                    {solution.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="ml-4 text-gray-700 leading-relaxed">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8">
+                    <Button 
+                      variant="outline"
+                      className="border-2 border-violet-200 text-violet-700 hover:bg-violet-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+                    >
+                      Learn More About {solution.industry}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Technology & Innovation Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-violet-900/50 to-blue-900/50 rounded-full px-6 py-3 mb-8 border border-violet-500/30">
+              <Cpu className="w-5 h-5 text-violet-400 mr-2" />
+              <span className="text-violet-300 font-semibold">Advanced Technology Stack</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Powered by Cutting-Edge AI
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+              Built on enterprise-grade infrastructure with the latest AI models, cloud computing, and security technologies to deliver unmatched performance and reliability.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Advanced AI Models</h3>
+              <p className="text-gray-400 mb-6">Multiple state-of-the-art AI models working in harmony to deliver exceptional results.</p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />GPT-4 Turbo for advanced reasoning</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Claude 3 for content analysis</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Custom fine-tuned models</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />DALL-E 3 for image generation</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Whisper for audio processing</li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
+                <Cloud className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Cloud Infrastructure</h3>
+              <p className="text-gray-400 mb-6">Enterprise-grade cloud infrastructure ensuring 99.9% uptime and global accessibility.</p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Multi-region deployment</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Auto-scaling architecture</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />CDN optimization</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Real-time monitoring</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Disaster recovery</li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-8 border border-gray-700/50 backdrop-blur-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                <Lock className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Security & Privacy</h3>
+              <p className="text-gray-400 mb-6">Bank-level security with comprehensive privacy protection and regulatory compliance.</p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />End-to-end encryption</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />SOC 2 Type II certified</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />GDPR compliant</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Regular security audits</li>
+                <li className="flex items-center"><Check className="w-4 h-4 text-green-400 mr-3" />Zero-trust architecture</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-400 text-lg">Built with modern technologies: React, Node.js, MongoDB, Redis, Docker, Kubernetes, and more</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Success Stories & Case Studies */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-full px-6 py-3 mb-8">
+              <Award className="w-5 h-5 text-green-600 mr-2" />
+              <span className="text-green-800 font-semibold">Success Stories</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Proven Results & Growth
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Real businesses achieving extraordinary results with VeeFore. From startups to Fortune 500 companies, see how our platform drives measurable growth.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-200">
+              <div className="text-center mb-8">
+                <div className="text-4xl font-bold text-blue-600 mb-2">500%</div>
+                <div className="text-gray-600 font-semibold">Engagement Increase</div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">E-commerce Fashion Brand</h3>
+              <p className="text-gray-600 mb-6">A mid-size fashion retailer increased their social media engagement by 500% and sales by 200% within 6 months using VeeFore's AI content generation and automation features.</p>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex justify-between"><span>Followers Growth:</span><span className="font-semibold text-green-600">+250%</span></div>
+                <div className="flex justify-between"><span>Content Efficiency:</span><span className="font-semibold text-green-600">+400%</span></div>
+                <div className="flex justify-between"><span>Revenue Impact:</span><span className="font-semibold text-green-600">+200%</span></div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 border border-purple-200">
+              <div className="text-center mb-8">
+                <div className="text-4xl font-bold text-purple-600 mb-2">90%</div>
+                <div className="text-gray-600 font-semibold">Time Saved</div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Digital Marketing Agency</h3>
+              <p className="text-gray-600 mb-6">A leading agency managing 100+ client accounts reduced content creation time by 90% while improving client satisfaction scores and expanding their service capacity.</p>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex justify-between"><span>Client Capacity:</span><span className="font-semibold text-green-600">+300%</span></div>
+                <div className="flex justify-between"><span>Response Time:</span><span className="font-semibold text-green-600">-85%</span></div>
+                <div className="flex justify-between"><span>Client Retention:</span><span className="font-semibold text-green-600">+95%</span></div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-8 border border-green-200">
+              <div className="text-center mb-8">
+                <div className="text-4xl font-bold text-green-600 mb-2">$2M</div>
+                <div className="text-gray-600 font-semibold">Revenue Generated</div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">SaaS Startup</h3>
+              <p className="text-gray-600 mb-6">A B2B SaaS startup generated $2M in additional revenue through VeeFore's lead generation automation and strategic content planning over 12 months.</p>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex justify-between"><span>Lead Quality:</span><span className="font-semibold text-green-600">+180%</span></div>
+                <div className="flex justify-between"><span>Conversion Rate:</span><span className="font-semibold text-green-600">+120%</span></div>
+                <div className="flex justify-between"><span>Customer LTV:</span><span className="font-semibold text-green-600">+150%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Button className="bg-gradient-to-r from-violet-600 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+              Read Complete Case Studies
+              <ExternalLink className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Platform Integrations */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-gradient-to-r from-gray-100 to-slate-100 rounded-full px-6 py-3 mb-8">
+              <Network className="w-5 h-5 text-gray-600 mr-2" />
+              <span className="text-gray-800 font-semibold">Platform Integrations</span>
+            </div>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-8">
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Connect Everything
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Seamless integration with all major social media platforms, business tools, and third-party services to create a unified workflow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-16">
+            {[
+              { name: "Instagram", users: "2B+" },
+              { name: "Facebook", users: "3B+" },
+              { name: "Twitter/X", users: "500M+" },
+              { name: "LinkedIn", users: "900M+" },
+              { name: "TikTok", users: "1B+" },
+              { name: "YouTube", users: "2.7B+" },
+              { name: "Pinterest", users: "450M+" },
+              { name: "Snapchat", users: "375M+" },
+              { name: "Reddit", users: "430M+" },
+              { name: "Discord", users: "150M+" },
+              { name: "Telegram", users: "700M+" },
+              { name: "WhatsApp", users: "2.8B+" }
+            ].map((platform, index) => (
+              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center group">
+                <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Globe className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-1">{platform.name}</h3>
+                <p className="text-sm text-gray-600">{platform.users} users</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-lg p-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Business Tools Integration</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <Database className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">CRM Systems</h4>
+                <p className="text-gray-600 text-sm">Salesforce, HubSpot, Pipedrive, Zoho</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">Analytics</h4>
+                <p className="text-gray-600 text-sm">Google Analytics, Adobe Analytics, Mixpanel</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">Automation</h4>
+                <p className="text-gray-600 text-sm">Zapier, Make, Microsoft Power Automate</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                  <ShoppingCart className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">E-commerce</h4>
+                <p className="text-gray-600 text-sm">Shopify, WooCommerce, Magento, BigCommerce</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
