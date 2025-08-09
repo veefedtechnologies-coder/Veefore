@@ -188,6 +188,113 @@ div[contenteditable="true"].transparent-input {
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
 
+/* Advanced morphing animations */
+@keyframes morph-1 {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: rotate(90deg) scale(1.1);
+  }
+  50% {
+    border-radius: 70% 30% 40% 60% / 40% 70% 60% 30%;
+    transform: rotate(180deg) scale(0.9);
+  }
+  75% {
+    border-radius: 40% 70% 60% 30% / 70% 40% 50% 60%;
+    transform: rotate(270deg) scale(1.05);
+  }
+}
+
+@keyframes morph-2 {
+  0%, 100% {
+    border-radius: 40% 60% 70% 30% / 40% 60% 30% 70%;
+    transform: rotate(0deg) scale(1);
+  }
+  33% {
+    border-radius: 70% 30% 60% 40% / 60% 40% 70% 30%;
+    transform: rotate(120deg) scale(1.1);
+  }
+  66% {
+    border-radius: 30% 70% 40% 60% / 30% 70% 40% 60%;
+    transform: rotate(240deg) scale(0.9);
+  }
+}
+
+@keyframes morph-3 {
+  0%, 100% {
+    border-radius: 50% 50% 30% 70% / 30% 70% 70% 30%;
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    border-radius: 30% 70% 70% 30% / 50% 50% 30% 70%;
+    transform: rotate(72deg) scale(1.1);
+  }
+  40% {
+    border-radius: 70% 30% 50% 50% / 70% 30% 50% 50%;
+    transform: rotate(144deg) scale(0.95);
+  }
+  60% {
+    border-radius: 50% 50% 70% 30% / 30% 70% 30% 70%;
+    transform: rotate(216deg) scale(1.05);
+  }
+  80% {
+    border-radius: 30% 70% 30% 70% / 70% 30% 70% 30%;
+    transform: rotate(288deg) scale(0.9);
+  }
+}
+
+.animate-morph-1 {
+  animation: morph-1 20s ease-in-out infinite;
+}
+
+.animate-morph-2 {
+  animation: morph-2 25s ease-in-out infinite;
+}
+
+.animate-morph-3 {
+  animation: morph-3 30s ease-in-out infinite;
+}
+
+/* Gradient animation */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 400% 400%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Typing animation */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-typing {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid transparent;
+  animation: typing 2s steps(40, end) infinite alternate;
+}
+
 /* Chat message text wrapping */
 .chat-message-content {
   word-wrap: break-word !important;

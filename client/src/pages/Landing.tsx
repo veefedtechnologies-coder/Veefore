@@ -846,106 +846,213 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Apple-Inspired Revolutionary Platform Features */}
-      <section id="platform" className="relative py-24 px-6 lg:px-8 bg-gradient-to-b from-gray-50 via-white to-gray-50 overflow-hidden">
-        {/* Sophisticated Background System */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Dynamic Mesh Gradient */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-violet-200/40 via-purple-100/20 to-transparent rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-blue-200/40 via-indigo-100/20 to-transparent rounded-full blur-3xl animate-float-delayed" />
+      {/* Next-Generation Advanced Platform Features */}
+      <section id="platform" className="relative py-32 px-6 lg:px-8 overflow-hidden">
+        {/* Ultra-Advanced Background System */}
+        <div className="absolute inset-0">
+          {/* Neural Network Mesh */}
+          <div className="absolute inset-0 opacity-5">
+            <svg className="w-full h-full" viewBox="0 0 1000 1000">
+              <defs>
+                <pattern id="neural-grid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <circle cx="50" cy="50" r="1" fill="currentColor" opacity="0.3">
+                    <animate attributeName="opacity" values="0.1;0.8;0.1" dur="4s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="25" cy="25" r="0.5" fill="currentColor" opacity="0.2">
+                    <animate attributeName="opacity" values="0.05;0.6;0.05" dur="6s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="75" cy="75" r="0.5" fill="currentColor" opacity="0.2">
+                    <animate attributeName="opacity" values="0.05;0.6;0.05" dur="5s" repeatCount="indefinite" />
+                  </circle>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#neural-grid)" className="text-violet-600" />
+            </svg>
           </div>
           
-          {/* Premium Dot Grid */}
-          <div className="absolute inset-0 opacity-20" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(99,102,241,0.3) 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }} />
+          {/* Dynamic Gradient Orbs */}
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-96 h-96 rounded-full opacity-20 animate-morph-1" style={{
+              background: 'conic-gradient(from 0deg, #8b5cf6, #06b6d4, #10b981, #8b5cf6)',
+              filter: 'blur(60px)',
+            }} />
+            <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full opacity-15 animate-morph-2" style={{
+              background: 'conic-gradient(from 90deg, #f59e0b, #ef4444, #8b5cf6, #f59e0b)',
+              filter: 'blur(50px)',
+            }} />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-10 animate-morph-3" style={{
+              background: 'conic-gradient(from 180deg, #06b6d4, #8b5cf6, #10b981, #06b6d4)',
+              filter: 'blur(40px)',
+            }} />
+          </div>
         </div>
 
         <div className="relative max-w-8xl mx-auto">
-          {/* Apple-Style Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center justify-center mb-6">
-              <div className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent text-sm font-medium tracking-wider uppercase">
-                Revolutionary Platform
+          {/* Ultra-Modern Header */}
+          <div className="text-center mb-24">
+            <div className="inline-flex items-center justify-center mb-8 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-600/20 to-purple-600/20 rounded-full blur-2xl animate-pulse" />
+              <div className="relative bg-gradient-to-r from-gray-50 to-white backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-3 shadow-2xl">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent uppercase tracking-wider">
+                    Next-Gen Platform
+                  </span>
+                  <div className="flex space-x-1">
+                    <div className="w-1 h-1 bg-violet-500 rounded-full animate-bounce" />
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}} />
+                    <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+                  </div>
+                </div>
               </div>
             </div>
             
-            <h2 className="text-5xl lg:text-7xl font-bold mb-6 tracking-tight">
-              <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                Designed for the way
+            <h2 className="text-6xl lg:text-8xl font-black mb-8 leading-none tracking-tight">
+              <span className="block bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
+                Redefining
               </span>
-              <br />
-              <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                you create.
+              <span className="block">
+                <span className="bg-gradient-to-r from-violet-600 via-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
+                  Intelligence
+                </span>
               </span>
             </h2>
             
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
-              Four breakthrough features that transform how you work, think, and create in the digital age.
+            <p className="text-2xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed mb-8">
+              Experience the future of AI-powered creativity with breakthrough technologies that adapt, learn, and evolve with your workflow.
             </p>
           </div>
 
-          {/* Apple-Style Feature Layout */}
-          <div className="space-y-16">
+          {/* Revolutionary Bento Grid Layout */}
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 min-h-[800px]">
             
-            {/* Primary Feature - Full Width Hero */}
-            <div className="relative group">
-              <div className="bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div className="relative h-[600px] lg:h-[500px] flex flex-col lg:flex-row items-center">
-                  {/* Content Side */}
-                  <div className="flex-1 p-12 lg:p-16 text-white">
+            {/* Primary Feature - Large Hero Card */}
+            <div className="col-span-12 lg:col-span-8 group">
+              <div className="relative h-full min-h-[500px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 shadow-2xl">
+                {/* Animated Background */}
+                <div className="absolute inset-0">
+                  <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 via-purple-600/30 to-blue-600/20 animate-gradient-shift" />
+                  <div className="absolute inset-0 opacity-30">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-2 h-2 bg-white rounded-full animate-float"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animationDelay: `${i * 0.5}s`,
+                          animationDuration: `${4 + Math.random() * 4}s`
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="relative h-full flex flex-col lg:flex-row">
+                  {/* Content Section */}
+                  <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center">
                     <div className="max-w-lg">
-                      <div className="text-sm font-medium opacity-80 mb-4 tracking-wider uppercase">
-                        {platformFeatures[0].subtitle}
+                      <div className="flex items-center space-x-3 mb-6">
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
+                          <div className="text-white text-xl">
+                            {platformFeatures[0].icon}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-white/60 text-xs font-bold uppercase tracking-wider">
+                            {platformFeatures[0].subtitle}
+                          </div>
+                          <div className="text-white text-sm font-medium">
+                            Next-Generation AI
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                      
+                      <h3 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
                         {platformFeatures[0].title.split(' - ')[0]}
                       </h3>
-                      <p className="text-xl opacity-90 mb-8 leading-relaxed">
+                      
+                      <p className="text-white/80 text-lg lg:text-xl mb-8 leading-relaxed">
                         {platformFeatures[0].description}
                       </p>
                       
-                      {/* Feature List */}
-                      <div className="space-y-3 mb-8">
-                        {platformFeatures[0].features.slice(0, 3).map((feature, idx) => (
-                          <div key={idx} className="flex items-center space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
+                      {/* Advanced Feature Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                        {platformFeatures[0].features.slice(0, 4).map((feature, idx) => (
+                          <div key={idx} className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-white" />
                             </div>
-                            <span className="text-white/90">{feature}</span>
+                            <span className="text-white/90 text-sm font-medium">{feature}</span>
                           </div>
                         ))}
                       </div>
                       
-                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-8 py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center space-x-2">
-                        <span>Try {platformFeatures[0].title.split(' - ')[0]}</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-4">
+                        <button 
+                          onClick={() => handleNavigation('veegpt')}
+                          className="bg-white text-gray-900 rounded-2xl px-8 py-4 font-bold hover:bg-gray-100 transition-all duration-300 flex items-center space-x-2 shadow-lg"
+                        >
+                          <span>Experience VeeGPT</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                        <div className="flex items-center space-x-2 text-white/60 text-sm">
+                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                          <span>Live & Interactive</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Visual Side */}
-                  <div className="flex-1 relative h-full">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative">
-                        {/* Main Visual Element */}
-                        <div className="w-80 h-80 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 p-8 transform rotate-3 group-hover:rotate-6 transition-transform duration-700">
-                          <div className="w-full h-full rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center">
-                            <div className="text-white text-6xl">
-                              {platformFeatures[0].icon}
+                  {/* Interactive Visual */}
+                  <div className="flex-1 relative p-8 lg:p-12 flex items-center justify-center">
+                    <div className="relative group-hover:scale-105 transition-transform duration-700">
+                      {/* Main Interface Mockup */}
+                      <div className="w-80 h-96 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 overflow-hidden shadow-2xl">
+                        <div className="h-16 bg-white/5 border-b border-white/10 flex items-center justify-between px-6">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 bg-red-400 rounded-full" />
+                            <div className="w-3 h-3 bg-yellow-400 rounded-full" />
+                            <div className="w-3 h-3 bg-green-400 rounded-full" />
+                          </div>
+                          <div className="text-white/60 text-xs font-medium">VeeGPT</div>
+                        </div>
+                        <div className="p-6 space-y-4">
+                          {/* Animated Chat Bubbles */}
+                          <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600" />
+                              <span className="text-white/80 text-xs">VeeGPT</span>
+                            </div>
+                            <div className="text-white/70 text-sm">
+                              <div className="animate-typing">How can I help you create amazing content today?</div>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-violet-500/20 rounded-2xl p-4 border border-violet-400/20 ml-8">
+                            <div className="text-white/90 text-sm">
+                              Generate a viral TikTok script about AI
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 animate-pulse" />
+                              <span className="text-white/80 text-xs">VeeGPT</span>
+                            </div>
+                            <div className="text-white/70 text-sm">
+                              <div className="animate-pulse">Creating your viral script...</div>
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Floating Elements */}
-                        <div className="absolute -top-8 -right-8 w-24 h-24 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center animate-float">
-                          <Sparkles className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-xl bg-white/15 backdrop-blur-xl border border-white/25 flex items-center justify-center animate-float-delayed">
-                          <Zap className="w-6 h-6 text-white" />
-                        </div>
+                      </div>
+                      
+                      {/* Floating Action Cards */}
+                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center animate-float shadow-xl">
+                        <Sparkles className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-float-delayed shadow-xl">
+                        <Zap className="w-6 h-6 text-white" />
                       </div>
                     </div>
                   </div>
@@ -953,102 +1060,164 @@ const Landing = ({ onNavigate }: LandingProps) => {
               </div>
             </div>
 
-            {/* Secondary Features - Two Column Layout */}
-            <div className="grid lg:grid-cols-2 gap-8">
-              {platformFeatures.slice(1, 3).map((feature, index) => (
-                <div key={feature.id} className="group">
-                  <div className="bg-white rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden hover:shadow-2xl transition-all duration-500">
-                    {/* Feature Header */}
-                    <div className={`relative h-64 bg-gradient-to-br ${feature.color} overflow-hidden`}>
-                      <div className="absolute inset-0 bg-black/10" />
-                      
-                      {/* Floating Icon */}
-                      <div className="absolute top-8 left-8 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                        <div className="text-white text-2xl">
-                          {feature.icon}
-                        </div>
-                      </div>
-                      
-                      {/* Ambient Elements */}
-                      <div className="absolute bottom-8 right-8 opacity-30">
-                        <div className="w-32 h-32 border-2 border-white/30 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
-                        <div className="absolute top-4 left-4 w-24 h-24 border border-white/20 rounded-full" />
+            {/* Secondary Feature - Tall Card */}
+            <div className="col-span-12 lg:col-span-4 group">
+              <div className="h-full min-h-[500px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-600 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                
+                <div className="relative h-full p-8 flex flex-col">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-white text-2xl">
+                        {platformFeatures[1].icon}
                       </div>
                     </div>
-                    
-                    {/* Content */}
-                    <div className="p-8">
-                      <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
-                        {feature.subtitle}
+                    <div>
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                        {platformFeatures[1].subtitle}
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
-                        {feature.title.split(' - ')[0]}
-                      </h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed">
-                        {feature.description.substring(0, 150)}...
-                      </p>
-                      
-                      {/* Key Features */}
-                      <div className="space-y-2 mb-6">
-                        {feature.features.slice(0, 2).map((feat, idx) => (
-                          <div key={idx} className="flex items-center space-x-3 text-sm text-gray-700">
-                            <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
-                              <div className="w-2 h-2 bg-gray-600 rounded-full" />
-                            </div>
-                            <span>{feat}</span>
-                          </div>
-                        ))}
+                      <div className="text-white text-lg font-bold">
+                        {platformFeatures[1].title.split(' - ')[0]}
                       </div>
-                      
-                      <button className="w-full bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl py-4 px-6 text-gray-900 font-medium transition-all duration-300 flex items-center justify-center space-x-2">
-                        <span>Learn more</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Tertiary Feature - Full Width Accent */}
-            <div className="relative group">
-              <div className="bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 rounded-3xl lg:rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div className="relative h-[400px] flex items-center">
-                  <div className="w-full px-12 lg:px-16 text-center text-white">
-                    <div className="max-w-4xl mx-auto">
-                      <div className="text-sm font-medium opacity-80 mb-4 tracking-wider uppercase">
-                        {platformFeatures[3].subtitle}
-                      </div>
-                      <h3 className="text-4xl lg:text-5xl font-bold mb-6">
-                        {platformFeatures[3].title.split(' - ')[0]}
-                      </h3>
-                      <p className="text-xl opacity-90 mb-8 leading-relaxed max-w-2xl mx-auto">
-                        {platformFeatures[3].description.substring(0, 200)}...
-                      </p>
-                      
-                      {/* Feature Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        {platformFeatures[3].features.slice(0, 3).map((feature, idx) => (
-                          <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4 mx-auto">
-                              <div className="w-6 h-6 bg-white rounded-full" />
-                            </div>
-                            <div className="text-white/90 text-sm font-medium">{feature}</div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <button className="bg-white text-gray-900 rounded-full px-8 py-4 font-semibold hover:bg-gray-100 transition-all duration-300 inline-flex items-center space-x-2">
-                        <span>Get started</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
                   
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-8 right-8 text-white/20 text-9xl">
-                      {platformFeatures[3].icon}
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-white/90 text-lg mb-8 leading-relaxed">
+                      {platformFeatures[1].description.substring(0, 200)}...
+                    </p>
+                    
+                    {/* Feature Metrics */}
+                    <div className="space-y-4 mb-8">
+                      {platformFeatures[1].features.slice(0, 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-center justify-between">
+                          <span className="text-white/80 text-sm">{feature.substring(0, 20)}...</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-white to-cyan-200 rounded-full animate-pulse"
+                                style={{ width: `${70 + idx * 15}%` }}
+                              />
+                            </div>
+                            <span className="text-white/60 text-xs">{70 + idx * 15}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <span>Explore Studio</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {/* Ambient Graphics */}
+                <div className="absolute top-8 right-8 opacity-20">
+                  <div className="w-32 h-32 border-2 border-white/30 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Tertiary Features - Wide Cards */}
+            <div className="col-span-12 lg:col-span-6 group">
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                
+                <div className="relative h-full p-8 flex items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center">
+                        <div className="text-white text-xl">
+                          {platformFeatures[2].icon}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                          {platformFeatures[2].subtitle}
+                        </div>
+                        <h3 className="text-white text-2xl font-bold">
+                          {platformFeatures[2].title.split(' - ')[0]}
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <p className="text-white/90 mb-6 leading-relaxed">
+                      {platformFeatures[2].description.substring(0, 150)}...
+                    </p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300">
+                        View Analytics
+                      </button>
+                      <div className="text-white/60 text-sm">Real-time insights</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 relative hidden lg:block">
+                    {/* Mini Chart Visualization */}
+                    <div className="w-full h-32 relative">
+                      {[...Array(8)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute bottom-0 bg-gradient-to-t from-white/60 to-white/20 rounded-t-lg animate-pulse"
+                          style={{
+                            left: `${i * 12}%`,
+                            width: '8%',
+                            height: `${30 + Math.random() * 70}%`,
+                            animationDelay: `${i * 0.2}s`
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 lg:col-span-6 group">
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 shadow-2xl relative">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-transparent" />
+                
+                <div className="relative h-full p-8 flex items-center">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center">
+                        <div className="text-white text-xl">
+                          {platformFeatures[3].icon}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                          {platformFeatures[3].subtitle}
+                        </div>
+                        <h3 className="text-white text-2xl font-bold">
+                          {platformFeatures[3].title.split(' - ')[0]}
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <p className="text-white/90 mb-6 leading-relaxed">
+                      {platformFeatures[3].description.substring(0, 150)}...
+                    </p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300">
+                        Create Content
+                      </button>
+                      <div className="text-white/60 text-sm">AI-powered</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 relative hidden lg:flex items-center justify-center">
+                    {/* Creative Elements */}
+                    <div className="relative">
+                      <div className="w-24 h-24 rounded-3xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center transform rotate-12 group-hover:rotate-45 transition-transform duration-700">
+                        <Palette className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center animate-bounce">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
                     </div>
                   </div>
                 </div>
