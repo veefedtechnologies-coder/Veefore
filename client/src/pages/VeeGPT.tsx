@@ -802,7 +802,47 @@ export default function VeeGPT() {
   // Don't show welcome screen if we have optimistic messages (instant UI transition)
   if (!currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0) {
     return (
-      <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
+      <div className="h-screen w-full bg-gray-50 flex relative overflow-hidden" style={{ minHeight: '100vh', display: 'flex' }}>
+        {/* Static Background - No Scroll Animations */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          {/* Static background elements - no scroll interaction */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
+          
+          {/* Static stars - slow automatic animation only */}
+          <div className="absolute inset-0 opacity-20">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-blue-400 rounded-full animate-slow-float"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${i * 3}s`,
+                  animationDuration: `${18 + Math.random() * 10}s`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Static analytics bars */}
+          <div className="absolute bottom-0 left-0 w-full h-32 opacity-10">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute bottom-0 bg-gradient-to-t from-blue-500/40 to-purple-500/20 rounded-t-lg animate-slow-pulse"
+                style={{
+                  left: `${10 + i * 10}%`,
+                  width: '6%',
+                  height: `${20 + Math.random() * 60}%`,
+                  animationDelay: `${i * 2}s`
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Content - Above Background */}
+        <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
           <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
@@ -1187,13 +1227,54 @@ export default function VeeGPT() {
           </div>
         </div>
       </div>
+    </div>
     )
   }
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-screen w-full bg-gray-50 flex" style={{ minHeight: '100vh', display: 'flex' }}>
-      {/* VeeGPT Sidebar */}
+    <div className="h-screen w-full bg-gray-50 flex relative overflow-hidden" style={{ minHeight: '100vh', display: 'flex' }}>
+      {/* Static Background - No Scroll Animations */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Static background elements - no scroll interaction */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
+        
+        {/* Static stars - slow automatic animation only */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-blue-400 rounded-full animate-slow-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 3}s`,
+                animationDuration: `${18 + Math.random() * 10}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Static analytics bars */}
+        <div className="absolute bottom-0 left-0 w-full h-32 opacity-10">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bottom-0 bg-gradient-to-t from-blue-500/40 to-purple-500/20 rounded-t-lg animate-slow-pulse"
+              style={{
+                left: `${10 + i * 10}%`,
+                width: '6%',
+                height: `${20 + Math.random() * 60}%`,
+                animationDelay: `${i * 2}s`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Content - Above Background */}
+      <div className="relative z-10 w-full h-full flex">
+        {/* VeeGPT Sidebar */}
       <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
         {/* Top Logo/Brand with Toggle */}
         <div className="p-4">
@@ -1766,6 +1847,7 @@ export default function VeeGPT() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
