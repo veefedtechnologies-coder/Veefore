@@ -66,6 +66,7 @@ export default function VeeGPT() {
   const [showSearchInput, setShowSearchInput] = useState(false)
   const [renamingChatId, setRenamingChatId] = useState<number | null>(null)
   const [newChatTitle, setNewChatTitle] = useState('')
+  const [hasUserStartedNewChat, setHasUserStartedNewChat] = useState(false)
   // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
@@ -637,6 +638,7 @@ export default function VeeGPT() {
   const startNewChat = () => {
     setCurrentConversationId(null)
     setHasSentFirstMessage(false)
+    setHasUserStartedNewChat(true)
     setInputText('')
     setSearchQuery('')
     setShowSearchInput(false)
@@ -661,13 +663,15 @@ export default function VeeGPT() {
   
   // No typewriter animation - streaming content updates in real-time
 
-  // Check if we have any conversations to determine initial state
+  // Initialize with first conversation if user has existing chats (but only on first load)
   useEffect(() => {
-    if (conversations.length > 0 && !currentConversationId) {
+    if (conversations.length > 0 && !currentConversationId && !hasUserStartedNewChat) {
       setHasSentFirstMessage(true)
       setCurrentConversationId(conversations[0].id)
     }
   }, [conversations, currentConversationId])
+
+
 
   // Welcome screen layout (when no conversation is active)
   if (!hasSentFirstMessage) {
