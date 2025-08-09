@@ -19,10 +19,14 @@ import {
   Edit,
   Search,
   BookOpen,
-  Play,
-  Sparkles,
   MoreHorizontal,
-  Settings
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Zap,
+  BarChart3,
+  History,
+  Share2
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -52,6 +56,7 @@ export default function VeeGPT() {
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
@@ -344,15 +349,27 @@ export default function VeeGPT() {
   // Chat interface layout (after first message)
   return (
     <div className="h-full w-full bg-gray-50 flex">
-      {/* Sidebar - ChatGPT Style */}
-      <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
-        {/* Top Logo/Brand */}
+      {/* VeeGPT Sidebar */}
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
+        {/* Top Logo/Brand with Toggle */}
         <div className="p-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-md flex items-center justify-center">
+                <Bot className="w-4 h-4 text-white" />
+              </div>
+              {!sidebarCollapsed && <span className="text-lg font-medium text-gray-900">VeeGPT</span>}
             </div>
-            <span className="text-lg font-medium text-gray-900">VeeGPT</span>
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight className="w-4 h-4 text-gray-600" />
+              ) : (
+                <ChevronLeft className="w-4 h-4 text-gray-600" />
+              )}
+            </button>
           </div>
         </div>
 
@@ -361,38 +378,61 @@ export default function VeeGPT() {
           <button
             onClick={startNewChat}
             className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "New chat" : ""}
           >
-            <Edit className="w-4 h-4" />
-            <span>New chat</span>
+            <Edit className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>New chat</span>}
           </button>
           
-          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-            <Search className="w-4 h-4" />
-            <span>Search chats</span>
+          <button 
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "Search chats" : ""}
+          >
+            <Search className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Search chats</span>}
           </button>
           
-          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-            <BookOpen className="w-4 h-4" />
-            <span>Library</span>
+          <button 
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "Content Assistant" : ""}
+          >
+            <Zap className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Content Assistant</span>}
           </button>
           
-          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-            <Play className="w-4 h-4" />
-            <span>Sora</span>
+          <button 
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "Analytics" : ""}
+          >
+            <BarChart3 className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Analytics</span>}
           </button>
           
-          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-            <Sparkles className="w-4 h-4" />
-            <span>GPTs</span>
+          <button 
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "Templates" : ""}
+          >
+            <BookOpen className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Templates</span>}
+          </button>
+
+          <button 
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title={sidebarCollapsed ? "Share & Export" : ""}
+          >
+            <Share2 className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Share & Export</span>}
           </button>
         </div>
 
         {/* Conversations Section */}
         <div className="flex-1 overflow-y-auto">
           <div className="px-3">
-            <div className="text-xs font-medium text-gray-500 mb-2 px-3">
-              Chats
-            </div>
+            {!sidebarCollapsed && (
+              <div className="text-xs font-medium text-gray-500 mb-2 px-3">
+                Recent Chats
+              </div>
+            )}
             <div className="space-y-1">
               {conversations.map((conversation) => (
                 <button
@@ -403,8 +443,14 @@ export default function VeeGPT() {
                       ? 'bg-gray-200 text-gray-900'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
+                  title={sidebarCollapsed ? conversation.title : ""}
                 >
-                  <div className="truncate">{conversation.title}</div>
+                  <div className="flex items-center space-x-2">
+                    <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                    {!sidebarCollapsed && (
+                      <div className="truncate">{conversation.title}</div>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
@@ -414,14 +460,18 @@ export default function VeeGPT() {
         {/* Bottom User Section */}
         <div className="p-3 border-t border-gray-200">
           <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-            <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
               <User className="w-4 h-4 text-white" />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900 truncate">Arpit Choudhary</div>
-              <div className="text-xs text-gray-500">Free</div>
-            </div>
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            {!sidebarCollapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">Arpit Choudhary</div>
+                  <div className="text-xs text-gray-500">Business Plan</div>
+                </div>
+                <MoreHorizontal className="w-4 h-4 text-gray-400" />
+              </>
+            )}
           </div>
         </div>
       </div>
