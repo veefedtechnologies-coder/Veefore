@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
+import veeforeLogo from '@assets/output-onlinepngtools_1754726286825.png'
 
 type ChatConversation = {
   id: number
@@ -575,8 +576,12 @@ export default function VeeGPT() {
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500 text-white">
-                    <Bot className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-transparent">
+                    <img 
+                      src={veeforeLogo} 
+                      alt="VeeFore AI" 
+                      className="w-6 h-6 object-contain"
+                    />
                   </div>
                 )}
                 <div className={`${
