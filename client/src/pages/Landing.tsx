@@ -1104,13 +1104,15 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
                               {/* Advanced Hover Preview */}
                               {selectedFeature === index && selectedFeature !== activeFeature && (
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl w-64">
-                                  <div className="text-center">
+                                <div className={`absolute top-0 z-50 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl w-72 ${
+                                  index % 4 >= 2 ? 'right-full mr-2' : 'left-full ml-2'
+                                }`}>
+                                  <div className="text-left">
                                     <h5 className="text-gray-900 font-semibold text-sm mb-2">{feature.title}</h5>
                                     <p className="text-gray-600 text-xs mb-3">{feature.description}</p>
                                     <div className="space-y-1">
                                       {feature.features.slice(0, 3).map((item, i) => (
-                                        <div key={i} className="flex items-center justify-center space-x-2 text-xs text-gray-700">
+                                        <div key={i} className="flex items-center space-x-2 text-xs text-gray-700">
                                           <div className="w-1 h-1 bg-violet-500 rounded-full" />
                                           <span>{item}</span>
                                         </div>
@@ -1120,8 +1122,12 @@ const Landing = ({ onNavigate }: LandingProps) => {
                                       Try {feature.title.split(' ')[0]}
                                     </button>
                                   </div>
-                                  {/* Arrow pointing down */}
-                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/95"></div>
+                                  {/* Arrow pointing to card */}
+                                  <div className={`absolute top-4 ${
+                                    index % 4 >= 2 
+                                      ? 'left-full w-0 h-0 border-t-8 border-b-8 border-l-8 border-t-transparent border-b-transparent border-l-white/95'
+                                      : 'right-full w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-white/95'
+                                  }`}></div>
                                 </div>
                               )}
                             </div>
