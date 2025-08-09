@@ -25,6 +25,10 @@ div[contenteditable="true"]:empty:before {
   pointer-events: none;
   background: transparent !important;
   background-color: transparent !important;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
 }
 
 div[contenteditable="true"]:focus {

@@ -517,42 +517,50 @@ export default function VeeGPT() {
                 }} />
               </button>
               
-              <div
-                ref={inputRef}
-                contentEditable
-                suppressContentEditableWarning
-                onInput={(e) => {
-                  const text = e.currentTarget.innerText
-                  setInputText(text)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSendMessage()
-                  }
-                }}
-                style={{
-                  flex: 1,
-                  minHeight: '24px',
-                  maxHeight: '120px',
-                  overflow: 'auto',
-                  outline: 'none',
-                  border: 'none',
-                  background: 'transparent',
-                  backgroundColor: 'transparent',
-                  color: '#374151',
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                  padding: '4px 0',
-                  margin: 0,
-                  boxShadow: 'none',
-                  borderRadius: 0,
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none',
-                  appearance: 'none'
-                }}
-                data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
-              />
+              <div style={{
+                flex: 1,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <div
+                  ref={inputRef}
+                  contentEditable
+                  suppressContentEditableWarning
+                  onInput={(e) => {
+                    const text = e.currentTarget.innerText
+                    setInputText(text)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSendMessage()
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    minHeight: '20px',
+                    maxHeight: '120px',
+                    overflow: 'hidden',
+                    outline: 'none',
+                    border: 'none',
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
+                    color: '#374151',
+                    fontSize: '16px',
+                    lineHeight: '20px',
+                    padding: '0',
+                    margin: '0',
+                    boxShadow: 'none',
+                    borderRadius: 0,
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    appearance: 'none',
+                    position: 'relative'
+                  }}
+                  data-placeholder={inputText.length === 0 ? "Message VeeGPT" : ""}
+                />
+              </div>
               
               <button
                 onClick={handleSendMessage}
