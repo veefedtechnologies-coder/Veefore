@@ -13525,10 +13525,12 @@ Create a detailed growth strategy in JSON format:
       // Set up SSE headers
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Connection': 'keep-alive',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
+        'Access-Control-Allow-Headers': 'Cache-Control',
+        'X-Accel-Buffering': 'no', // Disable nginx buffering
+        'Transfer-Encoding': 'chunked' // Force chunked encoding
       });
 
       // Send user message first
@@ -13581,14 +13583,20 @@ Create a detailed growth strategy in JSON format:
           
           res.write(`data: ${chunkData}\n\n`);
           
-          // Multiple flush attempts to force immediate send
+          // Force immediate flush with multiple methods
           if (res.flush) res.flush();
-          if (res.socket?.write) res.socket.write('');
+          if (res.socket && res.socket.write) {
+            res.socket.write('');
+          }
+          // Force socket flush
+          if (res.socket && res.socket.flush) {
+            res.socket.flush();
+          }
           
-          console.log(`[CHAT STREAM] [${timestamp}] Chunk sent, waiting 1 second...`);
+          console.log(`[CHAT STREAM] [${timestamp}] Chunk sent, waiting...`);
           
-          // Reduce server delay for testing (100ms)
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Increase delay to ensure chunks arrive separately (500ms)
+          await new Promise(resolve => setTimeout(resolve, 500));
           
           console.log(`[CHAT STREAM] [${Date.now()}] Wait complete, processing next chunk`);
         }
