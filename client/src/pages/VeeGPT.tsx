@@ -62,6 +62,10 @@ export default function VeeGPT() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchInput, setShowSearchInput] = useState(false)
+  const [renamingChatId, setRenamingChatId] = useState<number | null>(null)
+  const [newChatTitle, setNewChatTitle] = useState('')
   // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
@@ -212,6 +216,11 @@ export default function VeeGPT() {
     enabled: true // Always fetch conversations to show history
   })
 
+  // Filter conversations based on search query
+  const filteredConversations = conversations.filter(conv => 
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   // Fetch current conversation messages
   const { data: messages = [] } = useQuery<ChatMessage[]>({
     queryKey: ['/api/chat/conversations', currentConversationId, 'messages'],
@@ -272,6 +281,49 @@ export default function VeeGPT() {
       setIsGenerating(false)
       console.log('VeeGPT: REF SET TO FALSE in createConversation mutation error')
       isGeneratingRef.current = false
+    }
+  })
+
+  // Rename conversation mutation
+  const renameConversationMutation = useMutation({
+    mutationFn: async ({ conversationId, newTitle }: { conversationId: number, newTitle: string }) => {
+      return apiRequest(`/api/chat/conversations/${conversationId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ title: newTitle })
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+      setRenamingChatId(null)
+      setNewChatTitle('')
+    }
+  })
+
+  // Delete conversation mutation
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (conversationId: number) => {
+      return apiRequest(`/api/chat/conversations/${conversationId}`, {
+        method: 'DELETE'
+      })
+    },
+    onSuccess: (_, conversationId) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+      if (currentConversationId === conversationId) {
+        setCurrentConversationId(null)
+        setHasSentFirstMessage(false)
+      }
+    }
+  })
+
+  // Archive conversation mutation
+  const archiveConversationMutation = useMutation({
+    mutationFn: async (conversationId: number) => {
+      return apiRequest(`/api/chat/conversations/${conversationId}/archive`, {
+        method: 'POST'
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
     }
   })
 
@@ -586,6 +638,10 @@ export default function VeeGPT() {
     setCurrentConversationId(null)
     setHasSentFirstMessage(false)
     setInputText('')
+    setSearchQuery('')
+    setShowSearchInput(false)
+    setRenamingChatId(null)
+    setNewChatTitle('')
     // Clear streaming content when starting new chat
     setStreamingContent({})
   }
@@ -808,6 +864,7 @@ export default function VeeGPT() {
           </button>
           
           <button 
+            onClick={() => setShowSearchInput(!showSearchInput)}
             className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             title={sidebarCollapsed ? "Search chats" : ""}
           >
@@ -832,6 +889,20 @@ export default function VeeGPT() {
           </button>
         </div>
 
+        {/* Search Input */}
+        {showSearchInput && !sidebarCollapsed && (
+          <div className="px-3 pb-4">
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
+            />
+          </div>
+        )}
+
         {/* Conversations Section */}
         <div className="flex-1 overflow-y-auto">
           <div className="px-3">
@@ -841,7 +912,7 @@ export default function VeeGPT() {
               </div>
             )}
             <div className="space-y-2">
-              {conversations.map((conversation) => (
+              {filteredConversations.map((conversation) => (
                 <div
                   key={conversation.id}
                   className="relative"
@@ -866,7 +937,46 @@ export default function VeeGPT() {
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
                         <MessageSquare className="w-4 h-4 flex-shrink-0" />
                         {!sidebarCollapsed && (
-                          <div className="truncate text-base font-medium">{conversation.title}</div>
+                          <div className="truncate text-base font-medium">
+                            {renamingChatId === conversation.id ? (
+                              <input
+                                type="text"
+                                value={newChatTitle}
+                                onChange={(e) => setNewChatTitle(e.target.value)}
+                                onBlur={() => {
+                                  if (newChatTitle.trim()) {
+                                    renameConversationMutation.mutate({
+                                      conversationId: conversation.id,
+                                      newTitle: newChatTitle.trim()
+                                    })
+                                  } else {
+                                    setRenamingChatId(null)
+                                    setNewChatTitle('')
+                                  }
+                                }}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    if (newChatTitle.trim()) {
+                                      renameConversationMutation.mutate({
+                                        conversationId: conversation.id,
+                                        newTitle: newChatTitle.trim()
+                                      })
+                                    } else {
+                                      setRenamingChatId(null)
+                                      setNewChatTitle('')
+                                    }
+                                  } else if (e.key === 'Escape') {
+                                    setRenamingChatId(null)
+                                    setNewChatTitle('')
+                                  }
+                                }}
+                                className="w-full text-sm bg-white border border-gray-300 rounded px-2 py-1"
+                                autoFocus
+                              />
+                            ) : (
+                              conversation.title
+                            )}
+                          </div>
                         )}
                       </div>
                       
@@ -899,7 +1009,8 @@ export default function VeeGPT() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  console.log('Rename conversation:', conversation.id)
+                                  setRenamingChatId(conversation.id)
+                                  setNewChatTitle(conversation.title)
                                   setDropdownOpen(null)
                                 }}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
@@ -911,7 +1022,7 @@ export default function VeeGPT() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  console.log('Archive conversation:', conversation.id)
+                                  archiveConversationMutation.mutate(conversation.id)
                                   setDropdownOpen(null)
                                 }}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
@@ -923,7 +1034,9 @@ export default function VeeGPT() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  console.log('Delete conversation:', conversation.id)
+                                  if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                                    deleteConversationMutation.mutate(conversation.id)
+                                  }
                                   setDropdownOpen(null)
                                 }}
                                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3"

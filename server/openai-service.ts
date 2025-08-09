@@ -92,21 +92,42 @@ Always provide practical, actionable advice tailored to content creation and soc
         messages: [
           {
             role: "system",
-            content: "Generate a short, descriptive title (max 6 words) for a chat conversation based on the user's first message. Focus on the main topic or intent."
+            content: `Generate a short, descriptive title (max 35 characters) for a chat conversation based on the user's first message. The title should be concise, clear, and help users easily identify the conversation topic.
+
+Rules:
+- Maximum 35 characters
+- No quotes or special formatting
+- Capture the main topic or intent
+- Be specific but brief
+- Use title case
+
+Examples:
+"How to create engaging Instagram posts?" → "Instagram Post Creation"
+"I need help with my YouTube content strategy" → "YouTube Content Strategy"
+"What's the best way to grow followers?" → "Follower Growth Tips"`
           },
           {
             role: "user",
             content: firstMessage
           }
         ],
-        max_tokens: 20,
+        max_tokens: 30,
         temperature: 0.5,
       });
 
-      return response.choices[0]?.message?.content?.trim() || 'New Chat';
+      const title = response.choices[0]?.message?.content?.trim() || 'New Chat';
+      
+      // Ensure title doesn't exceed 35 characters
+      return title.length > 35 ? title.substring(0, 32) + '...' : title;
     } catch (error) {
       console.error('OpenAI Title Generation Error:', error);
-      return 'New Chat';
+      // Fallback: generate a simple title from the first few words
+      const words = firstMessage.split(' ').slice(0, 4);
+      let fallbackTitle = words.join(' ');
+      if (fallbackTitle.length > 35) {
+        fallbackTitle = fallbackTitle.substring(0, 32) + '...';
+      }
+      return fallbackTitle || 'New Chat';
     }
   }
 }

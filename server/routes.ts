@@ -13691,6 +13691,60 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // Rename conversation
+  app.patch('/api/chat/conversations/:conversationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const { title } = req.body;
+      const userId = req.user.id;
+      
+      if (!title?.trim()) {
+        return res.status(400).json({ error: 'Title is required' });
+      }
+      
+      await storage.updateChatConversation(parseInt(conversationId), { 
+        title: title.trim() 
+      });
+      
+      res.json({ success: true, conversationId: parseInt(conversationId) });
+    } catch (error: any) {
+      console.error('[CHAT] Rename conversation error:', error);
+      res.status(500).json({ error: 'Failed to rename conversation' });
+    }
+  });
+
+  // Delete conversation
+  app.delete('/api/chat/conversations/:conversationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      
+      await storage.deleteChatConversation(parseInt(conversationId));
+      
+      res.json({ success: true, conversationId: parseInt(conversationId) });
+    } catch (error: any) {
+      console.error('[CHAT] Delete conversation error:', error);
+      res.status(500).json({ error: 'Failed to delete conversation' });
+    }
+  });
+
+  // Archive conversation
+  app.post('/api/chat/conversations/:conversationId/archive', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const userId = req.user.id;
+      
+      await storage.updateChatConversation(parseInt(conversationId), { 
+        isArchived: true 
+      });
+      
+      res.json({ success: true, conversationId: parseInt(conversationId) });
+    } catch (error: any) {
+      console.error('[CHAT] Archive conversation error:', error);
+      res.status(500).json({ error: 'Failed to archive conversation' });
+    }
+  });
+
   app.post('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
     try {
       console.log('[CHAT] Create conversation request:', { userId: req.user.id, body: req.body });
