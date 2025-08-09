@@ -3,20 +3,22 @@ import {
   automationRules, suggestions, creditTransactions, referrals,
   subscriptions, payments, addons, contentRecommendations, userContentHistory,
   admins, adminSessions, notifications, popups, appSettings, auditLogs, feedbackMessages,
-  creativeBriefs, contentRepurposes, competitorAnalyses,
+  creativeBriefs, contentRepurposes, competitorAnalyses, chatConversations, chatMessages,
   type User, type Workspace, type WorkspaceMember, type TeamInvitation, type SocialAccount, type Content,
   type Analytics, type AutomationRule, type Suggestion,
   type CreditTransaction, type Referral, type Subscription, 
   type Payment, type Addon, type ContentRecommendation, type UserContentHistory,
   type Admin, type AdminSession, type Notification, type Popup, type AppSetting, type AuditLog, type FeedbackMessage,
   type CreativeBrief, type ContentRepurpose, type CompetitorAnalysis,
+  type ChatConversation, type ChatMessage,
   type InsertUser, type InsertWorkspace, type InsertWorkspaceMember, type InsertTeamInvitation,
   type InsertSocialAccount, type InsertContent, type InsertAutomationRule, type InsertAnalytics,
   type InsertSuggestion, type InsertCreditTransaction, type InsertReferral,
   type InsertSubscription, type InsertPayment, type InsertAddon,
   type InsertContentRecommendation, type InsertUserContentHistory,
   type InsertAdmin, type InsertNotification, type InsertPopup, type InsertAppSetting, type InsertAuditLog, type InsertFeedbackMessage,
-  type InsertCreativeBrief, type InsertContentRepurpose, type InsertCompetitorAnalysis
+  type InsertCreativeBrief, type InsertContentRepurpose, type InsertCompetitorAnalysis,
+  type InsertChatConversation, type InsertChatMessage
 } from "@shared/schema";
 
 export interface IStorage {
@@ -166,6 +168,16 @@ export interface IStorage {
   getDmConversations(workspaceId: string, limit?: number): Promise<any[]>;
   getDmMessages(conversationId: number | string, limit?: number): Promise<any[]>;
 
+  // VeeGPT Chat operations
+  getChatConversations(userId: number, workspaceId: number): Promise<ChatConversation[]>;
+  getChatConversation(id: number): Promise<ChatConversation | undefined>;
+  createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation>;
+  updateChatConversation(id: number, updates: Partial<ChatConversation>): Promise<ChatConversation>;
+  deleteChatConversation(id: number): Promise<void>;
+  getChatMessages(conversationId: number): Promise<ChatMessage[]>;
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessage(id: number): Promise<ChatMessage | undefined>;
+
   // YouTube workspace data operations
   updateYouTubeWorkspaceData(updates: any): Promise<any>;
 
@@ -284,6 +296,8 @@ export class MemStorage implements IStorage {
   private addons: Map<number, Addon> = new Map();
   private contentRecommendations: Map<number, ContentRecommendation> = new Map();
   private userContentHistory: Map<number, UserContentHistory> = new Map();
+  private chatConversations: Map<number, ChatConversation> = new Map();
+  private chatMessages: Map<number, ChatMessage> = new Map();
   
   private currentUserId: number = 1;
   private currentWorkspaceId: number = 1;
@@ -301,6 +315,8 @@ export class MemStorage implements IStorage {
   private currentAddonId: number = 1;
   private currentContentRecommendationId: number = 1;
   private currentUserContentHistoryId: number = 1;
+  private currentChatConversationId: number = 1;
+  private currentChatMessageId: number = 1;
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
@@ -1509,6 +1525,77 @@ export class MemStorage implements IStorage {
 
   async trackFeatureUsage(userId: number | string, featureId: string, usage: any): Promise<void> {
     // No-op for memory storage
+  }
+
+  // VeeGPT Chat operations
+  async getChatConversations(userId: number, workspaceId: number): Promise<ChatConversation[]> {
+    return Array.from(this.chatConversations.values())
+      .filter(conversation => conversation.userId === userId && conversation.workspaceId === workspaceId)
+      .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+  }
+
+  async getChatConversation(id: number): Promise<ChatConversation | undefined> {
+    return this.chatConversations.get(id);
+  }
+
+  async createChatConversation(conversation: InsertChatConversation): Promise<ChatConversation> {
+    const id = this.currentChatConversationId++;
+    const newConversation: ChatConversation = {
+      ...conversation,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.chatConversations.set(id, newConversation);
+    return newConversation;
+  }
+
+  async updateChatConversation(id: number, updates: Partial<ChatConversation>): Promise<ChatConversation> {
+    const conversation = this.chatConversations.get(id);
+    if (!conversation) {
+      throw new Error(`Conversation with id ${id} not found`);
+    }
+    const updatedConversation = {
+      ...conversation,
+      ...updates,
+      updatedAt: new Date()
+    };
+    this.chatConversations.set(id, updatedConversation);
+    return updatedConversation;
+  }
+
+  async deleteChatConversation(id: number): Promise<void> {
+    this.chatConversations.delete(id);
+    // Also delete all messages in this conversation
+    const messagesToDelete = Array.from(this.chatMessages.entries())
+      .filter(([_, message]) => message.conversationId === id)
+      .map(([messageId, _]) => messageId);
+    
+    messagesToDelete.forEach(messageId => {
+      this.chatMessages.delete(messageId);
+    });
+  }
+
+  async getChatMessages(conversationId: number): Promise<ChatMessage[]> {
+    return Array.from(this.chatMessages.values())
+      .filter(message => message.conversationId === conversationId)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    const id = this.currentChatMessageId++;
+    const newMessage: ChatMessage = {
+      ...message,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.chatMessages.set(id, newMessage);
+    return newMessage;
+  }
+
+  async getChatMessage(id: number): Promise<ChatMessage | undefined> {
+    return this.chatMessages.get(id);
   }
 }
 

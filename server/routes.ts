@@ -13466,5 +13466,155 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // VeeGPT Chat API Routes
+  app.get('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const workspaceId = req.user.workspaceId || (await storage.getDefaultWorkspace(userId))?.id;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      const conversations = await storage.getChatConversations(userId, workspaceId);
+      res.json(conversations);
+    } catch (error: any) {
+      console.error('[CHAT] Get conversations error:', error);
+      res.status(500).json({ error: 'Failed to fetch conversations' });
+    }
+  });
+
+  app.get('/api/chat/conversations/:conversationId/messages', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const messages = await storage.getChatMessages(parseInt(conversationId));
+      res.json(messages);
+    } catch (error: any) {
+      console.error('[CHAT] Get messages error:', error);
+      res.status(500).json({ error: 'Failed to fetch messages' });
+    }
+  });
+
+  app.post('/api/chat/conversations/:conversationId/messages', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      const { content } = req.body;
+      const userId = req.user.id;
+
+      if (!content?.trim()) {
+        return res.status(400).json({ error: 'Message content is required' });
+      }
+
+      // Create user message
+      const userMessage = await storage.createChatMessage({
+        conversationId: parseInt(conversationId),
+        role: 'user',
+        content: content.trim(),
+        tokensUsed: 0
+      });
+
+      // Get conversation history for AI context
+      const messages = await storage.getChatMessages(parseInt(conversationId));
+      const chatHistory = messages.map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      }));
+
+      // Generate AI response
+      const { OpenAIService } = await import('./openai-service');
+      const aiResponse = await OpenAIService.generateResponse(chatHistory);
+
+      // Create AI message
+      const aiMessage = await storage.createChatMessage({
+        conversationId: parseInt(conversationId),
+        role: 'assistant',
+        content: aiResponse,
+        tokensUsed: Math.ceil(aiResponse.length / 4) // Rough token estimation
+      });
+
+      // Update conversation last message time and count
+      await storage.updateChatConversation(parseInt(conversationId), {
+        lastMessageAt: new Date(),
+        messageCount: messages.length + 2
+      });
+
+      res.json({ userMessage, aiMessage });
+    } catch (error: any) {
+      console.error('[CHAT] Send message error:', error);
+      res.status(500).json({ error: 'Failed to send message' });
+    }
+  });
+
+  app.post('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { content } = req.body;
+      const userId = req.user.id;
+      const workspaceId = req.user.workspaceId || (await storage.getDefaultWorkspace(userId))?.id;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      if (!content?.trim()) {
+        return res.status(400).json({ error: 'Message content is required' });
+      }
+
+      // Generate conversation title
+      const { OpenAIService } = await import('./openai-service');
+      const title = await OpenAIService.generateChatTitle(content.trim());
+
+      // Create new conversation
+      const conversation = await storage.createChatConversation({
+        userId,
+        workspaceId,
+        title,
+        messageCount: 0,
+        lastMessageAt: new Date()
+      });
+
+      // Create user message
+      const userMessage = await storage.createChatMessage({
+        conversationId: conversation.id,
+        role: 'user',
+        content: content.trim(),
+        tokensUsed: 0
+      });
+
+      // Generate AI response
+      const chatHistory = [{ role: 'user' as const, content: content.trim() }];
+      const aiResponse = await OpenAIService.generateResponse(chatHistory);
+
+      // Create AI message
+      const aiMessage = await storage.createChatMessage({
+        conversationId: conversation.id,
+        role: 'assistant',
+        content: aiResponse,
+        tokensUsed: Math.ceil(aiResponse.length / 4)
+      });
+
+      // Update conversation
+      await storage.updateChatConversation(conversation.id, {
+        lastMessageAt: new Date(),
+        messageCount: 2
+      });
+
+      res.json({ conversation, userMessage, aiMessage });
+    } catch (error: any) {
+      console.error('[CHAT] Create conversation error:', error);
+      res.status(500).json({ error: 'Failed to create conversation' });
+    }
+  });
+
+  app.delete('/api/chat/conversations/:conversationId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { conversationId } = req.params;
+      await storage.deleteChatConversation(parseInt(conversationId));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('[CHAT] Delete conversation error:', error);
+      res.status(500).json({ error: 'Failed to delete conversation' });
+    }
+  });
+
   return httpServer;
 }

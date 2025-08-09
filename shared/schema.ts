@@ -622,6 +622,27 @@ export const fixedPosts = pgTable("fixed_posts", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// VeeGPT Chat System
+export const chatConversations = pgTable("chat_conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  workspaceId: integer("workspace_id").references(() => workspaces.id).notNull(),
+  title: text("title").notNull().default("New chat"),
+  messageCount: integer("message_count").default(0),
+  lastMessageAt: timestamp("last_message_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => chatConversations.id).notNull(),
+  role: text("role").notNull(), // 'user' or 'assistant'
+  content: text("content").notNull(),
+  tokensUsed: integer("tokens_used").default(0),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 // Export types for all schemas
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -651,6 +672,10 @@ export type UserProgress = typeof userProgress.$inferSelect;
 export type InsertUserProgress = typeof userProgress.$inferInsert;
 export type EmotionAnalysis = typeof emotionAnalyses.$inferSelect;
 export type InsertEmotionAnalysis = typeof emotionAnalyses.$inferInsert;
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = typeof chatConversations.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
 
 // Zod schemas for validation
 export const insertCreativeBriefSchema = createInsertSchema(creativeBriefs);
@@ -663,6 +688,8 @@ export const insertUserPersonaSchema = createInsertSchema(userPersonas);
 export const insertAffiliateApplicationSchema = createInsertSchema(affiliateApplications);
 export const insertSocialListeningSchema = createInsertSchema(socialListening);
 export const insertEmotionAnalysisSchema = createInsertSchema(emotionAnalyses);
+export const insertChatConversationSchema = createInsertSchema(chatConversations);
+export const insertChatMessageSchema = createInsertSchema(chatMessages);
 
 // Video Jobs types
 export const insertVideoJobSchema = createInsertSchema(videoJobs).omit({ id: true, createdAt: true, updatedAt: true });
