@@ -109,6 +109,7 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
+  const [refBasedGenerating, setRefBasedGenerating] = useState(false)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -116,6 +117,11 @@ export default function VeeGPT() {
   const queryClient = useQueryClient()
   
   console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
+
+  // Sync ref state with React state to trigger re-renders
+  useEffect(() => {
+    setRefBasedGenerating(isGeneratingRef.current)
+  }, [isGenerating]) // Update when isGenerating state changes
 
   const quickPrompts = [
     { icon: Lightbulb, text: "Inspire me!" },
@@ -172,6 +178,8 @@ export default function VeeGPT() {
       setHasSentFirstMessage(false)
       setCurrentConversationId(null)
       setIsGenerating(false)
+      isGeneratingRef.current = false
+      setRefBasedGenerating(false)
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -205,6 +213,7 @@ export default function VeeGPT() {
       
       // Set state to trigger re-render and make stop button visible
       setIsGenerating(true)
+      setRefBasedGenerating(true)
       
 
       
@@ -354,6 +363,7 @@ export default function VeeGPT() {
         // Generation completed - reset generation state
         setIsGenerating(false)
         isGeneratingRef.current = false
+        setRefBasedGenerating(false)
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
@@ -379,6 +389,7 @@ export default function VeeGPT() {
         console.error('VeeGPT: Stream error:', data.error)
         setIsGenerating(false)
         isGeneratingRef.current = false
+        setRefBasedGenerating(false)
         break
     }
   }
@@ -424,6 +435,7 @@ export default function VeeGPT() {
       console.error('VeeGPT: Error sending streaming message:', error)
       setIsGenerating(false)
       isGeneratingRef.current = false
+      setRefBasedGenerating(false)
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -472,6 +484,7 @@ export default function VeeGPT() {
     // Stop streaming immediately
     setIsGenerating(false)
     isGeneratingRef.current = false
+    setRefBasedGenerating(false)
     if (currentEventSource) {
       currentEventSource.close()
       setCurrentEventSource(null)
@@ -1155,12 +1168,13 @@ export default function VeeGPT() {
               </div>
               
               {(() => {
-                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current
+                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || refBasedGenerating
                 console.log('VeeGPT: Stop button visibility check:', {
                   createPending: createConversationMutation.isPending,
                   sendPending: sendMessageMutation.isPending,
                   isGenerating,
                   isGeneratingRef: isGeneratingRef.current,
+                  refBasedGenerating,
                   shouldShowStop
                 })
                 return shouldShowStop
