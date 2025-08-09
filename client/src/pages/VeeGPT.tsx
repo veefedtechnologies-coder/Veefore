@@ -503,15 +503,17 @@ export default function VeeGPT() {
         // Update streaming content for real-time display - accumulate chunks
         if (data.messageId && data.content !== undefined) {
           console.log('VeeGPT: PROCESSING CHUNK - MessageId:', data.messageId, 'Content:', `"${data.content}"`)
+          
+          // Force immediate state update with React's flushSync for real-time streaming
           setStreamingContent(prev => {
             const currentContent = prev[data.messageId] || ''
             const newContent = currentContent + data.content
             console.log('VeeGPT: STREAMING UPDATE - Message:', data.messageId, 'Current:', `"${currentContent}"`, 'Adding:', `"${data.content}"`, 'New Total:', `"${newContent}"`)
             
-            return {
-              ...prev,
-              [data.messageId]: newContent
-            }
+            // Return completely new object to ensure React re-renders
+            const newState = { ...prev }
+            newState[data.messageId] = newContent
+            return newState
           })
         } else {
           console.log('VeeGPT: CHUNK IGNORED - Missing messageId or content:', { messageId: data.messageId, content: data.content })
@@ -527,8 +529,18 @@ export default function VeeGPT() {
         console.log('VeeGPT: REF SET TO FALSE in complete event')
         isGeneratingRef.current = false
         
-        // DON'T clear streaming content immediately - let queries load first
-        // This prevents the disappearing text issue during stop operations
+        // Clear streaming content after a brief delay to allow final chunks to render
+        setTimeout(() => {
+          console.log('VeeGPT: Clearing streaming content after completion')
+          setStreamingContent(prev => {
+            if (data.messageId && prev[data.messageId]) {
+              const updated = { ...prev }
+              delete updated[data.messageId]
+              return updated
+            }
+            return prev
+          })
+        }, 100)
         
         // Invalidate queries to get final message state from backend
         if (currentConversationId) {
@@ -536,8 +548,6 @@ export default function VeeGPT() {
             queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
           })
           queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
-          
-          // Streaming content will be cleared by useEffect when real message loads
         }
         
         // Resolve the streaming Promise
