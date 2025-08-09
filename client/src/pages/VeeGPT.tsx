@@ -1550,7 +1550,10 @@ export default function VeeGPT() {
                     <div className={`mt-2 text-xs text-gray-500 ${
                       message.role === 'user' ? 'text-right' : 'text-left'
                     }`}>
-                      {new Date().toLocaleTimeString([], { 
+                      {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      }) : new Date().toLocaleTimeString([], { 
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}
