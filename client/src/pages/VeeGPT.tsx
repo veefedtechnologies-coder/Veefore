@@ -219,6 +219,24 @@ export default function VeeGPT() {
     enabled: !!currentConversationId
   })
 
+  // Add temporary streaming messages to the display
+  const displayMessages = [...messages]
+  
+  // Add temporary streaming message if we have streaming content for a message not in the list
+  Object.keys(streamingContent).forEach(messageId => {
+    const numericMessageId = parseInt(messageId)
+    if (!messages.some(msg => msg.id === numericMessageId)) {
+      displayMessages.push({
+        id: numericMessageId,
+        conversationId: currentConversationId || 0,
+        role: 'assistant' as const,
+        content: '',
+        tokensUsed: 0,
+        createdAt: new Date()
+      })
+    }
+  })
+
   // Create new conversation with streaming
   const createConversationMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -972,7 +990,7 @@ export default function VeeGPT() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8 overflow-x-hidden">
-            {messages.map((message) => (
+            {displayMessages.map((message) => (
               <div
                 key={message.id}
                 className={`flex space-x-4 ${
