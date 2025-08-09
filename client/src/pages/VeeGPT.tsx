@@ -105,6 +105,8 @@ export default function VeeGPT() {
   const [hoveredChatId, setHoveredChatId] = useState<number | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null)
   const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
@@ -136,56 +138,39 @@ export default function VeeGPT() {
     enabled: !!currentConversationId
   })
 
-  // Create new conversation mutation
+  // Create new conversation with streaming
   const createConversationMutation = useMutation({
     mutationFn: async (content: string) => {
-      const response = await apiRequest('/api/chat/conversations', {
+      // First create a new conversation
+      const newConv = await apiRequest('/api/chat/conversations', {
         method: 'POST',
-        body: JSON.stringify({ content })
+        body: { title: 'New Chat' }
       })
-      return response
+
+      setCurrentConversationId(newConv.id)
+      setHasSentFirstMessage(true)
+      
+      // Then send the message with streaming
+      await handleStreamingMessage(content, newConv.id)
+      
+      return newConv
     },
     onMutate: async (content) => {
       // Show the user message immediately by transitioning to chat view
       setHasSentFirstMessage(true)
-      
-      // Create a temporary conversation ID for optimistic updates
-      const tempConversationId = Date.now()
-      setCurrentConversationId(tempConversationId)
-      
-      // Create optimistic user message
-      const optimisticUserMessage = {
-        id: Date.now(),
-        conversationId: tempConversationId,
-        role: 'user',
-        content,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-      
-      // Set the optimistic message data
-      queryClient.setQueryData(['/api/chat/conversations', tempConversationId, 'messages'], [optimisticUserMessage])
-      
-      return { tempConversationId }
     },
-    onSuccess: (data, content, context) => {
-      // Replace temporary conversation ID with real one
-      setCurrentConversationId(data.conversation.id)
-      
-      // Clear the temporary data and let the real data load
-      if (context?.tempConversationId) {
-        queryClient.removeQueries({ queryKey: ['/api/chat/conversations', context.tempConversationId, 'messages'] })
-      }
-      
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.conversation.id, 'messages'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', data.id, 'messages'] })
     },
-    onError: (err, content, context) => {
+    onError: (err) => {
       // Revert optimistic updates on error
       setHasSentFirstMessage(false)
       setCurrentConversationId(null)
-      if (context?.tempConversationId) {
-        queryClient.removeQueries({ queryKey: ['/api/chat/conversations', context.tempConversationId, 'messages'] })
+      setIsGenerating(false)
+      if (currentEventSource) {
+        currentEventSource.close()
+        setCurrentEventSource(null)
       }
     }
   })
@@ -206,47 +191,159 @@ export default function VeeGPT() {
     }
   })
 
-  // Send message mutation
+  // Streaming helper functions
+  const handleStreamingMessage = async (content: string, conversationId: number): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      setIsGenerating(true)
+      
+      // Get auth token
+      const token = localStorage.getItem('authToken')
+      if (!token) {
+        reject(new Error('No auth token'))
+        return
+      }
+
+      // Use fetch for streaming response
+      fetch(`/api/chat/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ content })
+      }).then(response => {
+        if (!response.body) {
+          throw new Error('No response body')
+        }
+
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+
+        const readStream = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read()
+              
+              if (done) break
+
+              const chunk = decoder.decode(value, { stream: true })
+              const lines = chunk.split('\n')
+
+              for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                  try {
+                    const data = JSON.parse(line.slice(6))
+                    handleStreamEvent(data)
+                  } catch (e) {
+                    // Ignore parse errors for incomplete data
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error('VeeGPT: Stream reading error:', error)
+            reject(error)
+          } finally {
+            setIsGenerating(false)
+            resolve({ success: true })
+          }
+        }
+
+        readStream()
+        setCurrentEventSource({ close: () => reader.cancel() })
+
+      }).catch(error => {
+        console.error('VeeGPT: Fetch error:', error)
+        setIsGenerating(false)
+        reject(error)
+      })
+    })
+  }
+
+  const handleStreamEvent = (data: any) => {
+    console.log('VeeGPT: Stream event:', data)
+
+    switch (data.type) {
+      case 'userMessage':
+        // Refresh messages to show user message
+        if (currentConversationId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
+          })
+        }
+        break
+
+      case 'aiMessageStart':
+        // AI message created, refresh to show placeholder
+        if (currentConversationId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
+          })
+        }
+        break
+
+      case 'chunk':
+        // Update the AI message content in real-time
+        if (data.messageId && data.content && currentConversationId) {
+          updateMessageContentInCache(data.messageId, data.content)
+        }
+        break
+
+      case 'complete':
+        // Generation completed
+        setIsGenerating(false)
+        if (currentConversationId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
+          })
+          queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
+        }
+        break
+
+      case 'error':
+        console.error('VeeGPT: Stream error:', data.error)
+        setIsGenerating(false)
+        break
+    }
+  }
+
+  const updateMessageContentInCache = (messageId: number, newChunk: string) => {
+    if (!currentConversationId) return
+
+    queryClient.setQueryData(
+      ['/api/chat/conversations', currentConversationId, 'messages'],
+      (oldData: any) => {
+        if (!oldData) return oldData
+
+        return oldData.map((message: any) => {
+          if (message.id === messageId) {
+            return {
+              ...message,
+              content: (message.content || '') + newChunk
+            }
+          }
+          return message
+        })
+      }
+    )
+  }
+
+  // Send message mutation with streaming
   const sendMessageMutation = useMutation({
     mutationFn: async ({ conversationId, content }: { conversationId: number, content: string }) => {
-      const response = await apiRequest(`/api/chat/conversations/${conversationId}/messages`, {
-        method: 'POST',
-        body: JSON.stringify({ content })
-      })
-      return response
+      return await handleStreamingMessage(content, conversationId)
     },
-    onMutate: async ({ conversationId, content }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ['/api/chat/conversations', conversationId, 'messages'] })
-      
-      // Snapshot the previous value
-      const previousMessages = queryClient.getQueryData(['/api/chat/conversations', conversationId, 'messages'])
-      
-      // Optimistically update to show the user message immediately
-      const optimisticUserMessage = {
-        id: Date.now(), // temporary ID
-        conversationId,
-        role: 'user',
-        content,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+    onSuccess: () => {
+      // Stream handling manages state updates
+      console.log('VeeGPT: Streaming message completed')
+    },
+    onError: (error) => {
+      console.error('VeeGPT: Error sending streaming message:', error)
+      setIsGenerating(false)
+      if (currentEventSource) {
+        currentEventSource.close()
+        setCurrentEventSource(null)
       }
-      
-      queryClient.setQueryData(['/api/chat/conversations', conversationId, 'messages'], (old: any[]) => 
-        old ? [...old, optimisticUserMessage] : [optimisticUserMessage]
-      )
-      
-      // Return a context object with the snapshotted value
-      return { previousMessages }
-    },
-    onError: (err, { conversationId }, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData(['/api/chat/conversations', conversationId, 'messages'], context?.previousMessages)
-    },
-    onSuccess: (data, { conversationId }) => {
-      // Replace optimistic update with real data
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', conversationId, 'messages'] })
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
     }
   })
 
@@ -286,12 +383,19 @@ export default function VeeGPT() {
   }
 
   const handleStopGeneration = async () => {
-    console.log('VeeGPT: Stopping generation and typewriter animations')
+    console.log('VeeGPT: Stopping streaming generation')
     
-    // Stop all typewriter animations immediately
+    // Stop streaming immediately
+    setIsGenerating(false)
+    if (currentEventSource) {
+      currentEventSource.close()
+      setCurrentEventSource(null)
+    }
+    
+    // Also stop typewriter animations if any
     setTypewriterMessageIds(new Set())
     
-    // If there's an active conversation, also call the backend to stop generation
+    // Call backend to stop generation
     if (currentConversationId) {
       console.log('VeeGPT: Stopping generation for conversation:', currentConversationId)
       try {
@@ -962,7 +1066,7 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending || typewriterMessageIds.size > 0) ? (
+              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || typewriterMessageIds.size > 0) ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{

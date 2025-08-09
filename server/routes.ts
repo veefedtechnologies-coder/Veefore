@@ -13495,50 +13495,120 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // Global conversation state for stop functionality
+  const activeGenerations = new Map<number, boolean>();
+
   app.post('/api/chat/conversations/:conversationId/messages', requireAuth, async (req: any, res: Response) => {
     try {
       const { conversationId } = req.params;
       const { content } = req.body;
       const userId = req.user.id;
+      const convId = parseInt(conversationId);
 
       if (!content?.trim()) {
         return res.status(400).json({ error: 'Message content is required' });
       }
 
+      console.log(`[CHAT STREAM] Starting streaming response for conversation ${convId}`);
+
       // Create user message
       const userMessage = await storage.createChatMessage({
-        conversationId: parseInt(conversationId),
+        conversationId: convId,
         role: 'user',
         content: content.trim(),
         tokensUsed: 0
       });
 
+      // Mark this conversation as actively generating
+      activeGenerations.set(convId, true);
+
+      // Set up SSE headers
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control'
+      });
+
+      // Send user message first
+      res.write(`data: ${JSON.stringify({ type: 'userMessage', message: userMessage })}\n\n`);
+
       // Get conversation history for AI context
-      const messages = await storage.getChatMessages(parseInt(conversationId));
+      const messages = await storage.getChatMessages(convId);
       const chatHistory = messages.map(msg => ({
         role: msg.role as 'user' | 'assistant',
         content: msg.content
       }));
 
-      // Generate AI response
-      const { OpenAIService } = await import('./openai-service');
-      const aiResponse = await OpenAIService.generateResponse(chatHistory);
+      let aiResponseContent = '';
+      let aiMessage: any = null;
 
-      // Create AI message
-      const aiMessage = await storage.createChatMessage({
-        conversationId: parseInt(conversationId),
-        role: 'assistant',
-        content: aiResponse,
-        tokensUsed: Math.ceil(aiResponse.length / 4) // Rough token estimation
-      });
+      try {
+        // Create placeholder AI message
+        aiMessage = await storage.createChatMessage({
+          conversationId: convId,
+          role: 'assistant',
+          content: '',
+          tokensUsed: 0
+        });
 
-      // Update conversation last message time and count
-      await storage.updateChatConversation(parseInt(conversationId), {
-        lastMessageAt: new Date(),
-        messageCount: messages.length + 2
-      });
+        // Send AI message creation event
+        res.write(`data: ${JSON.stringify({ type: 'aiMessageStart', messageId: aiMessage.id })}\n\n`);
 
-      res.json({ userMessage, aiMessage });
+        // Generate streaming AI response
+        const { OpenAIService } = await import('./openai-service');
+        
+        for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
+          // Check if generation was stopped
+          if (!activeGenerations.get(convId)) {
+            console.log(`[CHAT STREAM] Generation stopped for conversation ${convId}`);
+            break;
+          }
+
+          aiResponseContent += chunk;
+          
+          // Send chunk to client
+          res.write(`data: ${JSON.stringify({ 
+            type: 'chunk', 
+            content: chunk,
+            messageId: aiMessage.id 
+          })}\n\n`);
+        }
+
+        // Update the AI message with complete content
+        if (aiMessage && aiResponseContent) {
+          await storage.updateChatMessage(aiMessage.id, {
+            content: aiResponseContent,
+            tokensUsed: Math.ceil(aiResponseContent.length / 4)
+          });
+        }
+
+        // Update conversation last message time and count
+        await storage.updateChatConversation(convId, {
+          lastMessageAt: new Date(),
+          messageCount: messages.length + 2
+        });
+
+        // Send completion event
+        res.write(`data: ${JSON.stringify({ 
+          type: 'complete',
+          messageId: aiMessage?.id,
+          finalContent: aiResponseContent
+        })}\n\n`);
+
+      } catch (error) {
+        console.error('[CHAT STREAM] AI generation error:', error);
+        res.write(`data: ${JSON.stringify({ 
+          type: 'error', 
+          error: 'Failed to generate AI response' 
+        })}\n\n`);
+      } finally {
+        // Clean up
+        activeGenerations.delete(convId);
+        res.end();
+      }
+
     } catch (error: any) {
       console.error('[CHAT] Send message error:', error);
       res.status(500).json({ error: 'Failed to send message' });
@@ -13550,16 +13620,21 @@ Create a detailed growth strategy in JSON format:
     try {
       const { conversationId } = req.params;
       const userId = req.user.id;
+      const convId = parseInt(conversationId);
 
-      console.log(`[CHAT] Stop generation request for conversation ${conversationId} by user ${userId}`);
+      console.log(`[CHAT STREAM] Stop generation request for conversation ${convId} by user ${userId}`);
 
-      // For now, we'll just return success since the generation is synchronous
-      // In a real streaming implementation, this would cancel the active generation
-      console.log(`[CHAT] Generation stopped for conversation ${conversationId}`);
-      
-      res.json({ success: true, message: 'Generation stopped' });
+      // Stop the active generation by removing from active map
+      if (activeGenerations.has(convId)) {
+        activeGenerations.delete(convId);
+        console.log(`[CHAT STREAM] Generation stopped for conversation ${convId}`);
+        res.json({ success: true, message: 'Generation stopped' });
+      } else {
+        console.log(`[CHAT STREAM] No active generation found for conversation ${convId}`);
+        res.json({ success: true, message: 'No active generation to stop' });
+      }
     } catch (error: any) {
-      console.error('[CHAT] Stop generation error:', error);
+      console.error('[CHAT STREAM] Stop generation error:', error);
       res.status(500).json({ error: 'Failed to stop generation' });
     }
   });

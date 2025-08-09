@@ -44,6 +44,45 @@ Always provide practical, actionable advice tailored to content creation and soc
     }
   }
 
+  static async* generateStreamingResponse(messages: ChatMessage[]): AsyncGenerator<string, void, unknown> {
+    try {
+      const stream = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `You are VeeGPT, an AI assistant specifically designed to help content creators and social media professionals. You specialize in:
+
+1. Content Strategy & Planning
+2. Social Media Marketing
+3. Video Content Creation
+4. Brand Building
+5. Audience Engagement
+6. Content Optimization
+7. Analytics & Insights
+8. Platform-specific advice (Instagram, YouTube, TikTok, etc.)
+
+Always provide practical, actionable advice tailored to content creation and social media growth. Be conversational, helpful, and specific in your recommendations.`
+          },
+          ...messages
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+          yield content;
+        }
+      }
+    } catch (error) {
+      console.error('OpenAI Streaming API Error:', error);
+      throw new Error('Failed to generate AI response. Please try again.');
+    }
+  }
+
   static async generateChatTitle(firstMessage: string): Promise<string> {
     try {
       const response = await openai.chat.completions.create({
