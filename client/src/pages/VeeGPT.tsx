@@ -314,12 +314,12 @@ export default function VeeGPT() {
         })
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
-        // Update streaming content for real-time display
+        // Update streaming content for real-time display - accumulate chunks
         if (data.messageId && data.content) {
-          console.log('VeeGPT: Updated streaming content for message', data.messageId, ':', data.content)
+          console.log('VeeGPT: Accumulating chunk for message', data.messageId, ':', data.content)
           setStreamingContent(prev => ({
             ...prev,
-            [data.messageId]: data.content
+            [data.messageId]: (prev[data.messageId] || '') + data.content
           }))
         }
         break
@@ -384,22 +384,7 @@ export default function VeeGPT() {
     }
   }
 
-  const updateMessageContentInCache = (messageId: number, newChunk: string) => {
-    if (!currentConversationId) return
-
-    // Update streaming content state for real-time display
-    setStreamingContent(prev => {
-      const updated = {
-        ...prev,
-        [messageId]: (prev[messageId] || '') + newChunk
-      }
-      console.log('VeeGPT: Updated streaming content for message', messageId, ':', updated[messageId])
-      return updated
-    })
-
-    // Note: We don't update query cache during streaming to avoid conflicts
-    // Final content is updated when streaming completes
-  }
+  // Removed updateMessageContentInCache - now using direct streaming content updates in event handler
 
   // Send message mutation with streaming
   const sendMessageMutation = useMutation({
