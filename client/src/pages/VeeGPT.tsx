@@ -111,40 +111,8 @@ export default function VeeGPT() {
         const data = JSON.parse(event.data)
         console.log('[WebSocket] Received:', data)
         
-        if (data.type === 'subscribed') {
-          console.log(`[WebSocket] Successfully subscribed to conversation ${data.conversationId}`)
-        } else if (data.type === 'aiMessageStart') {
-          console.log(`[WebSocket] AI message started: ${data.messageId}`)
-          setStreamingContent(prev => ({ ...prev, [data.messageId]: '' }))
-          setIsGenerating(true)
-          isGeneratingRef.current = true
-          console.log(`[WebSocket] Set streaming for message ${data.messageId}, isGenerating: true`)
-        } else if (data.type === 'chunk') {
-          console.log(`[WebSocket] Chunk received for message ${data.messageId}: "${data.content}"`)
-          setStreamingContent(prev => {
-            const updated = {
-              ...prev,
-              [data.messageId]: (prev[data.messageId] || '') + data.content
-            }
-            console.log(`[WebSocket] Updated streaming content for ${data.messageId}:`, updated[data.messageId])
-            return updated
-          })
-        } else if (data.type === 'complete') {
-          console.log(`[WebSocket] Generation complete for message ${data.messageId}`)
-          setIsGenerating(false)
-          isGeneratingRef.current = false
-          setStreamingContent(prev => {
-            const updated = { ...prev }
-            delete updated[data.messageId]
-            console.log(`[WebSocket] Cleared streaming content for ${data.messageId}`)
-            return updated
-          })
-          queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] })
-        } else if (data.type === 'error') {
-          console.error('[WebSocket] Error:', data.error)
-          setIsGenerating(false)
-          isGeneratingRef.current = false
-        }
+        // Use the unified stream event handler
+        handleStreamEvent(data)
       } catch (error) {
         console.error('[WebSocket] Parse error:', error)
       }
@@ -248,23 +216,30 @@ export default function VeeGPT() {
 
   // Clear streaming content when real messages have loaded (prevents flashing during stop)
   useEffect(() => {
-    if (currentConversationId && messages.length > 0 && Object.keys(streamingContent).length > 0) {
+    if (currentConversationId && messages.length > 0) {
       // Check if any streaming message ID now exists in real messages
-      const streamingMessageIds = Object.keys(streamingContent).map(id => parseInt(id))
-      const realMessageIds = messages.map(m => m.id)
-      
-      streamingMessageIds.forEach(streamingId => {
-        if (realMessageIds.includes(streamingId)) {
-          // This streaming message now exists as a real message, safe to clear streaming content
-          setStreamingContent(prev => {
-            const updated = { ...prev }
+      setStreamingContent(prev => {
+        if (Object.keys(prev).length === 0) return prev
+        
+        const streamingMessageIds = Object.keys(prev).map(id => parseInt(id))
+        const realMessageIds = messages.map(m => m.id)
+        
+        let hasChanges = false
+        const updated = { ...prev }
+        
+        streamingMessageIds.forEach(streamingId => {
+          if (realMessageIds.includes(streamingId)) {
+            // This streaming message now exists as a real message, safe to clear streaming content
             delete updated[streamingId]
-            return updated
-          })
-        }
+            hasChanges = true
+            console.log('VeeGPT: Cleared completed streaming content for message:', streamingId)
+          }
+        })
+        
+        return hasChanges ? updated : prev
       })
     }
-  }, [currentConversationId, messages, streamingContent])
+  }, [currentConversationId, messages])
 
   // Add temporary streaming message if we have streaming content for a message not in the list
   Object.keys(streamingContent).forEach(messageId => {
