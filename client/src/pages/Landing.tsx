@@ -1070,7 +1070,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         </div>
 
                         {/* Innovative Feature Grid with Hover Previews */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative">
                           {platformFeatures.slice(0, 4).map((feature, index) => (
                             <div key={feature.id} className="relative group">
                               <button
@@ -1104,7 +1104,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
                               {/* Advanced Hover Preview */}
                               {selectedFeature === index && selectedFeature !== activeFeature && (
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-10 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl w-64">
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 bg-white/95 backdrop-blur-xl border border-gray-200 rounded-xl p-4 shadow-xl w-64">
                                   <div className="text-center">
                                     <h5 className="text-gray-900 font-semibold text-sm mb-2">{feature.title}</h5>
                                     <p className="text-gray-600 text-xs mb-3">{feature.description}</p>
@@ -1120,6 +1120,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                                       Try {feature.title.split(' ')[0]}
                                     </button>
                                   </div>
+                                  {/* Arrow pointing down */}
+                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/95"></div>
                                 </div>
                               )}
                             </div>
