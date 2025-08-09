@@ -25,7 +25,8 @@ import {
   Share,
   Archive,
   Trash2,
-  Square
+  Square,
+  Edit2
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -460,6 +461,9 @@ export default function VeeGPT() {
             ...prev,
             [data.messageId]: ''
           }))
+          // Ensure generation state is set for proper UI updates
+          setIsGenerating(true)
+          isGeneratingRef.current = true
           
           // Add placeholder AI message to cache
           if (currentConversationId) {
@@ -497,15 +501,23 @@ export default function VeeGPT() {
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
         // Update streaming content for real-time display - accumulate chunks
-        if (data.messageId && data.content) {
+        if (data.messageId && data.content !== undefined) {
           setStreamingContent(prev => {
             const currentContent = prev[data.messageId] || ''
             const newContent = currentContent + data.content
             console.log('VeeGPT: STREAMING UPDATE - Message:', data.messageId, 'Current:', `"${currentContent}"`, 'Adding:', `"${data.content}"`, 'New Total:', `"${newContent}"`)
-            return {
-              ...prev,
-              [data.messageId]: newContent
-            }
+            
+            // Force React to re-render by creating a completely new object
+            const updated: {[key: number]: string} = {}
+            Object.keys(prev).forEach(key => {
+              const numKey = parseInt(key)
+              if (numKey !== data.messageId) {
+                updated[numKey] = prev[numKey]
+              }
+            })
+            updated[data.messageId] = newContent
+            
+            return updated
           })
         } else {
           console.log('VeeGPT: CHUNK IGNORED - Missing messageId or content:', { messageId: data.messageId, content: data.content })
@@ -840,9 +852,9 @@ export default function VeeGPT() {
                                     onChange={(e) => setNewChatTitle(e.target.value)}
                                     onBlur={() => {
                                       if (newChatTitle.trim()) {
-                                        renameChatMutation.mutate({
+                                        renameConversationMutation.mutate({
                                           conversationId: conversation.id,
-                                          title: newChatTitle.trim()
+                                          newTitle: newChatTitle.trim()
                                         })
                                       }
                                       setRenamingChatId(null)
@@ -851,9 +863,9 @@ export default function VeeGPT() {
                                     onKeyPress={(e) => {
                                       if (e.key === 'Enter') {
                                         if (newChatTitle.trim()) {
-                                          renameChatMutation.mutate({
+                                          renameConversationMutation.mutate({
                                             conversationId: conversation.id,
-                                            title: newChatTitle.trim()
+                                            newTitle: newChatTitle.trim()
                                           })
                                         }
                                         setRenamingChatId(null)
@@ -1433,8 +1445,8 @@ export default function VeeGPT() {
                       >
                         {streamingContent[message.id] !== undefined ? (
                           <span>
-                            {streamingContent[message.id]}
-                            {isGenerating && (
+                            {streamingContent[message.id] || ''}
+                            {(isGenerating || streamingContent[message.id] !== undefined) && (
                               <span className="animate-pulse text-blue-500 ml-1">▋</span>
                             )}
                           </span>
