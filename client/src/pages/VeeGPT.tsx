@@ -1117,7 +1117,17 @@ export default function VeeGPT() {
                 />
               </div>
               
-              {(createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current) ? (
+              {(() => {
+                const shouldShowStop = createConversationMutation.isPending || sendMessageMutation.isPending || isGenerating || isGeneratingRef.current
+                console.log('VeeGPT: Stop button visibility check:', {
+                  createPending: createConversationMutation.isPending,
+                  sendPending: sendMessageMutation.isPending,
+                  isGenerating,
+                  isGeneratingRef: isGeneratingRef.current,
+                  shouldShowStop
+                })
+                return shouldShowStop
+              })() ? (
                 <button
                   onClick={handleStopGeneration}
                   style={{
