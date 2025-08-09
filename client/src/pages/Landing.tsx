@@ -14,11 +14,12 @@ import {
 } from 'react-icons/si'
 import { Button } from '@/components/ui/button'
 
-// Import generated interface images
+// Import generated interface images and logo
 import VeeGPTInterface from '@assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png'
 import VideoStudioInterface from '@assets/generated_images/AI_Video_Studio_Interface_c4227f2a.png'
 import AnalyticsInterface from '@assets/generated_images/Analytics_Dashboard_Interface_939945d5.png'
 import ContentStudioInterface from '@assets/generated_images/Content_Studio_Interface_840b3ab8.png'
+import VeeForeLogo from '@assets/output-onlinepngtools_1754773215023.png'
 
 interface LandingProps {
   onNavigate: (view: string) => void
@@ -545,10 +546,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition-opacity" />
-                <div className="relative w-12 h-12 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-7 h-7 text-white" />
-                </div>
+                <img 
+                  src={VeeForeLogo}
+                  alt="VeeFore Logo"
+                  className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
