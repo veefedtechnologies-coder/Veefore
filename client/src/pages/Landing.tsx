@@ -2939,183 +2939,220 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Revolutionary Pricing Section - Apple-Inspired Premium Design */}
-      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Dynamic Premium Background with Floating Orbs */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
-          {/* Large Floating Orbs */}
-          <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl animate-float-slow-orb" />
-          <div className="absolute bottom-32 right-20 w-80 h-80 bg-gradient-to-br from-purple-400/15 to-pink-500/15 rounded-full blur-3xl animate-float-reverse-orb" />
-          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-br from-cyan-300/10 to-blue-400/10 rounded-full blur-2xl animate-morph-slow-orb" />
+      {/* Revolutionary Next-Gen Pricing Experience - Ultra Premium Innovation */}
+      <section id="pricing" className="py-40 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Ultra-Modern Animated Background */}
+        <div className="absolute inset-0">
+          {/* Dynamic Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white via-blue-50/40 to-purple-50/30" />
           
-          {/* Neural Network Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 10 L80 30 L80 70 L50 90 L20 70 L20 30 Z' fill='none' stroke='%23000' stroke-width='0.5'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%23000'/%3E%3C/svg%3E")`,
-            backgroundSize: '100px 100px'
+          {/* Floating Gradient Orbs with Advanced Animation */}
+          <div className="absolute top-20 left-20 w-[600px] h-[600px] bg-gradient-to-br from-blue-300/15 via-purple-300/10 to-pink-300/15 rounded-full blur-3xl animate-float-slow-orb" />
+          <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-300/10 via-cyan-300/15 to-blue-300/10 rounded-full blur-3xl animate-float-reverse-orb" />
+          <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-gradient-to-br from-purple-300/8 via-pink-300/12 to-rose-300/8 rounded-full blur-2xl animate-morph-slow-orb" />
+          
+          {/* Advanced Geometric Patterns */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000' stroke-width='0.8'%3E%3Cpath d='M60 20 L100 40 L100 80 L60 100 L20 80 L20 40 Z'/%3E%3Ccircle cx='60' cy='60' r='25'/%3E%3Cpath d='M40 40 L80 40 L80 80 L40 80 Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '120px 120px'
           }} />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Revolutionary Header Section */}
-          <div className="text-center mb-32">
-            <div className="inline-flex items-center bg-white/70 backdrop-blur-xl rounded-full px-8 py-4 mb-12 border border-white/40 shadow-2xl animate-gradient-shift-premium" style={{background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(249,250,251,0.9), rgba(243,244,246,0.8))'}}>
-              <div className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full mr-3 animate-pulse" />
-              <CreditCard className="w-6 h-6 text-slate-700 mr-3" />
-              <span className="text-slate-800 font-bold text-lg">Premium Pricing Plans</span>
-              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full ml-3 animate-pulse" style={{animationDelay: '1s'}} />
+          {/* Ultra-Modern Header Design */}
+          <div className="text-center mb-20">
+            {/* Innovative Badge Design */}
+            <div className="inline-flex items-center mb-8">
+              <div className="bg-gradient-to-r from-white/90 to-white/70 backdrop-blur-2xl rounded-full px-10 py-5 border border-white/50 shadow-2xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 animate-gradient-shift-premium" />
+                <div className="relative flex items-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full mr-4 animate-pulse" />
+                  <CreditCard className="w-7 h-7 text-slate-700 mr-4" />
+                  <span className="text-slate-800 font-black text-xl">Revolutionary Pricing</span>
+                  <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full ml-4 animate-pulse" style={{animationDelay: '1.5s'}} />
+                </div>
+              </div>
             </div>
             
-            <h2 className="text-6xl lg:text-8xl font-black mb-12 leading-tight">
-              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 bg-clip-text text-transparent drop-shadow-sm">
-                Choose Your
+            {/* Next-Level Typography */}
+            <h2 className="text-7xl lg:text-9xl font-black mb-8 leading-[0.9] tracking-tight">
+              <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent">
+                Plans That
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Perfect Plan
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Scale Dreams
               </span>
             </h2>
             
-            <p className="text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-medium">
-              Experience the future of social media management with our 
-              <span className="text-blue-600 font-bold"> revolutionary AI-powered platform</span>. 
-              Start your journey today and scale seamlessly as you grow.
+            <p className="text-2xl lg:text-3xl text-slate-600 max-w-5xl mx-auto leading-relaxed font-medium mb-12">
+              From ambitious creators to enterprise teams - discover pricing that grows with your vision. 
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold"> Choose innovation over limitation.</span>
             </p>
+          </div>
+
+          {/* Revolutionary Card-Based Pricing */}
+          <div className="relative">
+            {/* Floating Connection Lines */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-slate-200 to-transparent transform -translate-y-1/2 hidden lg:block" />
             
-            {/* Floating Price Preview Particles */}
-            <div className="relative mt-16">
-              <div className="absolute top-0 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-platform-particles opacity-60" />
-              <div className="absolute top-8 right-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full animate-platform-particles opacity-70" style={{animationDelay: '2s'}} />
-              <div className="absolute bottom-4 left-1/2 w-1 h-1 bg-indigo-400 rounded-full animate-platform-particles opacity-50" style={{animationDelay: '4s'}} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
+              {pricingTiers.map((tier, index) => (
+                <div key={index} className={`group relative ${tier.popular ? 'lg:-mt-8 lg:mb-8' : ''}`}>
+                  {/* Floating Popular Badge */}
+                  {tier.popular && (
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-40">
+                      <div className="relative">
+                        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-12 py-4 rounded-full font-black text-lg shadow-2xl border-4 border-white/80">
+                          <span className="relative z-10">🚀 Most Popular</span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full" />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-purple-400/30 blur-xl rounded-full scale-110 -z-10" />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Ultra-Modern Card Container */}
+                  <div className="relative group-hover:scale-105 transition-all duration-700 ease-out">
+                    {/* Layered Background Effects */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white via-white/95 to-white/90 rounded-3xl" />
+                    <div className={`absolute inset-0 bg-gradient-to-br opacity-30 rounded-3xl blur-sm ${
+                      tier.popular 
+                        ? 'from-blue-100 via-purple-100 to-pink-100' 
+                        : 'from-slate-50 via-gray-50 to-slate-100'
+                    }`} />
+                    <div className="absolute inset-0 backdrop-blur-xl rounded-3xl border border-white/60 shadow-2xl" />
+                    
+                    {/* Animated Border Gradient */}
+                    {tier.popular && (
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 p-1 animate-pulse-slow">
+                        <div className="bg-white rounded-3xl w-full h-full" />
+                      </div>
+                    )}
+                    
+                    {/* Dynamic Floating Elements */}
+                    <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                      <div className={`absolute top-8 right-8 w-4 h-4 rounded-full animate-platform-particles ${
+                        tier.popular ? 'bg-gradient-to-r from-blue-400 to-purple-500' : 'bg-gradient-to-r from-slate-300 to-slate-400'
+                      }`} />
+                      <div className={`absolute bottom-12 left-12 w-3 h-3 rounded-full animate-platform-particles ${
+                        tier.popular ? 'bg-gradient-to-r from-purple-400 to-pink-500' : 'bg-gradient-to-r from-slate-400 to-slate-500'
+                      }`} style={{animationDelay: '2s'}} />
+                      <div className={`absolute top-1/3 left-8 w-2 h-2 rounded-full animate-platform-particles ${
+                        tier.popular ? 'bg-gradient-to-r from-pink-400 to-rose-500' : 'bg-gradient-to-r from-slate-300 to-slate-400'
+                      }`} style={{animationDelay: '4s'}} />
+                    </div>
+
+                    {/* Premium Card Content */}
+                    <div className="relative p-12 lg:p-16">
+                      {/* Plan Identifier */}
+                      <div className="text-center mb-12">
+                        <h3 className={`text-4xl lg:text-5xl font-black mb-6 tracking-tight ${
+                          tier.popular 
+                            ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent' 
+                            : 'text-slate-900'
+                        }`}>
+                          {tier.name}
+                        </h3>
+                        
+                        {/* Revolutionary Price Display */}
+                        <div className="relative mb-8">
+                          <div className={`text-8xl lg:text-9xl font-black mb-3 tracking-tighter ${
+                            tier.popular 
+                              ? 'bg-gradient-to-r from-slate-900 via-blue-700 to-purple-700 bg-clip-text text-transparent' 
+                              : 'text-slate-900'
+                          }`}>
+                            {tier.price}
+                          </div>
+                          <div className="text-2xl text-slate-500 font-bold">{tier.period}</div>
+                          
+                          {/* Dynamic Price Aura */}
+                          {tier.popular && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-purple-400/15 to-pink-400/10 blur-3xl rounded-full scale-150 -z-10 animate-pulse-slow" />
+                          )}
+                        </div>
+                        
+                        <p className="text-xl lg:text-2xl text-slate-600 leading-relaxed font-medium max-w-md mx-auto">
+                          {tier.description}
+                        </p>
+                      </div>
+
+                      {/* Enhanced Feature Showcase */}
+                      <div className="space-y-6 mb-16">
+                        {tier.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-start group-hover:translate-x-2 transition-all duration-500" style={{transitionDelay: `${idx * 100}ms`}}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mt-1 flex-shrink-0 shadow-lg ${
+                              tier.popular 
+                                ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500' 
+                                : 'bg-gradient-to-r from-slate-400 to-slate-600'
+                            }`}>
+                              <Check className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="ml-6 text-slate-700 font-semibold text-xl lg:text-2xl leading-relaxed">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Next-Gen CTA Button */}
+                      <Button
+                        className={`w-full py-8 text-2xl font-black rounded-2xl transition-all duration-700 transform group-hover:scale-105 group-hover:-translate-y-2 shadow-2xl relative overflow-hidden ${
+                          tier.popular
+                            ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-4 border-white/30'
+                            : 'bg-gradient-to-r from-slate-100 via-white to-slate-100 hover:from-slate-200 hover:via-slate-50 hover:to-slate-200 text-slate-900 border-4 border-slate-200/50'
+                        }`}
+                      >
+                        <span className="relative z-10">{tier.buttonText}</span>
+                        {tier.popular && (
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/10 rounded-2xl" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 blur-xl rounded-2xl -z-10 animate-pulse-slow" />
+                          </>
+                        )}
+                      </Button>
+                      
+                      {/* Magical Hover Effect */}
+                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-30 rounded-3xl transition-all duration-700 ${
+                        tier.popular 
+                          ? 'bg-gradient-to-br from-blue-300/30 via-purple-300/30 to-pink-300/30' 
+                          : 'bg-gradient-to-br from-slate-200/30 to-slate-300/30'
+                      }`} />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Revolutionary 3D Premium Pricing Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-24">
-            {pricingTiers.map((tier, index) => (
-              <div key={index} className={`group relative ${tier.popular ? 'pt-8' : ''}`}>
-                {/* Popular Badge with Advanced Styling */}
-                {tier.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-30">
-                    <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full text-base font-bold shadow-2xl border-4 border-white backdrop-blur-sm">
-                      <span className="text-white drop-shadow-sm">✨ Most Popular ✨</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Card 3D Container with Perspective */}
-                <div className="relative transform-gpu perspective-1000">
-                  {/* Glass Morphism Background with Advanced Effects */}
-                  <div className={`absolute inset-0 bg-white/90 backdrop-blur-2xl rounded-3xl border transition-all duration-700 shadow-2xl animate-integration-card-morph ${
-                    tier.popular 
-                      ? 'border-blue-200/50 ring-4 ring-blue-100/50 transform scale-105 shadow-blue-500/20' 
-                      : 'border-white/60 group-hover:border-slate-200/80 group-hover:shadow-3xl'
-                  }`} style={{animationDelay: `${index * 0.2}s`}} />
-                  
-                  {/* Premium Floating Particles for Each Card */}
-                  <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                    <div className={`absolute top-6 right-6 w-3 h-3 bg-gradient-to-r ${tier.popular ? 'from-blue-400 to-purple-500' : 'from-slate-300 to-slate-400'} rounded-full animate-platform-particles opacity-70`} />
-                    <div className={`absolute bottom-8 left-8 w-2 h-2 bg-gradient-to-r ${tier.popular ? 'from-purple-400 to-pink-500' : 'from-slate-400 to-slate-500'} rounded-full animate-platform-particles opacity-50`} style={{animationDelay: '3s'}} />
-                    <div className={`absolute top-1/2 right-8 w-1.5 h-1.5 bg-gradient-to-r ${tier.popular ? 'from-indigo-400 to-blue-500' : 'from-slate-300 to-slate-400'} rounded-full animate-platform-particles opacity-60`} style={{animationDelay: '5s'}} />
-                  </div>
-
-                  {/* Card Content with Premium Spacing */}
-                  <div className="relative p-12 text-center transform transition-all duration-500 group-hover:scale-105">
-                    {/* Plan Name with Advanced Typography */}
-                    <h3 className={`text-3xl font-black mb-6 ${
-                      tier.popular 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
-                        : 'text-slate-900'
-                    }`}>
-                      {tier.name}
-                    </h3>
-                    
-                    {/* Revolutionary Price Display */}
-                    <div className="mb-8 relative">
-                      <div className={`text-7xl font-black mb-2 ${
-                        tier.popular 
-                          ? 'bg-gradient-to-r from-slate-900 via-blue-700 to-purple-700 bg-clip-text text-transparent' 
-                          : 'text-slate-900'
-                      }`}>
-                        {tier.price}
-                      </div>
-                      <div className="text-lg text-slate-500 font-medium">{tier.period}</div>
-                      
-                      {/* Price Glow Effect for Popular Plan */}
-                      {tier.popular && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 blur-2xl rounded-full transform scale-150 -z-10" />
-                      )}
-                    </div>
-                    
-                    {/* Description with Premium Styling */}
-                    <p className="text-slate-600 leading-relaxed text-lg font-medium mb-10 max-w-sm mx-auto">
-                      {tier.description}
-                    </p>
-
-                    {/* Premium Feature List */}
-                    <div className="space-y-5 mb-12 text-left">
-                      {tier.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-start group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${idx * 50}ms`}}>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 ${
-                            tier.popular 
-                              ? 'bg-gradient-to-r from-blue-500 to-purple-500' 
-                              : 'bg-gradient-to-r from-slate-400 to-slate-500'
-                          }`}>
-                            <Check className="w-3.5 h-3.5 text-white" />
-                          </div>
-                          <span className="ml-4 text-slate-700 font-medium text-lg">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Revolutionary CTA Button */}
-                    <Button
-                      className={`w-full py-6 text-xl font-bold rounded-2xl transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-1 shadow-xl ${
-                        tier.popular
-                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white shadow-2xl hover:shadow-blue-500/30 border-2 border-white/20'
-                          : 'bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-900 hover:shadow-2xl border-2 border-slate-200'
-                      }`}
-                    >
-                      <span className="relative z-10">{tier.buttonText}</span>
-                      {tier.popular && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-2xl" />
-                      )}
-                    </Button>
-                    
-                    {/* Premium Hover Glow Effect */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-20 rounded-3xl transition-opacity duration-500 ${
-                      tier.popular 
-                        ? 'bg-gradient-to-br from-blue-400 to-purple-500' 
-                        : 'bg-gradient-to-br from-slate-300 to-slate-400'
-                    }`} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Revolutionary Additional Info Section */}
-          <div className="text-center">
-            {/* Trust Badges with Glass Morphism */}
-            <div className="inline-flex bg-white/80 backdrop-blur-xl rounded-2xl px-8 py-6 mb-8 border border-white/40 shadow-2xl">
-              <p className="text-slate-600 text-lg font-medium">
-                <span className="text-emerald-600 font-bold">✨ 14-day free trial</span> • 
-                <span className="text-blue-600 font-bold mx-2">No credit card required</span> • 
-                <span className="text-purple-600 font-bold">Cancel anytime</span>
+          {/* Ultra-Premium Trust Section */}
+          <div className="text-center mt-32">
+            {/* Revolutionary Trust Badge */}
+            <div className="inline-flex bg-white/90 backdrop-blur-2xl rounded-3xl px-12 py-8 mb-12 border border-white/60 shadow-2xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/50 via-blue-50/50 to-purple-50/50 animate-gradient-shift-premium" />
+              <p className="relative text-slate-700 text-2xl font-bold">
+                <span className="bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">✨ 14-day free trial</span>
+                <span className="mx-4 text-slate-400">•</span>
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">No credit card required</span>
+                <span className="mx-4 text-slate-400">•</span>
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Cancel anytime</span>
               </p>
             </div>
             
-            {/* Premium Security Badges */}
-            <div className="flex justify-center flex-wrap gap-8 text-slate-600">
+            {/* Next-Level Security Badges */}
+            <div className="flex justify-center flex-wrap gap-12 text-slate-600">
               {[
-                { icon: Shield, text: "SOC 2 Compliant", color: "from-emerald-500 to-green-600" },
-                { icon: Lock, text: "Bank-Level Security", color: "from-blue-500 to-indigo-600" },
-                { icon: Award, text: "99.9% Uptime SLA", color: "from-purple-500 to-pink-600" }
+                { icon: Shield, text: "SOC 2 Compliant", color: "from-emerald-400 via-green-500 to-emerald-600", bg: "from-emerald-50 to-green-100" },
+                { icon: Lock, text: "Bank-Level Security", color: "from-blue-400 via-indigo-500 to-blue-600", bg: "from-blue-50 to-indigo-100" },
+                { icon: Award, text: "99.9% Uptime SLA", color: "from-purple-400 via-violet-500 to-purple-600", bg: "from-purple-50 to-violet-100" }
               ].map((badge, index) => (
-                <div key={index} className="flex items-center group cursor-pointer">
-                  <div className={`w-10 h-10 bg-gradient-to-r ${badge.color} rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <badge.icon className="w-5 h-5 text-white" />
+                <div key={index} className="group cursor-pointer transform hover:scale-110 transition-all duration-500">
+                  <div className={`bg-gradient-to-br ${badge.bg} rounded-2xl p-6 border border-white/60 shadow-xl group-hover:shadow-2xl transition-all duration-500`}>
+                    <div className="flex items-center">
+                      <div className={`w-12 h-12 bg-gradient-to-r ${badge.color} rounded-xl flex items-center justify-center mr-4 shadow-lg`}>
+                        <badge.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="font-black text-xl text-slate-800">{badge.text}</span>
+                    </div>
                   </div>
-                  <span className="font-semibold text-lg group-hover:text-slate-800 transition-colors duration-300">{badge.text}</span>
                 </div>
               ))}
             </div>
