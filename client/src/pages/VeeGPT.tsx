@@ -15,7 +15,14 @@ import {
   MessageSquare,
   User,
   Bot,
-  Paperclip
+  Paperclip,
+  Edit,
+  Search,
+  BookOpen,
+  Play,
+  Sparkles,
+  MoreHorizontal,
+  Settings
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -337,74 +344,84 @@ export default function VeeGPT() {
   // Chat interface layout (after first message)
   return (
     <div className="h-full w-full bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+      {/* Sidebar - ChatGPT Style */}
+      <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
+        {/* Top Logo/Brand */}
+        <div className="p-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center">
               <Bot className="w-4 h-4 text-white" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">VeeGPT</h2>
-              <p className="text-xs text-gray-500">AI Assistant</p>
-            </div>
+            <span className="text-lg font-medium text-gray-900">VeeGPT</span>
           </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <div className="px-3 pb-4 space-y-2">
           <button
             onClick={startNewChat}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+            className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>New Conversation</span>
+            <Edit className="w-4 h-4" />
+            <span>New chat</span>
+          </button>
+          
+          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <Search className="w-4 h-4" />
+            <span>Search chats</span>
+          </button>
+          
+          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <BookOpen className="w-4 h-4" />
+            <span>Library</span>
+          </button>
+          
+          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <Play className="w-4 h-4" />
+            <span>Sora</span>
+          </button>
+          
+          <button className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <Sparkles className="w-4 h-4" />
+            <span>GPTs</span>
           </button>
         </div>
 
-        {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto py-4">
-          <div className="px-4 space-y-2">
-            <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
-              Recent Conversations
+        {/* Conversations Section */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-3">
+            <div className="text-xs font-medium text-gray-500 mb-2 px-3">
+              Chats
             </div>
-            {conversations.map((conversation) => (
-              <button
-                key={conversation.id}
-                onClick={() => selectConversation(conversation.id)}
-                className={`w-full text-left p-3 rounded-xl transition-all duration-200 group hover:shadow-sm ${
-                  currentConversationId === conversation.id
-                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 shadow-sm'
-                    : 'hover:bg-gray-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+            <div className="space-y-1">
+              {conversations.map((conversation) => (
+                <button
+                  key={conversation.id}
+                  onClick={() => selectConversation(conversation.id)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors group ${
                     currentConversationId === conversation.id
-                      ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
-                  }`}>
-                    <MessageSquare className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className={`text-sm font-medium truncate ${
-                      currentConversationId === conversation.id
-                        ? 'text-gray-900'
-                        : 'text-gray-700 group-hover:text-gray-900'
-                    }`}>
-                      {conversation.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {conversation.messageCount} messages
-                    </p>
-                  </div>
-                </div>
-              </button>
-            ))}
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="truncate">{conversation.title}</div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Bottom section */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50">
-          <div className="text-xs text-gray-500 text-center">
-            🤖 VeeGPT can make mistakes. Verify important information.
+        {/* Bottom User Section */}
+        <div className="p-3 border-t border-gray-200">
+          <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+            <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-gray-900 truncate">Arpit Choudhary</div>
+              <div className="text-xs text-gray-500">Free</div>
+            </div>
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
           </div>
         </div>
       </div>
