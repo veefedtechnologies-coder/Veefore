@@ -809,46 +809,47 @@ export default function VeeGPT() {
                             ? 'bg-gray-200 text-gray-900'
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
+                        title={sidebarCollapsed ? conversation.title : ""}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex-1 min-w-0">
-                            {renamingChatId === conversation.id ? (
-                              <input
-                                type="text"
-                                value={newChatTitle}
-                                onChange={(e) => setNewChatTitle(e.target.value)}
-                                onBlur={() => {
-                                  if (newChatTitle.trim()) {
-                                    renameChatMutation.mutate({
-                                      conversationId: conversation.id,
-                                      title: newChatTitle.trim()
-                                    })
-                                  }
-                                  setRenamingChatId(null)
-                                  setNewChatTitle('')
-                                }}
-                                onKeyPress={(e) => {
-                                  if (e.key === 'Enter') {
-                                    if (newChatTitle.trim()) {
-                                      renameChatMutation.mutate({
-                                        conversationId: conversation.id,
-                                        title: newChatTitle.trim()
-                                      })
-                                    }
-                                    setRenamingChatId(null)
-                                    setNewChatTitle('')
-                                  }
-                                }}
-                                className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm"
-                                autoFocus
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                            ) : (
-                              <div className="font-medium truncate">{conversation.title}</div>
-                            )}
-                            {!sidebarCollapsed && renamingChatId !== conversation.id && (
-                              <div className="text-xs text-gray-500 mt-1">
-                                {new Date(conversation.lastMessageAt).toLocaleDateString()}
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                            {!sidebarCollapsed && (
+                              <div className="truncate text-base font-medium">
+                                {renamingChatId === conversation.id ? (
+                                  <input
+                                    type="text"
+                                    value={newChatTitle}
+                                    onChange={(e) => setNewChatTitle(e.target.value)}
+                                    onBlur={() => {
+                                      if (newChatTitle.trim()) {
+                                        renameChatMutation.mutate({
+                                          conversationId: conversation.id,
+                                          title: newChatTitle.trim()
+                                        })
+                                      }
+                                      setRenamingChatId(null)
+                                      setNewChatTitle('')
+                                    }}
+                                    onKeyPress={(e) => {
+                                      if (e.key === 'Enter') {
+                                        if (newChatTitle.trim()) {
+                                          renameChatMutation.mutate({
+                                            conversationId: conversation.id,
+                                            title: newChatTitle.trim()
+                                          })
+                                        }
+                                        setRenamingChatId(null)
+                                        setNewChatTitle('')
+                                      }
+                                    }}
+                                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm"
+                                    autoFocus
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                ) : (
+                                  conversation.title
+                                )}
                               </div>
                             )}
                           </div>
