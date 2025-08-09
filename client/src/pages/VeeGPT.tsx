@@ -109,6 +109,7 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
+  const [forceRerender, setForceRerender] = useState(0)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
   const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
@@ -206,6 +207,9 @@ export default function VeeGPT() {
       // Set state to trigger re-render and make stop button visible
       setIsGenerating(true)
       
+      // Force re-render to ensure stop button appears immediately
+      setForceRerender(prev => prev + 1)
+      
       // Store resolve function for completion handler
       streamResolveRef.current = resolve
       
@@ -275,6 +279,7 @@ export default function VeeGPT() {
             console.error('VeeGPT: Stream reading error:', error)
             setIsGenerating(false)
             isGeneratingRef.current = false
+            setForceRerender(prev => prev + 1)
             streamResolveRef.current = null
             reject(error)
           }
@@ -287,6 +292,7 @@ export default function VeeGPT() {
         console.error('VeeGPT: Fetch error:', error)
         setIsGenerating(false)
         isGeneratingRef.current = false
+        setForceRerender(prev => prev + 1)
         streamResolveRef.current = null
         reject(error)
       }
@@ -347,6 +353,7 @@ export default function VeeGPT() {
         // Generation completed - reset generation state
         setIsGenerating(false)
         isGeneratingRef.current = false
+        setForceRerender(prev => prev + 1)
         // Clear streaming content for this message
         if (data.messageId) {
           setStreamingContent(prev => {
@@ -372,6 +379,7 @@ export default function VeeGPT() {
         console.error('VeeGPT: Stream error:', data.error)
         setIsGenerating(false)
         isGeneratingRef.current = false
+        setForceRerender(prev => prev + 1)
         break
     }
   }
@@ -417,6 +425,7 @@ export default function VeeGPT() {
       console.error('VeeGPT: Error sending streaming message:', error)
       setIsGenerating(false)
       isGeneratingRef.current = false
+      setForceRerender(prev => prev + 1)
       if (currentEventSource) {
         currentEventSource.close()
         setCurrentEventSource(null)
@@ -465,6 +474,7 @@ export default function VeeGPT() {
     // Stop streaming immediately
     setIsGenerating(false)
     isGeneratingRef.current = false
+    setForceRerender(prev => prev + 1)
     if (currentEventSource) {
       currentEventSource.close()
       setCurrentEventSource(null)
