@@ -161,7 +161,7 @@ export default function VeeGPT() {
   // Welcome screen layout (when no conversation is active)
   if (!hasSentFirstMessage) {
     return (
-      <div className="h-full bg-gray-50 flex flex-col items-center justify-center px-4">
+      <div className="h-screen w-screen bg-gray-50 flex flex-col items-center justify-center px-4 fixed inset-0">
         <div className="w-full max-w-4xl">
           {/* Header */}
           <div className="text-center mb-10">
@@ -316,7 +316,7 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-full bg-gray-50 flex">
+    <div className="h-screen w-screen bg-gray-50 flex fixed inset-0">
       {/* Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
         {/* Header */}
@@ -391,35 +391,6 @@ export default function VeeGPT() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-white border-b border-gray-100">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">VeeGPT</h1>
-              <p className="text-sm text-gray-500">Your AI-powered assistant</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="hover:bg-gray-100 text-gray-600 hover:text-gray-900"
-            >
-              <Share className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="hover:bg-gray-100 text-gray-600 hover:text-gray-900"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/30 to-white">
           <div className="max-w-4xl mx-auto space-y-8">
