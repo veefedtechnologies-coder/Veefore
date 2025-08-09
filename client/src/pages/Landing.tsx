@@ -846,122 +846,147 @@ const Landing = ({ onNavigate }: LandingProps) => {
         </div>
       </section>
 
-      {/* Platform Features Overview - Professional Light */}
-      <section id="platform" className="relative py-32 px-6 lg:px-8 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-30" />
-          <div className="absolute inset-0 opacity-5" style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(139 92 246 / 0.1)'%3e%3cpath d='m0 .5 32 32M32 .5 0 32'/%3e%3c/svg%3e")`
-          }} />
+      {/* Premium Platform Features Section - Glass Morphism Design */}
+      <section id="platform" className="relative py-32 px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50 overflow-hidden">
+        {/* Advanced Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-40">
+            <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-violet-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-32 right-20 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-br from-pink-400/15 to-rose-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+          </div>
+          
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDAsIDAsIDAsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-24">
             <div className="inline-flex items-center mb-8 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-blue-600/10 rounded-full blur-xl" />
-                <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-lg">
-                  <Layers className="w-5 h-5 text-violet-600" />
-                  <span className="text-gray-700 font-medium">Complete AI Platform</span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-600/20 rounded-full blur-2xl scale-150" />
+                <div className="relative bg-white/70 backdrop-blur-2xl border border-white/50 rounded-full px-8 py-4 flex items-center space-x-3 shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-105">
+                  <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-gray-800 font-semibold">Revolutionary Platform</span>
+                  <div className="flex space-x-1">
+                    <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" />
+                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  </div>
                 </div>
               </div>
             </div>
             
-            <h2 className="text-6xl lg:text-8xl font-black mb-8 leading-none">
-              <span className="block bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
-                All-in-One
+            <h2 className="text-6xl lg:text-8xl font-black mb-12 leading-none">
+              <span className="block bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 bg-clip-text text-transparent mb-4">
+                AI-Powered
               </span>
-              <span className="block bg-gradient-to-r from-violet-600 via-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                AI Solution
+              <span className="block bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                Excellence
               </span>
             </h2>
             
-            <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
-              Everything you need for social media success in one powerful platform. From intelligent chat assistance to professional video generation, 
-              <span className="text-gray-900 font-semibold"> analytics to automation.</span>
+            <p className="text-2xl lg:text-3xl text-gray-700 max-w-5xl mx-auto font-light leading-relaxed">
+              Discover groundbreaking features that redefine digital creativity and 
+              <span className="text-gray-900 font-semibold"> transform your workflow forever.</span>
             </p>
           </div>
 
-          {/* Feature Grid - Premium Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {platformFeatures.map((feature, index) => (
-              <div
+              <div 
                 key={feature.id}
                 className="group relative cursor-pointer"
                 onMouseEnter={() => setHoveredFeature(index)}
                 onMouseLeave={() => setHoveredFeature(null)}
                 onClick={() => handleNavigation(feature.link.substring(1))}
-                style={{
-                  transform: `translateY(${scrollY * 0.05 * (index % 2 === 0 ? 1 : -1)}px)`
-                }}
               >
-                {/* Card Glow Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-all duration-700 scale-105`} />
-                
-                {/* Main Card */}
-                <div className="relative bg-white/70 backdrop-blur-xl border border-gray-200/50 rounded-3xl overflow-hidden transition-all duration-700 group-hover:border-gray-300/70 group-hover:bg-white/80 shadow-lg group-hover:shadow-xl">
-                  {/* Top Gradient Bar */}
-                  <div className={`h-1 bg-gradient-to-r ${feature.color}`} />
+                <div className="relative h-full bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-700 overflow-hidden border border-white/40 group-hover:border-white/60 group-hover:bg-white/80 group-hover:-translate-y-2">
                   
-                  {/* Card Content */}
-                  <div className="p-8">
+                  {/* Premium Glass Header */}
+                  <div className="relative h-40 overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-90`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10" />
+                    
                     {/* Floating Icon */}
-                    <div className="relative mb-8">
-                      <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity duration-500`} />
-                      <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    <div className="absolute top-6 left-6 p-4 bg-white/30 backdrop-blur-xl rounded-2xl border border-white/40 group-hover:scale-110 transition-all duration-500">
+                      <div className="text-white drop-shadow-lg">
                         {feature.icon}
                       </div>
                     </div>
+                    
+                    {/* Decorative Elements */}
+                    <div className="absolute top-6 right-6 opacity-40">
+                      <div className="w-12 h-12 border-2 border-white/50 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
+                      <div className="absolute top-2 left-2 w-8 h-8 border border-white/30 rounded-full animate-ping" />
+                    </div>
+                    
+                    {/* Bottom Wave */}
+                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-r from-white/20 to-white/40 backdrop-blur-sm" style={{
+                      clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 0 50%)'
+                    }} />
+                  </div>
 
+                  <div className="p-8">
                     {/* Title & Subtitle */}
-                    <div className="mb-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:text-transparent group-hover:from-violet-600 group-hover:to-blue-600 transition-all duration-500">
+                    <div className="mb-8">
+                      <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 opacity-80">
+                        {feature.subtitle}
+                      </div>
+                      <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight group-hover:text-gray-800">
                         {feature.title.split(' - ')[0]}
                       </h3>
-                      <p className="text-gray-500 text-sm font-medium tracking-wide uppercase">
-                        {feature.subtitle}
+                      <p className="text-gray-600 leading-relaxed text-sm font-medium">
+                        {feature.description.substring(0, 100)}...
                       </p>
                     </div>
 
-                    {/* Description */}
-                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
-                      {feature.description.substring(0, 120)}...
-                    </p>
-
-                    {/* Feature Pills */}
-                    <div className="flex flex-wrap gap-2 mb-6">
+                    {/* Modern Feature Tags */}
+                    <div className="flex flex-wrap gap-2 mb-8">
                       {feature.features.slice(0, 2).map((feat, idx) => (
-                        <div key={idx} className="bg-gray-100 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-600">
+                        <div key={idx} className="bg-gray-100/80 backdrop-blur-sm border border-gray-200/50 rounded-full px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200/80 transition-colors">
                           {feat.split(' ').slice(0, 2).join(' ')}
                         </div>
                       ))}
-                      <div className="bg-violet-100 border border-violet-200 rounded-full px-3 py-1.5 text-xs text-violet-700">
-                        +{feature.features.length - 2} more
+                      <div className="bg-gradient-to-r from-violet-100 to-purple-100 border border-violet-200/50 rounded-full px-4 py-2 text-xs font-bold text-violet-800">
+                        +{feature.features.length - 2}
                       </div>
                     </div>
 
-                    {/* CTA */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-500 text-sm font-medium">Explore Feature</span>
-                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center group-hover:bg-gray-200 group-hover:scale-110 transition-all duration-300">
-                        <ArrowRight className="w-4 h-4 text-gray-600 group-hover:translate-x-0.5 transition-transform" />
+                    {/* Premium CTA */}
+                    <div className="flex items-center justify-between group-hover:justify-center transition-all duration-500">
+                      <span className="text-gray-600 text-sm font-semibold group-hover:opacity-0 transition-opacity">Explore</span>
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300 flex items-center justify-center group-hover:bg-gradient-to-br group-hover:from-violet-500 group-hover:to-purple-600 group-hover:scale-110 group-hover:shadow-lg transition-all duration-500">
+                        <ArrowRight className="w-5 h-5 text-gray-700 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  {/* Shimmer Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-shimmer" />
+                  </div>
                 </div>
 
-                {/* Floating Preview on Hover */}
+                {/* Enhanced Floating Preview */}
                 {hoveredFeature === index && (
-                  <div className="absolute -top-4 -right-4 w-48 h-32 bg-gray-800/90 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl z-10 opacity-0 animate-in fade-in duration-300">
-                    <div className="p-4">
-                      <div className="text-white text-sm font-semibold mb-2">Preview</div>
-                      <div className="text-gray-400 text-xs leading-relaxed">
-                        {feature.features.slice(0, 3).join(' • ')}
+                  <div className="absolute -top-6 -right-6 w-64 h-40 bg-gray-900/95 backdrop-blur-2xl border border-white/20 rounded-3xl overflow-hidden shadow-2xl z-20 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="p-6">
+                      <div className="flex items-center mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                          <Zap className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-white text-sm font-bold">Quick Preview</div>
+                      </div>
+                      <div className="text-gray-300 text-xs leading-relaxed">
+                        {feature.features.slice(0, 4).map((feat, idx) => (
+                          <div key={idx} className="flex items-center mb-1">
+                            <div className="w-1.5 h-1.5 bg-violet-400 rounded-full mr-2" />
+                            {feat}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>

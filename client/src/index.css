@@ -141,6 +141,20 @@ div[contenteditable="true"].transparent-input {
   to { transform: rotate(360deg); }
 }
 
+/* Shimmer animation for premium cards */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
 /* Chat message text wrapping */
 .chat-message-content {
   word-wrap: break-word !important;
