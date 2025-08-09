@@ -7,7 +7,7 @@ import {
   Network, Wand2, Palette, Music, Video, Image, FileText, Mic, Camera, Megaphone, Compass, 
   Map, Database, Code, Server, Cloud, Gauge, LineChart, PieChart, Activity, Headphones, 
   ShoppingCart, CreditCard, Wallet, ChevronRight, ExternalLink, Github, Twitter, MousePointer2,
-  Maximize2, Move3D, Sparkle, Waves, Orbit, Hexagon, Triangle, Circle, Send
+  Maximize2, Move3D, Sparkle, Waves, Orbit, Hexagon, Triangle, Circle, Send, MessageCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -1424,17 +1424,17 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </svg>
           </div>
           
-          {/* Dynamic Gradient Orbs */}
+          {/* Dynamic Gradient Orbs with Premium Animations */}
           <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-96 h-96 rounded-full opacity-20 animate-morph-1" style={{
+            <div className="absolute top-20 left-20 w-96 h-96 rounded-full opacity-20 animate-morph-premium-1" style={{
               background: 'conic-gradient(from 0deg, #8b5cf6, #06b6d4, #10b981, #8b5cf6)',
               filter: 'blur(60px)',
             }} />
-            <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full opacity-15 animate-morph-2" style={{
+            <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full opacity-15 animate-morph-premium-2" style={{
               background: 'conic-gradient(from 90deg, #f59e0b, #ef4444, #8b5cf6, #f59e0b)',
               filter: 'blur(50px)',
             }} />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-10 animate-morph-3" style={{
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-10 animate-morph-premium-1" style={{
               background: 'conic-gradient(from 180deg, #06b6d4, #8b5cf6, #10b981, #06b6d4)',
               filter: 'blur(40px)',
             }} />
@@ -1523,38 +1523,28 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                       
                       <h3 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
-                        {platformFeatures[0].title.split(' - ')[0]}
+                        {detailedFeatures[0].title.split(' - ')[0]}
                       </h3>
-                      
-                      <p className="text-white/80 text-lg lg:text-xl mb-8 leading-relaxed">
-                        {platformFeatures[0].description}
+                      <p className="text-white/80 text-lg lg:text-xl font-light leading-relaxed mb-8">
+                        {detailedFeatures[0].description}
                       </p>
                       
-                      {/* Advanced Feature Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                        {platformFeatures[0].features.slice(0, 4).map((feature, idx) => (
-                          <div key={idx} className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="text-white/90 text-sm font-medium">{feature}</span>
+                      <div className="space-y-4 mb-8">
+                        {detailedFeatures[0].details.slice(0, 3).map((detail, idx) => (
+                          <div key={idx} className="flex items-center space-x-3 text-white/90">
+                            <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full" />
+                            <span className="text-sm font-medium">{detail}</span>
                           </div>
                         ))}
                       </div>
                       
-                      <div className="flex items-center space-x-4">
-                        <button 
-                          onClick={() => handleNavigation('veegpt')}
-                          className="bg-white text-gray-900 rounded-2xl px-8 py-4 font-bold hover:bg-gray-100 transition-all duration-300 flex items-center space-x-2 shadow-lg"
-                        >
-                          <span>Experience VeeGPT</span>
-                          <ArrowRight className="w-5 h-5" />
-                        </button>
-                        <div className="flex items-center space-x-2 text-white/60 text-sm">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                          <span>Live & Interactive</span>
-                        </div>
-                      </div>
+                      <button 
+                        onClick={() => handleNavigation('veegpt')}
+                        className="group relative inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:scale-105"
+                      >
+                        <span className="relative z-10">Experience VeeGPT</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </button>
                     </div>
                   </div>
                   
@@ -1601,11 +1591,18 @@ const Landing = ({ onNavigate }: LandingProps) => {
                         </div>
                       </div>
                       
-                      {/* Floating Action Cards */}
-                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center animate-float shadow-xl">
-                        <Sparkles className="w-8 h-8 text-white" />
+                      {/* Floating Action Cards with Real Interface Preview */}
+                      <div className="absolute -top-6 -right-6 w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center animate-float-premium shadow-xl overflow-hidden">
+                        <img 
+                          src="attached_assets/generated_images/VeeGPT_AI_Chat_Interface_9461d5ae.png"
+                          alt="VeeGPT Preview"
+                          className="w-full h-full object-cover opacity-80"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 to-cyan-500/40 flex items-center justify-center">
+                          <Sparkles className="w-8 h-8 text-white" />
+                        </div>
                       </div>
-                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-float-delayed shadow-xl">
+                      <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-float-delayed-premium shadow-xl">
                         <Zap className="w-6 h-6 text-white" />
                       </div>
                     </div>
@@ -1623,86 +1620,123 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                       <div className="text-white text-2xl">
-                        {platformFeatures[1].icon}
+                        {detailedFeatures[1].icon}
                       </div>
                     </div>
                     <div>
                       <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
-                        {platformFeatures[1].subtitle}
+                        AI Video Studio
                       </div>
                       <div className="text-white text-lg font-bold">
-                        {platformFeatures[1].title.split(' - ')[0]}
+                        {detailedFeatures[1].title.split(' - ')[0]}
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-center">
                     <p className="text-white/90 text-lg mb-8 leading-relaxed">
-                      {platformFeatures[1].description.substring(0, 200)}...
+                      {detailedFeatures[1].description.substring(0, 200)}...
                     </p>
                     
-                    {/* Feature Metrics */}
-                    <div className="space-y-4 mb-8">
-                      {platformFeatures[1].features.slice(0, 3).map((feature, idx) => (
-                        <div key={idx} className="flex items-center justify-between">
-                          <span className="text-white/80 text-sm">{feature.substring(0, 20)}...</span>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 h-2 bg-white/20 rounded-full overflow-hidden">
+                    {/* Apple-style Feature Cards */}
+                    <div className="space-y-3 mb-8">
+                      {[
+                        { label: "AI Script Generation", value: "95%" },
+                        { label: "Professional Voiceover", value: "92%" },
+                        { label: "Scene Creation", value: "88%" }
+                      ].map((metric, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                          <span className="text-white/90 text-sm font-medium">{metric.label}</span>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-20 h-2 bg-white/20 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-white to-cyan-200 rounded-full animate-pulse"
-                                style={{ width: `${70 + idx * 15}%` }}
+                                className="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full transition-all duration-1000"
+                                style={{ width: metric.value }}
                               />
                             </div>
-                            <span className="text-white/60 text-xs">{70 + idx * 15}%</span>
+                            <span className="text-white/70 text-xs font-medium w-8">{metric.value}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                   
-                  <button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2">
-                    <span>Explore Studio</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                    <span>Explore Video Studio</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </button>
                 </div>
                 
-                {/* Ambient Graphics */}
+                {/* Ambient Graphics with Apple-style floating elements */}
                 <div className="absolute top-8 right-8 opacity-20">
-                  <div className="w-32 h-32 border-2 border-white/30 rounded-full animate-spin" style={{ animationDuration: '20s' }} />
+                  <div className="w-32 h-32 border-2 border-white/30 rounded-full animate-morph-premium-1" />
                 </div>
+                <div className="absolute bottom-12 left-8 opacity-15">
+                  <div className="w-24 h-24 bg-gradient-to-br from-white/20 to-transparent rounded-2xl animate-float-premium" />
+                </div>
+                
+                {/* Floating particles */}
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 bg-white/40 rounded-full animate-particles-float"
+                    style={{
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 60}%`,
+                      animationDelay: `${i * 1.5}s`,
+                      animationDuration: `${8 + Math.random() * 4}s`
+                    }}
+                  />
+                ))}
               </div>
             </div>
 
-            {/* Tertiary Features - Wide Cards */}
+            {/* Tertiary Features - Wide Cards with Premium Design */}
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 shadow-2xl relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                         <div className="text-white text-xl">
-                          {platformFeatures[2].icon}
+                          {detailedFeatures[2].icon}
                         </div>
                       </div>
                       <div>
                         <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
-                          {platformFeatures[2].subtitle}
+                          Analytics Pro
                         </div>
                         <h3 className="text-white text-2xl font-bold">
-                          {platformFeatures[2].title.split(' - ')[0]}
+                          {detailedFeatures[2].title.split(' - ')[0]}
                         </h3>
                       </div>
                     </div>
                     
                     <p className="text-white/90 mb-6 leading-relaxed">
-                      {platformFeatures[2].description.substring(0, 150)}...
+                      {detailedFeatures[2].description.substring(0, 150)}...
                     </p>
                     
+                    {/* Apple-style Statistics */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {[
+                        { label: "Metrics", value: "200+" },
+                        { label: "Platforms", value: "15+" },
+                        { label: "Reports", value: "50+" },
+                        { label: "Accuracy", value: "99%" }
+                      ].map((stat, idx) => (
+                        <div key={idx} className="glass-premium rounded-xl p-3 text-center">
+                          <div className="text-white font-bold text-lg">{stat.value}</div>
+                          <div className="text-white/70 text-xs">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    
                     <div className="flex items-center space-x-4">
-                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300">
-                        View Analytics
+                      <button className="button-premium bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center space-x-2">
+                        <span>View Analytics</span>
+                        <ArrowRight className="w-4 h-4" />
                       </button>
                       <div className="text-white/60 text-sm">Real-time insights</div>
                     </div>
@@ -1730,50 +1764,207 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </div>
 
             <div className="col-span-12 lg:col-span-6 group">
-              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 shadow-2xl relative">
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-transparent" />
+              <div className="h-full min-h-[280px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-transparent animate-gradient-shift" />
                 
                 <div className="relative h-full p-8 flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                         <div className="text-white text-xl">
-                          {platformFeatures[3].icon}
+                          {detailedFeatures[3].icon}
                         </div>
                       </div>
                       <div>
                         <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
-                          {platformFeatures[3].subtitle}
+                          Content Studio
                         </div>
                         <h3 className="text-white text-2xl font-bold">
-                          {platformFeatures[3].title.split(' - ')[0]}
+                          {detailedFeatures[3].title.split(' - ')[0]}
                         </h3>
                       </div>
                     </div>
                     
                     <p className="text-white/90 mb-6 leading-relaxed">
-                      {platformFeatures[3].description.substring(0, 150)}...
+                      {detailedFeatures[3].description.substring(0, 150)}...
                     </p>
                     
+                    {/* Creative workflow steps */}
+                    <div className="space-y-2 mb-6">
+                      {[
+                        "AI Content Generation",
+                        "Visual Enhancement",
+                        "Multi-platform Publishing"
+                      ].map((step, idx) => (
+                        <div key={idx} className="flex items-center space-x-3">
+                          <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
+                            <span className="text-white/90 text-xs font-bold">{idx + 1}</span>
+                          </div>
+                          <span className="text-white/80 text-sm">{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
                     <div className="flex items-center space-x-4">
-                      <button className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300">
-                        Create Content
+                      <button className="button-premium bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center space-x-2">
+                        <span>Create Content</span>
+                        <Sparkles className="w-4 h-4" />
                       </button>
                       <div className="text-white/60 text-sm">AI-powered</div>
                     </div>
                   </div>
                   
                   <div className="flex-1 relative hidden lg:flex items-center justify-center">
-                    {/* Creative Elements */}
+                    {/* Apple-style Creative Visual */}
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-3xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center transform rotate-12 group-hover:rotate-45 transition-transform duration-700">
-                        <Palette className="w-8 h-8 text-white" />
+                      <div className="w-32 h-20 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
+                        <img 
+                          src="attached_assets/generated_images/Content_Studio_Interface_840b3ab8.png"
+                          alt="Content Studio Interface"
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                        />
                       </div>
-                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center animate-bounce">
+                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center animate-float-premium">
                         <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="absolute -bottom-2 -left-2 w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center animate-float-delayed-premium">
+                        <Zap className="w-3 h-3 text-white" />
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row - Revolutionary Features Grid */}
+            <div className="col-span-12 lg:col-span-4 group">
+              <div className="h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent" />
+                
+                <div className="relative h-full p-8 flex flex-col">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-white text-2xl">
+                        {detailedFeatures[4].icon}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                        Automation Engine
+                      </div>
+                      <div className="text-white text-lg font-bold">
+                        {detailedFeatures[4].title.split(' - ')[0]}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-white/90 text-lg mb-6 leading-relaxed">
+                      {detailedFeatures[4].description.substring(0, 120)}...
+                    </p>
+                    
+                    {/* Real Interface Preview */}
+                    <div className="mb-6 rounded-xl overflow-hidden border border-white/20">
+                      <img 
+                        src="attached_assets/generated_images/automation_engine_f4e9b7d2.png"
+                        alt="Automation Engine Interface"
+                        className="w-full h-24 object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                    </div>
+                  </div>
+                  
+                  <button className="w-full button-premium bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <span>Setup Automation</span>
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 lg:col-span-4 group">
+              <div className="h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                
+                <div className="relative h-full p-8 flex flex-col">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-white text-2xl">
+                        {detailedFeatures[5].icon}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                        Social Inbox
+                      </div>
+                      <div className="text-white text-lg font-bold">
+                        {detailedFeatures[5].title.split(' - ')[0]}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-white/90 text-lg mb-6 leading-relaxed">
+                      {detailedFeatures[5].description.substring(0, 120)}...
+                    </p>
+                    
+                    {/* Interface Preview */}
+                    <div className="mb-6 rounded-xl overflow-hidden border border-white/20">
+                      <img 
+                        src="attached_assets/generated_images/social_inbox_interface_d3c8b5a7.png"
+                        alt="Social Inbox Interface"
+                        className="w-full h-24 object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                    </div>
+                  </div>
+                  
+                  <button className="w-full button-premium bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <span>Manage Inbox</span>
+                    <MessageCircle className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 lg:col-span-4 group">
+              <div className="h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600 shadow-2xl relative card-premium">
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent" />
+                
+                <div className="relative h-full p-8 flex flex-col">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <div className="text-white text-2xl">
+                        {detailedFeatures[6].icon}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-wider">
+                        Smart Calendar
+                      </div>
+                      <div className="text-white text-lg font-bold">
+                        {detailedFeatures[6].title.split(' - ')[0]}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-white/90 text-lg mb-6 leading-relaxed">
+                      {detailedFeatures[6].description.substring(0, 120)}...
+                    </p>
+                    
+                    {/* Calendar visual with real interface */}
+                    <div className="mb-6 rounded-xl overflow-hidden border border-white/20">
+                      <img 
+                        src="attached_assets/generated_images/smart_calendar_interface_b8d4f1e6.png"
+                        alt="Smart Calendar Interface"
+                        className="w-full h-24 object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                    </div>
+                  </div>
+                  
+                  <button className="w-full button-premium bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl py-4 text-white font-medium hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <span>View Calendar</span>
+                    <Calendar className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
