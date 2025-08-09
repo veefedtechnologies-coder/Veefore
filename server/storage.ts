@@ -176,6 +176,7 @@ export interface IStorage {
   deleteChatConversation(id: number): Promise<void>;
   getChatMessages(conversationId: number): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  updateChatMessage(id: number, updates: Partial<ChatMessage>): Promise<ChatMessage>;
   getChatMessage(id: number): Promise<ChatMessage | undefined>;
 
   // YouTube workspace data operations
@@ -1592,6 +1593,19 @@ export class MemStorage implements IStorage {
     };
     this.chatMessages.set(id, newMessage);
     return newMessage;
+  }
+
+  async updateChatMessage(id: number, updates: Partial<ChatMessage>): Promise<ChatMessage> {
+    const message = this.chatMessages.get(id);
+    if (!message) throw new Error('Message not found');
+    
+    const updatedMessage = {
+      ...message,
+      ...updates,
+      updatedAt: new Date()
+    };
+    this.chatMessages.set(id, updatedMessage);
+    return updatedMessage;
   }
 
   async getChatMessage(id: number): Promise<ChatMessage | undefined> {

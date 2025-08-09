@@ -4615,6 +4615,24 @@ export class MongoStorage implements IStorage {
     };
   }
 
+  async updateChatMessage(id: number, updates: Partial<ChatMessage>): Promise<ChatMessage> {
+    await this.connect();
+    const updated = await ChatMessageModel.findOneAndUpdate(
+      { id: id },
+      { ...updates },
+      { new: true }
+    );
+    if (!updated) throw new Error('Message not found');
+    return {
+      id: updated.id,
+      conversationId: updated.conversationId,
+      role: updated.role,
+      content: updated.content,
+      tokensUsed: updated.tokensUsed,
+      createdAt: updated.createdAt
+    };
+  }
+
   async updateChatConversation(id: string | number, updates: Partial<ChatConversation>): Promise<ChatConversation> {
     await this.connect();
     const updated = await ChatConversationModel.findOneAndUpdate(

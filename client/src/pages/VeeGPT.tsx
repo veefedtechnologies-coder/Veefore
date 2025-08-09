@@ -108,6 +108,7 @@ export default function VeeGPT() {
   const [typewriterMessageIds, setTypewriterMessageIds] = useState<Set<number>>(new Set())
   const [isGenerating, setIsGenerating] = useState(false)
   const [currentEventSource, setCurrentEventSource] = useState<any>(null)
+  const [streamingContent, setStreamingContent] = useState<{[key: number]: string}>({})
   const inputRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
@@ -303,6 +304,14 @@ export default function VeeGPT() {
       case 'complete':
         // Generation completed
         setIsGenerating(false)
+        // Clear streaming content for this message
+        if (data.messageId) {
+          setStreamingContent(prev => {
+            const newContent = { ...prev }
+            delete newContent[data.messageId]
+            return newContent
+          })
+        }
         if (currentConversationId) {
           queryClient.invalidateQueries({ 
             queryKey: ['/api/chat/conversations', currentConversationId, 'messages'] 
@@ -321,6 +330,13 @@ export default function VeeGPT() {
   const updateMessageContentInCache = (messageId: number, newChunk: string) => {
     if (!currentConversationId) return
 
+    // Update streaming content state for real-time display
+    setStreamingContent(prev => ({
+      ...prev,
+      [messageId]: (prev[messageId] || '') + newChunk
+    }))
+
+    // Also update query cache
     queryClient.setQueryData(
       ['/api/chat/conversations', currentConversationId, 'messages'],
       (oldData: any) => {
@@ -915,7 +931,10 @@ export default function VeeGPT() {
                           lineBreak: 'anywhere'
                         }}
                       >
-                        {message.content}
+                        {streamingContent[message.id] || message.content}
+                        {streamingContent[message.id] && isGenerating && (
+                          <span className="animate-pulse text-gray-400">|</span>
+                        )}
                       </div>
                     ) : (
                       <div 
