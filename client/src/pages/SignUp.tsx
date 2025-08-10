@@ -172,12 +172,16 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <h1 className="text-4xl font-bold text-gray-900">
+          <div className="space-y-10">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-blue-700 font-semibold text-sm">Enterprise Account Setup</span>
+              </div>
+              <h1 className="text-5xl font-black text-gray-900 tracking-tight leading-tight">
                 Create your account
               </h1>
-              <p className="text-lg text-gray-600">
+              <p className="text-xl text-gray-600 font-light leading-relaxed max-w-md mx-auto">
                 Join thousands of creators using AI to grow their audience
               </p>
             </div>
@@ -206,56 +210,66 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                  Full name
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label htmlFor="fullName" className="block text-sm font-bold text-gray-900 tracking-wide">
+                  FULL NAME
                 </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  onFocus={() => setFocusedField('fullName')}
-                  onBlur={() => setFocusedField('')}
-                  className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 font-medium ${
-                    errors.fullName ? 'border-red-400 bg-red-50' : 
-                    focusedField === 'fullName' ? 'border-blue-500 bg-blue-50/30 shadow-lg' :
-                    'border-gray-200 hover:border-gray-300'
-                  }`}
-                  placeholder="Enter your full name"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    onFocus={() => setFocusedField('fullName')}
+                    onBlur={() => setFocusedField('')}
+                    className={`w-full px-6 py-5 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
+                      errors.fullName ? 'border-red-400 bg-red-50/80' : 
+                      focusedField === 'fullName' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      'border-gray-200 hover:border-blue-300 hover:shadow-lg'
+                    }`}
+                    placeholder="Enter your full name"
+                  />
+                  {focusedField === 'fullName' && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
                 {errors.fullName && (
-                  <p className="text-sm text-red-600">{errors.fullName}</p>
+                  <p className="text-sm text-red-600 font-medium">{errors.fullName}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
+              <div className="space-y-3">
+                <label htmlFor="email" className="block text-sm font-bold text-gray-900 tracking-wide">
+                  EMAIL ADDRESS
                 </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField('')}
-                  className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 font-medium ${
-                    errors.email ? 'border-red-400 bg-red-50' : 
-                    focusedField === 'email' ? 'border-blue-500 bg-blue-50/30 shadow-lg' :
-                    'border-gray-200 hover:border-gray-300'
-                  }`}
-                  placeholder="Enter your email address"
-                />
+                <div className="relative">
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField('')}
+                    className={`w-full px-6 py-5 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
+                      errors.email ? 'border-red-400 bg-red-50/80' : 
+                      focusedField === 'email' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      'border-gray-200 hover:border-blue-300 hover:shadow-lg'
+                    }`}
+                    placeholder="Enter your email address"
+                  />
+                  {focusedField === 'email' && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
                 {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email}</p>
+                  <p className="text-sm text-red-600 font-medium">{errors.email}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
+              <div className="space-y-3">
+                <label htmlFor="password" className="block text-sm font-bold text-gray-900 tracking-wide">
+                  PASSWORD
                 </label>
                 <div className="relative">
                   <input
@@ -265,34 +279,43 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField('')}
-                    className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 font-medium ${
-                      errors.password ? 'border-red-400 bg-red-50' : 
-                      focusedField === 'password' ? 'border-blue-500 bg-blue-50/30 shadow-lg' :
-                      'border-gray-200 hover:border-gray-300'
+                    className={`w-full px-6 py-5 pr-16 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
+                      errors.password ? 'border-red-400 bg-red-50/80' : 
+                      focusedField === 'password' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      'border-gray-200 hover:border-blue-300 hover:shadow-lg'
                     }`}
                     placeholder="Create a secure password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors duration-200"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
                   </button>
+                  {focusedField === 'password' && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                  )}
                 </div>
                 
                 {formData.password && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="text-sm font-medium text-gray-700 mb-3">Password requirements:</div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="mt-6 p-6 bg-gradient-to-br from-gray-50/80 to-blue-50/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl">
+                    <div className="text-sm font-bold text-gray-900 mb-4 tracking-wide">PASSWORD STRENGTH:</div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
                       {[
                         { key: 'length', label: '8+ characters', check: passwordRequirements.length },
                         { key: 'uppercase', label: 'Uppercase letter', check: passwordRequirements.uppercase },
                         { key: 'lowercase', label: 'Lowercase letter', check: passwordRequirements.lowercase },
                         { key: 'number', label: 'Number', check: passwordRequirements.number }
                       ].map(({ key, label, check }) => (
-                        <div key={key} className={`flex items-center ${check ? 'text-green-600' : 'text-gray-500'}`}>
-                          {check ? <Check className="w-4 h-4 mr-2" /> : <X className="w-4 h-4 mr-2" />}
+                        <div key={key} className={`flex items-center font-medium transition-all duration-300 ${
+                          check ? 'text-green-700' : 'text-gray-500'
+                        }`}>
+                          <div className={`w-5 h-5 mr-3 rounded-full flex items-center justify-center ${
+                            check ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-100 border-2 border-gray-300'
+                          }`}>
+                            {check ? <Check className="w-3 h-3 text-green-600" /> : <X className="w-3 h-3 text-gray-400" />}
+                          </div>
                           <span>{label}</span>
                         </div>
                       ))}
@@ -754,8 +777,20 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         </div>
       </div>
 
-      {/* Right side - Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center relative bg-white">
+      {/* Right side - Enhanced Sign up form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
+        {/* Subtle background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-r from-blue-100/40 to-purple-100/40 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-20 w-48 h-48 bg-gradient-to-r from-cyan-100/40 to-blue-100/40 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(59,130,246,0.1) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(99,102,241,0.1) 0%, transparent 50%)
+            `
+          }}></div>
+        </div>
+
         <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
           <div className="flex items-center justify-between p-6">
             <button 
@@ -773,60 +808,81 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        <div className="w-full max-w-lg mx-auto px-8 py-20">
-          {/* Progress indicator */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <span className="text-lg font-bold text-gray-900">
-                  Step {currentStep}
-                </span>
-                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">
-                  of {totalSteps}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-blue-600">
-                  {Math.round((currentStep / totalSteps) * 100)}%
-                </span>
-                <div className="w-12 h-12 relative">
-                  <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-gray-200"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="transparent"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-blue-600"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeDasharray={`${(currentStep / totalSteps) * 100}, 100`}
-                      strokeLinecap="round"
-                      fill="transparent"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-bold text-blue-600">{currentStep}</span>
+        <div className="w-full max-w-lg mx-auto px-8 py-20 relative z-10">
+          {/* Enhanced Progress indicator */}
+          <div className="mb-12">
+            <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">{currentStep}</span>
+                  </div>
+                  <div>
+                    <span className="text-xl font-black text-gray-900">
+                      Step {currentStep}
+                    </span>
+                    <span className="text-sm text-gray-500 bg-gray-100/80 px-3 py-1 rounded-full font-semibold ml-3">
+                      of {totalSteps}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg font-bold text-blue-600">
+                    {Math.round((currentStep / totalSteps) * 100)}%
+                  </span>
+                  <div className="w-16 h-16 relative">
+                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-gray-200"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        fill="transparent"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-blue-600"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeDasharray={`${(currentStep / totalSteps) * 100}, 100`}
+                        strokeLinecap="round"
+                        fill="transparent"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">{currentStep}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="flex space-x-2">
-              {Array.from({ length: totalSteps }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`flex-1 h-2 rounded-full transition-all duration-500 ${
-                    index < currentStep
-                      ? 'bg-blue-600'
-                      : index === currentStep - 1
-                      ? 'bg-blue-400'
-                      : 'bg-gray-200'
-                  }`}
-                ></div>
-              ))}
+              <div className="flex space-x-3">
+                {Array.from({ length: totalSteps }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`flex-1 h-3 rounded-full transition-all duration-500 relative overflow-hidden ${
+                      index < currentStep
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600'
+                        : index === currentStep - 1
+                        ? 'bg-gradient-to-r from-blue-400 to-blue-500'
+                        : 'bg-gray-200'
+                    }`}
+                  >
+                    {index < currentStep && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Step labels */}
+              <div className="flex justify-between mt-4 text-xs font-medium text-gray-500">
+                <span className={currentStep >= 1 ? 'text-blue-600' : ''}>Account</span>
+                <span className={currentStep >= 2 ? 'text-blue-600' : ''}>Business</span>
+                <span className={currentStep >= 3 ? 'text-blue-600' : ''}>Goals</span>
+                <span className={currentStep >= 4 ? 'text-blue-600' : ''}>Complete</span>
+              </div>
             </div>
           </div>
 
@@ -834,41 +890,46 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             {renderStepContent()}
           </form>
 
-          <div className="mt-10 text-center">
-            <p className="text-gray-600 text-lg">
-              Already have an account?{' '}
-              <button
-                onClick={() => onNavigate('signin')}
-                className="text-blue-600 hover:text-blue-700 font-bold transition-colors duration-200 hover:underline"
-              >
-                Sign in here
-              </button>
-            </p>
-          </div>
-
-          <div className="mt-8 text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <div className="flex items-center space-x-2 text-gray-500">
-                <Shield className="w-4 h-4" />
-                <span className="text-sm font-medium">Secure</span>
+          <div className="mt-12 text-center">
+            <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6">
+              <p className="text-gray-700 text-lg font-medium mb-4">
+                Already have an account?{' '}
+                <button
+                  onClick={() => onNavigate('signin')}
+                  className="text-blue-600 hover:text-blue-700 font-bold transition-all duration-200 hover:underline hover:scale-105 inline-block"
+                >
+                  Sign in here →
+                </button>
+              </p>
+              
+              <div className="flex items-center justify-center space-x-6 mb-6">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm font-semibold">Bank-Level Security</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Lock className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="text-sm font-semibold">256-bit Encryption</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Star className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <span className="text-sm font-semibold">Enterprise Grade</span>
+                </div>
               </div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <div className="flex items-center space-x-2 text-gray-500">
-                <Lock className="w-4 h-4" />
-                <span className="text-sm font-medium">Encrypted</span>
-              </div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <div className="flex items-center space-x-2 text-gray-500">
-                <Star className="w-4 h-4" />
-                <span className="text-sm font-medium">Trusted</span>
-              </div>
+              
+              <p className="text-sm text-gray-500 leading-relaxed">
+                By creating an account, you agree to our{' '}
+                <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold underline">Terms of Service</a>
+                {' '}and{' '}
+                <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold underline">Privacy Policy</a>
+              </p>
             </div>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              By creating an account, you agree to our{' '}
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">Terms of Service</a>
-              {' '}and{' '}
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">Privacy Policy</a>
-            </p>
           </div>
         </div>
       </div>
