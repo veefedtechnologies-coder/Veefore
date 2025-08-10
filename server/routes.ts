@@ -12652,12 +12652,15 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Get Waitlist User by ID
-  app.get('/api/early-access/status/user/:id', async (req: any, res: Response) => {
+  // Get Waitlist User by Email (for status page)
+  app.get('/api/early-access/status/user/:email', async (req: any, res: Response) => {
     try {
-      const { id } = req.params;
+      const { email } = req.params;
       
-      const waitlistUser = await storage.getWaitlistUser(id);
+      // Decode the URL-encoded email
+      const decodedEmail = decodeURIComponent(email);
+      
+      const waitlistUser = await storage.getWaitlistUserByEmail(decodedEmail);
       if (!waitlistUser) {
         return res.status(404).json({ error: 'User not found on waitlist' });
       }
