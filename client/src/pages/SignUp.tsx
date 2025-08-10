@@ -575,9 +575,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
       {/* Left side - Advanced Professional Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-y-auto">
         {/* Advanced Background Effects */}
         <div className="absolute inset-0">
           {/* Animated grid pattern */}
@@ -778,7 +778,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       </div>
 
       {/* Right side - Enhanced Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-start justify-center relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
+      <div className="w-full lg:w-1/2 flex items-start justify-center relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 overflow-y-auto">
         {/* Subtle background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-r from-blue-100/40 to-purple-100/40 rounded-full blur-3xl"></div>
