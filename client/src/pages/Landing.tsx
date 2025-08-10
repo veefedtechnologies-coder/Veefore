@@ -582,10 +582,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 Sign In
               </Button>
               <Button 
-                onClick={() => handleNavigation('signup')}
+                onClick={() => handleNavigation('waitlist')}
                 className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-violet-500/25 transition-all duration-300 group"
               >
-                <span className="relative z-10">Try VeeGPT</span>
+                <span className="relative z-10">Join Waitlist</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
             </div>
