@@ -552,22 +552,27 @@ const Waitlist = () => {
       console.log('[SUBMIT WAITLIST] Response data:', data);
 
       if (data.success) {
-        console.log('[SUBMIT WAITLIST] Setting waitlist data and submitted state');
-        console.log('[SUBMIT WAITLIST] Data to set:', data);
+        console.log('[SUBMIT WAITLIST] Success! Redirecting to status page');
+        console.log('[SUBMIT WAITLIST] User data:', data.user);
         
-        setWaitlistData(data);
-        setIsSubmitted(true);
+        // Clear current state
         setShowQuestionnaire(false);
         setShowOTPModal(false);
         setOtpCode('');
         setDevelopmentOtp(null);
         
-        console.log('[SUBMIT WAITLIST] State updated, modal should show');
-        
-        toast({
-          title: "Welcome to VeeFore!",
-          description: "Your email has been verified and you've been added to our exclusive waitlist.",
-        });
+        // Redirect to waitlist status page with user ID
+        const userId = data.user?.id;
+        if (userId) {
+          // Use window.location to ensure fresh page load
+          window.location.href = `/waitlist-status?user=${userId}`;
+        } else {
+          // Fallback to toast if no user ID
+          toast({
+            title: "Welcome to VeeFore!",
+            description: "You've successfully joined our exclusive waitlist!",
+          });
+        }
       } else {
         console.error('[SUBMIT WAITLIST] Failed response:', data);
         toast({
@@ -1932,8 +1937,6 @@ const Waitlist = () => {
       </div>
     )}
 
-    {/* Success Modal Overlay */}
-    <SuccessModal />
     </>
   );
 };

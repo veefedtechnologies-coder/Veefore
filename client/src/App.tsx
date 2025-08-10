@@ -23,6 +23,7 @@ import SignIn from './pages/SignIn'
 import ProfessionalOnboarding from './pages/ProfessionalOnboarding'
 import Workspaces from './pages/Workspaces'
 import Waitlist from './pages/Waitlist'
+import WaitlistStatus from './pages/WaitlistStatus'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -104,10 +105,16 @@ function App() {
 
   return (
     <Switch>
-      {/* Waitlist page - full screen without sidebar */}
+      {/* Waitlist pages - full screen without sidebar */}
       <Route path="/waitlist">
         <div className="min-h-screen">
           <Waitlist />
+        </div>
+      </Route>
+
+      <Route path="/waitlist-status">
+        <div className="min-h-screen">
+          <WaitlistStatus />
         </div>
       </Route>
 

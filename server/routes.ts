@@ -12631,7 +12631,7 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Check Waitlist Status
+  // Check Waitlist Status by Email
   app.get('/api/early-access/status/:email', async (req: any, res: Response) => {
     try {
       const { email } = req.params;
@@ -12649,6 +12649,27 @@ Create a detailed growth strategy in JSON format:
     } catch (error: any) {
       console.error('[EARLY ACCESS] Status check error:', error);
       res.status(500).json({ error: error.message || 'Failed to check status' });
+    }
+  });
+
+  // Get Waitlist User by ID
+  app.get('/api/early-access/status/user/:id', async (req: any, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const waitlistUser = await storage.getWaitlistUserById(id);
+      if (!waitlistUser) {
+        return res.status(404).json({ error: 'User not found on waitlist' });
+      }
+      
+      res.json({
+        success: true,
+        user: waitlistUser
+      });
+      
+    } catch (error: any) {
+      console.error('[EARLY ACCESS] User status check error:', error);
+      res.status(500).json({ error: error.message || 'Failed to check user status' });
     }
   });
 
