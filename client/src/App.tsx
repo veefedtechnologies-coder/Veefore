@@ -18,6 +18,7 @@ import { CreatePost } from './components/create/create-post'
 import VeeGPT from './pages/VeeGPT'
 import Landing from './pages/Landing'
 import SignUpIntegrated from './pages/SignUpIntegrated'
+import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import ProfessionalOnboarding from './pages/ProfessionalOnboarding'
 import Workspaces from './pages/Workspaces'
@@ -105,7 +106,7 @@ function App() {
       {/* Authentication pages - full screen without sidebar */}
       <Route path="/signup">
         <div className="min-h-screen">
-          <SignUpIntegrated onNavigate={(page: string) => setLocation(`/${page}`)} />
+          <SignUp onNavigate={(page: string) => setLocation(`/${page}`)} />
         </div>
       </Route>
       
