@@ -12657,7 +12657,7 @@ Create a detailed growth strategy in JSON format:
     try {
       const { id } = req.params;
       
-      const waitlistUser = await storage.getWaitlistUserById(id);
+      const waitlistUser = await storage.getWaitlistUser(id);
       if (!waitlistUser) {
         return res.status(404).json({ error: 'User not found on waitlist' });
       }
