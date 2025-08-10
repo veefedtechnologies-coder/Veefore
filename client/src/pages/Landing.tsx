@@ -20,6 +20,7 @@ import VideoStudioInterface from '@assets/generated_images/AI_Video_Studio_Inter
 import AnalyticsInterface from '@assets/generated_images/Analytics_Dashboard_Interface_939945d5.png'
 import ContentStudioInterface from '@assets/generated_images/Content_Studio_Interface_840b3ab8.png'
 import VeeForeLogo from '@assets/output-onlinepngtools_1754773215023.png'
+import VeeForeTransparentLogo from '@assets/output-onlinepngtools_1754852514040.png'
 
 interface LandingProps {
   onNavigate: (view: string) => void
@@ -856,8 +857,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   {/* Compact Platform Header */}
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 flex items-center justify-center text-white">
-                        <Zap className="w-4 h-4" />
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                        <img src={VeeForeTransparentLogo} alt="VeeFore" className="w-8 h-8" />
                       </div>
                       <div>
                         <h3 className="text-gray-900 font-bold text-base">VeeFore Dashboard</h3>
