@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play, Pause } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play, Pause, Wand2 } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -440,16 +440,16 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   ))}
                 </div>
 
-                {/* Clean Neural Network Section */}
+                {/* AI Content Engine Section */}
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Brain className="w-5 h-5 text-blue-600" />
+                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <Wand2 className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <span className="text-gray-900 font-semibold text-lg">Neural Network</span>
-                        <div className="text-sm text-blue-600 font-medium">Processing {particleCount} operations/sec</div>
+                        <span className="text-gray-900 font-semibold text-lg">AI Content Engine</span>
+                        <div className="text-sm text-purple-600 font-medium">Generating {particleCount} posts/hour</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 bg-white rounded-full px-3 py-1 border border-gray-200">
@@ -459,12 +459,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                   
                   <div className="space-y-4">
-                    {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
+                    {['Post Generation', 'Caption Writing', 'Hashtag Research'].map((task, index) => (
                       <div key={task}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-gray-800 text-sm font-medium">{task}</span>
                           <div className="flex items-center space-x-2">
-                            <span className="text-blue-600 text-sm font-semibold">{85 + (index * 5)}%</span>
+                            <span className="text-purple-600 text-sm font-semibold">{88 + (index * 4)}%</span>
                             <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
                               <span className="text-emerald-600 text-xs">✓</span>
                             </div>
@@ -472,8 +472,8 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                         </div>
                         <div className="w-full h-2 bg-white rounded-full border border-gray-200">
                           <div 
-                            className="h-full bg-blue-500 rounded-full transition-all duration-1000"
-                            style={{ width: `${85 + (index * 5)}%` }}
+                            className="h-full bg-purple-500 rounded-full transition-all duration-1000"
+                            style={{ width: `${88 + (index * 4)}%` }}
                           />
                         </div>
                       </div>
@@ -483,16 +483,16 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   {/* Simple Bottom Stats */}
                   <div className="mt-6 grid grid-cols-3 gap-3">
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 10)}</div>
-                      <div className="text-xs text-gray-600">Models</div>
+                      <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 8)}</div>
+                      <div className="text-xs text-gray-600">Posts</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 7)}ms</div>
-                      <div className="text-xs text-gray-600">Response</div>
+                      <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 12)}K</div>
+                      <div className="text-xs text-gray-600">Words</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-indigo-600">99.{Math.floor(particleCount % 10)}%</div>
-                      <div className="text-xs text-gray-600">Accuracy</div>
+                      <div className="text-lg font-bold text-indigo-600">4.{Math.floor(particleCount % 10)}</div>
+                      <div className="text-xs text-gray-600">Rating</div>
                     </div>
                   </div>
                 </div>
