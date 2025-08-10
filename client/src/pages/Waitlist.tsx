@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
   ArrowRight,
+  ArrowLeft,
   Mail,
   User,
   Copy,
@@ -905,6 +906,17 @@ const Waitlist = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-transparent to-purple-50/50" />
         <div className="max-w-7xl mx-auto px-6 py-5 relative">
           <div className="flex justify-between items-center">
+            {/* Back button */}
+            <motion.button
+              onClick={() => setLocation('/')}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 shadow-md hover:shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="font-medium text-sm">Back to Home</span>
+            </motion.button>
+
             <motion.div 
               className="flex items-center space-x-4"
               whileHover={{ scale: 1.03 }}

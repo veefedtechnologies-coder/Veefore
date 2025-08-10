@@ -43,7 +43,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   const totalSteps = 4
 
   const handleBackToLanding = () => {
-    onNavigate('landing')
+    setLocation('/')
   }
 
   const validatePassword = (password: string) => {
