@@ -753,7 +753,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       <div className="w-full border-t border-gray-200/60" />
                     </div>
                     <div className="relative flex justify-center text-lg">
-                      <span className="px-6 bg-white text-gray-500 font-medium">Or continue with</span>
+                      <span className="px-6 text-gray-500 font-medium bg-[#f1f6ff]">Or continue with</span>
                     </div>
                   </div>
 
