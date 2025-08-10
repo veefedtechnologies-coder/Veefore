@@ -820,23 +820,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       </div>
 
       {/* Right side - Enhanced Sign up form */}
-      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
-        {/* Fixed background elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ right: '0%', left: '50%' }}>
-          <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-r from-blue-100/40 to-purple-100/40 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-20 w-48 h-48 bg-gradient-to-r from-cyan-100/40 to-blue-100/40 rounded-full blur-3xl"></div>
-          <div className="absolute inset-0 opacity-[0.02]" style={{
-            backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(59,130,246,0.1) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(99,102,241,0.1) 0%, transparent 50%)
-            `
-          }}></div>
-        </div>
-        
-        {/* Scrollable content container */}
-        <div className="relative h-screen overflow-y-auto flex items-start justify-center">
+      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 overflow-y-auto">
 
-          <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
+
+        <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
           <div className="flex items-center justify-between p-6">
             <button 
               onClick={handleBackToLanding}
@@ -851,9 +838,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               <span className="text-gray-900 font-bold text-xl">VeeFore</span>
             </div>
           </div>
-          </div>
+        </div>
 
-          <div className="w-full max-w-lg mx-auto px-8 pt-4 pb-8 relative z-10">
+        <div className="w-full max-w-lg mx-auto px-8 pt-4 pb-8 relative z-10">
           {/* Enhanced Progress indicator */}
           <div className="mb-6">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
@@ -977,7 +964,6 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   )
