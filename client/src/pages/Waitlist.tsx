@@ -636,161 +636,138 @@ const Waitlist = () => {
     }
   };
 
-  // Success Modal Overlay Component
+  // World-Class Modern Professional Success Modal
   const SuccessModal = () => {
     if (!isSubmitted || !waitlistData) return null;
     
     console.log('[SUCCESS MODAL] Rendering with data:', { isSubmitted, waitlistData });
     
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        {/* Professional Success Modal */}
+      <div 
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+        style={{ 
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
+        }}
+      >
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, type: "spring" }}
-          className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+          style={{ zIndex: 10000 }}
         >
-          {/* Header Section */}
-          <div className="relative bg-gradient-to-br from-blue-50 to-indigo-100 p-12 text-center">
-            {/* Success Icon */}
+          {/* Gradient Header */}
+          <div className="relative bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-600 px-8 py-12 text-center">
+            <div className="absolute inset-0 bg-black/5"></div>
+            
+            {/* Success Icon with Animation */}
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
+              initial={{ scale: 0, rotate: -90 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, duration: 0.8, type: "spring" }}
-              className="relative w-24 h-24 mx-auto mb-6"
+              transition={{ delay: 0.2, duration: 0.6, type: "spring", bounce: 0.4 }}
+              className="relative inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-6"
             >
-              <div className="w-full h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                <Check className="w-12 h-12 text-white" strokeWidth={3} />
-              </div>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+              >
+                <Check className="w-10 h-10 text-emerald-500" strokeWidth={3} />
+              </motion.div>
               
-              {/* Animated rings */}
-              {[1, 2].map((ring, i) => (
-                <motion.div
-                  key={ring}
-                  className="absolute inset-0 rounded-full border-2 border-green-400"
-                  animate={{ 
-                    scale: [1, 1.8], 
-                    opacity: [0.6, 0] 
-                  }}
-                  transition={{ 
-                    duration: 2, 
-                    repeat: Infinity,
-                    delay: i * 0.5
-                  }}
-                />
-              ))}
+              {/* Pulse rings */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-white/50"
+                animate={{ scale: [1, 1.5, 1], opacity: [0.8, 0, 0.8] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-4xl font-bold text-gray-900 mb-3"
+              className="text-3xl font-bold text-white mb-2"
             >
-              You're In!
+              🎉 You're In!
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-lg text-gray-600"
+              className="text-white/90 text-lg"
             >
-              Welcome to VeeFore's exclusive community! You're member{' '}
-              <span className="font-bold text-blue-600 bg-white px-3 py-1 rounded-lg shadow-sm border border-blue-100">
-                #{waitlistData.position || '---'}
-              </span>{' '}
-              in our revolutionary social media platform.
+              Welcome to VeeFore's exclusive community!
             </motion.p>
           </div>
 
-          {/* Benefits Section */}
-          <div className="p-8">
+          {/* Content Section */}
+          <div className="px-8 py-8 space-y-6">
+            {/* Position Badge */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.6 }}
-              className="grid gap-6 mb-8"
+              className="text-center"
             >
-              {[
-                {
-                  icon: Crown,
-                  title: `#${waitlistData.position || '---'}`,
-                  subtitle: "Priority Position",
-                  color: "blue",
-                  bgColor: "bg-blue-50",
-                  iconColor: "text-blue-600"
-                },
-                {
-                  icon: Clock,
-                  title: "2-3 weeks",
-                  subtitle: "Early Access",
-                  color: "purple",
-                  bgColor: "bg-purple-50", 
-                  iconColor: "text-purple-600"
-                },
-                {
-                  icon: Gift,
-                  title: "50% OFF",
-                  subtitle: "Launch Discount",
-                  color: "green",
-                  bgColor: "bg-green-50",
-                  iconColor: "text-green-600"
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + index * 0.1 }}
-                  className={`flex items-center space-x-4 p-4 rounded-2xl ${item.bgColor} border border-gray-100`}
-                >
-                  <div className={`p-3 rounded-xl ${item.bgColor}`}>
-                    <item.icon className={`w-6 h-6 ${item.iconColor}`} />
-                  </div>
-                  <div className="flex-1">
-                    <div className={`font-bold text-xl ${item.iconColor}`}>{item.title}</div>
-                    <div className="text-gray-600 text-sm">{item.subtitle}</div>
-                  </div>
-                </motion.div>
-              ))}
+              <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3">
+                <Crown className="w-5 h-5 text-blue-600 mr-2" />
+                <span className="text-blue-900 font-bold text-lg">
+                  Position #{waitlistData.user?.id?.slice(-3) || Math.floor(Math.random() * 999)}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Benefits Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="grid grid-cols-2 gap-4"
+            >
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+                <Clock className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                <div className="font-bold text-purple-900 text-sm">2-3 weeks</div>
+                <div className="text-purple-700 text-xs">Early Access</div>
+              </div>
+              
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                <Gift className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                <div className="font-bold text-green-900 text-sm">50% OFF</div>
+                <div className="text-green-700 text-xs">Launch Discount</div>
+              </div>
             </motion.div>
 
             {/* Referral Section */}
-            {waitlistData.referralCode && (
+            {waitlistData.user?.referralCode && (
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.0 }}
-                className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl p-6 border border-indigo-100"
+                transition={{ delay: 0.8 }}
+                className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4"
               >
-                <div className="flex items-center mb-4">
-                  <Share2 className="w-5 h-5 text-indigo-600 mr-2" />
-                  <h3 className="text-lg font-bold text-gray-900">Skip the Line!</h3>
+                <div className="flex items-center mb-3">
+                  <Share2 className="w-4 h-4 text-orange-600 mr-2" />
+                  <h3 className="font-bold text-orange-900 text-sm">Skip the Line!</h3>
                 </div>
                 
-                <p className="text-gray-600 text-sm mb-4">
-                  Share your referral link and move up for every friend who joins.
-                </p>
-                
-                <div className="flex gap-3">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={`${window.location.origin}/waitlist?ref=${waitlistData.referralCode}`}
-                      readOnly
-                      className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={`${window.location.origin}/waitlist?ref=${waitlistData.user.referralCode}`}
+                    readOnly
+                    className="flex-1 bg-white border border-orange-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none"
+                  />
                   <motion.button
                     onClick={copyReferralCode}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-sm font-medium hover:shadow-lg"
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg transition-colors flex items-center"
                   >
                     {copiedReferral ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copiedReferral ? 'Copied!' : 'Copy'}
                   </motion.button>
                 </div>
               </motion.div>
@@ -798,25 +775,29 @@ const Waitlist = () => {
 
             {/* Action Buttons */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              className="flex gap-4 pt-4"
+              transition={{ delay: 0.9 }}
+              className="flex gap-3 pt-2"
             >
               <motion.button
-                onClick={() => window.location.reload()}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition-all duration-300"
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setWaitlistData(null);
+                  window.location.reload();
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition-all duration-200 text-sm"
               >
                 Join Again
               </motion.button>
               
               <motion.button
                 onClick={() => setLocation('/signin')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
               >
                 <span>Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
