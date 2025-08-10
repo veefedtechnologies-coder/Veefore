@@ -26,7 +26,8 @@ import {
   Play,
   Pause,
   Bot,
-  Share2
+  Share2,
+  X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -56,6 +57,14 @@ const Waitlist = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [waitlistData, setWaitlistData] = useState<WaitlistResponse | null>(null);
+  
+  // OTP Verification state
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
+  const [pendingUser, setPendingUser] = useState<{ name: string; email: string } | null>(null);
   const [copiedReferral, setCopiedReferral] = useState(false);
   const [currentDemo, setCurrentDemo] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -267,12 +276,117 @@ const Waitlist = () => {
     setIsLoading(true);
 
     try {
+      // First send OTP email
+      const response = await fetch('/api/auth/send-verification-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await response.json();
+      console.log('[WAITLIST] Send OTP response:', data);
+
+      if (data.success) {
+        // Store pending user data
+        setPendingUser({ name: formData.name, email: formData.email });
+        setShowOTPModal(true);
+        
+        // Set development OTP if available
+        if (data.developmentOtp) {
+          setDevelopmentOtp(data.developmentOtp);
+        }
+        
+        toast({
+          title: "Verification email sent",
+          description: "Please check your email for the verification code.",
+        });
+      } else {
+        toast({
+          title: "Failed to send verification email",
+          description: data.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Verification email error:', error);
+      toast({
+        title: "Connection error",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // OTP Verification Functions
+  const handleOTPSubmit = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      setOtpError(true);
+      toast({
+        title: "Invalid Code",
+        description: "Please enter the 6-digit verification code.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError(false);
+    
+    try {
+      console.log('[WAITLIST OTP] Verifying code:', { email: pendingUser?.email, code: otpCode });
+      
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: pendingUser?.email,
+          code: otpCode
+        }),
+      });
+
+      const responseData = await response.json();
+      console.log('[WAITLIST OTP] Verification response:', responseData);
+
+      if (!response.ok) {
+        setOtpError(true);
+        throw new Error(responseData.message || 'Verification failed');
+      }
+
+      // Email verified successfully, now submit to waitlist
+      await submitToWaitlist();
+      
+    } catch (error: any) {
+      console.error('[WAITLIST OTP] Verification error:', error);
+      setOtpError(true);
+      toast({
+        title: "Verification failed",
+        description: error.message || "Invalid or expired code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const submitToWaitlist = async () => {
+    try {
       const response = await fetch('/api/early-access/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: pendingUser?.name,
+          email: pendingUser?.email,
+          referredBy: formData.referredBy,
+          verified: true
+        }),
       });
 
       const data = await response.json();
@@ -280,13 +394,17 @@ const Waitlist = () => {
       if (data.success) {
         setWaitlistData(data);
         setIsSubmitted(true);
+        setShowOTPModal(false);
+        setOtpCode('');
+        setDevelopmentOtp(null);
+        
         toast({
           title: "Welcome to VeeFore!",
-          description: "You've been added to our exclusive waitlist.",
+          description: "Your email has been verified and you've been added to our exclusive waitlist.",
         });
       } else {
         toast({
-          title: "Something went wrong",
+          title: "Waitlist submission failed",
           description: data.message || "Please try again.",
           variant: "destructive",
         });
@@ -298,8 +416,43 @@ const Waitlist = () => {
         description: "Please check your connection and try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    try {
+      const response = await fetch('/api/auth/send-verification-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: pendingUser?.email }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.developmentOtp) {
+          setDevelopmentOtp(data.developmentOtp);
+        }
+        toast({
+          title: "Code resent",
+          description: "A new verification code has been sent to your email.",
+        });
+      } else {
+        toast({
+          title: "Failed to resend code",
+          description: data.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      toast({
+        title: "Connection error",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -564,6 +717,7 @@ const Waitlist = () => {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
       {/* Enhanced background effects */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50/40 to-purple-50/40 pointer-events-none" />
@@ -1342,6 +1496,197 @@ const Waitlist = () => {
         </div>
       </div>
     </div>
+
+    {/* OTP Verification Modal */}
+    {showOTPModal && (
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        {/* Floating gradient orbs for depth */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="relative bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/30 before:via-transparent before:to-transparent before:pointer-events-none">
+          <div className="relative z-10 text-center space-y-8">
+            {/* Premium Header with Glass Effect */}
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500/80 via-indigo-500/80 to-purple-600/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto shadow-2xl border border-white/20">
+                  <Mail className="w-10 h-10 text-white drop-shadow-lg" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400/90 backdrop-blur-sm rounded-full border-2 border-white/50 flex items-center justify-center shadow-lg">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-2xl blur-xl animate-pulse"></div>
+              </div>
+              
+              <div className="space-y-3">
+                <h2 className="text-3xl font-black text-white tracking-tight drop-shadow-lg">Verify Your Email</h2>
+                <div className="space-y-2">
+                  <p className="text-white/80 font-medium drop-shadow">
+                    We've sent a 6-digit verification code to
+                  </p>
+                  <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/30 shadow-lg">
+                    <Mail className="w-4 h-4 text-white/90" />
+                    <span className="font-bold text-white">{pendingUser?.email}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Revolutionary OTP Input Grid */}
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className={`text-sm font-bold tracking-wide drop-shadow transition-colors duration-300 ${
+                  otpError ? 'text-red-300' : 'text-white/90'
+                }`}>
+                  {otpError ? 'INVALID CODE' : 'VERIFICATION CODE'}
+                </div>
+                <div className="flex justify-center space-x-3">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className="relative">
+                      <input
+                        type="text"
+                        value={otpCode[index] || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '')
+                          if (value.length <= 1) {
+                            const newCode = otpCode.split('')
+                            newCode[index] = value
+                            setOtpCode(newCode.join('').slice(0, 6))
+                            
+                            // Clear error state when user starts typing
+                            if (otpError) {
+                              setOtpError(false)
+                            }
+                            
+                            // Auto-focus next input
+                            if (value && index < 5) {
+                              const nextInput = e.target.parentElement?.parentElement?.children[index + 1]?.querySelector('input')
+                              nextInput?.focus()
+                            }
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Handle backspace to focus previous input
+                          if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+                            const prevInput = e.target.parentElement?.parentElement?.children[index - 1]?.querySelector('input')
+                            prevInput?.focus()
+                          }
+                        }}
+                        className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 backdrop-blur-xl ${
+                          otpError 
+                            ? 'border-red-400/60 bg-red-500/20 text-white shadow-lg shadow-red-400/30 animate-pulse' 
+                            : otpCode[index] 
+                              ? 'border-green-400/60 bg-green-500/20 text-white shadow-lg shadow-green-400/30' 
+                              : 'border-white/30 bg-white/10 text-white placeholder-white/50 focus:border-blue-400/60 focus:bg-blue-500/20 focus:shadow-lg focus:shadow-blue-400/30'
+                        }`}
+                        maxLength={1}
+                        autoFocus={index === 0}
+                      />
+                      {otpCode[index] && !otpError && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
+                          <Check className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                      {otpCode[index] && otpError && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
+                          <X className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Progress indicator */}
+                <div className="flex justify-center space-x-1">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className={`h-1 w-8 rounded-full transition-all duration-300 ${
+                      otpError && otpCode[index] 
+                        ? 'bg-red-400/80 shadow-lg shadow-red-400/50' 
+                        : otpCode[index] 
+                          ? 'bg-green-400/80 shadow-lg shadow-green-400/50' 
+                          : 'bg-white/20'
+                    }`}></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Development OTP Display - Only in Development */}
+              {import.meta.env.DEV && developmentOtp && (
+                <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 backdrop-blur-xl rounded-xl p-6 border border-orange-400/30 shadow-lg">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
+                    <span className="text-orange-200 font-bold text-sm">DEVELOPMENT MODE</span>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-orange-100 text-sm mb-2">Development OTP Code:</p>
+                    <div className="bg-orange-900/50 border border-orange-400/50 rounded-lg p-4">
+                      <span className="text-orange-200 font-mono font-bold text-2xl tracking-widest">
+                        {developmentOtp}
+                      </span>
+                    </div>
+                    <p className="text-orange-200/80 text-xs mt-2">
+                      Use this code for testing or check your email
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Premium Action Buttons */}
+              <div className="space-y-4">
+                <button
+                  onClick={handleOTPSubmit}
+                  disabled={otpLoading || otpCode.length !== 6}
+                  className="w-full bg-gradient-to-r from-blue-600/80 via-indigo-600/80 to-purple-600/80 backdrop-blur-xl border border-white/20 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-blue-700/90 hover:via-indigo-700/90 hover:to-purple-700/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {otpLoading ? (
+                    <div className="flex items-center justify-center space-x-3 relative z-10">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Verifying Your Code...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-3 relative z-10">
+                      <Check className="w-5 h-5" />
+                      <span>Verify & Join Waitlist</span>
+                    </div>
+                  )}
+                </button>
+
+                {/* Resend and Cancel Options */}
+                <div className="flex items-center justify-between text-sm space-x-4">
+                  <button
+                    onClick={handleResendOTP}
+                    disabled={otpLoading}
+                    className="flex items-center space-x-2 text-white/80 hover:text-white font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Resend Code</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowOTPModal(false);
+                      setOtpCode('');
+                      setOtpError(false);
+                      setDevelopmentOtp(null);
+                      setPendingUser(null);
+                    }}
+                    disabled={otpLoading}
+                    className="flex items-center space-x-2 text-white/60 hover:text-white/80 font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
