@@ -632,7 +632,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     Sign In
                   </Button>
                   <Button 
-                    onClick={() => window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}`}
+                    onClick={() => {
+                      const email = encodeURIComponent(deviceStatus.user?.email || '')
+                      window.location.href = `/waitlist-status?user=${email}`
+                    }}
                     className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-300 group"
                   >
                     <span className="relative z-10">View Status</span>
