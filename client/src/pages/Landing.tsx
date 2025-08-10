@@ -756,16 +756,16 @@ const Landing = ({ onNavigate }: LandingProps) => {
           {/* Premium CTA System */}
           <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
             <Button 
-              onClick={() => handleNavigation('signup')}
+              onClick={() => deviceStatus.isOnWaitlist ? window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}` : handleNavigation('signup')}
               className="group relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 hover:from-violet-500 hover:via-purple-500 hover:to-blue-500 text-white px-16 py-6 text-xl font-bold rounded-3xl shadow-2xl hover:shadow-violet-500/30 transition-all duration-700 transform hover:-translate-y-2 hover:scale-105 border border-white/10"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               <div className="relative flex items-center space-x-4">
                 <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Bot className="w-5 h-5" />
+                  {deviceStatus.isOnWaitlist ? <CheckCircle className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                 </div>
-                <span>Get Early Access</span>
+                <span>{deviceStatus.isOnWaitlist ? 'Check Your Status' : 'Get Early Access'}</span>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
               </div>
             </Button>
@@ -1541,10 +1541,10 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       </div>
                       
                       <button 
-                        onClick={() => handleNavigation('signup')}
+                        onClick={() => deviceStatus.isOnWaitlist ? window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}` : handleNavigation('signup')}
                         className="group relative inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded-2xl text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
                       >
-                        <span className="relative z-10">Get Early Access</span>
+                        <span className="relative z-10">{deviceStatus.isOnWaitlist ? 'Check Your Status' : 'Get Early Access'}</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </button>
                     </div>
@@ -3485,14 +3485,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
               <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500 opacity-60 group-hover:opacity-100"></div>
               
               <Button 
-                onClick={() => handleNavigation('signup')}
+                onClick={() => deviceStatus.isOnWaitlist ? window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}` : handleNavigation('signup')}
                 className="relative bg-white text-slate-900 hover:bg-gray-50 px-16 py-6 text-xl font-bold rounded-2xl shadow-2xl transform hover:-translate-y-2 transition-all duration-500 border-0 group-hover:scale-105"
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-8 h-8 bg-gradient-to-r from-violet-600 to-blue-600 rounded-lg flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
+                    {deviceStatus.isOnWaitlist ? <CheckCircle className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
                   </div>
-                  <span>Get Early Access Free</span>
+                  <span>{deviceStatus.isOnWaitlist ? 'Check Your Status' : 'Get Early Access Free'}</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
               </Button>
