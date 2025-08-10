@@ -721,7 +721,7 @@ const Waitlist = () => {
               className="text-center"
             >
               <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3">
-                <img src={veeforeLogo} alt="VeeFore" className="w-5 h-5 mr-2" />
+                <img src={veeforeLogo} alt="VeeFore" className="w-6 h-6 mr-2" />
                 <span className="text-blue-900 font-bold text-lg">
                   Position #{waitlistData.user?.id?.slice(-3) || Math.floor(Math.random() * 999)}
                 </span>
@@ -924,13 +924,13 @@ const Waitlist = () => {
               transition={{ type: "spring", stiffness: 500 }}
             >
               <motion.div 
-                className="relative w-16 h-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl"
+                className="relative w-16 h-16 flex items-center justify-center"
                 animate={{ 
-                  boxShadow: [
-                    "0 10px 25px rgba(59, 130, 246, 0.3)",
-                    "0 10px 25px rgba(147, 51, 234, 0.3)",
-                    "0 10px 25px rgba(236, 72, 153, 0.3)",
-                    "0 10px 25px rgba(59, 130, 246, 0.3)"
+                  filter: [
+                    "drop-shadow(0 10px 25px rgba(59, 130, 246, 0.3))",
+                    "drop-shadow(0 10px 25px rgba(147, 51, 234, 0.3))",
+                    "drop-shadow(0 10px 25px rgba(236, 72, 153, 0.3))",
+                    "drop-shadow(0 10px 25px rgba(59, 130, 246, 0.3))"
                   ]
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
@@ -939,18 +939,9 @@ const Waitlist = () => {
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 >
-                  <img src={veeforeLogo} alt="VeeFore" className="w-10 h-10" />
+                  <img src={veeforeLogo} alt="VeeFore" className="w-16 h-16" />
                 </motion.div>
-                
-                {/* Logo glow rings */}
-                <motion.div
-                  className="absolute inset-0 rounded-2xl border-2 border-white/30"
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.5, 0.8, 0.5] 
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
+
               </motion.div>
               <div>
                 <motion.span 
@@ -1283,25 +1274,9 @@ const Waitlist = () => {
                 }}
                 transition={{ duration: 6, repeat: Infinity }}
               >
-                <div className="w-24 h-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden">
-                  <img src={veeforeLogo} alt="VeeFore" className="w-12 h-12 z-10" />
-                  
-                  {/* Animated background shine */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
-                    animate={{ x: ["-100%", "100%"] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                  />
-                  
-                  {/* Pulsing outer ring */}
-                  <motion.div
-                    className="absolute -inset-2 bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-lg"
-                    animate={{ 
-                      scale: [1, 1.3, 1],
-                      opacity: [0.5, 0.8, 0.5]
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
+                <div className="w-24 h-24 flex items-center justify-center relative">
+                  <img src={veeforeLogo} alt="VeeFore" className="w-24 h-24 z-10 drop-shadow-2xl" />
+
                 </div>
                 
                 {/* Floating sparkle effects */}
