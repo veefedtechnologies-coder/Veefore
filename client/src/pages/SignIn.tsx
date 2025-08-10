@@ -523,32 +523,47 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 
                 {/* Clean Professional Header */}
                 <div className="text-center mb-10 relative z-10">
-                  {/* Quantum Particle Assembly VeeFore Logo */}
+                  {/* Advanced 3D Cube Transform VeeFore Logo */}
                   <div className="mb-8 flex justify-center">
-                    <div className="relative p-6 group">
-                      {/* Quantum Energy Field */}
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-cyan-400/10 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-1000 animate-spin" style={{animationDuration: '20s'}}></div>
+                    <div className="relative p-8 group" style={{perspective: '1200px', transformStyle: 'preserve-3d'}}>
+                      {/* 3D Ambient Environment */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 via-purple-500/8 to-pink-500/5 backdrop-blur-lg border border-white/10 group-hover:border-white/20 transition-all duration-1000" 
+                           style={{transform: 'translateZ(-50px)'}}></div>
                       
-                      {/* Particle Assembly Logo */}
+                      {/* 3D Floating Geometric Shapes */}
+                      <div className="absolute inset-0 opacity-60 group-hover:opacity-100 transition-opacity duration-1000">
+                        <div className="absolute top-3 left-3 w-3 h-3 bg-blue-400/40 rounded-full animate-float-premium" 
+                             style={{transform: 'translateZ(30px)', animationDelay: '0s'}}></div>
+                        <div className="absolute top-6 right-4 w-2 h-2 bg-purple-400/40 rounded-sm animate-float-premium" 
+                             style={{transform: 'translateZ(20px) rotateY(45deg)', animationDelay: '1s'}}></div>
+                        <div className="absolute bottom-4 left-6 w-2.5 h-2.5 bg-pink-400/40 rounded-full animate-float-premium" 
+                             style={{transform: 'translateZ(40px)', animationDelay: '2s'}}></div>
+                        <div className="absolute bottom-3 right-3 w-1.5 h-1.5 bg-cyan-400/40 rotate-45 animate-float-premium" 
+                             style={{transform: 'translateZ(25px) rotateX(30deg)', animationDelay: '0.5s'}}></div>
+                      </div>
+                      
+                      {/* Main 3D Logo with Advanced Transform */}
                       <img 
                         src={veeforceLogo} 
                         alt="VeeFore" 
-                        className="relative z-10 w-24 h-24 transform hover:scale-110 hover:rotate-12 transition-all duration-800 ease-out animate-[quantumAssembly_2s_cubic-bezier(0.68,-0.55,0.27,1.55)_forwards] hover:animate-none" 
+                        className="relative z-20 w-28 h-28 transform hover:scale-110 hover:rotateY-12 hover:rotateX-6 transition-all duration-1200 ease-out animate-[cube3DTransform_3s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] hover:animate-none"
                         style={{
-                          animationDelay: '0.6s',
+                          animationDelay: '0.8s',
                           opacity: 0,
-                          transform: 'scale(2) rotate(180deg)',
-                          filter: 'brightness(0) contrast(0) saturate(2)',
-                          clipPath: 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)'
+                          transform: 'perspective(1000px) rotateX(-90deg) rotateY(-180deg) rotateZ(45deg) translateZ(-200px) scale(0.1)',
+                          filter: 'blur(15px) brightness(3) hue-rotate(240deg)',
+                          transformStyle: 'preserve-3d'
                         }}
                       />
                       
-                      {/* Orbital Particles */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-                        <div className="absolute top-2 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-pulse transform -translate-x-1/2"></div>
-                        <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.3s'}}></div>
-                        <div className="absolute bottom-2 left-2 w-1 h-1 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '0.6s'}}></div>
-                        <div className="absolute top-2 right-1/2 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '0.9s'}}></div>
+                      {/* 3D Layered Glow Effects */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-1500" 
+                           style={{transform: 'translateZ(-20px)'}}>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-2xl animate-pulse"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 bg-gradient-to-r from-purple-400/15 to-pink-400/15 rounded-full blur-xl animate-pulse" 
+                             style={{animationDelay: '0.7s'}}></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-r from-pink-400/20 to-cyan-400/20 rounded-full blur-lg animate-pulse" 
+                             style={{animationDelay: '1.4s'}}></div>
                       </div>
                     </div>
                   </div>
