@@ -261,11 +261,11 @@ const WaitlistStatus = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setLocation('/waitlist')}
+                onClick={() => setLocation('/')}
                 className="text-gray-600 border-gray-300 hover:bg-gray-50 hover:shadow-sm transition-all"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Signup
+                Back to Home
               </Button>
             </div>
           </div>
