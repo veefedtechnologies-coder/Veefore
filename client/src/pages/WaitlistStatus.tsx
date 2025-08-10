@@ -220,6 +220,57 @@ const WaitlistStatus = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative">
       <FloatingElements />
+
+      {/* Header */}
+      <div className="relative z-10 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <img 
+                  src="/attached_assets/output-onlinepngtools_1754845698441.png" 
+                  alt="VeeFore" 
+                  className="h-12 w-auto"
+                />
+              </motion.div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  VeeFore
+                </h1>
+                <p className="text-sm text-gray-600">Waitlist Status Dashboard</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 text-sm font-medium border border-green-200 shadow-sm">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-2 h-2 bg-green-500 rounded-full mr-2"
+                  />
+                  {user?.status === 'approved' ? 'Approved' : 'Waitlisted'}
+                </Badge>
+              </motion.div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation('/waitlist')}
+                className="text-gray-600 border-gray-300 hover:bg-gray-50 hover:shadow-sm transition-all"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Signup
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Enhanced Success Modal */}
       <AnimatePresence>
@@ -296,52 +347,7 @@ const WaitlistStatus = () => {
         )}
       </AnimatePresence>
 
-      {/* Modern Header */}
-      <motion.header 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="relative z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-sm"
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div 
-              className="flex items-center space-x-4"
-              whileHover={{ x: 2 }}
-            >
-              <div className="relative">
-                <motion.div
-                  animate={{ 
-                    rotate: 360,
-                    scale: [1, 1.05, 1]
-                  }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg"
-                >
-                  <Sparkles className="w-6 h-6 text-white" />
-                </motion.div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">VeeFore</h1>
-                <p className="text-sm text-gray-500">Waitlist Dashboard</p>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ x: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button 
-                variant="outline" 
-                onClick={() => setLocation('/waitlist')}
-                className="border-gray-300 text-gray-600 hover:bg-gray-50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Waitlist
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-      </motion.header>
+
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Innovative Hero Card */}
