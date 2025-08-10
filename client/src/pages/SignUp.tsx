@@ -19,7 +19,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     password: '',
     businessType: '',
     teamSize: '',
-    goals: []
+    goals: [] as string[]
   })
   const [errors, setErrors] = useState({
     fullName: '',
@@ -83,33 +83,80 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const newErrors = {
-      fullName: '',
-      email: '',
-      password: ''
-    }
+    if (currentStep === 1) {
+      // Step 1: Basic info validation and OTP trigger
+      const newErrors = {
+        fullName: '',
+        email: '',
+        password: ''
+      }
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Please enter your name'
-    }
+      if (!formData.fullName.trim()) {
+        newErrors.fullName = 'Please enter your name'
+      }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Please enter your email'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
+      if (!formData.email.trim()) {
+        newErrors.email = 'Please enter your email'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address'
+      }
 
-    const passwordReqs = validatePassword(formData.password)
-    if (!passwordReqs.length || !passwordReqs.uppercase || !passwordReqs.lowercase || !passwordReqs.number) {
-      newErrors.password = 'Password must be 8+ characters with uppercase, lowercase, and number'
-    }
+      const passwordReqs = validatePassword(formData.password)
+      if (!passwordReqs.length || !passwordReqs.uppercase || !passwordReqs.lowercase || !passwordReqs.number) {
+        newErrors.password = 'Password must be 8+ characters with uppercase, lowercase, and number'
+      }
 
-    setErrors(newErrors)
+      setErrors(newErrors)
 
-    if (!newErrors.fullName && !newErrors.email && !newErrors.password) {
+      if (!newErrors.fullName && !newErrors.email && !newErrors.password) {
+        setIsLoading(true)
+        try {
+          // Store user info for OTP verification
+          setPendingUser({
+            email: formData.email,
+            firstName: formData.fullName.split(' ')[0] || 'User'
+          })
+
+          // Send OTP verification email
+          const response = await fetch('/api/auth/send-verification-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: formData.email,
+              firstName: formData.fullName.split(' ')[0] || 'User'
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to send verification email')
+          }
+
+          // Show OTP modal - user must verify before proceeding to step 2
+          setShowOTPModal(true)
+          
+          toast({
+            title: "Verification required!",
+            description: "Please check your email for the 6-digit verification code to continue.",
+          })
+          
+        } catch (error: any) {
+          console.error('Email verification error:', error)
+          toast({
+            title: "Error",
+            description: error.message || "Failed to send verification email. Please try again.",
+            variant: "destructive",
+          })
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    } else {
+      // Final step: Complete account creation
       setIsLoading(true)
       try {
-        // Create Firebase account first
+        // Create Firebase account
         await signUpWithEmail(formData.email, formData.password)
         
         // Create user in database
@@ -125,40 +172,15 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           })
         })
 
-        // Store user info for OTP verification
-        setPendingUser({
-          email: formData.email,
-          firstName: formData.fullName.split(' ')[0] || 'User'
-        })
-
-        // Send OTP verification email
-        const response = await fetch('/api/auth/send-verification-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            firstName: formData.fullName.split(' ')[0] || 'User'
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to send verification email')
-        }
-
-        // Show OTP modal instead of redirecting
-        console.log('Setting showOTPModal to true')
-        setShowOTPModal(true)
-        console.log('showOTPModal state after setting:', showOTPModal)
-        
         toast({
-          title: "Verification email sent!",
-          description: "Please check your email for the 6-digit verification code.",
+          title: "Welcome to VeeFore!",
+          description: "Your account has been created successfully.",
         })
+        
+        setLocation('/')
         
       } catch (error: any) {
-        console.error('Signup error:', error)
+        console.error('Account creation error:', error)
         toast({
           title: "Error",
           description: error.message || "Failed to create account. Please try again.",
@@ -199,14 +221,15 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         throw new Error(error.message || 'Verification failed')
       }
 
-      // Success - account verified
+      // Success - email verified, now proceed to step 2
       setShowOTPModal(false)
+      setOtpCode('') // Clear the OTP code
       toast({
         title: "Email verified!",
-        description: "Your account has been activated. Welcome to VeeFore!",
+        description: "You can now continue with your account setup.",
       })
       
-      setLocation('/dashboard')
+      setCurrentStep(2) // Move to next step after verification
     } catch (error: any) {
       toast({
         title: "Verification failed",
@@ -446,13 +469,21 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             </div>
 
             <button
-              type="button"
-              onClick={handleNextStep}
-              disabled={!formData.fullName || !formData.email || !passwordRequirements.length || !passwordRequirements.uppercase || !passwordRequirements.lowercase || !passwordRequirements.number}
+              type="submit"
+              disabled={!formData.fullName || !formData.email || !passwordRequirements.length || !passwordRequirements.uppercase || !passwordRequirements.lowercase || !passwordRequirements.number || isLoading}
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:hover:scale-100 group"
             >
-              <span>Continue to Business Details</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Sending verification...</span>
+                </>
+              ) : (
+                <>
+                  <span>Send Verification Code</span>
+                  <Mail className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </>
+              )}
             </button>
           </div>
         )
@@ -1089,7 +1120,6 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     </div>
 
     {/* OTP Verification Modal */}
-    {console.log('Rendering: showOTPModal =', showOTPModal)}
     {showOTPModal && (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
