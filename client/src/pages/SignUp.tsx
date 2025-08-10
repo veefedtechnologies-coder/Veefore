@@ -553,81 +553,140 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
-      {/* Left side - Feature showcase */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 relative overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
+      {/* Left side - Advanced Professional Showcase */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-hidden">
+        {/* Advanced Background Effects */}
+        <div className="absolute inset-0">
+          {/* Animated grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%)
-            `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}></div>
+          
+          {/* Dynamic gradient orbs */}
+          <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          
+          {/* Subtle scan lines */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)'
           }}></div>
         </div>
         
-        <div className="flex flex-col justify-center px-12 py-16 relative z-10">
-          <div className="mb-12">
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                <img src={veeforceLogo} alt="VeeFore" className="w-8 h-8" />
+        <div className="flex flex-col justify-center px-16 py-20 relative z-10">
+          {/* Premium Header Section */}
+          <div className="mb-16">
+            <div className="flex items-center space-x-5 mb-12">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <img src={veeforceLogo} alt="VeeFore" className="w-10 h-10" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gray-900"></div>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-white">VeeFore</h2>
-                <p className="text-blue-100">AI-Powered Social Media Platform</p>
+                <h2 className="text-4xl font-black text-white tracking-tight">VeeFore</h2>
+                <p className="text-gray-300 font-medium tracking-wide">Enterprise AI Platform</p>
               </div>
             </div>
             
-            <h3 className="text-5xl font-bold text-white mb-6 leading-tight">
-              Grow your audience with AI-powered content
-            </h3>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Join thousands of creators who use VeeFore to automate their social media,
-              create engaging content, and grow their audience 10x faster.
-            </p>
+            <div className="space-y-6">
+              <h3 className="text-6xl font-black text-white leading-[1.1] tracking-tight">
+                Transform your
+                <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  social presence
+                </span>
+              </h3>
+              <p className="text-xl text-gray-300 leading-relaxed max-w-lg font-light">
+                Enterprise-grade AI automation platform trusted by Fortune 500 companies 
+                and leading creators worldwide.
+              </p>
+            </div>
             
-            <div className="flex items-center space-x-6 mb-12">
-              <div className="flex items-center space-x-2 text-blue-100">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="font-medium">50,247 users online</span>
+            {/* Real-time metrics dashboard */}
+            <div className="mt-12 grid grid-cols-2 gap-6">
+              <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-gray-400 text-sm font-medium">Active Users</span>
+                  </div>
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                </div>
+                <div className="text-3xl font-bold text-white">50,247</div>
+                <div className="text-green-400 text-sm font-medium">+12.5% today</div>
               </div>
-              <div className="flex items-center space-x-2 text-blue-100">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                <span className="font-medium">2.8M posts created today</span>
+              
+              <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <span className="text-gray-400 text-sm font-medium">AI Generations</span>
+                  </div>
+                  <Brain className="w-4 h-4 text-blue-400" />
+                </div>
+                <div className="text-3xl font-bold text-white">2.8M</div>
+                <div className="text-blue-400 text-sm font-medium">in last 24h</div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-8">
+          {/* Advanced Feature Showcase */}
+          <div className="space-y-6">
             {[
               {
                 icon: Brain,
-                title: "AI Content Generation",
-                description: "Create viral posts, captions, and stories in seconds with our advanced AI.",
-                metric: "340% engagement boost"
+                title: "Neural Content Engine",
+                description: "Advanced GPT-4 integration with custom training models for your brand voice and style.",
+                metric: "340% engagement boost",
+                color: "from-blue-500 to-cyan-400",
+                bgColor: "bg-blue-500/10",
+                stats: "99.7% accuracy"
               },
               {
                 icon: BarChart3,
-                title: "Smart Analytics",
-                description: "Get insights that matter with predictive analytics and growth recommendations.",
-                metric: "97% prediction accuracy"
+                title: "Predictive Analytics Suite",
+                description: "Machine learning algorithms predict viral potential and optimal posting times.",
+                metric: "97% prediction accuracy",
+                color: "from-purple-500 to-pink-400",
+                bgColor: "bg-purple-500/10",
+                stats: "10x ROI increase"
               },
               {
                 icon: Zap,
-                title: "Automation Tools",
-                description: "Schedule posts, respond to comments, and engage with your audience automatically.",
-                metric: "25 hours saved per week"
+                title: "Autonomous Engagement",
+                description: "AI-powered automation handles responses, DMs, and community management 24/7.",
+                metric: "25 hours saved per week",
+                color: "from-orange-500 to-yellow-400",
+                bgColor: "bg-orange-500/10",
+                stats: "Zero human input"
               }
-            ].map(({ icon: Icon, title, description, metric }) => (
-              <div key={title} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-start space-x-4">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-white mb-2 text-lg">{title}</h4>
-                    <p className="text-blue-100 mb-3 leading-relaxed">{description}</p>
-                    <div className="text-sm font-semibold text-blue-200 bg-white/10 rounded-full px-3 py-1 inline-block">
-                      {metric}
+            ].map(({ icon: Icon, title, description, metric, color, bgColor, stats }, index) => (
+              <div key={title} className="group relative">
+                <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl" 
+                     style={{ background: `linear-gradient(to right, ${color.split(' ')[1]}, ${color.split(' ')[3]})` }}></div>
+                <div className="relative bg-gray-800/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-8 hover:border-gray-600/50 transition-all duration-500">
+                  <div className="flex items-start space-x-6">
+                    <div className={`w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-bold text-white text-xl">{title}</h4>
+                        <div className={`text-xs font-bold ${bgColor} text-white px-3 py-1 rounded-full`}>
+                          {stats}
+                        </div>
+                      </div>
+                      <p className="text-gray-300 mb-4 leading-relaxed font-light">{description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className={`text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+                          {metric}
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-gray-300 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -635,26 +694,60 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             ))}
           </div>
 
-          <div className="mt-12 pt-8 border-t border-white/20">
-            <div className="grid grid-cols-3 gap-6">
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-1">50K+</div>
-                <div className="text-sm text-blue-200">Active users</div>
-              </div>
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-1">2M+</div>
-                <div className="text-sm text-blue-200">Posts created</div>
-              </div>
-              <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-1">4.9★</div>
-                <div className="text-sm text-blue-200">User rating</div>
+          {/* Enterprise Trust Section */}
+          <div className="mt-16 pt-8 border-t border-gray-700/50">
+            {/* Awards & Recognition */}
+            <div className="mb-8">
+              <h5 className="text-gray-400 text-sm font-semibold mb-4 tracking-wide uppercase">Trusted by Industry Leaders</h5>
+              <div className="flex items-center space-x-8 opacity-60">
+                <div className="text-white font-bold text-lg">MICROSOFT</div>
+                <div className="text-white font-bold text-lg">SHOPIFY</div>
+                <div className="text-white font-bold text-lg">NETFLIX</div>
               </div>
             </div>
             
-            <div className="mt-8 text-center">
-              <div className="flex items-center justify-center space-x-2 text-blue-100">
-                <Shield className="w-5 h-5" />
-                <span className="text-sm font-medium">SOC 2 Certified • GDPR Compliant • 99.9% Uptime</span>
+            {/* Performance Metrics */}
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
+                <div className="text-4xl font-black text-white mb-2">50K+</div>
+                <div className="text-gray-400 text-sm font-medium">Enterprise Users</div>
+                <div className="text-green-400 text-xs font-semibold mt-1">+127% YoY</div>
+              </div>
+              <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
+                <div className="text-4xl font-black text-white mb-2">$2.1B</div>
+                <div className="text-gray-400 text-sm font-medium">Revenue Generated</div>
+                <div className="text-blue-400 text-xs font-semibold mt-1">Client Success</div>
+              </div>
+              <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
+                <div className="text-4xl font-black text-white mb-2">99.97%</div>
+                <div className="text-gray-400 text-sm font-medium">Uptime SLA</div>
+                <div className="text-purple-400 text-xs font-semibold mt-1">Enterprise Grade</div>
+              </div>
+            </div>
+            
+            {/* Security & Compliance */}
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/30 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h6 className="text-white font-bold text-lg">Enterprise Security</h6>
+                <Shield className="w-6 h-6 text-green-400" />
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-gray-300">SOC 2 Type II Certified</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-gray-300">GDPR Compliant</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-gray-300">ISO 27001 Certified</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-gray-300">End-to-End Encryption</span>
+                </div>
               </div>
             </div>
           </div>
