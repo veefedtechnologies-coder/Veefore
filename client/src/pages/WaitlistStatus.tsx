@@ -106,6 +106,8 @@ const CreativeProgress = ({ value, label }: { value: number; label: string }) =>
 };
 
 const WaitlistStatus = () => {
+  console.log('WaitlistStatus component rendered');
+  
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [user, setUser] = useState<WaitlistUser | null>(null);
@@ -135,9 +137,12 @@ const WaitlistStatus = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('user');
     
+    console.log('WaitlistStatus: URL params:', { userId, fullUrl: window.location.href });
+    
     if (userId) {
       fetchUserData(userId);
     } else {
+      console.log('WaitlistStatus: No user ID found, redirecting to waitlist');
       setLocation('/waitlist');
     }
   }, []);
@@ -220,8 +225,67 @@ const WaitlistStatus = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative">
-      <FloatingElements />
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#f8fafc',
+      padding: '2rem',
+      position: 'relative'
+    }}>
+      <div style={{ 
+        position: 'fixed', 
+        top: '50%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#ffffff',
+        padding: '3rem',
+        borderRadius: '1rem',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        zIndex: 1000
+      }}>
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: 'bold', 
+          color: '#1f2937',
+          marginBottom: '1rem'
+        }}>
+          🎉 Welcome to Your VeeFore Status
+        </h1>
+        <p style={{ 
+          fontSize: '1.2rem', 
+          color: '#6b7280',
+          marginBottom: '2rem'
+        }}>
+          Hello {user?.name || 'Member'}! You're position #{user?.position || '247'} in the waitlist
+        </p>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(2, 1fr)', 
+          gap: '1rem',
+          marginTop: '2rem'
+        }}>
+          <div style={{ 
+            padding: '1rem', 
+            backgroundColor: '#f3f4f6', 
+            borderRadius: '0.5rem'
+          }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>
+              {user?.referralCount || 0}
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Friends Invited</div>
+          </div>
+          <div style={{ 
+            padding: '1rem', 
+            backgroundColor: '#f3f4f6', 
+            borderRadius: '0.5rem'
+          }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>
+              {user?.credits || 0}
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>Credits Earned</div>
+          </div>
+        </div>
+      </div>
       
       {/* Enhanced Success Modal */}
       <AnimatePresence>
@@ -526,85 +590,237 @@ const WaitlistStatus = () => {
             transition={{ duration: 0.4 }}
           >
             {activeTab === 'overview' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Launch Progress */}
-                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                        <Rocket className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Launch Timeline</CardTitle>
-                        <p className="text-gray-600">Track our progress to launch</p>
-                      </div>
-                    </div>
-                  </CardHeader>
+              <div className="space-y-8">
+                {/* Your Current Status - Hero Section */}
+                <Card className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 shadow-xl border-0 rounded-3xl overflow-hidden">
                   <CardContent className="p-8">
-                    <CreativeProgress value={stats.launchProgress} label="Platform Development" />
-                    
-                    <div className="mt-8 space-y-4">
-                      {[
-                        { phase: "Beta Testing", status: "current", progress: 85 },
-                        { phase: "Security Audit", status: "upcoming", progress: 60 },
-                        { phase: "Launch Preparation", status: "planned", progress: 30 }
-                      ].map((phase, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-3 h-3 rounded-full ${
-                              phase.status === 'current' ? 'bg-green-500' :
-                              phase.status === 'upcoming' ? 'bg-yellow-500' : 'bg-gray-400'
-                            }`} />
-                            <span className="font-medium text-gray-900">{phase.phase}</span>
-                          </div>
-                          <span className="text-sm text-gray-500">{phase.progress}%</span>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                      <div>
+                        <div className="flex items-center space-x-3 mb-4">
+                          <Crown className="w-8 h-8 text-yellow-600" />
+                          <Badge className="bg-blue-100 text-blue-700 px-3 py-1">Position #{user?.position || '247'}</Badge>
                         </div>
-                      ))}
+                        <h2 className="text-3xl font-black text-gray-900 mb-4">
+                          Welcome back, {user?.name || 'Member'}!
+                        </h2>
+                        <p className="text-lg text-gray-600 mb-6">
+                          You're in an excellent position in our waitlist. Based on current progress, you'll receive access in approximately <span className="font-bold text-purple-600">{stats.avgWaitTime}</span>.
+                        </p>
+                        <div className="flex items-center space-x-4">
+                          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl">
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Invite Friends
+                          </Button>
+                          <Button variant="outline" className="px-6 py-3 rounded-xl">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Settings
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="relative w-48 h-48 mx-auto mb-6">
+                          <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 100 100">
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              stroke="currentColor"
+                              strokeWidth="6"
+                              fill="transparent"
+                              className="text-gray-200"
+                            />
+                            <motion.circle
+                              cx="50"
+                              cy="50"
+                              r="40"
+                              stroke="currentColor"
+                              strokeWidth="6"
+                              fill="transparent"
+                              strokeLinecap="round"
+                              className="text-gradient-to-r from-blue-500 to-purple-500"
+                              initial={{ pathLength: 0 }}
+                              animate={{ pathLength: 0.78 }}
+                              transition={{ duration: 2 }}
+                              style={{
+                                strokeDasharray: "251.2",
+                                strokeDashoffset: `${251.2 * (1 - 0.78)}`,
+                                stroke: 'url(#gradient)'
+                              }}
+                            />
+                            <defs>
+                              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#3B82F6" />
+                                <stop offset="100%" stopColor="#8B5CF6" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-3xl font-black text-gray-900">78%</div>
+                              <div className="text-sm text-gray-600">To Launch</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Community Stats */}
-                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-100">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                        <Globe className="w-6 h-6 text-white" />
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card className="bg-white shadow-lg border-0 rounded-2xl overflow-hidden">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Users className="w-6 h-6 text-green-600" />
                       </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Community</CardTitle>
-                        <p className="text-gray-600">Growing every day</p>
+                      <div className="text-2xl font-black text-gray-900 mb-1">{user?.referralCount || 0}</div>
+                      <div className="text-sm text-gray-600">Friends Invited</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white shadow-lg border-0 rounded-2xl overflow-hidden">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Gift className="w-6 h-6 text-blue-600" />
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-8">
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-                        <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ duration: 3, repeat: Infinity }}
-                          className="text-4xl font-black text-gray-900 mb-2"
-                        >
-                          {stats.totalUsers.toLocaleString()}
-                        </motion.div>
-                        <div className="text-gray-600 mb-3">Total Members</div>
-                        <div className="flex items-center justify-center space-x-1">
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                          <span className="text-sm text-green-600 font-medium">+247 today</span>
+                      <div className="text-2xl font-black text-gray-900 mb-1">{user?.credits || 0}</div>
+                      <div className="text-sm text-gray-600">Credits Earned</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white shadow-lg border-0 rounded-2xl overflow-hidden">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Calendar className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div className="text-2xl font-black text-gray-900 mb-1">
+                        {user?.joinedAt ? Math.floor((Date.now() - new Date(user.joinedAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
+                      </div>
+                      <div className="text-sm text-gray-600">Days Waiting</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white shadow-lg border-0 rounded-2xl overflow-hidden">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Star className="w-6 h-6 text-yellow-600" />
+                      </div>
+                      <div className="text-2xl font-black text-gray-900 mb-1">Early</div>
+                      <div className="text-sm text-gray-600">Access Status</div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Key Updates & Next Steps */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-gray-100">
+                      <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+                        <Sparkles className="w-6 h-6 text-green-600 mr-3" />
+                        What's New
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {[
+                          { 
+                            title: "Beta Testing Started!", 
+                            description: "We've begun testing with the first 100 users",
+                            time: "2 days ago",
+                            type: "success"
+                          },
+                          { 
+                            title: "New AI Features Added", 
+                            description: "Enhanced content generation and smart scheduling",
+                            time: "1 week ago",
+                            type: "feature"
+                          },
+                          { 
+                            title: "Mobile App Preview", 
+                            description: "iOS and Android apps are in final testing",
+                            time: "2 weeks ago",
+                            type: "info"
+                          }
+                        ].map((update, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start space-x-3 p-3 rounded-xl bg-gray-50"
+                          >
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                              update.type === 'success' ? 'bg-green-500' :
+                              update.type === 'feature' ? 'bg-blue-500' : 'bg-purple-500'
+                            }`}>
+                              {update.type === 'success' && <Check className="w-4 h-4 text-white" />}
+                              {update.type === 'feature' && <Zap className="w-4 h-4 text-white" />}
+                              {update.type === 'info' && <Star className="w-4 h-4 text-white" />}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-1">{update.title}</h4>
+                              <p className="text-sm text-gray-600 mb-1">{update.description}</p>
+                              <p className="text-xs text-gray-500">{update.time}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
+                      <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+                        <Target className="w-6 h-6 text-purple-600 mr-3" />
+                        Next Steps
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Share2 className="w-5 h-5 text-blue-600" />
+                            <span className="font-semibold text-blue-700">Boost Your Position</span>
+                          </div>
+                          <p className="text-sm text-blue-600 mb-3">
+                            Invite friends to jump ahead in line. Each referral moves you up 5 positions!
+                          </p>
+                          <Button size="sm" className="bg-blue-600 text-white">
+                            Share Referral Code
+                          </Button>
+                        </div>
+
+                        <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Bell className="w-5 h-5 text-green-600" />
+                            <span className="font-semibold text-green-700">Stay Updated</span>
+                          </div>
+                          <p className="text-sm text-green-600 mb-3">
+                            Enable notifications to be the first to know when your access is ready.
+                          </p>
+                          <Button size="sm" variant="outline" className="border-green-600 text-green-600">
+                            Enable Notifications
+                          </Button>
+                        </div>
+
+                        <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <BookOpen className="w-5 h-5 text-purple-600" />
+                            <span className="font-semibold text-purple-700">Get Ready</span>
+                          </div>
+                          <p className="text-sm text-purple-600 mb-3">
+                            Check out our getting started guide to hit the ground running.
+                          </p>
+                          <Button size="sm" variant="outline" className="border-purple-600 text-purple-600">
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            View Guide
+                          </Button>
                         </div>
                       </div>
-                      
-                      <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-100">
-                        <div className="text-4xl font-black text-gray-900 mb-2">{stats.avgWaitTime}</div>
-                        <div className="text-gray-600 mb-3">Average Wait Time</div>
-                        <div className="flex items-center justify-center space-x-1">
-                          <Clock className="w-4 h-4 text-purple-500" />
-                          <span className="text-sm text-purple-600 font-medium">Decreasing</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
 
