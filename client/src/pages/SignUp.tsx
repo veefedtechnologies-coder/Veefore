@@ -148,7 +148,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         }
 
         // Show OTP modal instead of redirecting
+        console.log('Setting showOTPModal to true')
         setShowOTPModal(true)
+        console.log('showOTPModal state after setting:', showOTPModal)
         
         toast({
           title: "Verification email sent!",
@@ -1087,6 +1089,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     </div>
 
     {/* OTP Verification Modal */}
+    {console.log('Rendering: showOTPModal =', showOTPModal)}
     {showOTPModal && (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
