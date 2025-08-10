@@ -1,4 +1,5 @@
 import { createTransporter } from './email-config';
+import sgMail from '@sendgrid/mail';
 
 export class EmailService {
   private transporter: any;
@@ -29,10 +30,15 @@ export class EmailService {
     if (sendgridApiKey) {
       try {
         // Use SendGrid Web API instead of SMTP
-        const sgMail = require('@sendgrid/mail');
         sgMail.setApiKey(sendgridApiKey);
         
-        const fromEmail = process.env.SENDGRID_VERIFIED_SENDER || 'noreply@veefore.com';
+        // Need a verified sender email - ask user to provide one
+        const fromEmail = process.env.SENDGRID_VERIFIED_SENDER;
+        if (!fromEmail) {
+          console.log('[EMAIL] No verified sender email configured. Please add SENDGRID_VERIFIED_SENDER environment variable with your verified SendGrid sender email.');
+          throw new Error('No verified sender email configured');
+        }
+        
         const fromName = process.env.SENDGRID_FROM_NAME || 'VeeFore Support';
         
         const msg = {
