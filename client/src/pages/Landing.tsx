@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { 
-  ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, 
+  ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
   Lightbulb, Settings, Lock, 
   Sparkles, Crown, Cpu, Brain, 
@@ -999,26 +999,64 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     
                     {/* Interactive Action Center */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button 
-                        onClick={() => handleNavigation('signup')}
-                        className="group bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-violet-500/25 transition-all duration-300 transform hover:-translate-y-1"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Bot className="w-5 h-5" />
-                          <span>Get Early Access</span>
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      {deviceStatus.loading ? (
+                        // Loading state
+                        <div className="flex space-x-4">
+                          <div className="w-48 h-14 bg-gray-200 animate-pulse rounded-2xl"></div>
+                          <div className="w-48 h-14 bg-gray-200 animate-pulse rounded-2xl"></div>
                         </div>
-                      </button>
-                      
-                      <button 
-                        onClick={() => setIsInteractionActive(!isInteractionActive)}
-                        className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <MousePointer2 className="w-5 h-5" />
-                          <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
-                        </div>
-                      </button>
+                      ) : deviceStatus.isOnWaitlist ? (
+                        // User is on waitlist - show Check Status button
+                        <>
+                          <button 
+                            onClick={() => {
+                              const email = encodeURIComponent(deviceStatus.user?.email || '')
+                              window.location.href = `/waitlist-status?user=${email}`
+                            }}
+                            className="group bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <CheckCircle className="w-5 h-5" />
+                              <span>Check Your Status</span>
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </button>
+                          
+                          <button 
+                            onClick={() => setIsInteractionActive(!isInteractionActive)}
+                            className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <MousePointer2 className="w-5 h-5" />
+                              <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
+                            </div>
+                          </button>
+                        </>
+                      ) : (
+                        // User not on waitlist - show Get Early Access button
+                        <>
+                          <button 
+                            onClick={() => handleNavigation('waitlist')}
+                            className="group bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-violet-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Bot className="w-5 h-5" />
+                              <span>Get Early Access</span>
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </button>
+                          
+                          <button 
+                            onClick={() => setIsInteractionActive(!isInteractionActive)}
+                            className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <MousePointer2 className="w-5 h-5" />
+                              <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
+                            </div>
+                          </button>
+                        </>
+                      )}
                     </div>
                     
                     {/* Advanced Compact Interactive Demo */}
