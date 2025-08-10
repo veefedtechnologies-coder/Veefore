@@ -35,6 +35,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   const [otpLoading, setOtpLoading] = useState(false)
   const [otpError, setOtpError] = useState(false)
   const [pendingUser, setPendingUser] = useState<{email: string, firstName: string} | null>(null)
+  const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null)
 
   const totalSteps = 4
 
@@ -136,23 +137,21 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             throw new Error(responseData.message || 'Failed to send verification email')
           }
 
+          // Store development OTP and show OTP modal
+          if (responseData.developmentOtp && import.meta.env.DEV) {
+            console.log('🔑 DEVELOPMENT OTP:', responseData.developmentOtp)
+            setDevelopmentOtp(responseData.developmentOtp)
+          }
+          
           // Show OTP modal - user must verify before proceeding to step 2
           setShowOTPModal(true)
           
-          // Show development OTP in toast for easier testing
-          if (responseData.developmentOtp && import.meta.env.DEV) {
-            console.log('🔑 DEVELOPMENT OTP:', responseData.developmentOtp)
-            toast({
-              title: "🔑 Development Mode - OTP Code:",
-              description: `Use this code: ${responseData.developmentOtp} (Also check your email for real delivery)`,
-              duration: 30000, // Show for 30 seconds in development
-            })
-          } else {
-            toast({
-              title: "Verification required!",
-              description: "Please check your email for the 6-digit verification code to continue.",
-            })
-          }
+          // Simple toast notification
+          toast({
+            title: "Verification code sent!",
+            description: "Check your email for the 6-digit verification code.",
+            duration: 5000,
+          })
           
         } catch (error: any) {
           console.error('Email verification error:', error)
@@ -247,6 +246,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       setOtpError(false)
       setShowOTPModal(false)
       setOtpCode('') // Clear the OTP code
+      setDevelopmentOtp(null) // Clear development OTP
       toast({
         title: "Email verified!",
         description: "You can now continue with your account setup.",
@@ -288,20 +288,16 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         throw new Error(responseData.message || 'Failed to resend verification email')
       }
 
-      // Show development OTP in resend toast too
+      // Store new development OTP
       if (responseData.developmentOtp && import.meta.env.DEV) {
         console.log('🔑 RESENT DEVELOPMENT OTP:', responseData.developmentOtp)
-        toast({
-          title: "🔑 New Development Code:",
-          description: `Use this code: ${responseData.developmentOtp} (Also check your email)`,
-          duration: 30000,
-        })
-      } else {
-        toast({
-          title: "Code resent!",
-          description: "A new verification code has been sent to your email.",
-        })
+        setDevelopmentOtp(responseData.developmentOtp)
       }
+
+      toast({
+        title: "Code resent!",
+        description: "A new verification code has been sent to your email.",
+      })
       setOtpCode('') // Clear current code
     } catch (error: any) {
       toast({
@@ -1272,15 +1268,23 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </div>
 
               {/* Development OTP Display - Only in Development */}
-              {import.meta.env.DEV && (
-                <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 backdrop-blur-xl rounded-xl p-4 border border-orange-400/30 shadow-lg">
-                  <div className="flex items-center space-x-2 mb-2">
+              {import.meta.env.DEV && developmentOtp && (
+                <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 backdrop-blur-xl rounded-xl p-6 border border-orange-400/30 shadow-lg">
+                  <div className="flex items-center space-x-2 mb-3">
                     <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
                     <span className="text-orange-200 font-bold text-sm">DEVELOPMENT MODE</span>
                   </div>
-                  <p className="text-orange-100 text-sm">
-                    For testing: Use OTP code shown in the toast message
-                  </p>
+                  <div className="text-center">
+                    <p className="text-orange-100 text-sm mb-2">Development OTP Code:</p>
+                    <div className="bg-orange-900/50 border border-orange-400/50 rounded-lg p-4">
+                      <span className="text-orange-200 font-mono font-bold text-2xl tracking-widest">
+                        {developmentOtp}
+                      </span>
+                    </div>
+                    <p className="text-orange-200/80 text-xs mt-2">
+                      Use this code for testing or check your email
+                    </p>
+                  </div>
                 </div>
               )}
 
