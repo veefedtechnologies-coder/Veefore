@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, BarChart, MessageCircle, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code, Mail, Clock } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, BarChart, MessageCircle, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code, Mail, Clock, Plus } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -555,7 +555,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Core AI Features</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'ai-content-generation', 
@@ -585,40 +585,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: Target,
                       gradient: 'from-orange-500 to-red-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.interestedFeatures.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${index * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.interestedFeatures.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.interestedFeatures.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.interestedFeatures.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
@@ -636,7 +649,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Smart Automation</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'auto-scheduling', 
@@ -652,40 +665,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: Rocket,
                       gradient: 'from-cyan-500 to-blue-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.interestedFeatures.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${index * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.interestedFeatures.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.interestedFeatures.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.interestedFeatures.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
@@ -703,7 +729,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Analytics & Intelligence</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'analytics-insights', 
@@ -719,40 +745,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: TrendingUp,
                       gradient: 'from-rose-500 to-pink-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.interestedFeatures.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${(index + 6) * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.interestedFeatures.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.interestedFeatures.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.interestedFeatures.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.interestedFeatures.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
@@ -824,7 +863,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Business Growth Goals</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'brand-building', 
@@ -854,40 +893,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: Star,
                       gradient: 'from-orange-500 to-red-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${index * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.useCases.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.useCases.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.useCases.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
@@ -905,7 +957,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Operational Efficiency</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'time-optimization', 
@@ -935,40 +987,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: Users,
                       gradient: 'from-rose-500 to-pink-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${(index + 4) * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.useCases.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.useCases.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.useCases.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
@@ -986,7 +1051,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   <h2 className="text-2xl font-bold text-gray-900">Performance & Analytics</h2>
                   <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   {[
                     { 
                       id: 'data-driven-decisions', 
@@ -1002,40 +1067,53 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       icon: TrendingUp,
                       gradient: 'from-amber-500 to-orange-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.01]'
-                          : 'border-gray-200/50 hover:border-blue-300 hover:bg-blue-50/30'
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
+                        formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      style={{ 
+                        animationDelay: `${(index + 8) * 100}ms`,
+                        animation: 'fadeInUp 0.6s ease-out forwards'
+                      }}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative p-5 flex items-center space-x-4">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${gradient} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
-                          <Icon className="w-5 h-5" />
+                          <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-lg mb-1 ${
-                            formData.useCases.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
-                          <p className="text-gray-600 text-sm">{desc}</p>
+                          <p className={`text-base transition-all duration-300 ${
+                            formData.useCases.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                          }`}>
+                            {desc}
+                          </p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
-                          {formData.useCases.includes(id) && (
-                            <Check className="w-3 h-3 text-white" />
+                          {formData.useCases.includes(id) ? (
+                            <Check className="w-5 h-5 font-bold" />
+                          ) : (
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
                           )}
                         </div>
                       </div>
