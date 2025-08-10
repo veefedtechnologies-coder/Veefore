@@ -65,6 +65,10 @@ const Waitlist = () => {
   const [focusedField, setFocusedField] = useState('');
   const [ripples, setRipples] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [currentFeature, setCurrentFeature] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const [cursorTrail, setCursorTrail] = useState<Array<{id: number, x: number, y: number, opacity: number}>>([]);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [glowIntensity, setGlowIntensity] = useState(0);
 
   // Advanced demo scenarios for the interactive showcase
   const demoScenarios = [
@@ -130,13 +134,46 @@ const Waitlist = () => {
     }
   ];
 
-  // Mouse tracking for interactive effects
+  // Advanced mouse tracking with cursor trail
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
+      
+      // Create cursor trail effect
+      const newTrail = { 
+        id: Date.now(), 
+        x: e.clientX, 
+        y: e.clientY, 
+        opacity: 1 
+      };
+      setCursorTrail(prev => [...prev.slice(-8), newTrail]);
+      
+      // Update glow intensity based on mouse movement speed
+      const speed = Math.sqrt(e.movementX ** 2 + e.movementY ** 2);
+      setGlowIntensity(Math.min(speed * 0.1, 1));
     };
+    
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Fade cursor trail
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCursorTrail(prev => prev.map(trail => ({
+        ...trail,
+        opacity: trail.opacity * 0.8
+      })).filter(trail => trail.opacity > 0.1));
+    }, 50);
+    return () => clearInterval(interval);
   }, []);
 
   // Auto-advance demo scenarios
@@ -528,72 +565,195 @@ const Waitlist = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Advanced background effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 pointer-events-none" />
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50/40 to-purple-50/40 pointer-events-none" />
       
-      {/* Interactive mouse follower */}
+      {/* Animated mesh gradient background */}
+      <div className="fixed inset-0 opacity-30 pointer-events-none">
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 blur-3xl transform-gpu"
+          style={{
+            transform: `translateY(${scrollY * 0.5}px) rotate(${scrollY * 0.1}deg)`,
+          }}
+        />
+        <div 
+          className="absolute inset-0 bg-gradient-to-l from-cyan-400/20 via-blue-400/20 to-indigo-400/20 blur-3xl transform-gpu"
+          style={{
+            transform: `translateY(${scrollY * -0.3}px) rotate(${scrollY * -0.05}deg)`,
+          }}
+        />
+      </div>
+      
+      {/* Advanced interactive mouse follower */}
       <div
-        className="fixed w-96 h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full pointer-events-none transition-all duration-1000 ease-out blur-3xl"
+        className="fixed w-96 h-96 rounded-full pointer-events-none transition-all duration-1000 ease-out blur-3xl mix-blend-multiply"
         style={{
           left: mousePosition.x - 192,
           top: mousePosition.y - 192,
+          background: `radial-gradient(circle, rgba(59, 130, 246, ${0.1 + glowIntensity * 0.2}) 0%, rgba(147, 51, 234, ${0.1 + glowIntensity * 0.15}) 50%, transparent 100%)`,
+          transform: `scale(${1 + glowIntensity * 0.3})`,
         }}
       />
 
-      {/* Animated particles */}
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="fixed w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-30"
-          animate={{
-            x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-            y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-            scale: [0, 1, 0],
-            opacity: [0, 0.6, 0]
-          }}
-          transition={{
-            duration: Math.random() * 15 + 15,
-            repeat: Infinity,
-            delay: Math.random() * 8
+      {/* Cursor trail effect */}
+      {cursorTrail.map((trail, i) => (
+        <div
+          key={trail.id}
+          className="fixed w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full pointer-events-none mix-blend-multiply"
+          style={{
+            left: trail.x - 6,
+            top: trail.y - 6,
+            opacity: trail.opacity * 0.6,
+            transform: `scale(${trail.opacity})`,
+            transition: 'opacity 0.1s ease-out',
           }}
         />
       ))}
 
-      {/* Enhanced header */}
-      <header className="relative bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      {/* Enhanced floating particles */}
+      {[...Array(25)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="fixed rounded-full opacity-40 mix-blend-multiply"
+          style={{
+            width: Math.random() * 4 + 2,
+            height: Math.random() * 4 + 2,
+            background: `linear-gradient(${Math.random() * 360}deg, hsl(${210 + Math.random() * 60}, 70%, 60%), hsl(${270 + Math.random() * 60}, 70%, 60%))`,
+          }}
+          animate={{
+            x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+            y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+            scale: [0, Math.random() * 1.5 + 0.5, 0],
+            opacity: [0, 0.8, 0],
+            rotate: [0, Math.random() * 360]
+          }}
+          transition={{
+            duration: Math.random() * 20 + 20,
+            repeat: Infinity,
+            delay: Math.random() * 10,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+
+      {/* Geometric patterns */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="m 60 0 l 0 60 l -60 0 l 0 -60 z" fill="none" stroke="currentColor" strokeWidth="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" className="text-blue-600" />
+        </svg>
+      </div>
+
+      {/* Ultra-enhanced header */}
+      <header className="relative bg-white/90 backdrop-blur-2xl border-b border-white/30 shadow-2xl z-50">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-transparent to-purple-50/50" />
+        <div className="max-w-7xl mx-auto px-6 py-5 relative">
           <div className="flex justify-between items-center">
             <motion.div 
               className="flex items-center space-x-4"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 400 }}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 500 }}
             >
-              <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-10 h-10 text-white" />
-              </div>
+              <motion.div 
+                className="relative w-16 h-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl"
+                animate={{ 
+                  boxShadow: [
+                    "0 10px 25px rgba(59, 130, 246, 0.3)",
+                    "0 10px 25px rgba(147, 51, 234, 0.3)",
+                    "0 10px 25px rgba(236, 72, 153, 0.3)",
+                    "0 10px 25px rgba(59, 130, 246, 0.3)"
+                  ]
+                }}
+                transition={{ duration: 4, repeat: Infinity }}
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="w-10 h-10 text-white" />
+                </motion.div>
+                
+                {/* Logo glow rings */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl border-2 border-white/30"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0.8, 0.5] 
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </motion.div>
               <div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">VeeFore</span>
-                <div className="text-sm text-gray-500 font-medium">AI Social Media Management</div>
+                <motion.span 
+                  className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+                  animate={{ 
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                  }}
+                  transition={{ duration: 5, repeat: Infinity }}
+                  style={{ backgroundSize: "200% 200%" }}
+                >
+                  VeeFore
+                </motion.span>
+                <motion.div 
+                  className="text-sm text-gray-500 font-medium"
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  AI Social Media Revolution
+                </motion.div>
               </div>
             </motion.div>
             
             <div className="flex items-center space-x-6">
               <motion.div 
-                className="hidden sm:flex items-center space-x-3 bg-green-50 px-4 py-2 rounded-full border border-green-200 shadow-sm"
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                className="hidden sm:flex items-center space-x-3 bg-gradient-to-r from-green-50 to-emerald-50 px-5 py-3 rounded-full border border-green-200/50 shadow-lg backdrop-blur-sm"
+                animate={{ 
+                  scale: [1, 1.03, 1],
+                  boxShadow: [
+                    "0 4px 15px rgba(34, 197, 94, 0.2)",
+                    "0 4px 20px rgba(34, 197, 94, 0.3)",
+                    "0 4px 15px rgba(34, 197, 94, 0.2)"
+                  ]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
               >
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-green-700 font-semibold text-sm">2,847+ creators joined today</span>
+                <motion.div 
+                  className="w-3 h-3 bg-green-500 rounded-full"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [1, 0.7, 1] 
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <span className="text-green-700 font-bold text-sm">3,247+ joined today</span>
+                <motion.div
+                  className="text-green-600"
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  🚀
+                </motion.div>
               </motion.div>
               
               <motion.button
                 onClick={() => setLocation('/signin')}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)"
+                }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg"
+                className="relative bg-gradient-to-r from-gray-900 to-black text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-2xl overflow-hidden"
               >
-                Sign In
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+                <span className="relative">Sign In</span>
               </motion.button>
             </div>
           </div>
@@ -714,26 +874,106 @@ const Waitlist = () => {
               </AnimatePresence>
             </motion.div>
 
-            {/* Feature showcase */}
+            {/* Enhanced feature showcase */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-2 gap-6"
             >
               {featureShowcase.map((feature, index) => (
                 <motion.div
                   key={index}
-                  whileHover={{ scale: 1.05, rotateY: 5 }}
-                  className={`p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-lg transition-all duration-300 ${
-                    index === currentFeature ? 'ring-2 ring-blue-500 bg-white/80' : ''
+                  whileHover={{ 
+                    scale: 1.05, 
+                    rotateY: 8,
+                    z: 50
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onHoverStart={() => setHoveredCard(index)}
+                  onHoverEnd={() => setHoveredCard(null)}
+                  className={`relative p-6 rounded-2xl backdrop-blur-xl border shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer group ${
+                    index === currentFeature 
+                      ? 'ring-2 ring-blue-500/50 bg-white/90 border-blue-200/50 shadow-blue-500/20' 
+                      : 'bg-white/70 border-white/30 hover:bg-white/90'
                   }`}
+                  style={{
+                    background: hoveredCard === index 
+                      ? `linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)`
+                      : undefined
+                  }}
                 >
-                  <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-4 shadow-lg`}>
-                    <feature.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="font-bold text-gray-900 mb-2">{feature.title}</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                  {/* Animated background gradient */}
+                  <motion.div
+                    className={`absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-2xl`}
+                    style={{
+                      background: `linear-gradient(135deg, ${feature.color.replace('from-', '').replace('to-', ', ')})`.replace(' ', ', ')
+                    }}
+                  />
+                  
+                  {/* Shimmer effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100"
+                    animate={hoveredCard === index ? { x: ["-100%", "100%"] } : {}}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  />
+
+                  <motion.div 
+                    className={`relative w-14 h-14 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:shadow-2xl transition-all duration-500`}
+                    animate={{
+                      rotate: hoveredCard === index ? [0, 5, -5, 0] : 0,
+                      scale: hoveredCard === index ? 1.1 : 1
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <feature.icon className="w-7 h-7 text-white" />
+                    
+                    {/* Icon glow effect */}
+                    <motion.div
+                      className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-2xl opacity-0 group-hover:opacity-30 blur-lg`}
+                      animate={{ scale: hoveredCard === index ? [1, 1.2, 1] : 1 }}
+                      transition={{ duration: 1, repeat: hoveredCard === index ? Infinity : 0 }}
+                    />
+                  </motion.div>
+
+                  <motion.h4 
+                    className="font-bold text-gray-900 mb-3 text-lg group-hover:text-gray-800 transition-colors duration-300"
+                    animate={{ y: hoveredCard === index ? -2 : 0 }}
+                  >
+                    {feature.title}
+                  </motion.h4>
+                  
+                  <motion.p 
+                    className="text-gray-600 text-sm leading-relaxed group-hover:text-gray-700 transition-colors duration-300"
+                    animate={{ y: hoveredCard === index ? -1 : 0 }}
+                  >
+                    {feature.description}
+                  </motion.p>
+
+                  {/* Interactive corner accent */}
+                  <motion.div
+                    className="absolute top-4 right-4 w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: `linear-gradient(135deg, ${feature.color.replace('from-', '').replace('to-', ', ')})`.replace(' ', ', ')
+                    }}
+                    animate={hoveredCard === index ? { 
+                      scale: [1, 1.5, 1],
+                      opacity: [0.7, 1, 0.7]
+                    } : {}}
+                    transition={{ duration: 1, repeat: hoveredCard === index ? Infinity : 0 }}
+                  />
+
+                  {/* Active indicator */}
+                  {index === currentFeature && (
+                    <motion.div
+                      className="absolute bottom-4 right-4 w-3 h-3 bg-blue-500 rounded-full"
+                      animate={{ 
+                        scale: [1, 1.3, 1],
+                        opacity: [0.7, 1, 0.7]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
                 </motion.div>
               ))}
             </motion.div>
@@ -768,38 +1008,130 @@ const Waitlist = () => {
               ))}
             </div>
 
-            {/* Form header */}
-            <div className="text-center mb-10 relative">
+            {/* Ultra-enhanced form header */}
+            <div className="text-center mb-12 relative">
               <motion.div
-                className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl"
+                className="relative w-24 h-24 mx-auto mb-8"
                 animate={{ 
-                  rotate: [0, 3, -3, 0],
-                  scale: [1, 1.05, 1]
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 6, repeat: Infinity }}
+              >
+                <div className="w-24 h-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden">
+                  <Crown className="w-12 h-12 text-white z-10" />
+                  
+                  {/* Animated background shine */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
+                    animate={{ x: ["-100%", "100%"] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  />
+                  
+                  {/* Pulsing outer ring */}
+                  <motion.div
+                    className="absolute -inset-2 bg-gradient-to-r from-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-lg"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 0.8, 0.5]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </div>
+                
+                {/* Floating sparkle effects */}
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
+                    style={{
+                      left: `${Math.cos(i * 60 * Math.PI / 180) * 60 + 50}%`,
+                      top: `${Math.sin(i * 60 * Math.PI / 180) * 60 + 50}%`,
+                    }}
+                    animate={{
+                      scale: [0, 1, 0],
+                      opacity: [0, 1, 0],
+                      rotate: [0, 180]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.3,
+                      ease: "easeInOut"
+                    }}
+                  />
+                ))}
+              </motion.div>
+
+              <motion.h2 
+                className="text-4xl font-bold mb-4 relative"
+                style={{
+                  background: "linear-gradient(135deg, #1f2937 0%, #3b82f6 25%, #8b5cf6 50%, #ec4899 75%, #f59e0b 100%)",
+                  backgroundSize: "300% 300%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text"
+                }}
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                }}
+                transition={{ duration: 10, repeat: Infinity }}
+              >
+                Join the Revolution
+              </motion.h2>
+
+              <motion.p 
+                className="text-gray-600 leading-relaxed text-lg max-w-sm mx-auto"
+                animate={{ 
+                  opacity: [0.8, 1, 0.8],
+                  y: [0, -1, 0]
                 }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
-                <Crown className="w-10 h-10 text-white" />
-              </motion.div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent mb-3">
-                Join the Revolution
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                Get exclusive early access to VeeFore's AI-powered social media management platform
-              </p>
+                Get exclusive early access to VeeFore's revolutionary AI-powered social media platform
+              </motion.p>
+
+              {/* Decorative elements */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent rounded-full opacity-50" />
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent rounded-full opacity-50" />
             </div>
 
             {/* Enhanced form */}
             <form onSubmit={handleSubmit} className="space-y-8 relative" onClick={createRipple}>
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="relative"
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="relative group"
               >
-                <label className="block text-gray-700 font-semibold mb-3 text-lg">
+                <motion.label 
+                  className="block text-gray-700 font-bold mb-4 text-lg relative"
+                  animate={{ 
+                    color: focusedField === 'name' ? '#3b82f6' : '#374151' 
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
                   Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 transition-colors duration-300" />
-                  <input
+                  <motion.div
+                    className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 origin-left"
+                    animate={{ 
+                      scaleX: focusedField === 'name' ? 1 : 0,
+                      opacity: focusedField === 'name' ? 1 : 0 
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </motion.label>
+                
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-all duration-300"
+                    animate={{ 
+                      color: focusedField === 'name' ? '#3b82f6' : '#9ca3af',
+                      scale: focusedField === 'name' ? 1.1 : 1
+                    }}
+                  >
+                    <User className="w-6 h-6" />
+                  </motion.div>
+                  
+                  <motion.input
                     type="text"
                     name="name"
                     value={formData.name}
@@ -807,27 +1139,71 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/80 border-2 border-gray-200 rounded-2xl pl-14 pr-4 py-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
+                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
                     placeholder="Enter your full name"
+                    whileFocus={{ 
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 25px rgba(59, 130, 246, 0.2)'
+                    }}
                   />
+                  
+                  {/* Enhanced focus ring with gradient */}
                   <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-blue-500 opacity-0 pointer-events-none"
-                    animate={{ opacity: focusedField === 'name' ? 1 : 0 }}
-                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 pointer-events-none -z-10"
+                    style={{ padding: '2px' }}
+                    animate={{ 
+                      opacity: focusedField === 'name' ? 1 : 0,
+                      scale: focusedField === 'name' ? 1.02 : 1
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  
+                  {/* Shimmer effect on focus */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-200/50 to-transparent -skew-x-12 opacity-0"
+                    animate={focusedField === 'name' ? { 
+                      x: ["-100%", "100%"],
+                      opacity: [0, 0.5, 0]
+                    } : {}}
+                    transition={{ duration: 1.5, repeat: focusedField === 'name' ? Infinity : 0 }}
                   />
                 </div>
               </motion.div>
 
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="relative"
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="relative group"
               >
-                <label className="block text-gray-700 font-semibold mb-3 text-lg">
+                <motion.label 
+                  className="block text-gray-700 font-bold mb-4 text-lg relative"
+                  animate={{ 
+                    color: focusedField === 'email' ? '#3b82f6' : '#374151' 
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
                   Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 transition-colors duration-300" />
-                  <input
+                  <motion.div
+                    className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 origin-left"
+                    animate={{ 
+                      scaleX: focusedField === 'email' ? 1 : 0,
+                      opacity: focusedField === 'email' ? 1 : 0 
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </motion.label>
+                
+                <div className="relative group">
+                  <motion.div
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-all duration-300"
+                    animate={{ 
+                      color: focusedField === 'email' ? '#3b82f6' : '#9ca3af',
+                      scale: focusedField === 'email' ? 1.1 : 1
+                    }}
+                  >
+                    <Mail className="w-6 h-6" />
+                  </motion.div>
+                  
+                  <motion.input
                     type="email"
                     name="email"
                     value={formData.email}
@@ -835,13 +1211,33 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/80 border-2 border-gray-200 rounded-2xl pl-14 pr-4 py-4 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
+                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
                     placeholder="Enter your email address"
+                    whileFocus={{ 
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 25px rgba(59, 130, 246, 0.2)'
+                    }}
                   />
+                  
+                  {/* Enhanced focus ring with gradient */}
                   <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-blue-500 opacity-0 pointer-events-none"
-                    animate={{ opacity: focusedField === 'email' ? 1 : 0 }}
-                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 pointer-events-none -z-10"
+                    style={{ padding: '2px' }}
+                    animate={{ 
+                      opacity: focusedField === 'email' ? 1 : 0,
+                      scale: focusedField === 'email' ? 1.02 : 1
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  
+                  {/* Shimmer effect on focus */}
+                  <motion.div
+                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-purple-200/50 to-transparent -skew-x-12 opacity-0"
+                    animate={focusedField === 'email' ? { 
+                      x: ["-100%", "100%"],
+                      opacity: [0, 0.5, 0]
+                    } : {}}
+                    transition={{ duration: 1.5, repeat: focusedField === 'email' ? Infinity : 0 }}
                   />
                 </div>
               </motion.div>
@@ -872,24 +1268,170 @@ const Waitlist = () => {
               <motion.button
                 type="submit"
                 disabled={isLoading}
-                whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                whileHover={{ 
+                  scale: isLoading ? 1 : 1.05,
+                  boxShadow: isLoading ? 
+                    "0 10px 25px rgba(59, 130, 246, 0.3)" : 
+                    "0 25px 50px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)",
+                  y: isLoading ? 0 : -3
+                }}
                 whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-5 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl text-lg relative overflow-hidden"
+                className="group relative w-full text-white font-bold py-6 px-8 rounded-2xl transition-all duration-500 flex items-center justify-center space-x-4 shadow-2xl text-xl overflow-hidden transform-gpu"
+                style={{
+                  background: !isLoading ? 
+                    "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f59e0b 75%, #10b981 100%)" :
+                    "linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)",
+                  backgroundSize: "400% 400%"
+                }}
+                animate={{
+                  backgroundPosition: !isLoading ? 
+                    ["0% 50%", "100% 50%", "0% 50%"] : 
+                    "50% 50%"
+                }}
+                transition={{ duration: 6, repeat: !isLoading ? Infinity : 0, ease: "linear" }}
               >
-                {/* Button shine effect */}
+                {/* Ultra-advanced button shine effect */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                  animate={{ x: ["-100%", "100%"] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100"
+                  style={{
+                    background: "linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
+                    transform: "skewX(-12deg)"
+                  }}
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    ease: "easeInOut",
+                    repeatDelay: 1
+                  }}
                 />
                 
-                {isLoading ? (
-                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
+                {/* Multi-layer pulsing glow */}
+                <motion.div
+                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981)",
+                    backgroundSize: "400% 400%"
+                  }}
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                    scale: [0.98, 1.02, 0.98],
+                    opacity: [0.6, 1, 0.6]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                
+                {/* Enhanced loading animation */}
+                {isLoading && (
+                  <motion.div className="absolute inset-0 flex items-center justify-center">
+                    {/* Orbiting particles */}
+                    {[...Array(12)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-2 h-2 bg-white rounded-full opacity-80"
+                        style={{
+                          left: `${Math.cos(i * 30 * Math.PI / 180) * 35 + 50}%`,
+                          top: `${Math.sin(i * 30 * Math.PI / 180) * 35 + 50}%`,
+                        }}
+                        animate={{
+                          scale: [0.5, 1.2, 0.5],
+                          opacity: [0.4, 1, 0.4],
+                          rotate: [0, 360]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          delay: i * 0.15,
+                          ease: "easeInOut"
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Central pulsing core */}
+                    <motion.div
+                      className="w-4 h-4 bg-white rounded-full"
+                      animate={{
+                        scale: [0.8, 1.3, 0.8],
+                        opacity: [0.6, 1, 0.6]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                  </motion.div>
+                )}
+                
+                <motion.div
+                  className="relative z-10 flex items-center space-x-4"
+                  animate={{
+                    opacity: [1, 0.9, 1],
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                >
+                  {isLoading ? (
+                    <motion.span 
+                      className="font-extrabold tracking-wide"
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Joining Revolution...
+                    </motion.span>
+                  ) : (
+                    <>
+                      <motion.div
+                        animate={{
+                          rotate: [0, 360],
+                          scale: [1, 1.1, 1]
+                        }}
+                        transition={{ 
+                          rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+                          scale: { duration: 3, repeat: Infinity }
+                        }}
+                      >
+                        <Rocket className="w-7 h-7" />
+                      </motion.div>
+                      
+                      <span className="font-extrabold tracking-wide">Join the Revolution</span>
+                      
+                      <motion.div
+                        animate={{
+                          x: [0, 4, 0],
+                          rotate: [0, 10, 0]
+                        }}
+                        transition={{ duration: 2.5, repeat: Infinity }}
+                      >
+                        <ChevronRight className="w-7 h-7" />
+                      </motion.div>
+                    </>
+                  )}
+                </motion.div>
+                
+                {/* Success burst effect */}
+                {isSubmitted && (
                   <>
-                    <Rocket className="w-6 h-6" />
-                    <span>Join the Revolution</span>
-                    <ChevronRight className="w-6 h-6" />
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl"
+                      initial={{ scale: 0, opacity: 1 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ duration: 0.8 }}
+                    />
+                    {/* Success sparkles */}
+                    {[...Array(16)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-white rounded-full"
+                        style={{
+                          left: '50%',
+                          top: '50%',
+                        }}
+                        initial={{ scale: 0, x: 0, y: 0 }}
+                        animate={{
+                          scale: [0, 1, 0],
+                          x: Math.cos(i * 22.5 * Math.PI / 180) * 80,
+                          y: Math.sin(i * 22.5 * Math.PI / 180) * 80,
+                          opacity: [1, 0]
+                        }}
+                        transition={{ duration: 1, delay: i * 0.05 }}
+                      />
+                    ))}
                   </>
                 )}
               </motion.button>
