@@ -588,11 +588,14 @@ export function registerAdminRoutes(app: Express) {
     try {
       const { id } = req.params;
       
-      // Note: Since there's no delete method, we'll mark as removed
-      const updatedUser = await storage.updateWaitlistUser(id, {
-        status: 'removed',
-        updatedAt: new Date()
-      });
+      // Get user before deletion for logging
+      const userToRemove = await storage.getWaitlistUser(id);
+      if (!userToRemove) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Actually delete the user (complete removal from early access)
+      await storage.deleteWaitlistUser(id);
 
       await logAdminAction(
         req.admin!.id,
@@ -600,12 +603,12 @@ export function registerAdminRoutes(app: Express) {
         "waitlist_user",
         id,
         undefined,
-        { status: 'removed' },
+        { email: userToRemove.email, action: 'complete_deletion' },
         req.ip,
         req.get('User-Agent')
       );
 
-      res.json({ message: "User removed from waitlist successfully", user: updatedUser });
+      res.json({ message: "User completely removed from waitlist and early access", user: userToRemove });
     } catch (error) {
       console.error('[ADMIN REMOVE WAITLIST] Error:', error);
       res.status(500).json({ error: "Failed to remove user from waitlist" });

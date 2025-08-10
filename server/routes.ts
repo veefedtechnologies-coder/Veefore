@@ -12718,6 +12718,11 @@ Create a detailed growth strategy in JSON format:
       // Check if this device has already joined the waitlist with flexible IP matching
       const users = await storage.getAllWaitlistUsers();
       const deviceUser = users.find(user => {
+        // Exclude removed, banned users from early access
+        if (user.status === 'removed' || user.status === 'banned') {
+          return false;
+        }
+        
         // Check if the current IP matches either the primary IP or any alternate IPs
         const ipMatches = user.metadata?.ipAddress === clientIP || 
                          user.metadata?.alternateIPs?.includes(clientIP);
