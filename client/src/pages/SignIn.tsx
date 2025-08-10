@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, ChevronRight, Play, Pause, Zap, BarChart3 } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play, Pause } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -421,95 +421,78 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                 </div>
 
-                {/* Advanced Metrics with Animations */}
+                {/* Clean Professional Metrics */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   {Object.entries(demoScenarios[currentDemo].metrics).map(([key, value], index) => (
-                    <div key={key} className="bg-gradient-to-br from-white to-gray-50/80 rounded-xl p-4 border border-gray-200/50 hover:shadow-lg transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="relative z-10">
-                        <div className="text-3xl font-bold text-gray-900 mb-1 group-hover:scale-110 transition-transform duration-300">{value}</div>
-                        <div className="text-gray-600 text-sm capitalize font-medium">{key}</div>
-                        <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
-                          <div 
-                            className={`h-full bg-gradient-to-r ${demoScenarios[currentDemo].gradient} rounded-full transition-all duration-1000 relative`}
-                            style={{ 
-                              width: `${60 + index * 15}%`,
-                              animation: `loading ${2 + index}s ease-in-out infinite alternate`
-                            }}
-                          >
-                            <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse" />
-                          </div>
-                        </div>
-                        {/* Floating indicator */}
-                        <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div key={key} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
+                      <div className="text-gray-600 text-sm capitalize font-medium mb-3">{key}</div>
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                          style={{ width: `${60 + index * 15}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-end mt-1">
+                        <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Advanced AI Status with Real-time Metrics */}
-                <div className="bg-gradient-to-br from-blue-50/70 to-purple-50/50 rounded-2xl p-6 border border-blue-200/40 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
-                          <Brain className="w-6 h-6 text-blue-600 animate-pulse" />
-                          <div className="absolute -inset-1 w-8 h-8 border-2 border-blue-400/30 rounded-full animate-spin" />
-                        </div>
-                        <div>
-                          <span className="text-gray-900 font-bold text-lg">Neural Network</span>
-                          <div className="text-xs text-blue-600 font-medium">Processing {particleCount} operations/sec</div>
-                        </div>
+                {/* Clean Neural Network Section */}
+                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Brain className="w-5 h-5 text-blue-600" />
                       </div>
-                      <div className="flex items-center space-x-2 bg-white/60 rounded-full px-3 py-1">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                        <span className="text-emerald-700 text-sm font-semibold">Active</span>
+                      <div>
+                        <span className="text-gray-900 font-semibold text-lg">Neural Network</span>
+                        <div className="text-sm text-blue-600 font-medium">Processing {particleCount} operations/sec</div>
                       </div>
                     </div>
-                    
-                    <div className="space-y-4">
-                      {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
-                        <div key={task} className="relative">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-gray-800 text-sm font-medium">{task}</span>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-blue-600 text-xs font-bold">{85 + (index * 5)}%</span>
-                              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                                <span className="text-emerald-600 text-xs font-bold">✓</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="w-full h-3 bg-white/60 rounded-full overflow-hidden relative">
-                            <div 
-                              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-full transition-all duration-2000 relative"
-                              style={{ 
-                                width: `${85 + (index * 5)}%`,
-                                animation: `loading ${2 + index}s ease-in-out infinite alternate`
-                              }}
-                            >
-                              <div className="absolute inset-0 bg-white/40 rounded-full animate-pulse" />
-                              <div className="absolute right-0 top-0 w-2 h-full bg-white/80 rounded-full animate-pulse" />
+                    <div className="flex items-center space-x-2 bg-white rounded-full px-3 py-1 border border-gray-200">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                      <span className="text-emerald-700 text-sm font-medium">Active</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
+                      <div key={task}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-800 text-sm font-medium">{task}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-blue-600 text-sm font-semibold">{85 + (index * 5)}%</span>
+                            <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <span className="text-emerald-600 text-xs">✓</span>
                             </div>
                           </div>
                         </div>
-                      ))}
+                        <div className="w-full h-2 bg-white rounded-full border border-gray-200">
+                          <div 
+                            className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                            style={{ width: `${85 + (index * 5)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Simple Bottom Stats */}
+                  <div className="mt-6 grid grid-cols-3 gap-3">
+                    <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                      <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 10)}</div>
+                      <div className="text-xs text-gray-600">Models</div>
                     </div>
-                    
-                    {/* Real-time activity indicators */}
-                    <div className="mt-6 grid grid-cols-3 gap-3">
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 10)}</div>
-                        <div className="text-xs text-gray-600">Models</div>
-                      </div>
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 7)}ms</div>
-                        <div className="text-xs text-gray-600">Response</div>
-                      </div>
-                      <div className="text-center p-2 bg-white/50 rounded-lg">
-                        <div className="text-lg font-bold text-indigo-600">99.{Math.floor(particleCount % 10)}%</div>
-                        <div className="text-xs text-gray-600">Accuracy</div>
-                      </div>
+                    <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                      <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 7)}ms</div>
+                      <div className="text-xs text-gray-600">Response</div>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
+                      <div className="text-lg font-bold text-indigo-600">99.{Math.floor(particleCount % 10)}%</div>
+                      <div className="text-xs text-gray-600">Accuracy</div>
                     </div>
                   </div>
                 </div>
