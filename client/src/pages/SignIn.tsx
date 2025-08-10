@@ -327,43 +327,193 @@ const SignIn = ({ onNavigate }: SignInProps) => {
       </nav>
 
       <div className="flex min-h-[calc(100vh-140px)] relative z-40">
-        {/* Left Side - Clean Professional Section */}
-        <div className="lg:w-3/5 bg-gradient-to-br from-gray-50 to-white p-8 lg:p-16 relative overflow-hidden flex flex-col justify-center">
-          {/* Subtle Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/10 to-transparent" />
-          
-          <div className="relative z-10 max-w-lg">
-            {/* Clean Welcome Section */}
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Welcome to
-              <span className="text-blue-600 block">VeeFore</span>
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Your intelligent social media management platform. Automate, optimize, and grow your social presence with AI-powered tools.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <Zap className="w-5 h-5 text-blue-600" />
+        {/* Left Side - Professional Content Preview */}
+        <div className="lg:w-3/5 flex flex-col justify-center p-8 lg:p-16 relative">
+          {/* Hero Content */}
+          <div className="max-w-2xl mb-16">
+            {/* Advanced Status Badge with Typing Effect */}
+            <div className="inline-flex items-center bg-white/95 backdrop-blur-xl rounded-full px-8 py-4 mb-12 border border-gray-200/50 shadow-xl group hover:scale-105 transition-all duration-500 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="flex items-center space-x-3 relative z-10">
+                <div className="relative">
+                  <div className="w-4 h-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-4 h-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-ping opacity-40" />
+                  <div className="absolute -inset-1 w-6 h-6 bg-gradient-to-r from-emerald-400/20 to-blue-400/20 rounded-full animate-pulse delay-300" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">Smart Automation</h3>
-                <p className="text-sm text-gray-600">Automated scheduling and optimization</p>
-              </div>
-              
-              <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
-                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-800 font-semibold text-lg min-w-[300px] text-left">
+                    {typedText}
+                    {isTyping && <span className="animate-pulse">|</span>}
+                  </span>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">Analytics</h3>
-                <p className="text-sm text-gray-600">Real-time insights and tracking</p>
+                <Sparkles className="w-5 h-5 text-blue-600 group-hover:rotate-12 transition-transform duration-500" />
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-              <span>Trusted by 10,000+ content creators</span>
+
+            <h1 className="text-6xl lg:text-7xl font-black mb-8 leading-[0.9]">
+              <span className="block text-gray-900 mb-4">
+                Continue Your
+              </span>
+              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-violet-600 bg-clip-text text-transparent mb-4">
+                AI Journey
+              </span>
+              <span className="block text-gray-600 text-4xl lg:text-5xl font-light">
+                with Professional Excellence
+              </span>
+            </h1>
+
+            <p className="text-2xl text-gray-600 leading-relaxed font-light mb-12 max-w-xl">
+              Access your personalized AI workspace where intelligent content creation meets strategic social media management.
+            </p>
+          </div>
+
+          {/* Professional Preview Panel */}
+          <div className="relative">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-gray-200/50 shadow-2xl overflow-hidden">
+              {/* Panel Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+                <div className="flex items-center space-x-4">
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full" />
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                    <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  </div>
+                  <span className="text-gray-900 font-semibold text-lg">VeeFore AI Workspace</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-all duration-300"
+                  >
+                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  </button>
+                  <div className="flex space-x-1">
+                    {demoScenarios.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentDemo(index)}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentDemo ? 'bg-blue-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Panel Content */}
+              <div className="p-8">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${demoScenarios[currentDemo].gradient} flex items-center justify-center shadow-lg`}>
+                    {(() => {
+                      const IconComponent = demoScenarios[currentDemo].icon;
+                      return <IconComponent className="w-8 h-8 text-white" />;
+                    })()}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{demoScenarios[currentDemo].title}</h3>
+                    <p className="text-gray-600">{demoScenarios[currentDemo].description}</p>
+                  </div>
+                </div>
+
+                {/* Advanced Metrics with Animations */}
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  {Object.entries(demoScenarios[currentDemo].metrics).map(([key, value], index) => (
+                    <div key={key} className="bg-gradient-to-br from-white to-gray-50/80 rounded-xl p-4 border border-gray-200/50 hover:shadow-lg transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10">
+                        <div className="text-3xl font-bold text-gray-900 mb-1 group-hover:scale-110 transition-transform duration-300">{value}</div>
+                        <div className="text-gray-600 text-sm capitalize font-medium">{key}</div>
+                        <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${demoScenarios[currentDemo].gradient} rounded-full transition-all duration-1000 relative`}
+                            style={{ 
+                              width: `${60 + index * 15}%`,
+                              animation: `loading ${2 + index}s ease-in-out infinite alternate`
+                            }}
+                          >
+                            <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse" />
+                          </div>
+                        </div>
+                        {/* Floating indicator */}
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Advanced AI Status with Real-time Metrics */}
+                <div className="bg-gradient-to-br from-blue-50/70 to-purple-50/50 rounded-2xl p-6 border border-blue-200/40 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-3">
+                        <div className="relative">
+                          <Brain className="w-6 h-6 text-blue-600 animate-pulse" />
+                          <div className="absolute -inset-1 w-8 h-8 border-2 border-blue-400/30 rounded-full animate-spin" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-bold text-lg">Neural Network</span>
+                          <div className="text-xs text-blue-600 font-medium">Processing {particleCount} operations/sec</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 bg-white/60 rounded-full px-3 py-1">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-emerald-700 text-sm font-semibold">Active</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
+                        <div key={task} className="relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-gray-800 text-sm font-medium">{task}</span>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-blue-600 text-xs font-bold">{85 + (index * 5)}%</span>
+                              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                                <span className="text-emerald-600 text-xs font-bold">✓</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-full h-3 bg-white/60 rounded-full overflow-hidden relative">
+                            <div 
+                              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-full transition-all duration-2000 relative"
+                              style={{ 
+                                width: `${85 + (index * 5)}%`,
+                                animation: `loading ${2 + index}s ease-in-out infinite alternate`
+                              }}
+                            >
+                              <div className="absolute inset-0 bg-white/40 rounded-full animate-pulse" />
+                              <div className="absolute right-0 top-0 w-2 h-full bg-white/80 rounded-full animate-pulse" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Real-time activity indicators */}
+                    <div className="mt-6 grid grid-cols-3 gap-3">
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 10)}</div>
+                        <div className="text-xs text-gray-600">Models</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 7)}ms</div>
+                        <div className="text-xs text-gray-600">Response</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-indigo-600">99.{Math.floor(particleCount % 10)}%</div>
+                        <div className="text-xs text-gray-600">Accuracy</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
