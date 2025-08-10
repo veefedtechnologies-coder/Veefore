@@ -820,11 +820,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       </div>
 
       {/* Right side - Enhanced Sign up form */}
-      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 overflow-y-auto">
-
-
-        <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
-          <div className="flex items-center justify-between p-6">
+      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
+        <div className="h-screen overflow-y-auto">
+          <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
+            <div className="flex items-center justify-between p-6">
             <button 
               onClick={handleBackToLanding}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -837,10 +836,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               <img src={veeforceLogo} alt="VeeFore" className="w-8 h-8" />
               <span className="text-gray-900 font-bold text-xl">VeeFore</span>
             </div>
+            </div>
           </div>
-        </div>
 
-        <div className="w-full max-w-lg mx-auto px-8 pt-4 pb-8 relative z-10">
+          <div className="w-full max-w-lg mx-auto px-8 pt-4 pb-8 relative z-10">
           {/* Enhanced Progress indicator */}
           <div className="mb-6">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
@@ -963,6 +962,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
