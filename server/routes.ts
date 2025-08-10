@@ -12545,14 +12545,14 @@ Create a detailed growth strategy in JSON format:
         });
       }
       
-      // Check if device/IP already joined waitlist
+      // Check if device/IP already joined waitlist, but allow questionnaire updates
       const allUsers = await storage.getAllWaitlistUsers();
       const deviceUser = allUsers.find(user => 
         user.metadata?.ipAddress === clientIP &&
         user.metadata?.userAgent === userAgent
       );
       
-      if (deviceUser) {
+      if (deviceUser && !questionnaire) {
         return res.status(400).json({ 
           error: 'Device already joined waitlist',
           existingUser: {
@@ -12561,6 +12561,27 @@ Create a detailed growth strategy in JSON format:
             status: deviceUser.status,
             referralCode: deviceUser.referralCode
           }
+        });
+      }
+      
+      // If user exists and submitting questionnaire, update existing user
+      if (deviceUser && questionnaire) {
+        // Update existing user with questionnaire data
+        const updatedUser = await storage.updateWaitlistUser(deviceUser.id, {
+          metadata: {
+            ...deviceUser.metadata,
+            questionnaire: questionnaire,
+            emailVerified: verified || false,
+            updatedAt: new Date().toISOString()
+          }
+        });
+        
+        console.log('[EARLY ACCESS] Updated existing user with questionnaire:', updatedUser);
+        
+        return res.json({
+          success: true,
+          message: 'Questionnaire completed successfully',
+          user: updatedUser
         });
       }
       
