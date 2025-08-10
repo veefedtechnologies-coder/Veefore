@@ -808,9 +808,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        <div className="w-full max-w-lg mx-auto px-8 py-12 relative z-10">
+        <div className="w-full max-w-lg mx-auto px-8 py-8 relative z-10">
           {/* Enhanced Progress indicator */}
-          <div className="mb-10">
+          <div className="mb-8">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
@@ -890,7 +890,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             {renderStepContent()}
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6">
               <p className="text-gray-700 text-lg font-medium mb-4">
                 Already have an account?{' '}
