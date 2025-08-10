@@ -839,10 +839,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        {/* Scrollable content container */}
-        <div className="h-screen overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="w-full max-w-lg space-y-8">
+        {/* Fixed form container - no scroll displacement */}
+        <div className="h-screen flex items-center justify-center p-8">
+          <div className="w-full max-w-lg space-y-8 overflow-y-auto max-h-full">
           {/* Enhanced Progress indicator */}
           <div className="mb-6">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
@@ -965,7 +964,6 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </p>
             </div>
           </div>
-            </div>
           </div>
         </div>
       </div>
