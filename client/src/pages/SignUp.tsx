@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -624,35 +624,35 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 </span>
               </h3>
               <p className="text-xl text-gray-300 leading-relaxed max-w-lg font-light">
-                Enterprise-grade AI automation platform trusted by Fortune 500 companies 
-                and leading creators worldwide.
+                Next-generation AI platform in development. Join our early access program 
+                to shape the future of social media automation.
               </p>
             </div>
             
-            {/* Real-time metrics dashboard */}
+            {/* Development progress dashboard */}
             <div className="mt-12 grid grid-cols-2 gap-6">
               <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-gray-400 text-sm font-medium">Active Users</span>
+                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                    <span className="text-gray-400 text-sm font-medium">Beta Testers</span>
                   </div>
-                  <TrendingUp className="w-4 h-4 text-green-400" />
+                  <Users className="w-4 h-4 text-amber-400" />
                 </div>
-                <div className="text-3xl font-bold text-white">50,247</div>
-                <div className="text-green-400 text-sm font-medium">+12.5% today</div>
+                <div className="text-3xl font-bold text-white">1,247</div>
+                <div className="text-amber-400 text-sm font-medium">Early access</div>
               </div>
               
               <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                    <span className="text-gray-400 text-sm font-medium">AI Generations</span>
+                    <span className="text-gray-400 text-sm font-medium">Platform Progress</span>
                   </div>
-                  <Brain className="w-4 h-4 text-blue-400" />
+                  <Code className="w-4 h-4 text-blue-400" />
                 </div>
-                <div className="text-3xl font-bold text-white">2.8M</div>
-                <div className="text-blue-400 text-sm font-medium">in last 24h</div>
+                <div className="text-3xl font-bold text-white">87%</div>
+                <div className="text-blue-400 text-sm font-medium">Development complete</div>
               </div>
             </div>
           </div>
@@ -664,28 +664,28 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 icon: Brain,
                 title: "Neural Content Engine",
                 description: "Advanced GPT-4 integration with custom training models for your brand voice and style.",
-                metric: "340% engagement boost",
+                metric: "Ready for beta testing",
                 color: "from-blue-500 to-cyan-400",
                 bgColor: "bg-blue-500/10",
-                stats: "99.7% accuracy"
+                stats: "In development"
               },
               {
                 icon: BarChart3,
                 title: "Predictive Analytics Suite",
                 description: "Machine learning algorithms predict viral potential and optimal posting times.",
-                metric: "97% prediction accuracy",
+                metric: "Algorithm training phase",
                 color: "from-purple-500 to-pink-400",
                 bgColor: "bg-purple-500/10",
-                stats: "10x ROI increase"
+                stats: "95% complete"
               },
               {
                 icon: Zap,
                 title: "Autonomous Engagement",
                 description: "AI-powered automation handles responses, DMs, and community management 24/7.",
-                metric: "25 hours saved per week",
+                metric: "Currently in testing",
                 color: "from-orange-500 to-yellow-400",
                 bgColor: "bg-orange-500/10",
-                stats: "Zero human input"
+                stats: "Beta ready"
               }
             ].map(({ icon: Icon, title, description, metric, color, bgColor, stats }, index) => (
               <div key={title} className="group relative">
@@ -719,35 +719,77 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
 
           {/* Enterprise Trust Section */}
           <div className="mt-16 pt-8 border-t border-gray-700/50">
-            {/* Awards & Recognition */}
+            {/* Early Access Program */}
             <div className="mb-8">
-              <h5 className="text-gray-400 text-sm font-semibold mb-4 tracking-wide uppercase">Trusted by Industry Leaders</h5>
-              <div className="flex items-center space-x-8 opacity-60">
-                <div className="text-white font-bold text-lg">MICROSOFT</div>
-                <div className="text-white font-bold text-lg">SHOPIFY</div>
-                <div className="text-white font-bold text-lg">NETFLIX</div>
+              <h5 className="text-gray-400 text-sm font-semibold mb-4 tracking-wide uppercase">Early Access Program</h5>
+              <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl p-6 border border-amber-500/30">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Star className="w-5 h-5 text-amber-400" />
+                  <span className="text-amber-400 font-bold text-sm">FOUNDING MEMBER</span>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Join our exclusive pre-launch community and get lifetime benefits, priority support, and input on product direction.
+                </p>
               </div>
             </div>
             
-            {/* Performance Metrics */}
+            {/* Development Metrics */}
             <div className="grid grid-cols-3 gap-4 mb-8">
               <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
-                <div className="text-4xl font-black text-white mb-2">50K+</div>
-                <div className="text-gray-400 text-sm font-medium">Enterprise Users</div>
-                <div className="text-green-400 text-xs font-semibold mt-1">+127% YoY</div>
+                <div className="text-4xl font-black text-white mb-2">Q1</div>
+                <div className="text-gray-400 text-sm font-medium">Launch Target</div>
+                <div className="text-green-400 text-xs font-semibold mt-1">2025</div>
               </div>
               <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
-                <div className="text-4xl font-black text-white mb-2">$2.1B</div>
-                <div className="text-gray-400 text-sm font-medium">Revenue Generated</div>
-                <div className="text-blue-400 text-xs font-semibold mt-1">Client Success</div>
+                <div className="text-4xl font-black text-white mb-2">15+</div>
+                <div className="text-gray-400 text-sm font-medium">AI Features</div>
+                <div className="text-blue-400 text-xs font-semibold mt-1">In Development</div>
               </div>
               <div className="text-center bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
-                <div className="text-4xl font-black text-white mb-2">99.97%</div>
-                <div className="text-gray-400 text-sm font-medium">Uptime SLA</div>
-                <div className="text-purple-400 text-xs font-semibold mt-1">Enterprise Grade</div>
+                <div className="text-4xl font-black text-white mb-2">24/7</div>
+                <div className="text-gray-400 text-sm font-medium">Beta Support</div>
+                <div className="text-purple-400 text-xs font-semibold mt-1">Coming Soon</div>
               </div>
             </div>
             
+            {/* Development Roadmap */}
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/30 rounded-2xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h6 className="text-white font-bold text-lg">Development Roadmap</h6>
+                <Target className="w-6 h-6 text-blue-400" />
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-green-400 rounded-full flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <div className="text-gray-300 text-sm">Core AI Engine</div>
+                    <div className="text-green-400 text-xs">Completed ✓</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full flex-shrink-0 animate-pulse"></div>
+                  <div className="flex-1">
+                    <div className="text-gray-300 text-sm">Social Platform Integrations</div>
+                    <div className="text-blue-400 text-xs">In Progress - 85%</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-amber-400 rounded-full flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <div className="text-gray-300 text-sm">Beta Testing Platform</div>
+                    <div className="text-amber-400 text-xs">Next - Q1 2025</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-gray-500 rounded-full flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <div className="text-gray-300 text-sm">Public Launch</div>
+                    <div className="text-gray-500 text-xs">Planned - Q2 2025</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Security & Compliance */}
             <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/30 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
@@ -756,20 +798,20 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">SOC 2 Type II Certified</span>
+                  <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+                  <span className="text-gray-300">SOC 2 Certification</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">GDPR Compliant</span>
+                  <span className="text-gray-300">GDPR Ready</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-300">ISO 27001 Prep</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">ISO 27001 Certified</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-gray-300">End-to-End Encryption</span>
+                  <span className="text-gray-300">AES-256 Encryption</span>
                 </div>
               </div>
             </div>
