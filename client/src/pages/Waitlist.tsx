@@ -720,7 +720,7 @@ const Waitlist = () => {
               className="text-center"
             >
               <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full px-6 py-3">
-                <Crown className="w-5 h-5 text-blue-600 mr-2" />
+                <img src="@assets/output-onlinepngtools_1754852514040.png" alt="VeeFore" className="w-5 h-5 mr-2" />
                 <span className="text-blue-900 font-bold text-lg">
                   Position #{waitlistData.user?.id?.slice(-3) || Math.floor(Math.random() * 999)}
                 </span>
@@ -938,7 +938,7 @@ const Waitlist = () => {
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 >
-                  <Sparkles className="w-10 h-10 text-white" />
+                  <img src="@assets/output-onlinepngtools_1754852514040.png" alt="VeeFore" className="w-10 h-10" />
                 </motion.div>
                 
                 {/* Logo glow rings */}
@@ -1283,7 +1283,7 @@ const Waitlist = () => {
                 transition={{ duration: 6, repeat: Infinity }}
               >
                 <div className="w-24 h-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden">
-                  <Crown className="w-12 h-12 text-white z-10" />
+                  <img src="@assets/output-onlinepngtools_1754852514040.png" alt="VeeFore" className="w-12 h-12 z-10" />
                   
                   {/* Animated background shine */}
                   <motion.div
@@ -1562,7 +1562,7 @@ const Waitlist = () => {
                   <div className="grid grid-cols-2 gap-3 text-sm text-green-600">
                     {[
                       { icon: Heart, text: "50% Launch Discount" },
-                      { icon: Crown, text: "Priority Access" },
+                      { icon: () => <img src="@assets/output-onlinepngtools_1754852514040.png" alt="VeeFore" className="w-4 h-4" />, text: "Priority Access" },
                       { icon: Zap, text: "Beta Features" },
                       { icon: Shield, text: "Premium Support" }
                     ].map((benefit, i) => (
