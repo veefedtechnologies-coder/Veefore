@@ -59,6 +59,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
         if (response.ok) {
           const data = await response.json()
           console.log('Device check successful:', data)
+          console.log('User status:', data.user?.status)
+          console.log('Is approved or early_access?', data.user?.status === 'approved' || data.user?.status === 'early_access')
           setDeviceStatus(prev => ({
             isOnWaitlist: true,
             user: data.user,
