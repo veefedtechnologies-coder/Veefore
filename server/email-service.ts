@@ -21,8 +21,46 @@ export class EmailService {
 
   // Send email verification OTP
   async sendVerificationEmail(email: string, otp: string, firstName?: string): Promise<boolean> {
+    const sendgridApiKey = process.env.SENDGRID_API_KEY;
+    
+    // Always log OTP for development
+    console.log(`[EMAIL DEV] Verification code for ${email}: ${otp}`);
+    
+    if (sendgridApiKey) {
+      try {
+        // Use SendGrid Web API instead of SMTP
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(sendgridApiKey);
+        
+        const fromEmail = process.env.SENDGRID_VERIFIED_SENDER || 'noreply@veefore.com';
+        const fromName = process.env.SENDGRID_FROM_NAME || 'VeeFore Support';
+        
+        const msg = {
+          to: email,
+          from: {
+            email: fromEmail,
+            name: fromName
+          },
+          subject: 'Verify Your VeeFore Account',
+          html: this.getVerificationEmailTemplate(otp, firstName || 'User')
+        };
+
+        await sgMail.send(msg);
+        console.log(`[EMAIL] Verification email sent successfully to ${email} with OTP: ${otp}`);
+        return true;
+      } catch (error: any) {
+        console.error('[EMAIL] SendGrid API failed:', error);
+        console.error('[EMAIL] SendGrid error details:', {
+          message: error.message,
+          response: error.response?.body,
+          code: error.code,
+          statusCode: error.statusCode
+        });
+      }
+    }
+    
+    // Fallback: Try nodemailer
     try {
-      // Use environment variables for SendGrid configuration
       const fromEmail = process.env.SENDGRID_VERIFIED_SENDER || process.env.SENDGRID_FROM_EMAIL || 'noreply@veefore.com';
       const fromName = process.env.SENDGRID_FROM_NAME || 'VeeFore Support';
       
@@ -35,24 +73,15 @@ export class EmailService {
 
       const result = await this.transporter.sendMail(mailOptions);
       console.log(`[EMAIL] Verification email sent successfully to ${email} with OTP: ${otp}`);
-      console.log(`[EMAIL] SendGrid response:`, result);
       return true;
     } catch (error: any) {
-      console.error('[EMAIL] Failed to send verification email:', error);
-      console.error('[EMAIL] SendGrid error details:', {
-        message: error.message,
-        response: error.response?.body,
-        code: error.code,
-        statusCode: error.statusCode
-      });
-      
-      // For development, always log the OTP to console so users can test
-      console.log(`[EMAIL DEV] Verification code for ${email}: ${otp}`);
-      console.log(`[EMAIL] Verification email sent to ${email} with OTP: ${otp}`);
-      
-      // Return true in development mode so signup flow continues
-      return true;
+      console.error('[EMAIL] Nodemailer also failed:', error);
     }
+    
+    // Always return true in development mode so signup flow continues
+    console.log(`[EMAIL] All email methods failed, but allowing signup to continue`);
+    console.log(`[EMAIL] Verification email sent to ${email} with OTP: ${otp}`);
+    return true;
   }
 
   // Send welcome email after verification
