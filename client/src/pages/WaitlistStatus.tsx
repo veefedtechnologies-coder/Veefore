@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { 
   Crown, Clock, Gift, Share2, Copy, Check, Users, TrendingUp, 
-  Star, Calendar, Mail, Trophy, Zap, Sparkles, BarChart3, 
+  Star, Calendar, Mail, Trophy, Zap, BarChart3, 
   Globe, BookOpen, MessageSquare, HeartHandshake, 
   Gem, ArrowLeft, Rocket, Shield, Bell, Settings, 
   Download, Target, ChevronRight, Activity, Briefcase, Award
@@ -231,7 +231,7 @@ const WaitlistStatus = () => {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <img 
-                  src="/attached_assets/output-onlinepngtools_1754845698441.png" 
+                  src="/attached_assets/output-onlinepngtools_1754845868695.png" 
                   alt="VeeFore" 
                   className="h-12 w-auto"
                 />
