@@ -52,17 +52,24 @@ export class EmailService {
         };
 
         await sgMail.send(msg);
-        console.log(`[EMAIL] Verification email sent successfully to ${email} with OTP: ${otp}`);
+        console.log(`[EMAIL] ✅ REAL EMAIL SENT to ${email} with OTP: ${otp}`);
         return true;
       } catch (error: any) {
-        console.error('[EMAIL] SendGrid API failed:', error);
+        console.error('[EMAIL] ❌ SendGrid API failed:', error);
         console.error('[EMAIL] SendGrid error details:', {
           message: error.message,
-          response: error.response?.body,
+          response: error.response?.body || 'No response body',
           code: error.code,
           statusCode: error.statusCode
         });
+        
+        // Log the specific error for debugging
+        if (error.response?.body?.errors) {
+          console.error('[EMAIL] Specific SendGrid errors:', error.response.body.errors);
+        }
       }
+    } else {
+      console.log('[EMAIL] No SendGrid API key provided');
     }
     
     // Fallback: Try nodemailer
