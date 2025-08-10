@@ -364,51 +364,140 @@ const WaitlistStatus = () => {
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-100/40 to-transparent rounded-full -ml-32 -mb-32" />
             
             <div className="relative z-10 p-12">
-              <motion.div
-                initial={{ scale: 0, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                className="inline-flex items-center space-x-3 bg-gradient-to-r from-emerald-100 to-blue-100 rounded-full px-6 py-3 mb-8 border border-emerald-200/50"
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                >
-                  <Crown className="w-6 h-6 text-emerald-600" />
-                </motion.div>
-                <span className="text-emerald-700 font-semibold text-lg">Premium Early Access</span>
-                <Badge className="bg-green-500 text-white text-xs px-2 py-1">ACTIVE</Badge>
-              </motion.div>
-              
-              <motion.h1 
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 bg-clip-text text-transparent leading-tight"
-              >
-                Welcome, {user?.name || 'Creator'}!
-                <motion.span
-                  animate={{ 
-                    rotate: [0, 10, 0, -10, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                  className="inline-block ml-4 text-yellow-500"
-                >
-                  👋
-                </motion.span>
-              </motion.h1>
-              
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="text-2xl text-gray-700 mb-12 max-w-3xl leading-relaxed"
-              >
-                You're part of an exclusive community shaping the future of 
-                <span className="font-semibold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> AI-powered content creation</span>. 
-                Your journey to revolutionize social media starts now.
-              </motion.p>
+              {user?.status === 'approved' || user?.status === 'early_access' ? (
+                // Congratulations Section for Approved/Early Access Users
+                <>
+                  <motion.div
+                    initial={{ scale: 0, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                    className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full px-8 py-4 mb-8 border border-green-200/80 shadow-xl"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Trophy className="w-7 h-7 text-green-600" />
+                    </motion.div>
+                    <span className="text-green-700 font-bold text-xl">
+                      {user?.status === 'early_access' ? 'Early Access Granted!' : 'Beta Access Approved!'}
+                    </span>
+                    <Badge className="bg-green-500 text-white text-sm px-4 py-1 font-bold">APPROVED</Badge>
+                  </motion.div>
+                  
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-6xl md:text-7xl font-black mb-8 bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent leading-tight"
+                  >
+                    🎉 Congratulations!
+                    <motion.span
+                      animate={{ 
+                        rotate: [0, 15, -15, 0],
+                        scale: [1, 1.3, 1]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                      className="inline-block ml-4 text-yellow-400"
+                    >
+                      ✨
+                    </motion.span>
+                  </motion.h1>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="mb-12 text-center"
+                  >
+                    <p className="text-3xl md:text-4xl text-gray-800 mb-6 font-bold">
+                      Welcome to VeeFore Beta Access! 🚀
+                    </p>
+                    <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+                      You've been selected for exclusive beta access to the future of 
+                      <span className="font-bold text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text"> AI-powered social media management</span>. 
+                      Your account is ready - let's build something amazing together!
+                    </p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
+                    className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
+                  >
+                    <button
+                      onClick={() => window.location.href = '/signup'}
+                      className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-green-500/25 transition-all duration-300 transform hover:-translate-y-2"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <Rocket className="w-7 h-7" />
+                        <span>Create Your Account Now</span>
+                        <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => setActiveTab('benefits')}
+                      className="group border-3 border-emerald-300 bg-emerald-50/90 backdrop-blur-xl text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 px-10 py-5 rounded-2xl font-bold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Gift className="w-6 h-6" />
+                        <span>View Beta Benefits</span>
+                      </div>
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                // Regular Waitlist Display
+                <>
+                  <motion.div
+                    initial={{ scale: 0, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                    className="inline-flex items-center space-x-3 bg-gradient-to-r from-emerald-100 to-blue-100 rounded-full px-6 py-3 mb-8 border border-emerald-200/50"
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Crown className="w-6 h-6 text-emerald-600" />
+                    </motion.div>
+                    <span className="text-emerald-700 font-semibold text-lg">Premium Waitlist</span>
+                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">WAITLISTED</Badge>
+                  </motion.div>
+                  
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 bg-clip-text text-transparent leading-tight"
+                  >
+                    Welcome, {user?.name || 'Creator'}!
+                    <motion.span
+                      animate={{ 
+                        rotate: [0, 10, 0, -10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                      className="inline-block ml-4 text-yellow-500"
+                    >
+                      👋
+                    </motion.span>
+                  </motion.h1>
+                  
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-2xl text-gray-700 mb-12 max-w-3xl leading-relaxed"
+                  >
+                    You're part of an exclusive community shaping the future of 
+                    <span className="font-semibold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> AI-powered content creation</span>. 
+                    Your journey to revolutionize social media starts soon.
+                  </motion.p>
+                </>
+              )}
 
               {/* Creative Stats Display */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -475,6 +475,12 @@ export function registerAdminRoutes(app: Express) {
   app.get("/api/admin/waitlist/:id", requireAdminAuth, async (req: AdminRequest, res) => {
     try {
       const { id } = req.params;
+      
+      // Don't call getWaitlistUser for 'stats' endpoint
+      if (id === 'stats') {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+      
       const user = await storage.getWaitlistUser(id);
       
       if (!user) {
@@ -618,7 +624,9 @@ export function registerAdminRoutes(app: Express) {
   // Get waitlist statistics
   app.get("/api/admin/waitlist/stats", requireAdminAuth, async (req: AdminRequest, res) => {
     try {
+      console.log('[ADMIN STATS] Fetching waitlist statistics...');
       const stats = await storage.getWaitlistStats();
+      console.log('[ADMIN STATS] Statistics retrieved:', stats);
       res.json(stats);
     } catch (error) {
       console.error('[ADMIN WAITLIST STATS] Error:', error);

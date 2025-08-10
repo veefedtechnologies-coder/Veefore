@@ -1008,32 +1008,62 @@ const Landing = ({ onNavigate }: LandingProps) => {
                           <div className="w-48 h-14 bg-gray-200 animate-pulse rounded-2xl"></div>
                         </div>
                       ) : deviceStatus.isOnWaitlist ? (
-                        // User is on waitlist - show Check Status button
-                        <>
-                          <button 
-                            onClick={() => {
-                              const email = encodeURIComponent(deviceStatus.user?.email || '')
-                              window.location.href = `/waitlist-status?user=${email}`
-                            }}
-                            className="group bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-1"
-                          >
-                            <div className="flex items-center space-x-3">
-                              <CheckCircle className="w-5 h-5" />
-                              <span>Check Your Status</span>
-                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
-                          </button>
-                          
-                          <button 
-                            onClick={() => setIsInteractionActive(!isInteractionActive)}
-                            className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
-                          >
-                            <div className="flex items-center space-x-3">
-                              <MousePointer2 className="w-5 h-5" />
-                              <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
-                            </div>
-                          </button>
-                        </>
+                        // User is on waitlist - check their status
+                        deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access' ? (
+                          // Approved or Early Access users - show Sign Up button
+                          <>
+                            <button 
+                              onClick={() => onNavigate('signup')}
+                              className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-green-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <Crown className="w-5 h-5" />
+                                <span>Welcome! Create Account</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </button>
+                            
+                            <button 
+                              onClick={() => {
+                                const email = encodeURIComponent(deviceStatus.user?.email || '')
+                                window.location.href = `/waitlist-status?user=${email}`
+                              }}
+                              className="group border-2 border-emerald-300 bg-emerald-50/80 backdrop-blur-xl text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <Trophy className="w-5 h-5" />
+                                <span>View Beta Status</span>
+                              </div>
+                            </button>
+                          </>
+                        ) : (
+                          // Regular waitlist users - show Check Status button
+                          <>
+                            <button 
+                              onClick={() => {
+                                const email = encodeURIComponent(deviceStatus.user?.email || '')
+                                window.location.href = `/waitlist-status?user=${email}`
+                              }}
+                              className="group bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <CheckCircle className="w-5 h-5" />
+                                <span>Check Your Status</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </button>
+                            
+                            <button 
+                              onClick={() => setIsInteractionActive(!isInteractionActive)}
+                              className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <MousePointer2 className="w-5 h-5" />
+                                <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
+                              </div>
+                            </button>
+                          </>
+                        )
                       ) : (
                         // User not on waitlist - show Get Early Access button
                         <>
