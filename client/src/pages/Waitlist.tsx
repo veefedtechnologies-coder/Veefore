@@ -1120,17 +1120,8 @@ const Waitlist = () => {
                   />
                 </motion.label>
                 
-                <div className="relative group">
-                  <motion.div
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-all duration-300"
-                    animate={{ 
-                      color: focusedField === 'name' ? '#3b82f6' : '#9ca3af',
-                      scale: focusedField === 'name' ? 1.1 : 1
-                    }}
-                  >
-                    <User className="w-6 h-6" />
-                  </motion.div>
-                  
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 z-20" />
                   <input
                     type="text"
                     name="name"
@@ -1139,29 +1130,8 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
+                    className="relative z-30 w-full bg-white border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 text-lg font-medium"
                     placeholder="Enter your full name"
-                  />
-                  
-                  {/* Enhanced focus ring with gradient */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 pointer-events-none -z-10"
-                    style={{ padding: '2px' }}
-                    animate={{ 
-                      opacity: focusedField === 'name' ? 1 : 0,
-                      scale: focusedField === 'name' ? 1.02 : 1
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  
-                  {/* Shimmer effect on focus */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-200/50 to-transparent -skew-x-12 opacity-0"
-                    animate={focusedField === 'name' ? { 
-                      x: ["-100%", "100%"],
-                      opacity: [0, 0.5, 0]
-                    } : {}}
-                    transition={{ duration: 1.5, repeat: focusedField === 'name' ? Infinity : 0 }}
                   />
                 </div>
               </motion.div>
@@ -1188,17 +1158,8 @@ const Waitlist = () => {
                   />
                 </motion.label>
                 
-                <div className="relative group">
-                  <motion.div
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 transition-all duration-300"
-                    animate={{ 
-                      color: focusedField === 'email' ? '#3b82f6' : '#9ca3af',
-                      scale: focusedField === 'email' ? 1.1 : 1
-                    }}
-                  >
-                    <Mail className="w-6 h-6" />
-                  </motion.div>
-                  
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400 z-20" />
                   <input
                     type="email"
                     name="email"
@@ -1207,29 +1168,8 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
+                    className="relative z-30 w-full bg-white border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 text-lg font-medium"
                     placeholder="Enter your email address"
-                  />
-                  
-                  {/* Enhanced focus ring with gradient */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 pointer-events-none -z-10"
-                    style={{ padding: '2px' }}
-                    animate={{ 
-                      opacity: focusedField === 'email' ? 1 : 0,
-                      scale: focusedField === 'email' ? 1.02 : 1
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  
-                  {/* Shimmer effect on focus */}
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-purple-200/50 to-transparent -skew-x-12 opacity-0"
-                    animate={focusedField === 'email' ? { 
-                      x: ["-100%", "100%"],
-                      opacity: [0, 0.5, 0]
-                    } : {}}
-                    transition={{ duration: 1.5, repeat: focusedField === 'email' ? Infinity : 0 }}
                   />
                 </div>
               </motion.div>
