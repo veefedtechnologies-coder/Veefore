@@ -205,6 +205,8 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
 
     setOtpLoading(true)
     try {
+      console.log('[OTP DEBUG] Attempting to verify OTP:', { email: pendingUser?.email, code: otpCode })
+      
       const response = await fetch('/api/auth/verify-email', {
         method: 'POST',
         headers: {
@@ -216,9 +218,13 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         }),
       })
 
+      console.log('[OTP DEBUG] Response status:', response.status)
+      
+      const responseData = await response.json()
+      console.log('[OTP DEBUG] Response data:', responseData)
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Verification failed')
+        throw new Error(responseData.message || 'Verification failed')
       }
 
       // Success - email verified, now proceed to step 2
@@ -231,6 +237,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       
       setCurrentStep(2) // Move to next step after verification
     } catch (error: any) {
+      console.error('[OTP DEBUG] Verification error:', error)
       toast({
         title: "Verification failed",
         description: error.message || "Invalid or expired code. Please try again.",
