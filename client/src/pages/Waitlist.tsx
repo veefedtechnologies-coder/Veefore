@@ -561,13 +561,13 @@ const Waitlist = () => {
         setOtpCode('');
         setDevelopmentOtp(null);
         
-        // Redirect to waitlist status page with user ID
-        const userId = data.user?.id;
-        if (userId) {
-          // Use window.location to ensure fresh page load
-          window.location.href = `/waitlist-status?user=${userId}`;
+        // Redirect to waitlist status page with user email
+        const userEmail = data.user?.email || pendingUser?.email;
+        if (userEmail) {
+          // Use window.location to ensure fresh page load with encoded email
+          window.location.href = `/waitlist-status?user=${encodeURIComponent(userEmail)}`;
         } else {
-          // Fallback to toast if no user ID
+          // Fallback to toast if no user email
           toast({
             title: "Welcome to VeeFore!",
             description: "You've successfully joined our exclusive waitlist!",
