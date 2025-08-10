@@ -129,17 +129,29 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             }),
           })
 
+          const responseData = await response.json()
+
           if (!response.ok) {
-            throw new Error('Failed to send verification email')
+            throw new Error(responseData.message || 'Failed to send verification email')
           }
 
           // Show OTP modal - user must verify before proceeding to step 2
           setShowOTPModal(true)
           
-          toast({
-            title: "Verification required!",
-            description: "Please check your email for the 6-digit verification code to continue.",
-          })
+          // Show development OTP in toast for easier testing
+          if (responseData.developmentOtp && import.meta.env.DEV) {
+            console.log('🔑 DEVELOPMENT OTP:', responseData.developmentOtp)
+            toast({
+              title: "Verification required!",
+              description: `Check your email for the code. DEV: ${responseData.developmentOtp}`,
+              duration: 15000,
+            })
+          } else {
+            toast({
+              title: "Verification required!",
+              description: "Please check your email for the 6-digit verification code to continue.",
+            })
+          }
           
         } catch (error: any) {
           console.error('Email verification error:', error)
