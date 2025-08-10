@@ -562,39 +562,39 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'AI Content Generation', 
                       desc: 'Create viral posts, captions, and hashtags with GPT-4o',
                       icon: Sparkles,
-                      iconGradient: 'from-purple-500 to-pink-500',
-                      selectedGradient: 'from-purple-200/30 to-pink-200/30'
+                      gradient: 'from-purple-500 to-pink-500'
                     },
                     { 
                       id: 'ai-visual-creation', 
                       label: 'AI Visual Creation', 
                       desc: 'Generate stunning images, videos, and graphics automatically',
                       icon: Brain,
-                      iconGradient: 'from-green-500 to-emerald-500',
-                      selectedGradient: 'from-green-200/30 to-emerald-200/30'
+                      gradient: 'from-green-500 to-emerald-500'
                     },
                     { 
                       id: 'ai-responses', 
                       label: 'AI Engagement Engine', 
                       desc: 'Intelligent comment management and audience engagement',
                       icon: MessageCircle,
-                      iconGradient: 'from-blue-500 to-cyan-500',
-                      selectedGradient: 'from-blue-200/30 to-cyan-200/30'
+                      gradient: 'from-blue-500 to-cyan-500'
                     },
                     { 
                       id: 'ai-optimization', 
                       label: 'AI Performance Optimizer', 
                       desc: 'Optimize posting times, content, and strategies with AI',
                       icon: Target,
-                      iconGradient: 'from-orange-500 to-red-500',
-                      selectedGradient: 'from-orange-200/30 to-red-200/30'
+                      gradient: 'from-orange-500 to-red-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`w-full group relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`} rounded-2xl border-2 ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
+                        formData.interestedFeatures.includes(id)
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
                         formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       style={{ 
@@ -602,26 +602,30 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`}>
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
+                        }`}>
                           <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
                           <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
-                            formData.interestedFeatures.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-gray-700'
+                            formData.interestedFeatures.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
                           <p className={`text-base transition-all duration-300 ${
-                            formData.interestedFeatures.includes(id) ? 'text-gray-700' : 'text-gray-600 group-hover:text-gray-500'
+                            formData.interestedFeatures.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
                           }`}>
                             {desc}
                           </p>
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.interestedFeatures.includes(id) ? (
@@ -652,23 +656,25 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Smart Scheduling', 
                       desc: 'AI predicts optimal posting times with 97% accuracy',
                       icon: Clock,
-                      iconGradient: 'from-violet-500 to-purple-500',
-                      selectedGradient: 'from-violet-200/30 to-purple-200/30'
+                      gradient: 'from-violet-500 to-purple-500'
                     },
                     { 
                       id: 'workflow-automation', 
                       label: 'Workflow Automation', 
                       desc: 'End-to-end automation from content creation to publishing',
                       icon: Rocket,
-                      iconGradient: 'from-cyan-500 to-blue-500',
-                      selectedGradient: 'from-cyan-200/30 to-blue-200/30'
+                      gradient: 'from-cyan-500 to-blue-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`w-full group relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`} rounded-2xl border-2 ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
+                        formData.interestedFeatures.includes(id)
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
                         formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       style={{ 
@@ -676,9 +682,13 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`}>
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
+                        }`}>
                           <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
@@ -695,7 +705,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.interestedFeatures.includes(id) ? (
@@ -726,23 +736,25 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Advanced Analytics', 
                       desc: 'AI-powered insights and performance forecasting',
                       icon: BarChart,
-                      iconGradient: 'from-emerald-500 to-teal-500',
-                      selectedGradient: 'from-emerald-200/30 to-teal-200/30'
+                      gradient: 'from-emerald-500 to-teal-500'
                     },
                     { 
                       id: 'trend-analysis', 
                       label: 'Trend Intelligence', 
                       desc: 'Real-time trend discovery and viral prediction',
                       icon: TrendingUp,
-                      iconGradient: 'from-rose-500 to-pink-500',
-                      selectedGradient: 'from-rose-200/30 to-pink-200/30'
+                      gradient: 'from-rose-500 to-pink-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`w-full group relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`} rounded-2xl border-2 ${
+                      className={`w-full group relative overflow-hidden transition-all duration-500 ${
+                        formData.interestedFeatures.includes(id)
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
+                      } rounded-2xl border-2 ${
                         formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       style={{ 
@@ -750,9 +762,13 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`}>
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
+                        }`}>
                           <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
@@ -769,7 +785,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.interestedFeatures.includes(id) ? (
@@ -854,41 +870,37 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Brand Building & Awareness', 
                       desc: 'Establish thought leadership and expand brand recognition',
                       icon: Rocket,
-                      iconGradient: 'from-purple-500 to-pink-500',
-                      selectedGradient: 'from-purple-200/30 to-pink-200/30'
+                      gradient: 'from-purple-500 to-pink-500'
                     },
                     { 
                       id: 'lead-generation', 
                       label: 'Lead Generation & Sales', 
                       desc: 'Convert social engagement into qualified leads and revenue',
                       icon: Target,
-                      iconGradient: 'from-green-500 to-emerald-500',
-                      selectedGradient: 'from-green-200/30 to-emerald-200/30'
+                      gradient: 'from-green-500 to-emerald-500'
                     },
                     { 
                       id: 'audience-growth', 
                       label: 'Audience Growth & Community', 
                       desc: 'Build engaged communities and expand your follower base',
                       icon: Users,
-                      iconGradient: 'from-blue-500 to-cyan-500',
-                      selectedGradient: 'from-blue-200/30 to-cyan-200/30'
+                      gradient: 'from-blue-500 to-cyan-500'
                     },
                     { 
                       id: 'thought-leadership', 
                       label: 'Thought Leadership & Authority', 
                       desc: 'Position yourself as an industry expert and influencer',
                       icon: Star,
-                      iconGradient: 'from-orange-500 to-red-500',
-                      selectedGradient: 'from-orange-200/30 to-red-200/30'
+                      gradient: 'from-orange-500 to-red-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
                       className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? `bg-gradient-to-r ${selectedGradient} text-gray-900 shadow-2xl transform scale-[1.02]`
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
                           : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
                       } rounded-2xl border-2 ${
                         formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
@@ -898,12 +910,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
-                            
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
                           <Icon className="w-7 h-7" />
                         </div>
@@ -921,7 +933,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.useCases.includes(id) ? (
@@ -952,41 +964,37 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Time & Resource Optimization', 
                       desc: 'Maximize efficiency with intelligent automation and workflows',
                       icon: Clock,
-                      iconGradient: 'from-violet-500 to-purple-500',
-                      selectedGradient: 'from-violet-200/30 to-purple-200/30'
+                      gradient: 'from-violet-500 to-purple-500'
                     },
                     { 
                       id: 'content-scaling', 
                       label: 'Content Production Scaling', 
                       desc: 'Dramatically increase content output without sacrificing quality',
                       icon: Sparkles,
-                      iconGradient: 'from-cyan-500 to-blue-500',
-                      selectedGradient: 'from-cyan-200/30 to-blue-200/30'
+                      gradient: 'from-cyan-500 to-blue-500'
                     },
                     { 
                       id: 'multi-platform-mastery', 
                       label: 'Multi-Platform Management', 
                       desc: 'Seamlessly manage and optimize across all social platforms',
                       icon: Globe,
-                      iconGradient: 'from-emerald-500 to-teal-500',
-                      selectedGradient: 'from-emerald-200/30 to-teal-200/30'
+                      gradient: 'from-emerald-500 to-teal-500'
                     },
                     { 
                       id: 'team-collaboration', 
                       label: 'Team & Client Collaboration', 
                       desc: 'Streamline workflows for agencies and team environments',
                       icon: Users,
-                      iconGradient: 'from-rose-500 to-pink-500',
-                      selectedGradient: 'from-rose-200/30 to-pink-200/30'
+                      gradient: 'from-rose-500 to-pink-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
                       className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? `bg-gradient-to-r ${selectedGradient} text-gray-900 shadow-2xl transform scale-[1.02]`
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
                           : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
                       } rounded-2xl border-2 ${
                         formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
@@ -996,12 +1004,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
-                            
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
                           <Icon className="w-7 h-7" />
                         </div>
@@ -1019,7 +1027,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.useCases.includes(id) ? (
@@ -1050,25 +1058,23 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Data-Driven Strategy', 
                       desc: 'Make informed decisions with comprehensive analytics and insights',
                       icon: BarChart3,
-                      iconGradient: 'from-emerald-500 to-teal-500',
-                      selectedGradient: 'from-emerald-200/30 to-teal-200/30'
+                      gradient: 'from-emerald-500 to-teal-500'
                     },
                     { 
                       id: 'competitive-advantage', 
                       label: 'Competitive Intelligence', 
                       desc: 'Stay ahead with competitor analysis and market insights',
                       icon: TrendingUp,
-                      iconGradient: 'from-amber-500 to-orange-500',
-                      selectedGradient: 'from-amber-200/30 to-orange-200/30'
+                      gradient: 'from-amber-500 to-orange-500'
                     }
-                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('useCases', id)}
                       className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.useCases.includes(id)
-                          ? `bg-gradient-to-r ${selectedGradient} text-gray-900 shadow-2xl transform scale-[1.02]`
+                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
                           : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
                       } rounded-2xl border-2 ${
                         formData.useCases.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
@@ -1078,12 +1084,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? `bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
-                            
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
                           <Icon className="w-7 h-7" />
                         </div>
@@ -1101,7 +1107,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.useCases.includes(id)
-                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
+                            ? 'border-white bg-white text-gray-800 shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.useCases.includes(id) ? (
