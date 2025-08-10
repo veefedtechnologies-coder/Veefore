@@ -1269,170 +1269,84 @@ const Waitlist = () => {
                 type="submit"
                 disabled={isLoading}
                 whileHover={{ 
-                  scale: isLoading ? 1 : 1.05,
+                  scale: isLoading ? 1 : 1.02,
                   boxShadow: isLoading ? 
-                    "0 10px 25px rgba(59, 130, 246, 0.3)" : 
-                    "0 25px 50px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)",
-                  y: isLoading ? 0 : -3
+                    "0 8px 20px rgba(0, 0, 0, 0.15)" : 
+                    "0 12px 30px rgba(0, 0, 0, 0.2)",
+                  y: isLoading ? 0 : -1
                 }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                className="group relative w-full text-white font-bold py-6 px-8 rounded-2xl transition-all duration-500 flex items-center justify-center space-x-4 shadow-2xl text-xl overflow-hidden transform-gpu"
-                style={{
-                  background: !isLoading ? 
-                    "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f59e0b 75%, #10b981 100%)" :
-                    "linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)",
-                  backgroundSize: "400% 400%"
-                }}
-                animate={{
-                  backgroundPosition: !isLoading ? 
-                    ["0% 50%", "100% 50%", "0% 50%"] : 
-                    "50% 50%"
-                }}
-                transition={{ duration: 6, repeat: !isLoading ? Infinity : 0, ease: "linear" }}
+                whileTap={{ scale: isLoading ? 1 : 0.99 }}
+                className="group relative w-full bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white font-bold py-5 px-8 rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-xl text-lg overflow-hidden"
               >
-                {/* Ultra-advanced button shine effect */}
+                {/* Subtle shine effect */}
                 <motion.div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100"
-                  style={{
-                    background: "linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
-                    transform: "skewX(-12deg)"
-                  }}
-                  animate={{ x: ["-100%", "200%"] }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100"
+                  animate={{ x: ["-100%", "100%"] }}
                   transition={{ 
                     duration: 2, 
                     repeat: Infinity, 
-                    ease: "easeInOut",
-                    repeatDelay: 1
+                    ease: "linear",
+                    repeatDelay: 3
                   }}
                 />
                 
-                {/* Multi-layer pulsing glow */}
-                <motion.div
-                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg"
-                  style={{
-                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981)",
-                    backgroundSize: "400% 400%"
-                  }}
-                  animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                    scale: [0.98, 1.02, 0.98],
-                    opacity: [0.6, 1, 0.6]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-                
-                {/* Enhanced loading animation */}
+                {/* Loading spinner */}
                 {isLoading && (
-                  <motion.div className="absolute inset-0 flex items-center justify-center">
-                    {/* Orbiting particles */}
-                    {[...Array(12)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-2 h-2 bg-white rounded-full opacity-80"
-                        style={{
-                          left: `${Math.cos(i * 30 * Math.PI / 180) * 35 + 50}%`,
-                          top: `${Math.sin(i * 30 * Math.PI / 180) * 35 + 50}%`,
-                        }}
-                        animate={{
-                          scale: [0.5, 1.2, 0.5],
-                          opacity: [0.4, 1, 0.4],
-                          rotate: [0, 360]
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          delay: i * 0.15,
-                          ease: "easeInOut"
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Central pulsing core */}
-                    <motion.div
-                      className="w-4 h-4 bg-white rounded-full"
-                      animate={{
-                        scale: [0.8, 1.3, 0.8],
-                        opacity: [0.6, 1, 0.6]
-                      }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    />
-                  </motion.div>
+                  <motion.div 
+                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  />
                 )}
                 
                 <motion.div
-                  className="relative z-10 flex items-center space-x-4"
+                  className="relative z-10 flex items-center space-x-3"
                   animate={{
-                    opacity: [1, 0.9, 1],
+                    opacity: isLoading ? 0.8 : 1,
                   }}
-                  transition={{ duration: 4, repeat: Infinity }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {isLoading ? (
-                    <motion.span 
-                      className="font-extrabold tracking-wide"
-                      animate={{ opacity: [0.7, 1, 0.7] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      Joining Revolution...
-                    </motion.span>
-                  ) : (
+                  {!isLoading && (
                     <>
                       <motion.div
                         animate={{
-                          rotate: [0, 360],
-                          scale: [1, 1.1, 1]
+                          scale: [1, 1.05, 1]
                         }}
-                        transition={{ 
-                          rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-                          scale: { duration: 3, repeat: Infinity }
-                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <Rocket className="w-7 h-7" />
+                        <Sparkles className="w-5 h-5" />
                       </motion.div>
                       
-                      <span className="font-extrabold tracking-wide">Join the Revolution</span>
+                      <span className="font-bold tracking-wide">
+                        {isSubmitted ? 'Welcome to VeeFore!' : 'Join the Waitlist'}
+                      </span>
                       
                       <motion.div
                         animate={{
-                          x: [0, 4, 0],
-                          rotate: [0, 10, 0]
+                          x: [0, 2, 0]
                         }}
-                        transition={{ duration: 2.5, repeat: Infinity }}
+                        transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <ChevronRight className="w-7 h-7" />
+                        <ArrowRight className="w-5 h-5" />
                       </motion.div>
                     </>
                   )}
+                  
+                  {isLoading && (
+                    <span className="font-bold tracking-wide">
+                      Joining waitlist...
+                    </span>
+                  )}
                 </motion.div>
                 
-                {/* Success burst effect */}
+                {/* Success effect */}
                 {isSubmitted && (
-                  <>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl"
-                      initial={{ scale: 0, opacity: 1 }}
-                      animate={{ scale: 2, opacity: 0 }}
-                      transition={{ duration: 0.8 }}
-                    />
-                    {/* Success sparkles */}
-                    {[...Array(16)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-1 h-1 bg-white rounded-full"
-                        style={{
-                          left: '50%',
-                          top: '50%',
-                        }}
-                        initial={{ scale: 0, x: 0, y: 0 }}
-                        animate={{
-                          scale: [0, 1, 0],
-                          x: Math.cos(i * 22.5 * Math.PI / 180) * 80,
-                          y: Math.sin(i * 22.5 * Math.PI / 180) * 80,
-                          opacity: [1, 0]
-                        }}
-                        transition={{ duration: 1, delay: i * 0.05 }}
-                      />
-                    ))}
-                  </>
+                  <motion.div
+                    className="absolute inset-0 bg-green-600 rounded-xl"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
                 )}
               </motion.button>
 
