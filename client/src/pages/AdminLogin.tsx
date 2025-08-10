@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Eye, EyeOff } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import { apiRequest } from '@/lib/queryClient'
+// import { apiRequest } from '@/lib/queryClient'
 import { useLocation } from 'wouter'
 
 export default function AdminLogin() {
@@ -23,15 +23,26 @@ export default function AdminLogin() {
     setIsLoading(true)
 
     try {
-      const response = await apiRequest('/api/admin/login', {
+      // Direct fetch for admin login (bypass Firebase auth requirement)
+      const response = await fetch('/api/admin/login', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData)
       })
 
-      if (response.token) {
+      if (!response.ok) {
+        const errorData = await response.text()
+        throw new Error(errorData || 'Login failed')
+      }
+
+      const result = await response.json()
+
+      if (result.token) {
         // Store admin token
-        localStorage.setItem('adminToken', response.token)
-        localStorage.setItem('adminUser', JSON.stringify(response.admin))
+        localStorage.setItem('adminToken', result.token)
+        localStorage.setItem('adminUser', JSON.stringify(result.admin))
         
         toast({
           title: "Login successful",
