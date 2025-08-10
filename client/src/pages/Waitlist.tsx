@@ -1131,7 +1131,7 @@ const Waitlist = () => {
                     <User className="w-6 h-6" />
                   </motion.div>
                   
-                  <motion.input
+                  <input
                     type="text"
                     name="name"
                     value={formData.name}
@@ -1139,12 +1139,8 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
+                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
                     placeholder="Enter your full name"
-                    whileFocus={{ 
-                      borderColor: '#3b82f6',
-                      boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 25px rgba(59, 130, 246, 0.2)'
-                    }}
                   />
                   
                   {/* Enhanced focus ring with gradient */}
@@ -1203,7 +1199,7 @@ const Waitlist = () => {
                     <Mail className="w-6 h-6" />
                   </motion.div>
                   
-                  <motion.input
+                  <input
                     type="email"
                     name="email"
                     value={formData.email}
@@ -1211,12 +1207,8 @@ const Waitlist = () => {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField('')}
                     required
-                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
+                    className="w-full bg-white/90 border-2 border-gray-200 rounded-2xl pl-14 pr-6 py-5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 backdrop-blur-sm shadow-lg group-hover:shadow-xl text-lg font-medium"
                     placeholder="Enter your email address"
-                    whileFocus={{ 
-                      borderColor: '#3b82f6',
-                      boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 25px rgba(59, 130, 246, 0.2)'
-                    }}
                   />
                   
                   {/* Enhanced focus ring with gradient */}
