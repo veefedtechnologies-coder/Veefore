@@ -6,7 +6,7 @@ import {
   Sparkles, Crown, Cpu, Brain, 
   Network, Wand2, Palette, Video, Image, Database, Code, Cloud, Activity, 
   ShoppingCart, CreditCard, ExternalLink, Github, Twitter, MousePointer2,
-  Sparkle, Triangle, Send
+  Sparkle, Triangle, Send, Trophy, Gift, Rocket, ChevronRight
 } from 'lucide-react'
 import { 
   SiInstagram, SiFacebook, SiX, SiLinkedin, SiTiktok, SiYoutube,
