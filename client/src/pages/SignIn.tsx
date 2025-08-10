@@ -523,30 +523,32 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 
                 {/* Clean Professional Header */}
                 <div className="text-center mb-10 relative z-10">
-                  {/* Next-Gen 3D Holographic VeeFore Logo */}
+                  {/* Quantum Particle Assembly VeeFore Logo */}
                   <div className="mb-8 flex justify-center">
-                    <div className="relative p-8 rounded-3xl hover:scale-105 transition-all duration-700 ease-out group perspective-1000">
-                      {/* Holographic Backdrop */}
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 backdrop-blur-sm border border-blue-200/20 group-hover:border-blue-300/30 transition-all duration-700"></div>
+                    <div className="relative p-6 group">
+                      {/* Quantum Energy Field */}
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-cyan-400/10 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-1000 animate-spin" style={{animationDuration: '20s'}}></div>
                       
-                      {/* 3D Holographic Logo */}
+                      {/* Particle Assembly Logo */}
                       <img 
                         src={veeforceLogo} 
                         alt="VeeFore" 
-                        className="relative z-10 w-28 h-28 transform hover:scale-110 hover:rotate-y-12 transition-all duration-1000 ease-out animate-[holographicReveal_2.5s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] hover:animate-none" 
+                        className="relative z-10 w-24 h-24 transform hover:scale-110 hover:rotate-12 transition-all duration-800 ease-out animate-[quantumAssembly_2s_cubic-bezier(0.68,-0.55,0.27,1.55)_forwards] hover:animate-none" 
                         style={{
-                          animationDelay: '0.8s',
+                          animationDelay: '0.6s',
                           opacity: 0,
-                          transform: 'perspective(800px) rotateX(90deg) rotateY(45deg) scale(0.3) translateZ(-100px)',
-                          filter: 'hue-rotate(180deg) brightness(2) blur(8px)',
-                          transformStyle: 'preserve-3d'
+                          transform: 'scale(2) rotate(180deg)',
+                          filter: 'brightness(0) contrast(0) saturate(2)',
+                          clipPath: 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)'
                         }}
                       />
                       
-                      {/* Ambient Glow Effects */}
-                      <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-cyan-400/30 to-blue-400/30 rounded-full blur-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                      {/* Orbital Particles */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                        <div className="absolute top-2 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-pulse transform -translate-x-1/2"></div>
+                        <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                        <div className="absolute bottom-2 left-2 w-1 h-1 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '0.6s'}}></div>
+                        <div className="absolute top-2 right-1/2 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '0.9s'}}></div>
                       </div>
                     </div>
                   </div>
