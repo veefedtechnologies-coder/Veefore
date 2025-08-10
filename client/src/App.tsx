@@ -154,6 +154,13 @@ function App() {
         </div>
       </Route>
 
+      {/* Admin Panel - Accessible with admin token */}
+      <Route path="/admin">
+        <div className="min-h-screen bg-gray-50">
+          <AdminPanel />
+        </div>
+      </Route>
+
       {/* Root route - Landing for unauthenticated, Dashboard for authenticated & onboarded, Signup for authenticated but not onboarded */}
       <Route path="/">
         {!user && !hasFirebaseAuth ? (
@@ -468,11 +475,7 @@ function App() {
             </div>
           </Route>
 
-          <Route path="/admin">
-            <div className="min-h-screen bg-gray-50">
-              <AdminPanel />
-            </div>
-          </Route>
+
 
           <Route path="/profile">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
