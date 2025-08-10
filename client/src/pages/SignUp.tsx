@@ -778,7 +778,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       </div>
 
       {/* Right side - Enhanced Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
+      <div className="w-full lg:w-1/2 flex items-start justify-center relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
         {/* Subtle background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-r from-blue-100/40 to-purple-100/40 rounded-full blur-3xl"></div>
@@ -808,9 +808,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        <div className="w-full max-w-lg mx-auto px-8 py-8 relative z-10">
+        <div className="w-full max-w-lg mx-auto px-8 pt-4 pb-8 relative z-10">
           {/* Enhanced Progress indicator */}
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
