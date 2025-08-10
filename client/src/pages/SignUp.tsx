@@ -562,28 +562,28 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'AI Content Generation', 
                       desc: 'Create viral posts, captions, and hashtags with GPT-4o',
                       icon: Sparkles,
-                      gradient: 'from-purple-500 to-pink-500'
+                      gradient: 'from-slate-700 to-slate-800'
                     },
                     { 
                       id: 'ai-visual-creation', 
                       label: 'AI Visual Creation', 
                       desc: 'Generate stunning images, videos, and graphics automatically',
                       icon: Brain,
-                      gradient: 'from-green-500 to-emerald-500'
+                      gradient: 'from-gray-700 to-gray-800'
                     },
                     { 
                       id: 'ai-responses', 
                       label: 'AI Engagement Engine', 
                       desc: 'Intelligent comment management and audience engagement',
                       icon: MessageCircle,
-                      gradient: 'from-blue-500 to-cyan-500'
+                      gradient: 'from-zinc-700 to-zinc-800'
                     },
                     { 
                       id: 'ai-optimization', 
                       label: 'AI Performance Optimizer', 
                       desc: 'Optimize posting times, content, and strategies with AI',
                       icon: Target,
-                      gradient: 'from-orange-500 to-red-500'
+                      gradient: 'from-stone-700 to-stone-800'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
@@ -656,14 +656,14 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Smart Scheduling', 
                       desc: 'AI predicts optimal posting times with 97% accuracy',
                       icon: Clock,
-                      gradient: 'from-violet-500 to-purple-500'
+                      gradient: 'from-slate-600 to-slate-700'
                     },
                     { 
                       id: 'workflow-automation', 
                       label: 'Workflow Automation', 
                       desc: 'End-to-end automation from content creation to publishing',
                       icon: Rocket,
-                      gradient: 'from-cyan-500 to-blue-500'
+                      gradient: 'from-gray-600 to-gray-700'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
@@ -736,14 +736,14 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Advanced Analytics', 
                       desc: 'AI-powered insights and performance forecasting',
                       icon: BarChart,
-                      gradient: 'from-emerald-500 to-teal-500'
+                      gradient: 'from-zinc-600 to-zinc-700'
                     },
                     { 
                       id: 'trend-analysis', 
                       label: 'Trend Intelligence', 
                       desc: 'Real-time trend discovery and viral prediction',
                       icon: TrendingUp,
-                      gradient: 'from-rose-500 to-pink-500'
+                      gradient: 'from-stone-600 to-stone-700'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
@@ -870,28 +870,28 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Brand Building & Awareness', 
                       desc: 'Establish thought leadership and expand brand recognition',
                       icon: Rocket,
-                      gradient: 'from-purple-500 to-pink-500'
+                      gradient: 'from-slate-700 to-slate-800'
                     },
                     { 
                       id: 'lead-generation', 
                       label: 'Lead Generation & Sales', 
                       desc: 'Convert social engagement into qualified leads and revenue',
                       icon: Target,
-                      gradient: 'from-green-500 to-emerald-500'
+                      gradient: 'from-gray-700 to-gray-800'
                     },
                     { 
                       id: 'audience-growth', 
                       label: 'Audience Growth & Community', 
                       desc: 'Build engaged communities and expand your follower base',
                       icon: Users,
-                      gradient: 'from-blue-500 to-cyan-500'
+                      gradient: 'from-zinc-700 to-zinc-800'
                     },
                     { 
                       id: 'thought-leadership', 
                       label: 'Thought Leadership & Authority', 
                       desc: 'Position yourself as an industry expert and influencer',
                       icon: Star,
-                      gradient: 'from-orange-500 to-red-500'
+                      gradient: 'from-stone-700 to-stone-800'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
@@ -964,28 +964,28 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Time & Resource Optimization', 
                       desc: 'Maximize efficiency with intelligent automation and workflows',
                       icon: Clock,
-                      gradient: 'from-violet-500 to-purple-500'
+                      gradient: 'from-slate-600 to-slate-700'
                     },
                     { 
                       id: 'content-scaling', 
                       label: 'Content Production Scaling', 
                       desc: 'Dramatically increase content output without sacrificing quality',
                       icon: Sparkles,
-                      gradient: 'from-cyan-500 to-blue-500'
+                      gradient: 'from-gray-600 to-gray-700'
                     },
                     { 
                       id: 'multi-platform-mastery', 
                       label: 'Multi-Platform Management', 
                       desc: 'Seamlessly manage and optimize across all social platforms',
                       icon: Globe,
-                      gradient: 'from-emerald-500 to-teal-500'
+                      gradient: 'from-zinc-600 to-zinc-700'
                     },
                     { 
                       id: 'team-collaboration', 
                       label: 'Team & Client Collaboration', 
                       desc: 'Streamline workflows for agencies and team environments',
                       icon: Users,
-                      gradient: 'from-rose-500 to-pink-500'
+                      gradient: 'from-stone-600 to-stone-700'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
@@ -1058,14 +1058,14 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'Data-Driven Strategy', 
                       desc: 'Make informed decisions with comprehensive analytics and insights',
                       icon: BarChart3,
-                      gradient: 'from-emerald-500 to-teal-500'
+                      gradient: 'from-slate-600 to-slate-700'
                     },
                     { 
                       id: 'competitive-advantage', 
                       label: 'Competitive Intelligence', 
                       desc: 'Stay ahead with competitor analysis and market insights',
                       icon: TrendingUp,
-                      gradient: 'from-amber-500 to-orange-500'
+                      gradient: 'from-gray-600 to-gray-700'
                     }
                   ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
                     <button
