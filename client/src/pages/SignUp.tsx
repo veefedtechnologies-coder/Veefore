@@ -172,8 +172,8 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-10">
-            <div className="text-center space-y-6">
+          <div className="space-y-8">
+            <div className="text-center space-y-5">
               <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
                 <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                 <span className="text-blue-700 font-semibold text-sm">Enterprise Account Setup</span>
@@ -210,7 +210,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </div>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               <div className="space-y-3">
                 <label htmlFor="fullName" className="block text-sm font-bold text-gray-900 tracking-wide">
                   FULL NAME
@@ -808,9 +808,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        <div className="w-full max-w-lg mx-auto px-8 py-20 relative z-10">
+        <div className="w-full max-w-lg mx-auto px-8 py-12 relative z-10">
           {/* Enhanced Progress indicator */}
-          <div className="mb-12">
+          <div className="mb-10">
             <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
@@ -890,7 +890,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             {renderStepContent()}
           </form>
 
-          <div className="mt-12 text-center">
+          <div className="mt-8 text-center">
             <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6">
               <p className="text-gray-700 text-lg font-medium mb-4">
                 Already have an account?{' '}
