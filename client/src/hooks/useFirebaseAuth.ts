@@ -3,18 +3,8 @@ import { User, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export const useFirebaseAuth = () => {
-  // Check for existing auth immediately to speed up loading
-  const hasExistingAuth = () => {
-    const firebaseKeys = Object.keys(localStorage).filter(key => 
-      key.includes('firebase:authUser') && localStorage.getItem(key)
-    )
-    return firebaseKeys.length > 0
-  }
-
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true) // Always start with loading true
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [hasInitialCheck, setHasInitialCheck] = useState(false)
 
   useEffect(() => {
     console.log('useFirebaseAuth: Setting up Firebase auth listener')
@@ -29,7 +19,6 @@ export const useFirebaseAuth = () => {
     const loadingTimeout = setTimeout(() => {
       console.log('useFirebaseAuth: Timeout reached, stopping loading state')
       setLoading(false)
-      setIsInitialized(true)
     }, 3000) // 3 second timeout for better auth persistence
     
     // Check if there's already a current user (for persistence)
@@ -37,16 +26,13 @@ export const useFirebaseAuth = () => {
       console.log('useFirebaseAuth: Found existing authenticated user:', auth.currentUser.email)
       setUser(auth.currentUser)
       setLoading(false)
-      setIsInitialized(true)
       clearTimeout(loadingTimeout)
     }
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('useFirebaseAuth: Auth state changed:', user ? `User logged in: ${user.email}` : 'User logged out')
       setUser(user)
-      setHasInitialCheck(true)
       setLoading(false)
-      setIsInitialized(true)
       clearTimeout(loadingTimeout)
       
       // Additional debugging for persistence
@@ -54,8 +40,6 @@ export const useFirebaseAuth = () => {
         console.log('useFirebaseAuth: User authenticated with tokens:', {
           uid: user.uid,
           email: user.email,
-          accessToken: user.accessToken ? 'Present' : 'Missing',
-          refreshToken: user.refreshToken ? 'Present' : 'Missing',
           emailVerified: user.emailVerified
         })
         
