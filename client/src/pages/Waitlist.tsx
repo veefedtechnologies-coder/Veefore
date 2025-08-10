@@ -287,8 +287,10 @@ const Waitlist = () => {
 
       const data = await response.json();
       console.log('[WAITLIST] Send OTP response:', data);
+      console.log('[WAITLIST] Response success field:', data.success);
+      console.log('[WAITLIST] Response message:', data.message);
 
-      if (data.success) {
+      if (response.ok && (data.message || data.success !== false)) {
         // Store pending user data
         setPendingUser({ name: formData.name, email: formData.email });
         setShowOTPModal(true);
