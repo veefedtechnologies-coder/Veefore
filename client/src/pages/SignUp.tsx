@@ -600,7 +600,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           }}></div>
         </div>
         
-        <div className="flex flex-col justify-center px-16 py-20 relative z-10">
+        <div className="flex flex-col justify-start px-16 py-8 pb-16 relative z-10 min-h-full">
           {/* Premium Header Section */}
           <div className="mb-16">
             <div className="flex items-center space-x-5 mb-12">
