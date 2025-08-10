@@ -1836,93 +1836,153 @@ const Waitlist = () => {
       </div>
     )}
 
-    {/* Questionnaire Modal */}
+    {/* Professional Light Theme Questionnaire Modal */}
     {showQuestionnaire && (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-gradient-to-br from-slate-900/95 via-purple-900/95 to-indigo-900/95 backdrop-blur-xl border border-white/20 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-          <div className="p-8">
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between text-sm text-white/80 mb-2">
-                <span>Question {currentQuestion + 1} of {questions.length}</span>
-                <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
+      <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-100">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Tell us about yourself</h1>
+                <p className="text-gray-600 text-sm mt-1">Help us personalize your VeeFore experience</p>
               </div>
-              <div className="w-full bg-white/20 rounded-full h-2">
+              <div className="text-right">
+                <div className="text-sm font-semibold text-gray-500 mb-1">
+                  Question {currentQuestion + 1} of {questions.length}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete
+                </div>
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="relative">
+              <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500 ease-out"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-700 ease-out shadow-sm"
                   style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
                 ></div>
               </div>
             </div>
+          </div>
 
-            {/* Question Content */}
+          {/* Content Area */}
+          <div className="p-8 max-h-[60vh] overflow-y-auto">
+            {/* Question Title */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-white mb-4">{questions[currentQuestion]?.title}</h2>
-              
-              <div className="space-y-3">
-                {questions[currentQuestion]?.options.map((option) => {
-                  const isSelected = questions[currentQuestion].type === 'multiple-choice'
-                    ? (questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] as string[])?.includes(option.value)
-                    : questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] === option.value;
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{questions[currentQuestion]?.title}</h2>
+              {questions[currentQuestion]?.type === 'multiple-choice' && (
+                <p className="text-gray-500 text-sm">Select all that apply</p>
+              )}
+            </div>
+            
+            {/* Options Grid */}
+            <div className="grid gap-3">
+              {questions[currentQuestion]?.options.map((option, index) => {
+                const isSelected = questions[currentQuestion].type === 'multiple-choice'
+                  ? (questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] as string[])?.includes(option.value)
+                  : questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] === option.value;
 
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => handleQuestionnaireAnswer(questions[currentQuestion].id, option.value)}
-                      className={`w-full p-4 rounded-xl border transition-all duration-300 text-left flex items-center space-x-4 hover:scale-[1.02] ${
-                        isSelected 
-                          ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 border-white/30 text-white shadow-lg' 
-                          : 'bg-white/10 border-white/20 text-white/90 hover:bg-white/15 hover:border-white/30'
-                      }`}
-                    >
-                      <div className="text-2xl">{option.icon}</div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-lg">{option.label}</div>
-                        {option.desc && (
-                          <div className={`text-sm mt-1 ${isSelected ? 'text-white/80' : 'text-white/60'}`}>
-                            {option.desc}
-                          </div>
-                        )}
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => handleQuestionnaireAnswer(questions[currentQuestion].id, option.value)}
+                    className={`group relative p-5 rounded-2xl border-2 transition-all duration-300 text-left flex items-center space-x-4 hover:shadow-lg hover:-translate-y-0.5 ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-50 shadow-lg shadow-blue-100' 
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`
+                    }}
+                  >
+                    {/* Icon */}
+                    <div className={`text-3xl p-3 rounded-xl transition-all duration-300 ${
+                      isSelected 
+                        ? 'bg-blue-100' 
+                        : 'bg-gray-100 group-hover:bg-gray-200'
+                    }`}>
+                      {option.icon}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
+                        isSelected ? 'text-blue-900' : 'text-gray-900'
+                      }`}>
+                        {option.label}
                       </div>
-                      {isSelected && (
-                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                          <Check className="w-4 h-4 text-blue-600" />
+                      {option.desc && (
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isSelected ? 'text-blue-700' : 'text-gray-500'
+                        }`}>
+                          {option.desc}
                         </div>
                       )}
-                    </button>
-                  );
-                })}
-              </div>
+                    </div>
+                    
+                    {/* Selection Indicator */}
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-500' 
+                        : 'border-gray-300 group-hover:border-gray-400'
+                    }`}>
+                      {isSelected && (
+                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                      )}
+                    </div>
+
+                    {/* Subtle Selection Glow */}
+                    {isSelected && (
+                      <div className="absolute inset-0 rounded-2xl bg-blue-500/5 pointer-events-none"></div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+            <button
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestion === 0}
+              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold transition-all duration-300 hover:bg-gray-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Previous</span>
+            </button>
+
+            {/* Step Indicators */}
+            <div className="flex space-x-2">
+              {questions.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentQuestion
+                      ? 'bg-blue-500 w-6'
+                      : index < currentQuestion
+                      ? 'bg-blue-300'
+                      : 'bg-gray-300'
+                  }`}
+                />
+              ))}
             </div>
 
-            {/* Navigation Buttons */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={handlePreviousQuestion}
-                disabled={currentQuestion === 0}
-                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold transition-all duration-300 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </button>
-
-              <div className="text-white/60 text-sm">
-                {questions[currentQuestion]?.type === 'multiple-choice' && 'Select all that apply'}
-              </div>
-
-              <button
-                onClick={handleNextQuestion}
-                disabled={!canProceed()}
-                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600/80 to-purple-600/80 border border-white/20 text-white font-semibold transition-all duration-300 hover:from-blue-700/90 hover:to-purple-700/90 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
-              >
-                <span>{currentQuestion === questions.length - 1 ? 'Complete' : 'Next'}</span>
-                {currentQuestion === questions.length - 1 ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
-              </button>
-            </div>
+            <button
+              onClick={handleNextQuestion}
+              disabled={!canProceed()}
+              className="flex items-center space-x-2 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold transition-all duration-300 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            >
+              <span>{currentQuestion === questions.length - 1 ? 'Complete Survey' : 'Next'}</span>
+              {currentQuestion === questions.length - 1 ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <ChevronRight className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
       </div>
