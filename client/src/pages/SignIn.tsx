@@ -523,10 +523,14 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 
                 {/* Clean Professional Header */}
                 <div className="text-center mb-10 relative z-10">
-                  {/* Simple VeeFore Logo */}
+                  {/* Enhanced Animated VeeFore Logo */}
                   <div className="mb-8 flex justify-center">
-                    <div className="p-5 rounded-2xl">
-                      <img src={veeforceLogo} alt="VeeFore" className="w-16 h-16" />
+                    <div className="p-6 rounded-3xl hover:scale-105 transition-all duration-500 ease-out group">
+                      <img 
+                        src={veeforceLogo} 
+                        alt="VeeFore" 
+                        className="w-24 h-24 transform hover:scale-110 transition-all duration-700 ease-out group-hover:rotate-1 filter drop-shadow-lg hover:drop-shadow-2xl animate-pulse hover:animate-none" 
+                      />
                     </div>
                   </div>
 
