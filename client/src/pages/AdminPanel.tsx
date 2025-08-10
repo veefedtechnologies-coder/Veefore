@@ -87,7 +87,7 @@ export default function AdminPanel() {
       setLocation('/admin-login')
       return
     }
-  }, [])
+  }, [setLocation])
   
   // State
   const [currentPage, setCurrentPage] = useState(1)
