@@ -231,7 +231,7 @@ const WaitlistStatus = () => {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <img 
-                  src="/attached_assets/output-onlinepngtools_1754845868695.png" 
+                  src="/veefore-logo.png" 
                   alt="VeeFore" 
                   className="h-12 w-auto"
                 />
