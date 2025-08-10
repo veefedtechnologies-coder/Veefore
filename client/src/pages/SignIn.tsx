@@ -731,57 +731,20 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       )}
                     </div>
 
-                    {/* Advanced Sign In Button with Multiple Effects */}
+                    {/* Clean Professional Sign In Button */}
                   <Button 
                     type="submit" 
                     disabled={isLoading}
-                    onClick={createRipple}
-                    className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white py-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
-                    {/* Animated background overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    
-                    {/* Glowing effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-xl" />
-                    
-                    <div className="flex items-center justify-center space-x-3 relative z-10">
-                      {isLoading ? (
-                        <>
-                          <div className="relative">
-                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-blue-300 rounded-full animate-spin animate-reverse" />
-                          </div>
-                          <span className="animate-pulse">Establishing connection...</span>
-                          <div className="flex space-x-1">
-                            <div className="w-1 h-1 bg-white rounded-full animate-bounce" />
-                            <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-100" />
-                            <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-200" />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-6 h-6 group-hover:rotate-180 transition-transform duration-500" />
-                          <span className="group-hover:tracking-wider transition-all duration-300">Sign In to VeeFore AI</span>
-                          <ChevronRight className="w-6 h-6 group-hover:translate-x-2 group-hover:scale-125 transition-all duration-300" />
-                        </>
-                      )}
-                    </div>
-                    
-                    {/* Particle effects */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      {[...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="absolute w-1 h-1 bg-white/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{
-                            left: `${20 + i * 12}%`,
-                            top: `${30 + Math.sin(i) * 20}%`,
-                            animation: `particles-float ${2 + i * 0.5}s ease-in-out infinite`,
-                            animationDelay: `${i * 0.2}s`
-                          }}
-                        />
-                      ))}
-                    </div>
+                    {isLoading ? (
+                      <div className="flex items-center justify-center space-x-2">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Signing in...</span>
+                      </div>
+                    ) : (
+                      'Sign In'
+                    )}
                   </Button>
 
                   {/* Divider */}
@@ -800,10 +763,10 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     variant="outline"
                     disabled={isLoading}
                     onClick={handleGoogleSignIn}
-                    className="w-full bg-white/90 backdrop-blur-xl border-2 border-gray-200/60 text-gray-700 py-6 rounded-2xl font-bold text-xl hover:bg-gray-50/90 hover:border-gray-300/60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50"
+                    className="w-full bg-white border border-gray-300 text-gray-700 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 shadow-sm"
                   >
-                    <div className="flex items-center justify-center space-x-4">
-                      <svg className="w-6 h-6" viewBox="0 0 24 24">
+                    <div className="flex items-center justify-center space-x-3">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                         <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
