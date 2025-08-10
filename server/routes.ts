@@ -12520,11 +12520,11 @@ Create a detailed growth strategy in JSON format:
   // Join Waitlist
   app.post('/api/early-access/join', async (req: any, res: Response) => {
     try {
-      const { name, email, referredBy } = req.body;
+      const { name, email, referredBy, questionnaire, verified } = req.body;
       const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
       const userAgent = req.get('User-Agent') || 'unknown';
       
-      console.log('[EARLY ACCESS] Waitlist join request:', { name, email, referredBy, clientIP, userAgent: userAgent.substring(0, 50) });
+      console.log('[EARLY ACCESS] Waitlist join request:', { name, email, referredBy, verified, questionnaire: !!questionnaire, clientIP, userAgent: userAgent.substring(0, 50) });
       
       // Validate required fields
       if (!name || !email) {
@@ -12577,7 +12577,9 @@ Create a detailed growth strategy in JSON format:
         metadata: {
           ipAddress: clientIP,
           userAgent: userAgent,
-          joinedAt: new Date().toISOString()
+          joinedAt: new Date().toISOString(),
+          questionnaire: questionnaire || null,
+          emailVerified: verified || false
         }
       });
       

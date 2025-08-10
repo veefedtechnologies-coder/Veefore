@@ -15,6 +15,7 @@ import {
   Zap,
   Shield,
   ChevronRight,
+  ChevronLeft,
   Award,
   CheckCircle,
   Flame,
@@ -65,6 +66,95 @@ const Waitlist = () => {
   const [otpLoading, setOtpLoading] = useState(false);
   const [developmentOtp, setDevelopmentOtp] = useState<string | null>(null);
   const [pendingUser, setPendingUser] = useState<{ name: string; email: string } | null>(null);
+  
+  // Questionnaire state
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questionnaireData, setQuestionnaireData] = useState({
+    businessType: '',
+    teamSize: '',
+    currentTools: [],
+    primaryGoal: '',
+    contentTypes: [],
+    budget: '',
+    urgency: ''
+  });
+
+  // Questionnaire questions
+  const questions = [
+    {
+      id: 'businessType',
+      title: 'What describes you best?',
+      type: 'single-choice',
+      options: [
+        { value: 'creator', label: 'Content Creator', icon: '🎨', desc: 'Individual influencer or creator' },
+        { value: 'business', label: 'Business Owner', icon: '🏢', desc: 'Running a business or brand' },
+        { value: 'agency', label: 'Marketing Agency', icon: '📈', desc: 'Managing multiple clients' },
+        { value: 'freelancer', label: 'Freelancer', icon: '💼', desc: 'Providing social media services' }
+      ]
+    },
+    {
+      id: 'teamSize',
+      title: 'How big is your team?',
+      type: 'single-choice',
+      options: [
+        { value: 'solo', label: 'Just Me', icon: '👤', desc: 'Working alone' },
+        { value: 'small', label: '2-5 People', icon: '👥', desc: 'Small team' },
+        { value: 'medium', label: '6-20 People', icon: '👨‍👩‍👧‍👦', desc: 'Growing team' },
+        { value: 'large', label: '20+ People', icon: '🏘️', desc: 'Large organization' }
+      ]
+    },
+    {
+      id: 'currentTools',
+      title: 'What tools do you currently use?',
+      type: 'multiple-choice',
+      options: [
+        { value: 'canva', label: 'Canva', icon: '🎨' },
+        { value: 'hootsuite', label: 'Hootsuite', icon: '📅' },
+        { value: 'buffer', label: 'Buffer', icon: '⏰' },
+        { value: 'later', label: 'Later', icon: '📱' },
+        { value: 'photoshop', label: 'Photoshop', icon: '🖼️' },
+        { value: 'figma', label: 'Figma', icon: '✨' },
+        { value: 'none', label: 'None / Manual', icon: '✋' }
+      ]
+    },
+    {
+      id: 'primaryGoal',
+      title: 'What\'s your primary goal?',
+      type: 'single-choice',
+      options: [
+        { value: 'growth', label: 'Grow Followers', icon: '📈', desc: 'Increase audience size' },
+        { value: 'engagement', label: 'Boost Engagement', icon: '❤️', desc: 'More likes, comments, shares' },
+        { value: 'sales', label: 'Drive Sales', icon: '💰', desc: 'Convert followers to customers' },
+        { value: 'efficiency', label: 'Save Time', icon: '⏱️', desc: 'Automate repetitive tasks' }
+      ]
+    },
+    {
+      id: 'contentTypes',
+      title: 'What content do you create?',
+      type: 'multiple-choice',
+      options: [
+        { value: 'posts', label: 'Social Posts', icon: '📝' },
+        { value: 'stories', label: 'Stories', icon: '📸' },
+        { value: 'videos', label: 'Videos', icon: '🎥' },
+        { value: 'reels', label: 'Reels/Shorts', icon: '🎬' },
+        { value: 'graphics', label: 'Graphics', icon: '🖌️' },
+        { value: 'blogs', label: 'Blog Content', icon: '📄' }
+      ]
+    },
+    {
+      id: 'urgency',
+      title: 'When do you need this solution?',
+      type: 'single-choice',
+      options: [
+        { value: 'asap', label: 'Right Now', icon: '🚀', desc: 'Urgent need for solution' },
+        { value: 'month', label: 'Within a Month', icon: '📅', desc: 'Planning ahead' },
+        { value: 'quarter', label: 'Next Quarter', icon: '🗓️', desc: 'Part of strategy planning' },
+        { value: 'exploring', label: 'Just Exploring', icon: '🔍', desc: 'Learning about options' }
+      ]
+    }
+  ];
+
   const [copiedReferral, setCopiedReferral] = useState(false);
   const [currentDemo, setCurrentDemo] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -360,8 +450,16 @@ const Waitlist = () => {
         throw new Error(responseData.message || 'Verification failed');
       }
 
-      // Email verified successfully, now submit to waitlist
-      await submitToWaitlist();
+      // Email verified successfully, now show questionnaire
+      setShowOTPModal(false);
+      setOtpCode('');
+      setShowQuestionnaire(true);
+      setCurrentQuestion(0);
+      
+      toast({
+        title: "Email verified!",
+        description: "Let's learn more about your needs to personalize your experience.",
+      });
       
     } catch (error: any) {
       console.error('[WAITLIST OTP] Verification error:', error);
@@ -376,6 +474,53 @@ const Waitlist = () => {
     }
   };
 
+  // Questionnaire handlers
+  const handleQuestionnaireAnswer = (questionId: string, value: string) => {
+    const question = questions[currentQuestion];
+    
+    if (question.type === 'multiple-choice') {
+      const currentValues = questionnaireData[questionId as keyof typeof questionnaireData] as string[];
+      const newValues = currentValues.includes(value) 
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      
+      setQuestionnaireData(prev => ({
+        ...prev,
+        [questionId]: newValues
+      }));
+    } else {
+      setQuestionnaireData(prev => ({
+        ...prev,
+        [questionId]: value
+      }));
+    }
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      // All questions answered, submit to waitlist with questionnaire data
+      submitToWaitlist();
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
+
+  const canProceed = () => {
+    const question = questions[currentQuestion];
+    const currentValue = questionnaireData[question.id as keyof typeof questionnaireData];
+    
+    if (question.type === 'multiple-choice') {
+      return Array.isArray(currentValue) && currentValue.length > 0;
+    }
+    return currentValue && currentValue !== '';
+  };
+
   const submitToWaitlist = async () => {
     try {
       const response = await fetch('/api/early-access/join', {
@@ -387,7 +532,8 @@ const Waitlist = () => {
           name: pendingUser?.name,
           email: pendingUser?.email,
           referredBy: formData.referredBy,
-          verified: true
+          verified: true,
+          questionnaire: questionnaireData
         }),
       });
 
@@ -396,6 +542,7 @@ const Waitlist = () => {
       if (data.success) {
         setWaitlistData(data);
         setIsSubmitted(true);
+        setShowQuestionnaire(false);
         setShowOTPModal(false);
         setOtpCode('');
         setDevelopmentOtp(null);
@@ -1683,6 +1830,98 @@ const Waitlist = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Questionnaire Modal */}
+    {showQuestionnaire && (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gradient-to-br from-slate-900/95 via-purple-900/95 to-indigo-900/95 backdrop-blur-xl border border-white/20 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="p-8">
+            {/* Progress Bar */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between text-sm text-white/80 mb-2">
+                <span>Question {currentQuestion + 1} of {questions.length}</span>
+                <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Question Content */}
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">{questions[currentQuestion]?.title}</h2>
+              
+              <div className="space-y-3">
+                {questions[currentQuestion]?.options.map((option) => {
+                  const isSelected = questions[currentQuestion].type === 'multiple-choice'
+                    ? (questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] as string[])?.includes(option.value)
+                    : questionnaireData[questions[currentQuestion].id as keyof typeof questionnaireData] === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => handleQuestionnaireAnswer(questions[currentQuestion].id, option.value)}
+                      className={`w-full p-4 rounded-xl border transition-all duration-300 text-left flex items-center space-x-4 hover:scale-[1.02] ${
+                        isSelected 
+                          ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 border-white/30 text-white shadow-lg' 
+                          : 'bg-white/10 border-white/20 text-white/90 hover:bg-white/15 hover:border-white/30'
+                      }`}
+                    >
+                      <div className="text-2xl">{option.icon}</div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-lg">{option.label}</div>
+                        {option.desc && (
+                          <div className={`text-sm mt-1 ${isSelected ? 'text-white/80' : 'text-white/60'}`}>
+                            {option.desc}
+                          </div>
+                        )}
+                      </div>
+                      {isSelected && (
+                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                          <Check className="w-4 h-4 text-blue-600" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handlePreviousQuestion}
+                disabled={currentQuestion === 0}
+                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold transition-all duration-300 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
+              </button>
+
+              <div className="text-white/60 text-sm">
+                {questions[currentQuestion]?.type === 'multiple-choice' && 'Select all that apply'}
+              </div>
+
+              <button
+                onClick={handleNextQuestion}
+                disabled={!canProceed()}
+                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600/80 to-purple-600/80 border border-white/20 text-white font-semibold transition-all duration-300 hover:from-blue-700/90 hover:to-purple-700/90 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
+              >
+                <span>{currentQuestion === questions.length - 1 ? 'Complete' : 'Next'}</span>
+                {currentQuestion === questions.length - 1 ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
             </div>
           </div>
         </div>
