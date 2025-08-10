@@ -449,7 +449,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       </div>
                       <div>
                         <span className="text-gray-900 font-semibold text-lg">AI Content Engine</span>
-                        <div className="text-sm text-purple-600 font-medium">Generating {particleCount} posts/hour</div>
+                        <div className="text-sm text-purple-600 font-medium">Generating 247 posts/hour</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 bg-white rounded-full px-3 py-1 border border-gray-200">
@@ -483,15 +483,15 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   {/* Simple Bottom Stats */}
                   <div className="mt-6 grid grid-cols-3 gap-3">
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 8)}</div>
+                      <div className="text-lg font-bold text-purple-600">42</div>
                       <div className="text-xs text-gray-600">Posts</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 12)}K</div>
+                      <div className="text-lg font-bold text-blue-600">28K</div>
                       <div className="text-xs text-gray-600">Words</div>
                     </div>
                     <div className="text-center p-3 bg-white rounded-lg border border-gray-200">
-                      <div className="text-lg font-bold text-indigo-600">4.{Math.floor(particleCount % 10)}</div>
+                      <div className="text-lg font-bold text-indigo-600">4.8</div>
                       <div className="text-xs text-gray-600">Rating</div>
                     </div>
                   </div>
