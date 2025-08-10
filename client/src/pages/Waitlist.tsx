@@ -538,8 +538,10 @@ const Waitlist = () => {
       });
 
       const data = await response.json();
+      console.log('[SUBMIT WAITLIST] Response data:', data);
 
       if (data.success) {
+        console.log('[SUBMIT WAITLIST] Setting waitlist data and submitted state');
         setWaitlistData(data);
         setIsSubmitted(true);
         setShowQuestionnaire(false);
@@ -621,6 +623,8 @@ const Waitlist = () => {
   // Success Modal Overlay Component
   const SuccessModal = () => {
     if (!isSubmitted || !waitlistData) return null;
+    
+    console.log('[SUCCESS MODAL] Rendering with data:', { isSubmitted, waitlistData });
     
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
