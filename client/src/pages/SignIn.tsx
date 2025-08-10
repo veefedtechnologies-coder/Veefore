@@ -522,8 +522,8 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 <div className="text-center mb-10 relative z-10">
                   {/* Simple VeeFore Logo */}
                   <div className="mb-8 flex justify-center">
-                    <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-5 rounded-2xl shadow-lg">
-                      <Sparkles className="w-10 h-10 text-white" />
+                    <div className="p-5 rounded-2xl">
+                      <img src={veeforceLogo} alt="VeeFore" className="w-16 h-16" />
                     </div>
                   </div>
 
