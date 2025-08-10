@@ -1122,29 +1122,35 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     {/* Revolutionary OTP Verification Experience */}
     {showOTPModal && (
       <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="relative bg-white/98 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/30">
-          <div className="text-center space-y-8">
-            {/* Premium Header */}
+        {/* Floating gradient orbs for depth */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="relative bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/30 before:via-transparent before:to-transparent before:pointer-events-none">
+          <div className="relative z-10 text-center space-y-8">
+            {/* Premium Header with Glass Effect */}
             <div className="space-y-6">
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
-                  <Mail className="w-10 h-10 text-white" />
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-3 border-white flex items-center justify-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500/80 via-indigo-500/80 to-purple-600/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto shadow-2xl border border-white/20">
+                  <Mail className="w-10 h-10 text-white drop-shadow-lg" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400/90 backdrop-blur-sm rounded-full border-2 border-white/50 flex items-center justify-center shadow-lg">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                   </div>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-2xl blur-xl animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-2xl blur-xl animate-pulse"></div>
               </div>
               
               <div className="space-y-3">
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Verify Your Email</h2>
+                <h2 className="text-3xl font-black text-white tracking-tight drop-shadow-lg">Verify Your Email</h2>
                 <div className="space-y-2">
-                  <p className="text-gray-600 font-medium">
+                  <p className="text-white/80 font-medium drop-shadow">
                     We've sent a 6-digit verification code to
                   </p>
-                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-xl border border-blue-200/50">
-                    <Mail className="w-4 h-4 text-blue-600" />
-                    <span className="font-bold text-blue-900">{pendingUser?.email}</span>
+                  <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/30 shadow-lg">
+                    <Mail className="w-4 h-4 text-white/90" />
+                    <span className="font-bold text-white">{pendingUser?.email}</span>
                   </div>
                 </div>
               </div>
@@ -1153,7 +1159,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             {/* Revolutionary OTP Input Grid */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="text-sm font-bold text-gray-900 tracking-wide">VERIFICATION CODE</div>
+                <div className="text-sm font-bold text-white/90 tracking-wide drop-shadow">VERIFICATION CODE</div>
                 <div className="flex justify-center space-x-3">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className="relative">
@@ -1181,16 +1187,16 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                             prevInput?.focus()
                           }
                         }}
-                        className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 ${
+                        className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 backdrop-blur-xl ${
                           otpCode[index] 
-                            ? 'border-green-400 bg-green-50 text-green-800 shadow-lg shadow-green-200/50' 
-                            : 'border-gray-300 bg-white focus:border-blue-500 focus:bg-blue-50 focus:shadow-lg focus:shadow-blue-200/50'
+                            ? 'border-green-400/60 bg-green-500/20 text-white shadow-lg shadow-green-400/30' 
+                            : 'border-white/30 bg-white/10 text-white placeholder-white/50 focus:border-blue-400/60 focus:bg-blue-500/20 focus:shadow-lg focus:shadow-blue-400/30'
                         }`}
                         maxLength={1}
                         autoFocus={index === 0}
                       />
                       {otpCode[index] && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full flex items-center justify-center">
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
                           <Check className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
@@ -1202,7 +1208,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 <div className="flex justify-center space-x-1">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className={`h-1 w-8 rounded-full transition-all duration-300 ${
-                      otpCode[index] ? 'bg-green-400' : 'bg-gray-200'
+                      otpCode[index] ? 'bg-green-400/80 shadow-lg shadow-green-400/50' : 'bg-white/20'
                     }`}></div>
                   ))}
                 </div>
@@ -1213,9 +1219,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 <button
                   onClick={handleOTPSubmit}
                   disabled={otpLoading || otpCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden group"
+                  className="w-full bg-gradient-to-r from-blue-600/80 via-indigo-600/80 to-purple-600/80 backdrop-blur-xl border border-white/20 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-blue-700/90 hover:via-indigo-700/90 hover:to-purple-700/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   {otpLoading ? (
                     <div className="flex items-center justify-center space-x-3 relative z-10">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -1230,11 +1236,11 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 </button>
 
                 <div className="flex items-center justify-center space-x-4 text-sm">
-                  <span className="text-gray-600">Didn't receive the code?</span>
+                  <span className="text-white/70 drop-shadow">Didn't receive the code?</span>
                   <button
                     onClick={handleResendOTP}
                     disabled={otpLoading}
-                    className="text-blue-600 hover:text-blue-700 font-bold hover:underline disabled:opacity-50 transition-colors duration-200"
+                    className="text-white font-bold hover:text-blue-200 hover:underline disabled:opacity-50 transition-colors duration-200 drop-shadow"
                   >
                     Resend Code
                   </button>
@@ -1243,12 +1249,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             </div>
 
             {/* Enhanced Security Note */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-2xl p-4">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 shadow-lg">
               <div className="flex items-center justify-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400/80 to-orange-500/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 shadow-lg">
                   <Shield className="w-4 h-4 text-white" />
                 </div>
-                <div className="text-sm text-amber-800 font-semibold">
+                <div className="text-sm text-white/90 font-semibold drop-shadow">
                   Code expires in 15 minutes • Bank-level security
                 </div>
               </div>
