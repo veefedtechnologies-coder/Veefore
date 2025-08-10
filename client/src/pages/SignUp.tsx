@@ -33,6 +33,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   const [showOTPModal, setShowOTPModal] = useState(false)
   const [otpCode, setOtpCode] = useState('')
   const [otpLoading, setOtpLoading] = useState(false)
+  const [otpError, setOtpError] = useState(false)
   const [pendingUser, setPendingUser] = useState<{email: string, firstName: string} | null>(null)
 
   const totalSteps = 4
@@ -207,6 +208,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   // OTP Verification Functions
   const handleOTPSubmit = async () => {
     if (!otpCode || otpCode.length !== 6) {
+      setOtpError(true)
       toast({
         title: "Invalid Code",
         description: "Please enter the 6-digit verification code.",
@@ -216,6 +218,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     }
 
     setOtpLoading(true)
+    setOtpError(false) // Reset error state
     try {
       console.log('[OTP DEBUG] Attempting to verify OTP:', { email: pendingUser?.email, code: otpCode })
       
@@ -236,10 +239,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       console.log('[OTP DEBUG] Response data:', responseData)
 
       if (!response.ok) {
+        setOtpError(true) // Set error state for visual feedback
         throw new Error(responseData.message || 'Verification failed')
       }
 
       // Success - email verified, now proceed to step 2
+      setOtpError(false)
       setShowOTPModal(false)
       setOtpCode('') // Clear the OTP code
       toast({
@@ -250,6 +255,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       setCurrentStep(2) // Move to next step after verification
     } catch (error: any) {
       console.error('[OTP DEBUG] Verification error:', error)
+      setOtpError(true) // Ensure error state is set
       toast({
         title: "Verification failed",
         description: error.message || "Invalid or expired code. Please try again.",
@@ -1178,7 +1184,11 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             {/* Revolutionary OTP Input Grid */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="text-sm font-bold text-white/90 tracking-wide drop-shadow">VERIFICATION CODE</div>
+                <div className={`text-sm font-bold tracking-wide drop-shadow transition-colors duration-300 ${
+                  otpError ? 'text-red-300' : 'text-white/90'
+                }`}>
+                  {otpError ? 'INVALID CODE' : 'VERIFICATION CODE'}
+                </div>
                 <div className="flex justify-center space-x-3">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className="relative">
@@ -1191,6 +1201,11 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                             const newCode = otpCode.split('')
                             newCode[index] = value
                             setOtpCode(newCode.join('').slice(0, 6))
+                            
+                            // Clear error state when user starts typing
+                            if (otpError) {
+                              setOtpError(false)
+                            }
                             
                             // Auto-focus next input
                             if (value && index < 5) {
@@ -1207,16 +1222,23 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                           }
                         }}
                         className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 backdrop-blur-xl ${
-                          otpCode[index] 
-                            ? 'border-green-400/60 bg-green-500/20 text-white shadow-lg shadow-green-400/30' 
-                            : 'border-white/30 bg-white/10 text-white placeholder-white/50 focus:border-blue-400/60 focus:bg-blue-500/20 focus:shadow-lg focus:shadow-blue-400/30'
+                          otpError 
+                            ? 'border-red-400/60 bg-red-500/20 text-white shadow-lg shadow-red-400/30 animate-pulse' 
+                            : otpCode[index] 
+                              ? 'border-green-400/60 bg-green-500/20 text-white shadow-lg shadow-green-400/30' 
+                              : 'border-white/30 bg-white/10 text-white placeholder-white/50 focus:border-blue-400/60 focus:bg-blue-500/20 focus:shadow-lg focus:shadow-blue-400/30'
                         }`}
                         maxLength={1}
                         autoFocus={index === 0}
                       />
-                      {otpCode[index] && (
+                      {otpCode[index] && !otpError && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
                           <Check className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                      {otpCode[index] && otpError && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
+                          <X className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
                     </div>
@@ -1227,7 +1249,11 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 <div className="flex justify-center space-x-1">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className={`h-1 w-8 rounded-full transition-all duration-300 ${
-                      otpCode[index] ? 'bg-green-400/80 shadow-lg shadow-green-400/50' : 'bg-white/20'
+                      otpError && otpCode[index] 
+                        ? 'bg-red-400/80 shadow-lg shadow-red-400/50' 
+                        : otpCode[index] 
+                          ? 'bg-green-400/80 shadow-lg shadow-green-400/50' 
+                          : 'bg-white/20'
                     }`}></div>
                   ))}
                 </div>
