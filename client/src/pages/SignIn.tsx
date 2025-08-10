@@ -543,133 +543,24 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                 ))}
                 
-                {/* Ultra-Advanced Header Section */}
-                <div className="text-center mb-12 relative z-10">
-                  {/* Revolutionary Logo with Multiple Effects */}
-                  <div className="relative flex flex-col items-center mb-10">
-                    {/* Floating orb background */}
-                    <div className="absolute -inset-8 bg-gradient-to-r from-blue-400/5 via-purple-400/10 to-indigo-400/5 rounded-full blur-3xl animate-pulse" />
-                    
-                    {/* Main logo container with advanced effects */}
-                    <div className="relative group cursor-pointer transform transition-all duration-700 hover:scale-110" onClick={createRipple}>
-                      {/* Rotating outer ring */}
-                      <div className="absolute -inset-4 w-28 h-28 border-2 border-gradient-to-r from-blue-400/30 via-purple-400/30 to-indigo-400/30 rounded-full animate-spin opacity-60" style={{ animationDuration: '8s' }} />
-                      <div className="absolute -inset-3 w-26 h-26 border border-gradient-to-r from-indigo-300/40 via-blue-300/40 to-purple-300/40 rounded-full animate-spin opacity-40" style={{ animationDuration: '12s', animationDirection: 'reverse' }} />
-                      
-                      {/* Core logo */}
-                      <div className="relative w-20 h-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-2xl group-hover:shadow-blue-500/25 transition-all duration-700">
-                        {/* Inner glow effect */}
-                        <div className="absolute inset-1 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-2xl animate-pulse" />
-                        
-                        {/* Logo icon with advanced animations */}
-                        <Sparkles className="w-10 h-10 text-white relative z-10 group-hover:rotate-180 transition-transform duration-700 drop-shadow-lg" />
-                        
-                        {/* Floating particles around logo */}
-                        {[...Array(8)].map((_, i) => (
-                          <div
-                            key={i}
-                            className="absolute w-1 h-1 bg-white/60 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700"
-                            style={{
-                              left: `${50 + 35 * Math.cos((i * Math.PI * 2) / 8)}%`,
-                              top: `${50 + 35 * Math.sin((i * Math.PI * 2) / 8)}%`,
-                              animation: `particles-orbit ${3 + i * 0.2}s linear infinite`,
-                              animationDelay: `${i * 0.3}s`
-                            }}
-                          />
-                        ))}
-                      </div>
-                      
-                      {/* Hover effect overlay */}
-                      <div className="absolute inset-0 w-20 h-20 bg-gradient-to-br from-white/10 to-white/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Clean Professional Header */}
+                <div className="text-center mb-10 relative z-10">
+                  {/* Simple VeeFore Logo */}
+                  <div className="mb-8 flex justify-center">
+                    <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-5 rounded-2xl shadow-lg">
+                      <Sparkles className="w-10 h-10 text-white" />
                     </div>
                   </div>
 
-                  {/* Sophisticated Welcome Text */}
-                  <div className="space-y-4 mb-8">
-                    <h2 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 bg-clip-text text-transparent hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all duration-700 cursor-default leading-tight">
-                      Welcome Back
-                    </h2>
-                    <div className="relative">
-                      <p className="text-xl text-gray-600 font-medium relative z-10">
-                        Sign in to your{' '}
-                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
-                          intelligent
-                        </span>{' '}
-                        VeeFore workspace
-                      </p>
-                      {/* Subtle text underline effect */}
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-blue-400/30 to-transparent" />
-                    </div>
-                  </div>
+                  {/* Clean Welcome Text */}
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    Welcome Back
+                  </h1>
                   
-                  {/* Revolutionary Security Status Bar */}
-                  <div className="relative bg-gradient-to-r from-gray-50/80 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl p-4 border border-gray-200/50 shadow-lg">
-                    {/* Animated background pattern */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-purple-50/20 to-indigo-50/30 rounded-2xl opacity-50" />
-                    
-                    <div className="relative z-10 flex items-center justify-center space-x-8">
-                      {/* Advanced Security Indicators */}
-                      <div className="flex items-center space-x-3 group cursor-pointer">
-                        <div className="relative">
-                          <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-green-400 rounded-full animate-pulse shadow-lg" />
-                          <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping opacity-30" />
-                          <div className="absolute -inset-1 w-5 h-5 border border-emerald-300/30 rounded-full animate-pulse" />
-                        </div>
-                        <div className="text-center">
-                          <span className="text-emerald-700 text-sm font-bold block">Secure</span>
-                          <span className="text-emerald-600 text-xs">256-bit SSL</span>
-                        </div>
-                      </div>
-                      
-                      <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
-                      
-                      <div className="flex items-center space-x-3 group cursor-pointer">
-                        <div className="relative">
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-pulse shadow-lg delay-300" />
-                          <div className="absolute inset-0 w-3 h-3 bg-blue-400 rounded-full animate-ping opacity-30 delay-300" />
-                          <div className="absolute -inset-1 w-5 h-5 border border-blue-300/30 rounded-full animate-pulse delay-300" />
-                        </div>
-                        <div className="text-center">
-                          <span className="text-blue-700 text-sm font-bold block">Encrypted</span>
-                          <span className="text-blue-600 text-xs">End-to-End</span>
-                        </div>
-                      </div>
-                      
-                      <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
-                      
-                      <div className="flex items-center space-x-3 group cursor-pointer">
-                        <div className="relative">
-                          <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full animate-pulse shadow-lg delay-500" />
-                          <div className="absolute inset-0 w-3 h-3 bg-purple-400 rounded-full animate-ping opacity-30 delay-500" />
-                          <div className="absolute -inset-1 w-5 h-5 border border-purple-300/30 rounded-full animate-pulse delay-500" />
-                        </div>
-                        <div className="text-center">
-                          <span className="text-purple-700 text-sm font-bold block">AI-Protected</span>
-                          <span className="text-purple-600 text-xs">Neural Guard</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Security level indicator */}
-                    <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-1 h-1 rounded-full transition-all duration-500 ${
-                            i < 5 ? 'bg-emerald-500 scale-125' : 'bg-gray-300'
-                          }`}
-                          style={{ animationDelay: `${i * 100}ms` }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Dynamic trust score */}
-                  <div className="mt-4 text-center">
-                    <span className="text-xs text-gray-500 bg-gray-50/80 backdrop-blur-sm px-3 py-1 rounded-full border border-gray-200/50">
-                      Trust Score: <span className="text-emerald-600 font-bold">99.{Math.floor(particleCount % 10)}%</span>
-                    </span>
-                  </div>
+                  {/* Simple subtitle */}
+                  <p className="text-lg text-gray-600 mb-8">
+                    Sign in to your VeeFore workspace
+                  </p>
                 </div>
 
                 {/* Completely New Card-Style Sign In Form */}
