@@ -471,6 +471,119 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // Get single waitlist user with questionnaire details
+  app.get("/api/admin/waitlist/:id", requireAdminAuth, async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getWaitlistUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "Waitlist user not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      console.error('[ADMIN GET WAITLIST USER] Error:', error);
+      res.status(500).json({ error: "Failed to fetch waitlist user" });
+    }
+  });
+
+  // Approve waitlist user
+  app.post("/api/admin/waitlist/:id/approve", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      
+      const updatedUser = await storage.updateWaitlistUser(id, {
+        status: 'approved',
+        updatedAt: new Date()
+      });
+
+      await logAdminAction(
+        req.admin!.id,
+        "APPROVE_WAITLIST_USER",
+        "waitlist_user",
+        id,
+        undefined,
+        { status: 'approved' },
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "User approved successfully", user: updatedUser });
+    } catch (error) {
+      console.error('[ADMIN APPROVE WAITLIST] Error:', error);
+      res.status(500).json({ error: "Failed to approve user" });
+    }
+  });
+
+  // Reject waitlist user
+  app.post("/api/admin/waitlist/:id/reject", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      
+      const updatedUser = await storage.updateWaitlistUser(id, {
+        status: 'rejected',
+        metadata: {
+          ...await storage.getWaitlistUser(id).then(u => u?.metadata || {}),
+          rejectionReason: reason || 'No reason provided'
+        },
+        updatedAt: new Date()
+      });
+
+      await logAdminAction(
+        req.admin!.id,
+        "REJECT_WAITLIST_USER",
+        "waitlist_user",
+        id,
+        undefined,
+        { status: 'rejected', reason },
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "User rejected successfully", user: updatedUser });
+    } catch (error) {
+      console.error('[ADMIN REJECT WAITLIST] Error:', error);
+      res.status(500).json({ error: "Failed to reject user" });
+    }
+  });
+
+  // Ban waitlist user
+  app.post("/api/admin/waitlist/:id/ban", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      
+      const updatedUser = await storage.updateWaitlistUser(id, {
+        status: 'banned',
+        metadata: {
+          ...await storage.getWaitlistUser(id).then(u => u?.metadata || {}),
+          banReason: reason || 'No reason provided',
+          bannedAt: new Date(),
+          bannedBy: req.admin!.id
+        },
+        updatedAt: new Date()
+      });
+
+      await logAdminAction(
+        req.admin!.id,
+        "BAN_WAITLIST_USER",
+        "waitlist_user",
+        id,
+        undefined,
+        { status: 'banned', reason },
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      res.json({ message: "User banned successfully", user: updatedUser });
+    } catch (error) {
+      console.error('[ADMIN BAN WAITLIST] Error:', error);
+      res.status(500).json({ error: "Failed to ban user" });
+    }
+  });
+
   app.post("/api/admin/waitlist/:id/remove", requireAdminAuth, requireRole(["admin", "superadmin"]), async (req: AdminRequest, res) => {
     try {
       const { id } = req.params;
@@ -496,6 +609,17 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error('[ADMIN REMOVE WAITLIST] Error:', error);
       res.status(500).json({ error: "Failed to remove user from waitlist" });
+    }
+  });
+
+  // Get waitlist statistics
+  app.get("/api/admin/waitlist/stats", requireAdminAuth, async (req: AdminRequest, res) => {
+    try {
+      const stats = await storage.getWaitlistStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('[ADMIN WAITLIST STATS] Error:', error);
+      res.status(500).json({ error: "Failed to fetch waitlist statistics" });
     }
   });
 

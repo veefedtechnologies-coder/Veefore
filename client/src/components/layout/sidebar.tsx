@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Home, Calendar, Edit3, BarChart3, MessageSquare, Settings, User, Building2, TrendingUp, PieChart, Globe, LogOut, Users, Link, Plus, Zap, Video } from 'lucide-react'
+import { Home, Calendar, BarChart3, MessageSquare, Settings, Globe, LogOut, Users, Link, Plus, Zap, Video, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateDropdown } from './create-dropdown'
-import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
+// import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
+const veeGPTLogo = '' // temporary placeholder
 import { logout } from '@/lib/auth'
 import { useToast } from '@/hooks/use-toast'
 import { useLocation } from 'wouter'
@@ -18,6 +19,7 @@ const sidebarItems = [
   { icon: Zap, label: 'Automation', key: 'automation', url: '/automation' },
   { icon: Link, label: 'Integration', key: 'integration', url: '/integration' },
   { icon: Users, label: 'Workspaces', key: 'workspaces', url: '/workspaces' },
+  { icon: Shield, label: 'Admin Panel', key: 'admin', url: '/admin' },
   { icon: Globe, label: 'Landing', key: 'landing', url: '/landing' },
 ]
 
@@ -49,6 +51,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
     if (loc === '/automation') return 'automation'
     if (loc === '/integration') return 'integration'
     if (loc === '/workspaces') return 'workspaces'
+    if (loc === '/admin') return 'admin'
     if (loc === '/landing') return 'landing'
     return 'home'
   }

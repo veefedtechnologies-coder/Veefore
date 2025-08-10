@@ -33,6 +33,8 @@ import Profile from './pages/Profile'
 import Integration from './pages/Integration'
 import AutomationStepByStep from './pages/AutomationStepByStep'
 import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
+import AdminPanel from './pages/AdminPanel'
+import AdminLogin from './pages/AdminLogin'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -142,6 +144,13 @@ function App() {
       <Route path="/veegpt">
         <div className="min-h-screen">
           <VeeGPT />
+        </div>
+      </Route>
+
+      {/* Admin Login - Accessible to everyone */}
+      <Route path="/admin-login">
+        <div className="min-h-screen">
+          <AdminLogin />
         </div>
       </Route>
 
@@ -456,6 +465,12 @@ function App() {
                   <Workspaces />
                 </main>
               </div>
+            </div>
+          </Route>
+
+          <Route path="/admin">
+            <div className="min-h-screen bg-gray-50">
+              <AdminPanel />
             </div>
           </Route>
 
