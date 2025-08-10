@@ -562,37 +562,41 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                       label: 'AI Content Generation', 
                       desc: 'Create viral posts, captions, and hashtags with GPT-4o',
                       icon: Sparkles,
-                      gradient: 'from-slate-700 to-slate-800'
+                      iconGradient: 'from-purple-500 to-pink-500',
+                      selectedGradient: 'from-purple-200/30 to-pink-200/30'
                     },
                     { 
                       id: 'ai-visual-creation', 
                       label: 'AI Visual Creation', 
                       desc: 'Generate stunning images, videos, and graphics automatically',
                       icon: Brain,
-                      gradient: 'from-gray-700 to-gray-800'
+                      iconGradient: 'from-green-500 to-emerald-500',
+                      selectedGradient: 'from-green-200/30 to-emerald-200/30'
                     },
                     { 
                       id: 'ai-responses', 
                       label: 'AI Engagement Engine', 
                       desc: 'Intelligent comment management and audience engagement',
                       icon: MessageCircle,
-                      gradient: 'from-zinc-700 to-zinc-800'
+                      iconGradient: 'from-blue-500 to-cyan-500',
+                      selectedGradient: 'from-blue-200/30 to-cyan-200/30'
                     },
                     { 
                       id: 'ai-optimization', 
                       label: 'AI Performance Optimizer', 
                       desc: 'Optimize posting times, content, and strategies with AI',
                       icon: Target,
-                      gradient: 'from-stone-700 to-stone-800'
+                      iconGradient: 'from-orange-500 to-red-500',
+                      selectedGradient: 'from-orange-200/30 to-red-200/30'
                     }
-                  ].map(({ id, label, desc, icon: Icon, gradient }, index) => (
+                  ].map(({ id, label, desc, icon: Icon, iconGradient, selectedGradient }, index) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
                       className={`w-full group relative overflow-hidden transition-all duration-500 ${
                         formData.interestedFeatures.includes(id)
-                          ? `bg-gradient-to-r ${gradient} text-white shadow-2xl transform scale-[1.02]`
+                          ? `bg-gradient-to-r ${selectedGradient} text-gray-900 shadow-2xl transform scale-[1.02]`
                           : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-xl hover:scale-[1.01]'
                       } rounded-2xl border-2 ${
                         formData.interestedFeatures.includes(id) ? 'border-transparent' : 'border-gray-200 hover:border-gray-300'
@@ -602,30 +606,30 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                         animation: 'fadeInUp 0.6s ease-out forwards'
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-r ${iconGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                       <div className="relative p-5 flex items-center space-x-4">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'bg-white/20 text-white shadow-lg'
-                            : `bg-gradient-to-r ${gradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
+                            ? 'bg-gradient-to-r ${iconGradient} text-white shadow-lg'
+                            : `bg-gradient-to-r ${iconGradient} text-white shadow-md group-hover:shadow-lg group-hover:scale-110`
                         }`}>
                           <Icon className="w-7 h-7" />
                         </div>
                         <div className="flex-1">
                           <h3 className={`font-bold text-xl mb-1 transition-all duration-300 ${
-                            formData.interestedFeatures.includes(id) ? 'text-white' : 'text-gray-900 group-hover:text-gray-700'
+                            formData.interestedFeatures.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-gray-700'
                           }`}>
                             {label}
                           </h3>
                           <p className={`text-base transition-all duration-300 ${
-                            formData.interestedFeatures.includes(id) ? 'text-white/90' : 'text-gray-600 group-hover:text-gray-500'
+                            formData.interestedFeatures.includes(id) ? 'text-gray-700' : 'text-gray-600 group-hover:text-gray-500'
                           }`}>
                             {desc}
                           </p>
                         </div>
                         <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-white bg-white text-gray-800 shadow-lg'
+                            ? 'border-gray-800 bg-gray-800 text-white shadow-lg'
                             : 'border-gray-300 group-hover:border-gray-400 group-hover:scale-110'
                         }`}>
                           {formData.interestedFeatures.includes(id) ? (
