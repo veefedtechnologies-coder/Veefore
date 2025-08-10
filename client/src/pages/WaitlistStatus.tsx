@@ -118,6 +118,18 @@ const WaitlistStatus = () => {
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'info', message: 'Beta testing phase has begun!', time: '2 hours ago', read: false },
+    { id: 2, type: 'success', message: 'Your position moved up by 15 spots', time: '1 day ago', read: false },
+    { id: 3, type: 'update', message: 'New feature preview available', time: '3 days ago', read: true }
+  ]);
+  const [milestones] = useState([
+    { id: 1, title: 'Account Created', description: 'Successfully joined the waitlist', completed: true, date: user?.joinedAt },
+    { id: 2, title: 'Email Verified', description: 'Email verification completed', completed: true, date: user?.joinedAt },
+    { id: 3, title: 'Profile Setup', description: 'Complete your profile information', completed: true, date: user?.joinedAt },
+    { id: 4, title: 'Beta Access', description: 'Receive beta testing invitation', completed: false, date: null },
+    { id: 5, title: 'Full Access', description: 'Get complete platform access', completed: false, date: null }
+  ]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -463,33 +475,42 @@ const WaitlistStatus = () => {
           </div>
         </motion.div>
 
-        {/* Innovative Tab System */}
+        {/* Enhanced Tab System with More Options */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4 }}
           className="mb-8"
         >
-          <div className="flex space-x-2 p-2 bg-white rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex flex-wrap gap-2 p-2 bg-white rounded-2xl shadow-lg border border-gray-100">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
               { id: 'progress', label: 'Progress', icon: Activity },
               { id: 'referrals', label: 'Referrals', icon: Share2 },
-              { id: 'benefits', label: 'Benefits', icon: Gift }
+              { id: 'benefits', label: 'Benefits', icon: Gift },
+              { id: 'notifications', label: 'Updates', icon: Bell },
+              { id: 'timeline', label: 'Timeline', icon: Calendar }
             ].map((tab) => (
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className={`flex-1 flex items-center justify-center space-x-2 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${
+                className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 relative ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.label}</span>
+                <tab.icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.id === 'notifications' && notifications.some(n => !n.read) && (
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
+                  />
+                )}
               </motion.button>
             ))}
           </div>
@@ -587,6 +608,264 @@ const WaitlistStatus = () => {
               </div>
             )}
 
+            {activeTab === 'progress' && (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Enhanced Launch Progress */}
+                  <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                          <Rocket className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl font-bold text-gray-900">Launch Timeline</CardTitle>
+                          <p className="text-gray-600">Track our progress to launch</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                      <CreativeProgress value={stats.launchProgress} label="Platform Development" />
+                      
+                      <div className="mt-8 space-y-4">
+                        {[
+                          { phase: "Beta Testing", status: "current", progress: 85, description: "Testing core features with select users" },
+                          { phase: "Security Audit", status: "upcoming", progress: 60, description: "Third-party security review" },
+                          { phase: "Launch Preparation", status: "planned", progress: 30, description: "Final preparations for public release" }
+                        ].map((phase, index) => (
+                          <motion.div 
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-3 h-3 rounded-full ${
+                                  phase.status === 'current' ? 'bg-green-500' :
+                                  phase.status === 'upcoming' ? 'bg-yellow-500' : 'bg-gray-400'
+                                }`} />
+                                <span className="font-medium text-gray-900">{phase.phase}</span>
+                              </div>
+                              <span className="text-sm font-semibold text-gray-700">{phase.progress}%</span>
+                            </div>
+                            <p className="text-sm text-gray-600 ml-6">{phase.description}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Enhanced Community Stats */}
+                  <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-100">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                          <Globe className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl font-bold text-gray-900">Community Growth</CardTitle>
+                          <p className="text-gray-600">Real-time waitlist statistics</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+                          <motion.div
+                            animate={{ scale: [1, 1.05, 1] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="text-4xl font-black text-gray-900 mb-2"
+                          >
+                            {stats.totalUsers.toLocaleString()}
+                          </motion.div>
+                          <div className="text-gray-600 mb-3">Total Members</div>
+                          <div className="flex items-center justify-center space-x-1">
+                            <TrendingUp className="w-4 h-4 text-green-500" />
+                            <span className="text-sm text-green-600 font-medium">+247 today</span>
+                          </div>
+                        </div>
+                        
+                        <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-100">
+                          <div className="text-4xl font-black text-gray-900 mb-2">{stats.avgWaitTime}</div>
+                          <div className="text-gray-600 mb-3">Average Wait Time</div>
+                          <div className="flex items-center justify-center space-x-1">
+                            <Clock className="w-4 h-4 text-purple-500" />
+                            <span className="text-sm text-purple-600 font-medium">Decreasing</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Detailed Progress Metrics */}
+                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-indigo-50 to-cyan-50 border-b border-gray-100">
+                    <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
+                      <Activity className="w-8 h-8 text-indigo-600 mr-3" />
+                      Development Progress
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {[
+                        {
+                          title: "AI Features",
+                          progress: 92,
+                          items: [
+                            { name: "Content Generation", completed: true },
+                            { name: "Smart Scheduling", completed: true },
+                            { name: "Analytics AI", completed: true },
+                            { name: "Voice Recognition", completed: false }
+                          ]
+                        },
+                        {
+                          title: "Platform Core",
+                          progress: 88,
+                          items: [
+                            { name: "User Management", completed: true },
+                            { name: "Database Systems", completed: true },
+                            { name: "Security Layer", completed: true },
+                            { name: "Load Testing", completed: false }
+                          ]
+                        },
+                        {
+                          title: "User Experience",
+                          progress: 95,
+                          items: [
+                            { name: "Interface Design", completed: true },
+                            { name: "Mobile App", completed: true },
+                            { name: "Accessibility", completed: true },
+                            { name: "Tutorial System", completed: true }
+                          ]
+                        }
+                      ].map((category, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.2 }}
+                          className="space-y-4"
+                        >
+                          <div className="text-center mb-6">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">{category.title}</h3>
+                            <div className="relative w-24 h-24 mx-auto mb-4">
+                              <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                                <circle
+                                  cx="50"
+                                  cy="50"
+                                  r="40"
+                                  stroke="currentColor"
+                                  strokeWidth="8"
+                                  fill="transparent"
+                                  className="text-gray-200"
+                                />
+                                <motion.circle
+                                  cx="50"
+                                  cy="50"
+                                  r="40"
+                                  stroke="currentColor"
+                                  strokeWidth="8"
+                                  fill="transparent"
+                                  strokeLinecap="round"
+                                  className="text-indigo-600"
+                                  initial={{ pathLength: 0 }}
+                                  animate={{ pathLength: category.progress / 100 }}
+                                  transition={{ duration: 2, delay: index * 0.3 }}
+                                  style={{
+                                    strokeDasharray: "251.2",
+                                    strokeDashoffset: `${251.2 * (1 - category.progress / 100)}`,
+                                  }}
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-2xl font-bold text-gray-900">{category.progress}%</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            {category.items.map((item, itemIndex) => (
+                              <motion.div
+                                key={itemIndex}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: (index * 0.2) + (itemIndex * 0.1) }}
+                                className="flex items-center space-x-3 p-3 rounded-xl bg-gray-50"
+                              >
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                  item.completed ? 'bg-green-500' : 'bg-gray-300'
+                                }`}>
+                                  {item.completed && <Check className="w-4 h-4 text-white" />}
+                                </div>
+                                <span className={`text-sm font-medium ${
+                                  item.completed ? 'text-gray-900' : 'text-gray-600'
+                                }`}>
+                                  {item.name}
+                                </span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Team Activity Feed */}
+                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 border-b border-gray-100">
+                    <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
+                      <Users className="w-8 h-8 text-orange-600 mr-3" />
+                      Development Team Activity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <div className="space-y-4">
+                      {[
+                        { time: "2 hours ago", activity: "Security patches deployed to production", team: "DevOps Team", type: "deployment" },
+                        { time: "4 hours ago", activity: "New AI model integration completed", team: "AI Engineering", type: "feature" },
+                        { time: "6 hours ago", activity: "Mobile app performance optimizations", team: "Mobile Team", type: "improvement" },
+                        { time: "8 hours ago", activity: "User feedback analysis and improvements", team: "UX Research", type: "research" },
+                        { time: "12 hours ago", activity: "Database backup and optimization completed", team: "Backend Team", type: "maintenance" }
+                      ].map((activity, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-start space-x-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                        >
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                            activity.type === 'deployment' ? 'bg-green-500' :
+                            activity.type === 'feature' ? 'bg-blue-500' :
+                            activity.type === 'improvement' ? 'bg-purple-500' :
+                            activity.type === 'research' ? 'bg-orange-500' : 'bg-gray-500'
+                          }`}>
+                            {activity.type === 'deployment' && <Rocket className="w-6 h-6 text-white" />}
+                            {activity.type === 'feature' && <Star className="w-6 h-6 text-white" />}
+                            {activity.type === 'improvement' && <Zap className="w-6 h-6 text-white" />}
+                            {activity.type === 'research' && <Target className="w-6 h-6 text-white" />}
+                            {activity.type === 'maintenance' && <Shield className="w-6 h-6 text-white" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-gray-900 font-medium mb-1">{activity.activity}</p>
+                            <div className="flex items-center space-x-4">
+                              <span className="text-sm font-medium text-gray-700">{activity.team}</span>
+                              <span className="text-sm text-gray-500">•</span>
+                              <span className="text-sm text-gray-500">{activity.time}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {activeTab === 'referrals' && (
               <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
                 <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
@@ -662,56 +941,282 @@ const WaitlistStatus = () => {
             )}
 
             {activeTab === 'benefits' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[
-                  { 
-                    icon: Gift, 
-                    title: "50% Launch Discount", 
-                    description: "Save big with our early bird special pricing for the first year.",
-                    gradient: "from-green-500 to-emerald-600",
-                    bg: "from-green-50 to-emerald-50"
-                  },
-                  { 
-                    icon: Zap, 
-                    title: "Priority Support", 
-                    description: "Get dedicated 24/7 customer support with priority response times.",
-                    gradient: "from-blue-500 to-cyan-600",
-                    bg: "from-blue-50 to-cyan-50"
-                  },
-                  { 
-                    icon: Star, 
-                    title: "Exclusive Features", 
-                    description: "Beta access to new AI tools and features before public release.",
-                    gradient: "from-purple-500 to-indigo-600",
-                    bg: "from-purple-50 to-indigo-50"
-                  },
-                  { 
-                    icon: Award, 
-                    title: "Founder Status", 
-                    description: "Lifetime recognition as a founding member with special badges.",
-                    gradient: "from-pink-500 to-rose-600",
-                    bg: "from-pink-50 to-rose-50"
-                  }
-                ].map((benefit, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  >
-                    <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden h-full">
-                      <CardContent className="p-8">
-                        <div className={`w-16 h-16 bg-gradient-to-r ${benefit.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
-                          <benefit.icon className="w-8 h-8 text-white" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">{benefit.title}</h3>
-                        <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+              <div className="space-y-8">
+                {/* Premium Benefits */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {[
+                    { 
+                      icon: Gift, 
+                      title: "50% Launch Discount", 
+                      description: "Save big with our early bird special pricing for the first year.",
+                      value: "$297 saved",
+                      gradient: "from-green-500 to-emerald-600",
+                      bg: "from-green-50 to-emerald-50"
+                    },
+                    { 
+                      icon: Zap, 
+                      title: "Priority Support", 
+                      description: "Get dedicated 24/7 customer support with priority response times.",
+                      value: "< 1 hour response",
+                      gradient: "from-blue-500 to-cyan-600",
+                      bg: "from-blue-50 to-cyan-50"
+                    },
+                    { 
+                      icon: Star, 
+                      title: "Exclusive Features", 
+                      description: "Beta access to new AI tools and features before public release.",
+                      value: "3 months early",
+                      gradient: "from-purple-500 to-indigo-600",
+                      bg: "from-purple-50 to-indigo-50"
+                    },
+                    { 
+                      icon: Award, 
+                      title: "Founder Status", 
+                      description: "Lifetime recognition as a founding member with special badges.",
+                      value: "Permanent badge",
+                      gradient: "from-pink-500 to-rose-600",
+                      bg: "from-pink-50 to-rose-50"
+                    }
+                  ].map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                    >
+                      <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden h-full">
+                        <CardContent className="p-8">
+                          <div className={`w-16 h-16 bg-gradient-to-r ${benefit.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
+                            <benefit.icon className="w-8 h-8 text-white" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
+                          <div className="text-lg font-semibold text-blue-600 mb-4">{benefit.value}</div>
+                          <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Additional Perks */}
+                <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 shadow-xl border-0 rounded-3xl">
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
+                      <Gem className="w-8 h-8 text-purple-600 mr-3" />
+                      Additional Member Perks
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[
+                        { icon: Shield, title: "Advanced Security", desc: "Enterprise-grade encryption" },
+                        { icon: Briefcase, title: "Business Templates", desc: "200+ ready-made templates" },
+                        { icon: Globe, title: "Multi-language Support", desc: "Content in 25+ languages" },
+                        { icon: BarChart3, title: "Advanced Analytics", desc: "Deep insight reports" },
+                        { icon: Users, title: "Team Collaboration", desc: "Unlimited team members" },
+                        { icon: Rocket, title: "API Access", desc: "Full developer API access" }
+                      ].map((perk, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-start space-x-3 p-4 bg-white rounded-2xl shadow-sm"
+                        >
+                          <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <perk.icon className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-1">{perk.title}</h4>
+                            <p className="text-sm text-gray-600">{perk.desc}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
+            )}
+
+            {activeTab === 'notifications' && (
+              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                        <Bell className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl font-bold text-gray-900">Latest Updates</CardTitle>
+                        <p className="text-gray-600">Stay informed about your waitlist status</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-700">
+                      {notifications.filter(n => !n.read).length} unread
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="space-y-6">
+                    {notifications.map((notification, index) => (
+                      <motion.div
+                        key={notification.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`flex items-start space-x-4 p-6 rounded-2xl border-2 transition-all duration-200 ${
+                          !notification.read 
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' 
+                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                          notification.type === 'success' ? 'bg-green-500' :
+                          notification.type === 'info' ? 'bg-blue-500' :
+                          'bg-purple-500'
+                        }`}>
+                          {notification.type === 'success' && <Check className="w-6 h-6 text-white" />}
+                          {notification.type === 'info' && <Bell className="w-6 h-6 text-white" />}
+                          {notification.type === 'update' && <Zap className="w-6 h-6 text-white" />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-900 font-medium mb-1">{notification.message}</p>
+                          <p className="text-sm text-gray-500">{notification.time}</p>
+                        </div>
+                        {!notification.read && (
+                          <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="w-3 h-3 bg-blue-500 rounded-full"
+                          />
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Newsletter Signup */}
+                  <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <Mail className="w-8 h-8 text-purple-600" />
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">Stay Updated</h3>
+                        <p className="text-gray-600">Get weekly updates about VeeFore development</p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-4">
+                      <input
+                        type="email"
+                        placeholder="Your email address"
+                        className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        defaultValue={user?.email || ''}
+                        readOnly
+                      />
+                      <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl">
+                        Subscribe
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'timeline' && (
+              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-gray-900">Your Journey Timeline</CardTitle>
+                      <p className="text-gray-600">Track your progress through the waitlist</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="space-y-8">
+                    {milestones.map((milestone, index) => (
+                      <motion.div
+                        key={milestone.id}
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.2 }}
+                        className="flex items-start space-x-6"
+                      >
+                        <div className="relative">
+                          <motion.div
+                            animate={milestone.completed ? { scale: [1, 1.1, 1] } : {}}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className={`w-16 h-16 rounded-2xl flex items-center justify-center border-4 ${
+                              milestone.completed 
+                                ? 'bg-green-500 border-green-200' 
+                                : 'bg-gray-100 border-gray-300'
+                            }`}
+                          >
+                            {milestone.completed ? (
+                              <Check className="w-8 h-8 text-white" />
+                            ) : (
+                              <Clock className="w-8 h-8 text-gray-500" />
+                            )}
+                          </motion.div>
+                          {index < milestones.length - 1 && (
+                            <div className={`absolute left-8 top-16 w-px h-16 ${
+                              milestone.completed ? 'bg-green-300' : 'bg-gray-300'
+                            }`} />
+                          )}
+                        </div>
+                        <div className="flex-1 pt-2">
+                          <h3 className={`text-xl font-bold mb-2 ${
+                            milestone.completed ? 'text-green-700' : 'text-gray-700'
+                          }`}>
+                            {milestone.title}
+                          </h3>
+                          <p className="text-gray-600 mb-3">{milestone.description}</p>
+                          {milestone.date && (
+                            <p className="text-sm text-gray-500">
+                              Completed on {new Date(milestone.date).toLocaleDateString()}
+                            </p>
+                          )}
+                          {!milestone.completed && milestone.id === 4 && (
+                            <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <TrendingUp className="w-5 h-5 text-blue-600" />
+                                <span className="font-semibold text-blue-700">Coming Soon</span>
+                              </div>
+                              <p className="text-sm text-blue-600">
+                                Beta invitations start rolling out in the next 2-3 weeks based on queue position and engagement.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Estimated Timeline */}
+                  <div className="mt-12 p-8 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-200">
+                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                      <Rocket className="w-6 h-6 text-indigo-600 mr-3" />
+                      Estimated Timeline
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                        <div className="text-2xl font-black text-indigo-600 mb-2">Week 1-2</div>
+                        <div className="text-sm text-gray-600">Beta Invitations</div>
+                      </div>
+                      <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                        <div className="text-2xl font-black text-purple-600 mb-2">Week 3-4</div>
+                        <div className="text-sm text-gray-600">Early Access</div>
+                      </div>
+                      <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                        <div className="text-2xl font-black text-pink-600 mb-2">Week 5-6</div>
+                        <div className="text-sm text-gray-600">Full Launch</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </motion.div>
         </AnimatePresence>
