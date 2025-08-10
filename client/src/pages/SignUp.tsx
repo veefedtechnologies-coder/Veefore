@@ -225,7 +225,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                     onBlur={() => setFocusedField('')}
                     className={`w-full px-6 py-5 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
                       errors.fullName ? 'border-red-400 bg-red-50/80' : 
-                      focusedField === 'fullName' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      focusedField === 'fullName' ? 'border-blue-500 bg-blue-50/30 shadow-xl' :
                       'border-gray-200 hover:border-blue-300 hover:shadow-lg'
                     }`}
                     placeholder="Enter your full name"
@@ -253,7 +253,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                     onBlur={() => setFocusedField('')}
                     className={`w-full px-6 py-5 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
                       errors.email ? 'border-red-400 bg-red-50/80' : 
-                      focusedField === 'email' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      focusedField === 'email' ? 'border-blue-500 bg-blue-50/30 shadow-xl' :
                       'border-gray-200 hover:border-blue-300 hover:shadow-lg'
                     }`}
                     placeholder="Enter your email address"
@@ -281,7 +281,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                     onBlur={() => setFocusedField('')}
                     className={`w-full px-6 py-5 pr-16 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 font-medium text-lg bg-white/80 backdrop-blur-sm ${
                       errors.password ? 'border-red-400 bg-red-50/80' : 
-                      focusedField === 'password' ? 'border-blue-500 bg-blue-50/30 shadow-xl transform scale-[1.02]' :
+                      focusedField === 'password' ? 'border-blue-500 bg-blue-50/30 shadow-xl' :
                       'border-gray-200 hover:border-blue-300 hover:shadow-lg'
                     }`}
                     placeholder="Create a secure password"
