@@ -529,80 +529,228 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
 
       case 2:
         return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-blue-700 font-semibold text-sm">Early Access Beta</span>
+          <div className="space-y-10">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-8 py-4 shadow-lg">
+                <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-700 font-bold text-sm tracking-wide">EARLY ACCESS BETA FEATURES</span>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                Which features interest you most?
+              <h1 className="text-5xl font-black text-gray-900 leading-tight">
+                Choose Your AI Superpowers
               </h1>
-              <p className="text-lg text-gray-600">
-                Help us prioritize development for your needs
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Select the advanced features you're most excited to beta test. Multiple selections recommended for full experience.
               </p>
             </div>
 
             <div className="space-y-8">
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-6 tracking-wide">
-                  SELECT ALL THAT APPLY:
-                </label>
-                <div className="grid grid-cols-1 gap-4">
-                  {[
-                    { id: 'ai-content-generation', label: 'AI Content Generation', desc: 'Automatically create posts, captions, and hashtags', icon: Sparkles },
-                    { id: 'auto-scheduling', label: 'Smart Scheduling', desc: 'AI-powered optimal posting times', icon: Clock },
-                    { id: 'analytics-insights', label: 'Advanced Analytics', desc: 'Deep insights and performance tracking', icon: BarChart },
-                    { id: 'multi-platform', label: 'Multi-Platform Management', desc: 'Manage all social accounts in one place', icon: Globe },
-                    { id: 'ai-responses', label: 'AI Comment Management', desc: 'Automated responses and engagement', icon: MessageCircle },
-                    { id: 'trend-analysis', label: 'Trend Discovery', desc: 'Stay ahead with trending content ideas', icon: TrendingUp }
-                  ].map(({ id, label, desc, icon: Icon }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
-                        formData.interestedFeatures.includes(id)
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.02]'
-                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
-                      }`}
-                    >
-                      <div className="flex items-start space-x-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              <div className="text-center">
+                <div className="inline-flex items-center space-x-2 bg-gray-100/80 backdrop-blur-sm rounded-xl px-4 py-2">
+                  <span className="text-sm font-bold text-gray-700 tracking-wider">CORE AI FEATURES</span>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[
+                  { 
+                    id: 'ai-content-generation', 
+                    label: 'AI Content Studio', 
+                    desc: 'GPT-4 powered content creation with brand voice adaptation, multi-format generation, and real-time optimization',
+                    features: ['Brand Voice Training', 'Multi-Platform Adaptation', 'SEO Optimization', 'Hashtag Research'],
+                    icon: Sparkles,
+                    gradient: 'from-purple-500 to-pink-500',
+                    bgGradient: 'from-purple-50 to-pink-50'
+                  },
+                  { 
+                    id: 'ai-video-creation', 
+                    label: 'AI Video Engine', 
+                    desc: 'Advanced video generation with scene creation, voiceover synthesis, and automated editing workflows',
+                    features: ['Scene Generation', 'AI Voiceover', 'Auto Editing', 'Custom Templates'],
+                    icon: Code,
+                    gradient: 'from-blue-500 to-cyan-500',
+                    bgGradient: 'from-blue-50 to-cyan-50'
+                  },
+                  { 
+                    id: 'smart-scheduling', 
+                    label: 'Quantum Scheduler', 
+                    desc: 'ML-powered posting optimization with audience behavior analysis and cross-platform timing synchronization',
+                    features: ['Audience Analysis', 'Optimal Timing', 'Cross-Platform Sync', 'Performance Prediction'],
+                    icon: Clock,
+                    gradient: 'from-green-500 to-emerald-500',
+                    bgGradient: 'from-green-50 to-emerald-50'
+                  },
+                  { 
+                    id: 'advanced-analytics', 
+                    label: 'Analytics Intelligence', 
+                    desc: 'Deep learning insights with predictive analytics, competitor analysis, and ROI tracking across all platforms',
+                    features: ['Predictive Analytics', 'Competitor Analysis', 'ROI Tracking', 'Custom Dashboards'],
+                    icon: BarChart,
+                    gradient: 'from-orange-500 to-red-500',
+                    bgGradient: 'from-orange-50 to-red-50'
+                  }
+                ].map(({ id, label, desc, features, icon: Icon, gradient, bgGradient }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
+                    className={`group p-8 rounded-3xl border-2 transition-all duration-300 text-left hover:shadow-2xl transform hover:-translate-y-1 ${
+                      formData.interestedFeatures.includes(id)
+                        ? `border-transparent bg-gradient-to-br ${bgGradient} shadow-2xl scale-[1.02] ring-4 ring-blue-200/50`
+                        : 'border-gray-200/50 hover:border-blue-300/50 hover:bg-gradient-to-br hover:from-blue-50/30 hover:to-indigo-50/30 backdrop-blur-sm'
+                    }`}
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-start justify-between">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
                           formData.interestedFeatures.includes(id)
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <Icon className="w-5 h-5" />
+                            ? `bg-gradient-to-br ${gradient} text-white shadow-lg`
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-indigo-500 group-hover:text-white'
+                        } transition-all duration-300`}>
+                          <Icon className="w-8 h-8" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className={`font-bold text-lg ${
-                            formData.interestedFeatures.includes(id) ? 'text-blue-700' : 'text-gray-900'
-                          }`}>
-                            {label}
-                          </h3>
-                          <p className="text-gray-600 text-sm mt-1">{desc}</p>
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
                           formData.interestedFeatures.includes(id)
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-blue-500 bg-blue-500 shadow-lg'
+                            : 'border-gray-300 group-hover:border-blue-400'
                         }`}>
                           {formData.interestedFeatures.includes(id) && (
-                            <Check className="w-4 h-4 text-white" />
+                            <Check className="w-5 h-5 text-white" />
                           )}
                         </div>
                       </div>
-                    </button>
-                  ))}
+                      
+                      <div className="space-y-3">
+                        <h3 className={`font-black text-xl transition-colors duration-300 ${
+                          formData.interestedFeatures.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-blue-700'
+                        }`}>
+                          {label}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                        
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          {features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center space-x-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                formData.interestedFeatures.includes(id) ? 'bg-blue-500' : 'bg-gray-400 group-hover:bg-blue-500'
+                              } transition-colors duration-300`}></div>
+                              <span className="text-xs font-medium text-gray-600">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <div className="inline-flex items-center space-x-2 bg-gray-100/80 backdrop-blur-sm rounded-xl px-4 py-2">
+                  <span className="text-sm font-bold text-gray-700 tracking-wider">AUTOMATION & ENGAGEMENT</span>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[
+                  { 
+                    id: 'ai-engagement', 
+                    label: 'AI Engagement Engine', 
+                    desc: 'Intelligent comment management, automated responses, and sentiment analysis with human-like interactions',
+                    features: ['Smart Replies', 'Sentiment Analysis', 'Auto Moderation', 'Engagement Scoring'],
+                    icon: MessageCircle,
+                    gradient: 'from-violet-500 to-purple-500',
+                    bgGradient: 'from-violet-50 to-purple-50'
+                  },
+                  { 
+                    id: 'trend-intelligence', 
+                    label: 'Trend Intelligence', 
+                    desc: 'Real-time trend discovery with viral content prediction, hashtag optimization, and competitor monitoring',
+                    features: ['Viral Prediction', 'Hashtag Optimization', 'Competitor Tracking', 'Trend Alerts'],
+                    icon: TrendingUp,
+                    gradient: 'from-teal-500 to-blue-500',
+                    bgGradient: 'from-teal-50 to-blue-50'
+                  },
+                  { 
+                    id: 'multi-platform-sync', 
+                    label: 'Platform Orchestrator', 
+                    desc: 'Unified multi-platform management with cross-posting optimization and platform-specific adaptations',
+                    features: ['Cross-Platform Posting', 'Format Adaptation', 'Unified Inbox', 'Platform Analytics'],
+                    icon: Globe,
+                    gradient: 'from-rose-500 to-pink-500',
+                    bgGradient: 'from-rose-50 to-pink-50'
+                  },
+                  { 
+                    id: 'ai-influencer-tools', 
+                    label: 'Creator Studio Pro', 
+                    desc: 'Advanced creator tools with brand collaboration management, sponsored content optimization, and earnings tracking',
+                    features: ['Brand Collaborations', 'Sponsored Content', 'Earnings Tracking', 'Creator Analytics'],
+                    icon: Star,
+                    gradient: 'from-amber-500 to-orange-500',
+                    bgGradient: 'from-amber-50 to-orange-50'
+                  }
+                ].map(({ id, label, desc, features, icon: Icon, gradient, bgGradient }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
+                    className={`group p-8 rounded-3xl border-2 transition-all duration-300 text-left hover:shadow-2xl transform hover:-translate-y-1 ${
+                      formData.interestedFeatures.includes(id)
+                        ? `border-transparent bg-gradient-to-br ${bgGradient} shadow-2xl scale-[1.02] ring-4 ring-indigo-200/50`
+                        : 'border-gray-200/50 hover:border-indigo-300/50 hover:bg-gradient-to-br hover:from-indigo-50/30 hover:to-purple-50/30 backdrop-blur-sm'
+                    }`}
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-start justify-between">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                          formData.interestedFeatures.includes(id)
+                            ? `bg-gradient-to-br ${gradient} text-white shadow-lg`
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-indigo-500 group-hover:to-purple-500 group-hover:text-white'
+                        } transition-all duration-300`}>
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'border-indigo-500 bg-indigo-500 shadow-lg'
+                            : 'border-gray-300 group-hover:border-indigo-400'
+                        }`}>
+                          {formData.interestedFeatures.includes(id) && (
+                            <Check className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h3 className={`font-black text-xl transition-colors duration-300 ${
+                          formData.interestedFeatures.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-indigo-700'
+                        }`}>
+                          {label}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                        
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          {features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center space-x-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                formData.interestedFeatures.includes(id) ? 'bg-indigo-500' : 'bg-gray-400 group-hover:bg-indigo-500'
+                              } transition-colors duration-300`}></div>
+                              <span className="text-xs font-medium text-gray-600">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <button
-              onClick={handleNextStep}
-              disabled={formData.interestedFeatures.length === 0}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:hover:scale-100 group"
+            <div className="text-center pt-6">
+              <p className="text-sm text-gray-500 mb-6">Selected {formData.interestedFeatures.length} of 8 advanced features</p>
+              <button
+                onClick={handleNextStep}
+                disabled={formData.interestedFeatures.length === 0}
+                className="w-full max-w-md mx-auto bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-5 rounded-2xl font-black text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-[1.02] disabled:hover:scale-100 group"
             >
               <span>Continue to Use Cases</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
@@ -612,90 +760,269 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
 
       case 3:
         return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-blue-700 font-semibold text-sm">Early Access Beta</span>
+          <div className="space-y-10">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-indigo-50/90 to-purple-50/90 backdrop-blur-sm border border-indigo-200/50 rounded-2xl px-8 py-4 shadow-lg">
+                <div className="w-4 h-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700 font-bold text-sm tracking-wide">STRATEGIC USE CASE SELECTION</span>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                What's your primary use case?
+              <h1 className="text-5xl font-black text-gray-900 leading-tight">
+                Define Your Success Strategy
               </h1>
-              <p className="text-lg text-gray-600">
-                Help us understand how you plan to use VeeFore
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Choose your primary goals to unlock personalized AI workflows. Select multiple use cases for maximum impact.
               </p>
             </div>
 
-            <div className="space-y-4">
-              <label className="block text-sm font-bold text-gray-900 mb-6 tracking-wide">
-                CHOOSE YOUR TOP PRIORITIES:
-              </label>
-              {[
-                { id: 'content-creation', label: 'Content Creation & Automation', desc: 'AI-powered posts, captions, and scheduling', icon: Sparkles },
-                { id: 'audience-growth', label: 'Audience Growth & Engagement', desc: 'Build followers and increase interactions', icon: TrendingUp },
-                { id: 'time-saving', label: 'Time-Saving Workflows', desc: 'Automate routine social media tasks', icon: Clock },
-                { id: 'analytics-insights', label: 'Analytics & Performance Tracking', desc: 'Data-driven social media decisions', icon: BarChart },
-                { id: 'multi-account', label: 'Multi-Account Management', desc: 'Manage multiple brands or clients', icon: Globe },
-                { id: 'brand-consistency', label: 'Brand Consistency', desc: 'Maintain unified voice across platforms', icon: Target }
-              ].map(({ id, label, desc, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => handleArrayFieldToggle('useCases', id)}
-                  className={`w-full p-6 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
-                    formData.useCases.includes(id)
-                      ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.02]'
-                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
-                  }`}
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+            <div className="space-y-8">
+              <div className="text-center">
+                <div className="inline-flex items-center space-x-2 bg-gray-100/80 backdrop-blur-sm rounded-xl px-4 py-2">
+                  <span className="text-sm font-bold text-gray-700 tracking-wider">BUSINESS OBJECTIVES</span>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[
+                  { 
+                    id: 'content-mastery', 
+                    label: 'Content Mastery & Automation', 
+                    desc: 'Transform your content creation with AI-powered generation, optimization, and brand voice consistency across all platforms',
+                    benefits: ['10x Faster Content Creation', 'Brand Voice Consistency', 'Multi-Format Optimization', 'SEO Enhancement'],
+                    icon: Sparkles,
+                    gradient: 'from-emerald-500 to-teal-500',
+                    bgGradient: 'from-emerald-50 to-teal-50',
+                    metric: '500% faster content creation'
+                  },
+                  { 
+                    id: 'growth-acceleration', 
+                    label: 'Growth Acceleration Engine', 
+                    desc: 'Accelerate audience growth with intelligent engagement strategies, viral content prediction, and community building automation',
+                    benefits: ['Viral Content Prediction', 'Smart Engagement', 'Audience Insights', 'Growth Analytics'],
+                    icon: TrendingUp,
+                    gradient: 'from-blue-500 to-indigo-500',
+                    bgGradient: 'from-blue-50 to-indigo-50',
+                    metric: '300% engagement increase'
+                  },
+                  { 
+                    id: 'productivity-optimization', 
+                    label: 'Productivity Optimization', 
+                    desc: 'Eliminate manual tasks with intelligent automation workflows, smart scheduling, and time-saving AI assistants',
+                    benefits: ['Automated Workflows', 'Smart Scheduling', 'Task Optimization', 'Time Analytics'],
+                    icon: Clock,
+                    gradient: 'from-purple-500 to-pink-500',
+                    bgGradient: 'from-purple-50 to-pink-50',
+                    metric: '80% time savings'
+                  },
+                  { 
+                    id: 'data-intelligence', 
+                    label: 'Data Intelligence & ROI', 
+                    desc: 'Unlock deep insights with predictive analytics, competitor intelligence, and comprehensive ROI tracking across all channels',
+                    benefits: ['Predictive Analytics', 'Competitor Intelligence', 'ROI Tracking', 'Performance Insights'],
+                    icon: BarChart,
+                    gradient: 'from-orange-500 to-red-500',
+                    bgGradient: 'from-orange-50 to-red-50',
+                    metric: '250% better ROI visibility'
+                  }
+                ].map(({ id, label, desc, benefits, icon: Icon, gradient, bgGradient, metric }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleArrayFieldToggle('useCases', id)}
+                    className={`group p-8 rounded-3xl border-2 transition-all duration-300 text-left hover:shadow-2xl transform hover:-translate-y-1 ${
                       formData.useCases.includes(id)
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      <Icon className="w-6 h-6" />
+                        ? `border-transparent bg-gradient-to-br ${bgGradient} shadow-2xl scale-[1.02] ring-4 ring-indigo-200/50`
+                        : 'border-gray-200/50 hover:border-indigo-300/50 hover:bg-gradient-to-br hover:from-indigo-50/30 hover:to-purple-50/30 backdrop-blur-sm'
+                    }`}
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-start justify-between">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                          formData.useCases.includes(id)
+                            ? `bg-gradient-to-br ${gradient} text-white shadow-lg`
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-indigo-500 group-hover:to-purple-500 group-hover:text-white'
+                        } transition-all duration-300`}>
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
+                          formData.useCases.includes(id)
+                            ? 'border-indigo-500 bg-indigo-500 shadow-lg'
+                            : 'border-gray-300 group-hover:border-indigo-400'
+                        }`}>
+                          {formData.useCases.includes(id) && (
+                            <Check className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <h3 className={`font-black text-xl transition-colors duration-300 ${
+                          formData.useCases.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-indigo-700'
+                        }`}>
+                          {label}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                        
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                          formData.useCases.includes(id) 
+                            ? 'bg-indigo-100 text-indigo-700' 
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'
+                        } transition-all duration-300`}>
+                          {metric}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          {benefits.map((benefit, idx) => (
+                            <div key={idx} className="flex items-center space-x-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                formData.useCases.includes(id) ? 'bg-indigo-500' : 'bg-gray-400 group-hover:bg-indigo-500'
+                              } transition-colors duration-300`}></div>
+                              <span className="text-xs font-medium text-gray-600">{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className={`font-bold text-xl ${
-                        formData.useCases.includes(id) ? 'text-blue-700' : 'text-gray-900'
-                      }`}>
-                        {label}
-                      </h3>
-                      <p className="text-gray-600 text-base mt-2">{desc}</p>
-                    </div>
-                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center ${
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <div className="inline-flex items-center space-x-2 bg-gray-100/80 backdrop-blur-sm rounded-xl px-4 py-2">
+                  <span className="text-sm font-bold text-gray-700 tracking-wider">SPECIALIZED WORKFLOWS</span>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[
+                  { 
+                    id: 'enterprise-management', 
+                    label: 'Enterprise Multi-Brand Management', 
+                    desc: 'Manage multiple brands, clients, or teams with advanced collaboration tools, approval workflows, and enterprise security',
+                    benefits: ['Multi-Brand Dashboard', 'Team Collaboration', 'Approval Workflows', 'Enterprise Security'],
+                    icon: Briefcase,
+                    gradient: 'from-slate-500 to-gray-500',
+                    bgGradient: 'from-slate-50 to-gray-50',
+                    metric: 'Up to 50 brands per account'
+                  },
+                  { 
+                    id: 'brand-authority', 
+                    label: 'Brand Authority & Consistency', 
+                    desc: 'Build powerful brand presence with voice consistency, visual identity management, and reputation monitoring across platforms',
+                    benefits: ['Voice Consistency', 'Visual Identity', 'Reputation Monitoring', 'Brand Guidelines'],
+                    icon: Target,
+                    gradient: 'from-rose-500 to-pink-500',
+                    bgGradient: 'from-rose-50 to-pink-50',
+                    metric: '95% brand consistency score'
+                  },
+                  { 
+                    id: 'creator-monetization', 
+                    label: 'Creator Monetization Studio', 
+                    desc: 'Maximize creator earnings with brand collaboration tools, sponsored content optimization, and revenue analytics',
+                    benefits: ['Brand Partnerships', 'Revenue Analytics', 'Sponsored Content', 'Monetization Tools'],
+                    icon: Star,
+                    gradient: 'from-amber-500 to-yellow-500',
+                    bgGradient: 'from-amber-50 to-yellow-50',
+                    metric: '400% revenue growth potential'
+                  },
+                  { 
+                    id: 'platform-domination', 
+                    label: 'Cross-Platform Domination', 
+                    desc: 'Master every social platform with unified management, platform-specific optimization, and cross-channel analytics',
+                    benefits: ['Unified Management', 'Platform Optimization', 'Cross-Channel Analytics', 'Multi-Platform ROI'],
+                    icon: Globe,
+                    gradient: 'from-cyan-500 to-blue-500',
+                    bgGradient: 'from-cyan-50 to-blue-50',
+                    metric: '15+ platforms supported'
+                  }
+                ].map(({ id, label, desc, benefits, icon: Icon, gradient, bgGradient, metric }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleArrayFieldToggle('useCases', id)}
+                    className={`group p-8 rounded-3xl border-2 transition-all duration-300 text-left hover:shadow-2xl transform hover:-translate-y-1 ${
                       formData.useCases.includes(id)
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {formData.useCases.includes(id) && (
-                        <Check className="w-4 h-4 text-white" />
-                      )}
+                        ? `border-transparent bg-gradient-to-br ${bgGradient} shadow-2xl scale-[1.02] ring-4 ring-purple-200/50`
+                        : 'border-gray-200/50 hover:border-purple-300/50 hover:bg-gradient-to-br hover:from-purple-50/30 hover:to-pink-50/30 backdrop-blur-sm'
+                    }`}
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-start justify-between">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                          formData.useCases.includes(id)
+                            ? `bg-gradient-to-br ${gradient} text-white shadow-lg`
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-pink-500 group-hover:text-white'
+                        } transition-all duration-300`}>
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <div className={`w-8 h-8 rounded-full border-3 flex items-center justify-center transition-all duration-300 ${
+                          formData.useCases.includes(id)
+                            ? 'border-purple-500 bg-purple-500 shadow-lg'
+                            : 'border-gray-300 group-hover:border-purple-400'
+                        }`}>
+                          {formData.useCases.includes(id) && (
+                            <Check className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <h3 className={`font-black text-xl transition-colors duration-300 ${
+                          formData.useCases.includes(id) ? 'text-gray-900' : 'text-gray-900 group-hover:text-purple-700'
+                        }`}>
+                          {label}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                        
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                          formData.useCases.includes(id) 
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-purple-100 group-hover:text-purple-700'
+                        } transition-all duration-300`}>
+                          {metric}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          {benefits.map((benefit, idx) => (
+                            <div key={idx} className="flex items-center space-x-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                formData.useCases.includes(id) ? 'bg-purple-500' : 'bg-gray-400 group-hover:bg-purple-500'
+                              } transition-colors duration-300`}></div>
+                              <span className="text-xs font-medium text-gray-600">{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 pt-6">
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-xl font-bold text-lg transition-colors duration-200 flex items-center justify-center space-x-3"
+                className="flex-1 bg-gray-100/80 hover:bg-gray-200/80 backdrop-blur-sm text-gray-700 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 border border-gray-200/50 hover:border-gray-300/50"
               >
                 <ArrowLeft className="w-5 h-5" />
-                <span>Back</span>
+                <span>Back to Features</span>
               </button>
               <button
                 type="button"
                 onClick={handleNextStep}
                 disabled={formData.useCases.length === 0}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:hover:scale-100 group"
+                className="flex-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-5 rounded-2xl font-black text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-[1.02] disabled:hover:scale-100 group"
+                style={{ flexGrow: 2 }}
               >
-                <span>Complete Beta Signup</span>
+                <span>Complete Beta Registration</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-gray-500">Selected {formData.useCases.length} strategic use cases for personalized AI workflows</p>
             </div>
           </div>
         )
@@ -792,10 +1119,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   }
 
   return (
-    <>
-    <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
-      {/* Left side - Advanced Professional Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-y-auto">
+    <div className="relative">
+      <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
+        {/* Left side - Advanced Professional Showcase */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-y-auto">
         {/* Advanced Background Effects */}
         <div className="absolute inset-0">
           {/* Animated grid pattern */}
@@ -1183,123 +1510,74 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </p>
             </div>
           </div>
-            </div>
-          </div>
         </div>
       </div>
-    </div>
+      </div>
 
-    {/* Revolutionary OTP Verification Experience */}
-    {showOTPModal && (
-      <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        {/* Floating gradient orbs for depth */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        </div>
-        
-        <div className="relative bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/30 before:via-transparent before:to-transparent before:pointer-events-none">
-          <div className="relative z-10 text-center space-y-8">
-            {/* Premium Header with Glass Effect */}
-            <div className="space-y-6">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500/80 via-indigo-500/80 to-purple-600/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto shadow-2xl border border-white/20">
-                  <Mail className="w-10 h-10 text-white drop-shadow-lg" />
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400/90 backdrop-blur-sm rounded-full border-2 border-white/50 flex items-center justify-center shadow-lg">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-2xl blur-xl animate-pulse"></div>
-              </div>
-              
-              <div className="space-y-3">
-                <h2 className="text-3xl font-black text-white tracking-tight drop-shadow-lg">Verify Your Email</h2>
-                <div className="space-y-2">
-                  <p className="text-white/80 font-medium drop-shadow">
-                    We've sent a 6-digit verification code to
-                  </p>
-                  <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/30 shadow-lg">
-                    <Mail className="w-4 h-4 text-white/90" />
-                    <span className="font-bold text-white">{pendingUser?.email}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Revolutionary OTP Input Grid */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className={`text-sm font-bold tracking-wide drop-shadow transition-colors duration-300 ${
-                  otpError ? 'text-red-300' : 'text-white/90'
-                }`}>
-                  {otpError ? 'INVALID CODE' : 'VERIFICATION CODE'}
-                </div>
-                <div className="flex justify-center space-x-3">
-                  {[...Array(6)].map((_, index) => (
-                    <div key={index} className="relative">
-                      <input
-                        type="text"
-                        value={otpCode[index] || ''}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '')
-                          if (value.length <= 1) {
-                            const newCode = otpCode.split('')
-                            newCode[index] = value
-                            setOtpCode(newCode.join('').slice(0, 6))
-                            
-                            // Clear error state when user starts typing
-                            if (otpError) {
-                              setOtpError(false)
-                            }
-                            
-                            // Auto-focus next input
-                            if (value && index < 5) {
-                              const nextInput = e.target.parentElement?.parentElement?.children[index + 1]?.querySelector('input')
-                              nextInput?.focus()
-                            }
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          // Handle backspace to focus previous input
-                          if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
-                            const prevInput = e.target.parentElement?.parentElement?.children[index - 1]?.querySelector('input')
-                            prevInput?.focus()
-                          }
-                        }}
-                        className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 backdrop-blur-xl ${
-                          otpError 
-                            ? 'border-red-400/60 bg-red-500/20 text-white shadow-lg shadow-red-400/30 animate-pulse' 
-                            : otpCode[index] 
-                              ? 'border-green-400/60 bg-green-500/20 text-white shadow-lg shadow-green-400/30' 
-                              : 'border-white/30 bg-white/10 text-white placeholder-white/50 focus:border-blue-400/60 focus:bg-blue-500/20 focus:shadow-lg focus:shadow-blue-400/30'
-                        }`}
-                        maxLength={1}
-                        autoFocus={index === 0}
-                      />
-                      {otpCode[index] && !otpError && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
-                          <Check className="w-2.5 h-2.5 text-white" />
-                        </div>
-                      )}
-                      {otpCode[index] && otpError && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30">
-                          <X className="w-2.5 h-2.5 text-white" />
-                        </div>
-                      )}
+      {/* Revolutionary OTP Verification Experience */}
+      {showOTPModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          {/* Floating gradient orbs for depth */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          </div>
+          
+          <div className="relative bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/30 before:via-transparent before:to-transparent before:pointer-events-none">
+            <div className="relative z-10 text-center space-y-8">
+              {/* Premium Header with Glass Effect */}
+              <div className="space-y-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500/80 via-indigo-500/80 to-purple-600/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto shadow-2xl border border-white/20">
+                    <Mail className="w-10 h-10 text-white drop-shadow-lg" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400/90 backdrop-blur-sm rounded-full border-2 border-white/50 flex items-center justify-center shadow-lg">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     </div>
-                  ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-2xl blur-xl animate-pulse"></div>
                 </div>
                 
-                {/* Progress indicator */}
-                <div className="flex justify-center space-x-1">
+                <div className="space-y-3">
+                  <h2 className="text-3xl font-black text-white tracking-tight drop-shadow-lg">Verify Your Email</h2>
+                  <div className="space-y-2">
+                    <p className="text-white/80 font-medium drop-shadow">
+                      We've sent a 6-digit verification code to
+                    </p>
+                    <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/30 shadow-lg">
+                      <Mail className="w-4 h-4 text-white/90" />
+                      <span className="font-bold text-white">{pendingUser?.email}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Enhanced OTP Input Grid */}
+              <div className="space-y-6">
+                <div className="flex justify-center space-x-4">
                   {[...Array(6)].map((_, index) => (
-                    <div key={index} className={`h-1 w-8 rounded-full transition-all duration-300 ${
-                      otpError && otpCode[index] 
-                        ? 'bg-red-400/80 shadow-lg shadow-red-400/50' 
-                        : otpCode[index] 
-                          ? 'bg-green-400/80 shadow-lg shadow-green-400/50' 
-                          : 'bg-white/20'
-                    }`}></div>
+                    <div
+                      key={index}
+                      className="relative group"
+                    >
+                      <input
+                        type="text"
+                        maxLength={1}
+                        className="w-14 h-16 bg-white/20 backdrop-blur-xl border-2 border-white/30 rounded-xl text-center text-2xl font-black text-white placeholder-white/50 focus:border-blue-400/80 focus:bg-white/30 focus:outline-none focus:ring-4 focus:ring-blue-400/20 transition-all duration-300 shadow-lg group-hover:border-blue-400/60"
+                        value={otpCode[index] || ''}
+                        onChange={(e) => handleOTPChange(e, index)}
+                        onKeyDown={(e) => handleOTPKeyDown(e, index)}
+                        onPaste={handleOTPPaste}
+                        placeholder="•"
+                      />
+                      {/* Enhanced visual feedback indicators */}
+                      <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-8 h-1 rounded-full transition-all duration-300 ${
+                        otpError 
+                          ? 'bg-red-400/80 shadow-lg shadow-red-400/50' 
+                          : otpCode[index] 
+                            ? 'bg-green-400/80 shadow-lg shadow-green-400/50' 
+                            : 'bg-white/20'
+                      }`}></div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -1372,10 +1650,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             </div>
           </div>
         </div>
-      </div>
-    )}
-    </>
+      )}
+    </div>
   )
 }
 
-export default SignUp
+export default SignUp 
