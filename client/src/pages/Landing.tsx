@@ -39,8 +39,49 @@ const Landing = ({ onNavigate }: LandingProps) => {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [selectedFeature, setSelectedFeature] = useState<number | null>(null)
   const heroRef = useRef<HTMLDivElement>(null)
+  
+  // Device fingerprinting state
+  const [deviceStatus, setDeviceStatus] = useState<{
+    isOnWaitlist: boolean
+    user: any
+    loading: boolean
+  }>({
+    isOnWaitlist: false,
+    user: null,
+    loading: true
+  })
 
   useEffect(() => {
+    // Check device fingerprint status
+    const checkDeviceStatus = async () => {
+      try {
+        const response = await fetch('/api/early-access/check-device')
+        if (response.ok) {
+          const data = await response.json()
+          setDeviceStatus({
+            isOnWaitlist: true,
+            user: data.user,
+            loading: false
+          })
+        } else {
+          setDeviceStatus({
+            isOnWaitlist: false,
+            user: null,
+            loading: false
+          })
+        }
+      } catch (error) {
+        console.error('Device check error:', error)
+        setDeviceStatus({
+          isOnWaitlist: false,
+          user: null,
+          loading: false
+        })
+      }
+    }
+
+    checkDeviceStatus()
+
     // Auto-cycle through features
     const featureInterval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 8)
@@ -574,20 +615,40 @@ const Landing = ({ onNavigate }: LandingProps) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline"
-                onClick={() => handleNavigation('signin')}
-                className="hidden sm:flex border border-gray-300 text-gray-700 hover:bg-gray-50 backdrop-blur-sm px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
-              >
-                Sign In
-              </Button>
-              <Button 
-                onClick={() => handleNavigation('waitlist')}
-                className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-violet-500/25 transition-all duration-300 group"
-              >
-                <span className="relative z-10">Join Waitlist</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </Button>
+              {deviceStatus.loading ? (
+                // Loading state
+                <div className="flex items-center space-x-4">
+                  <div className="w-20 h-10 bg-gray-200 animate-pulse rounded-xl"></div>
+                  <div className="w-28 h-10 bg-gray-300 animate-pulse rounded-xl"></div>
+                </div>
+              ) : deviceStatus.isOnWaitlist ? (
+                // User is on waitlist - show Sign In and Status buttons
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleNavigation('signin')}
+                    className="border border-gray-300 text-gray-700 hover:bg-gray-50 backdrop-blur-sm px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={() => window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}`}
+                    className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-emerald-500/25 transition-all duration-300 group"
+                  >
+                    <span className="relative z-10">View Status</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </Button>
+                </>
+              ) : (
+                // User not on waitlist - show only Join Waitlist button
+                <Button 
+                  onClick={() => handleNavigation('waitlist')}
+                  className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-violet-500/25 transition-all duration-300 group"
+                >
+                  <span className="relative z-10">Join Waitlist</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
