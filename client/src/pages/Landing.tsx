@@ -774,9 +774,12 @@ const Landing = ({ onNavigate }: LandingProps) => {
           </div>
 
           {/* Premium CTA System */}
-          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
+          <div key={`hero-cta-${deviceStatus.loading}-${deviceStatus.isOnWaitlist}-${deviceStatus.user?.status}`} className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
             <Button 
               onClick={() => {
+                console.log('Hero CTA clicked - Device Status:', deviceStatus)
+                console.log('User status:', deviceStatus.user?.status)
+                console.log('Is approved/early_access?', deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access')
                 if (deviceStatus.isOnWaitlist && (deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access')) {
                   onNavigate('signup')
                 } else if (deviceStatus.isOnWaitlist) {
