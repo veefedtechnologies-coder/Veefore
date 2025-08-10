@@ -45,14 +45,14 @@ const SignIn = ({ onNavigate }: SignInProps) => {
       title: "Smart Automation",
       description: "Automated scheduling and optimization in action",
       gradient: "from-blue-600 via-cyan-600 to-emerald-600",
-      icon: Zap,
+      icon: Play,
       metrics: { efficiency: "+340%", saved: "15h/week", posts: "847" }
     },
     {
       title: "Analytics Intelligence",
       description: "Real-time insights and performance tracking",
       gradient: "from-emerald-600 via-teal-600 to-cyan-600",
-      icon: Network,
+      icon: Brain,
       metrics: { accuracy: "94.8%", insights: "156", trends: "+45%" }
     }
   ]
