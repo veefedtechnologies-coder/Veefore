@@ -672,107 +672,199 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Email Input */}
-                  <div className="space-y-3">
-                    <label htmlFor="email" className="block text-gray-800 font-semibold text-lg">
-                      Email Address
-                    </label>
+                {/* Ultra-Advanced Professional Sign In Form */}
+                <form onSubmit={handleSubmit} className="space-y-10">
+                  {/* Revolutionary Email Field */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="email" className="block text-gray-800 font-bold text-lg flex items-center space-x-2">
+                        <span>Email Address</span>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                      </label>
+                      <div className="text-xs text-gray-500 bg-gray-100/80 px-2 py-1 rounded-full">
+                        Required
+                      </div>
+                    </div>
+                    
                     <div className="relative group">
-                      <input
-                        type="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        onFocus={() => setFocusedField('email')}
-                        onBlur={() => setFocusedField('')}
-                        className={`w-full px-6 py-5 bg-white/90 backdrop-blur-xl border-2 ${
-                          errors.email ? 'border-red-400' : 'border-gray-200/60 group-hover:border-blue-400/60 focus:border-blue-500'
-                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg focus:ring-4 focus:ring-blue-500/10 relative z-10`}
-                        placeholder="Enter your email address"
-                      />
-                      {/* Advanced focus indicator */}
-                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 transition-opacity duration-500 ${focusedField === 'email' ? 'opacity-100' : 'opacity-0'}`} />
-                      {/* Typing animation dots */}
-                      {focusedField === 'email' && formData.email && (
-                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-1">
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" />
-                          <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce delay-100" />
-                          <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce delay-200" />
+                      {/* Field container with advanced effects */}
+                      <div className="relative">
+                        {/* Floating label effect */}
+                        <div className={`absolute left-6 transition-all duration-300 pointer-events-none ${
+                          focusedField === 'email' || formData.email 
+                            ? '-top-2 text-xs text-blue-600 bg-white px-2 font-medium' 
+                            : 'top-5 text-gray-500'
+                        }`}>
+                          {focusedField === 'email' || formData.email ? 'Email Address' : ''}
+                        </div>
+                        
+                        <input
+                          type="email"
+                          id="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          onFocus={() => setFocusedField('email')}
+                          onBlur={() => setFocusedField('')}
+                          className={`w-full px-6 py-5 bg-gradient-to-r from-white/95 to-gray-50/95 backdrop-blur-xl border-2 ${
+                            errors.email 
+                              ? 'border-red-400 shadow-red-100' 
+                              : focusedField === 'email'
+                                ? 'border-blue-500 shadow-blue-100/50'
+                                : 'border-gray-200/60 group-hover:border-blue-400/60'
+                          } rounded-2xl focus:outline-none transition-all duration-500 text-gray-900 placeholder-gray-500 text-lg shadow-lg hover:shadow-xl focus:shadow-2xl relative z-10`}
+                          placeholder="Enter your email address"
+                        />
+                        
+                        {/* Advanced visual effects */}
+                        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/3 via-purple-500/5 to-indigo-500/3 transition-opacity duration-500 ${focusedField === 'email' ? 'opacity-100' : 'opacity-0'}`} />
+                        
+                        {/* Smart validation indicator */}
+                        {formData.email && (
+                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              formData.email.includes('@') && formData.email.includes('.') 
+                                ? 'bg-emerald-100 text-emerald-600' 
+                                : 'bg-yellow-100 text-yellow-600'
+                            }`}>
+                              {formData.email.includes('@') && formData.email.includes('.') ? '✓' : '•••'}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Typing activity indicator */}
+                        {focusedField === 'email' && formData.email && (
+                          <div className="absolute bottom-2 left-6 flex space-x-1">
+                            <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+                            <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse delay-100" />
+                            <div className="w-1 h-1 bg-indigo-500 rounded-full animate-pulse delay-200" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Enhanced error display */}
+                      {errors.email && (
+                        <div className="mt-3 p-3 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl flex items-center space-x-3">
+                          <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">!</div>
+                          <span className="text-red-700 text-sm font-medium">{errors.email}</span>
                         </div>
                       )}
                     </div>
-                    {errors.email && (
-                      <p className="text-red-500 text-sm font-medium flex items-center space-x-2">
-                        <span>⚠️</span>
-                        <span>{errors.email}</span>
-                      </p>
-                    )}
                   </div>
 
-                  {/* Password Input */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="password" className="block text-gray-800 font-semibold text-lg">
-                        Password
+                  {/* Revolutionary Password Field */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="password" className="block text-gray-800 font-bold text-lg flex items-center space-x-2">
+                        <span>Password</span>
+                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-300" />
                       </label>
-                      <Link href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
+                      <Link 
+                        href="/forgot-password" 
+                        className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-all duration-300 text-sm bg-blue-50/50 hover:bg-blue-100/50 px-3 py-1 rounded-full"
+                      >
                         Forgot password?
                       </Link>
                     </div>
+                    
                     <div className="relative group">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        onFocus={() => setFocusedField('password')}
-                        onBlur={() => setFocusedField('')}
-                        className={`w-full px-6 py-5 bg-white/90 backdrop-blur-xl border-2 ${
-                          errors.password ? 'border-red-400' : 'border-gray-200/60 group-hover:border-blue-400/60 focus:border-blue-500'
-                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg pr-20 focus:ring-4 focus:ring-blue-500/10 relative z-10`}
-                        placeholder="Enter your password"
-                      />
-                      {/* Advanced focus indicator */}
-                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 transition-opacity duration-500 ${focusedField === 'password' ? 'opacity-100' : 'opacity-0'}`} />
-                      
-                      {/* Enhanced password visibility toggle */}
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-all duration-300 hover:scale-110 relative z-20"
-                      >
-                        {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
-                      </button>
-                      
-                      {/* Password strength indicator */}
-                      {focusedField === 'password' && formData.password && (
-                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20">
-                          <div className={`w-3 h-3 rounded-full ${formData.password.length >= 8 ? 'bg-emerald-500' : formData.password.length >= 4 ? 'bg-yellow-500' : 'bg-red-500'} animate-pulse`} />
+                      {/* Advanced password field container */}
+                      <div className="relative">
+                        {/* Floating label */}
+                        <div className={`absolute left-6 transition-all duration-300 pointer-events-none ${
+                          focusedField === 'password' || formData.password 
+                            ? '-top-2 text-xs text-purple-600 bg-white px-2 font-medium' 
+                            : 'top-5 text-gray-500'
+                        }`}>
+                          {focusedField === 'password' || formData.password ? 'Password' : ''}
                         </div>
-                      )}
+                        
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          id="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          onFocus={() => setFocusedField('password')}
+                          onBlur={() => setFocusedField('')}
+                          className={`w-full px-6 py-5 bg-gradient-to-r from-white/95 to-gray-50/95 backdrop-blur-xl border-2 ${
+                            errors.password 
+                              ? 'border-red-400 shadow-red-100' 
+                              : focusedField === 'password'
+                                ? 'border-purple-500 shadow-purple-100/50'
+                                : 'border-gray-200/60 group-hover:border-purple-400/60'
+                          } rounded-2xl focus:outline-none transition-all duration-500 text-gray-900 placeholder-gray-500 text-lg pr-24 shadow-lg hover:shadow-xl focus:shadow-2xl relative z-10`}
+                          placeholder="Enter your password"
+                        />
+                        
+                        {/* Advanced focus effects */}
+                        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/3 via-indigo-500/5 to-blue-500/3 transition-opacity duration-500 ${focusedField === 'password' ? 'opacity-100' : 'opacity-0'}`} />
+                        
+                        {/* Enhanced password visibility toggle */}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-16 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-gray-100/80 hover:bg-gray-200/80 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-110 relative z-20 group"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                            {showPassword ? 'Hide' : 'Show'}
+                          </div>
+                        </button>
+                        
+                        {/* Advanced password strength indicator */}
+                        {formData.password && (
+                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20">
+                            <div className="relative">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                formData.password.length >= 8 
+                                  ? 'bg-emerald-100 text-emerald-600' 
+                                  : formData.password.length >= 4 
+                                    ? 'bg-yellow-100 text-yellow-600'
+                                    : 'bg-red-100 text-red-600'
+                              }`}>
+                                {formData.password.length >= 8 ? '✓' : formData.password.length >= 4 ? '○' : '✕'}
+                              </div>
+                              <div className={`absolute -inset-1 rounded-full animate-pulse ${
+                                formData.password.length >= 8 
+                                  ? 'bg-emerald-400/20' 
+                                  : formData.password.length >= 4 
+                                    ? 'bg-yellow-400/20'
+                                    : 'bg-red-400/20'
+                              }`} />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Professional security strength bar */}
+                        {formData.password && (
+                          <div className="absolute bottom-2 left-6 right-6 z-20">
+                            <div className="flex space-x-1">
+                              {[...Array(5)].map((_, i) => (
+                                <div
+                                  key={i}
+                                  className={`flex-1 h-1 rounded-full transition-all duration-300 ${
+                                    formData.password.length > i * 2 
+                                      ? formData.password.length >= 8 
+                                        ? 'bg-emerald-500' 
+                                        : formData.password.length >= 4 
+                                          ? 'bg-yellow-500'
+                                          : 'bg-red-500'
+                                      : 'bg-gray-200'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       
-                      {/* Security level indicator */}
-                      {formData.password && (
-                        <div className="absolute bottom-2 left-2 flex space-x-1 z-20">
-                          {[...Array(4)].map((_, i) => (
-                            <div
-                              key={i}
-                              className={`w-1 h-1 rounded-full transition-all duration-300 ${
-                                formData.password.length > i * 2 ? 'bg-blue-500 scale-125' : 'bg-gray-300'
-                              }`}
-                            />
-                          ))}
+                      {/* Enhanced error display */}
+                      {errors.password && (
+                        <div className="mt-3 p-3 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl flex items-center space-x-3">
+                          <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">!</div>
+                          <span className="text-red-700 text-sm font-medium">{errors.password}</span>
                         </div>
                       )}
                     </div>
-                    {errors.password && (
-                      <p className="text-red-500 text-sm font-medium flex items-center space-x-2">
-                        <span>⚠️</span>
-                        <span>{errors.password}</span>
-                      </p>
-                    )}
                   </div>
 
                   {/* Advanced Sign In Button with Multiple Effects */}
