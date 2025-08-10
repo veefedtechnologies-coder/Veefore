@@ -17,9 +17,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     fullName: '',
     email: '',
     password: '',
-    businessType: '',
+    interestedFeatures: [] as string[],
+    useCases: [] as string[],
+    currentPlatforms: [] as string[],
+    monthlyContent: '',
     teamSize: '',
-    goals: [] as string[]
+    industry: ''
   })
   const [errors, setErrors] = useState({
     fullName: '',
@@ -61,12 +64,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     }
   }
 
-  const handleGoalToggle = (goal: string) => {
+  const handleArrayFieldToggle = (field: 'interestedFeatures' | 'useCases' | 'currentPlatforms', value: string) => {
     setFormData(prev => ({
       ...prev,
-      goals: prev.goals.includes(goal) 
-        ? prev.goals.filter(g => g !== goal)
-        : [...prev.goals, goal]
+      [field]: prev[field].includes(value) 
+        ? prev[field].filter(item => item !== value)
+        : [...prev[field], value]
     }))
   }
 
@@ -171,16 +174,19 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         // Create Firebase account
         await signUpWithEmail(formData.email, formData.password)
         
-        // Create user in database
+        // Create user in database with early access details
         await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             fullName: formData.fullName,
             email: formData.email,
-            businessType: formData.businessType,
+            interestedFeatures: formData.interestedFeatures,
+            useCases: formData.useCases,
+            currentPlatforms: formData.currentPlatforms,
+            monthlyContent: formData.monthlyContent,
             teamSize: formData.teamSize,
-            goals: formData.goals
+            industry: formData.industry
           })
         })
 
@@ -525,93 +531,82 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
+              <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-blue-700 font-semibold text-sm">Early Access Beta</span>
+              </div>
               <h1 className="text-4xl font-bold text-gray-900">
-                Tell us about your business
+                Which features interest you most?
               </h1>
               <p className="text-lg text-gray-600">
-                Help us personalize your experience
+                Help us prioritize development for your needs
               </p>
             </div>
 
             <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  What type of business do you run?
+                <label className="block text-sm font-bold text-gray-900 mb-6 tracking-wide">
+                  SELECT ALL THAT APPLY:
                 </label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {[
-                    { id: 'agency', label: 'Marketing Agency', icon: Target },
-                    { id: 'ecommerce', label: 'E-commerce', icon: Rocket },
-                    { id: 'saas', label: 'SaaS Company', icon: Zap },
-                    { id: 'consulting', label: 'Consulting', icon: Briefcase },
-                    { id: 'creator', label: 'Content Creator', icon: Sparkles },
-                    { id: 'other', label: 'Other', icon: Globe }
-                  ].map(({ id, label, icon: Icon }) => (
+                    { id: 'ai-content-generation', label: 'AI Content Generation', desc: 'Automatically create posts, captions, and hashtags', icon: Sparkles },
+                    { id: 'auto-scheduling', label: 'Smart Scheduling', desc: 'AI-powered optimal posting times', icon: Clock },
+                    { id: 'analytics-insights', label: 'Advanced Analytics', desc: 'Deep insights and performance tracking', icon: BarChart },
+                    { id: 'multi-platform', label: 'Multi-Platform Management', desc: 'Manage all social accounts in one place', icon: Globe },
+                    { id: 'ai-responses', label: 'AI Comment Management', desc: 'Automated responses and engagement', icon: MessageCircle },
+                    { id: 'trend-analysis', label: 'Trend Discovery', desc: 'Stay ahead with trending content ideas', icon: TrendingUp }
+                  ].map(({ id, label, desc, icon: Icon }) => (
                     <button
                       key={id}
                       type="button"
-                      onClick={() => handleInputChange('businessType', id)}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
-                        formData.businessType === id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                      onClick={() => handleArrayFieldToggle('interestedFeatures', id)}
+                      className={`p-6 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                        formData.interestedFeatures.includes(id)
+                          ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.02]'
+                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
                       }`}
                     >
-                      <Icon className="w-6 h-6 text-blue-600 mb-2" />
-                      <div className="font-medium text-gray-900">{label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  What's your team size?
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { id: 'solo', label: 'Just me', subtitle: 'Solo entrepreneur' },
-                    { id: 'small', label: '2-10 people', subtitle: 'Small team' },
-                    { id: 'medium', label: '11-50 people', subtitle: 'Growing company' },
-                    { id: 'large', label: '50+ people', subtitle: 'Enterprise' }
-                  ].map(({ id, label, subtitle }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => handleInputChange('teamSize', id)}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 text-center ${
-                        formData.teamSize === id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="font-medium text-gray-900">{label}</div>
-                      <div className="text-sm text-gray-500">{subtitle}</div>
+                      <div className="flex items-start space-x-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className={`font-bold text-lg ${
+                            formData.interestedFeatures.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                          }`}>
+                            {label}
+                          </h3>
+                          <p className="text-gray-600 text-sm mt-1">{desc}</p>
+                        </div>
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          formData.interestedFeatures.includes(id)
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {formData.interestedFeatures.includes(id) && (
+                            <Check className="w-4 h-4 text-white" />
+                          )}
+                        </div>
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="flex space-x-4">
-              <button
-                type="button"
-                onClick={handlePrevStep}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleNextStep}
-                disabled={!formData.businessType || !formData.teamSize}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              onClick={handleNextStep}
+              disabled={formData.interestedFeatures.length === 0}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:hover:scale-100 group"
+            >
+              <span>Continue to Use Cases</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </button>
           </div>
         )
 
@@ -619,39 +614,66 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
+              <div className="inline-flex items-center space-x-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl px-6 py-3">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-blue-700 font-semibold text-sm">Early Access Beta</span>
+              </div>
               <h1 className="text-4xl font-bold text-gray-900">
-                What are your goals?
+                What's your primary use case?
               </h1>
               <p className="text-lg text-gray-600">
-                Select all that apply (you can change these later)
+                Help us understand how you plan to use VeeFore
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-gray-900 mb-6 tracking-wide">
+                CHOOSE YOUR TOP PRIORITIES:
+              </label>
               {[
-                'Increase social media engagement',
-                'Save time on content creation',
-                'Grow my audience faster',
-                'Improve brand consistency',
-                'Get better analytics insights',
-                'Automate routine tasks',
-                'Manage multiple accounts',
-                'Create viral content'
-              ].map((goal) => (
+                { id: 'content-creation', label: 'Content Creation & Automation', desc: 'AI-powered posts, captions, and scheduling', icon: Sparkles },
+                { id: 'audience-growth', label: 'Audience Growth & Engagement', desc: 'Build followers and increase interactions', icon: TrendingUp },
+                { id: 'time-saving', label: 'Time-Saving Workflows', desc: 'Automate routine social media tasks', icon: Clock },
+                { id: 'analytics-insights', label: 'Analytics & Performance Tracking', desc: 'Data-driven social media decisions', icon: BarChart },
+                { id: 'multi-account', label: 'Multi-Account Management', desc: 'Manage multiple brands or clients', icon: Globe },
+                { id: 'brand-consistency', label: 'Brand Consistency', desc: 'Maintain unified voice across platforms', icon: Target }
+              ].map(({ id, label, desc, icon: Icon }) => (
                 <button
-                  key={goal}
+                  key={id}
                   type="button"
-                  onClick={() => handleGoalToggle(goal)}
-                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left flex items-center justify-between ${
-                    formData.goals.includes(goal)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                  onClick={() => handleArrayFieldToggle('useCases', id)}
+                  className={`w-full p-6 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-lg ${
+                    formData.useCases.includes(id)
+                      ? 'border-blue-500 bg-blue-50/80 shadow-lg scale-[1.02]'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
                   }`}
                 >
-                  <span className="font-medium text-gray-900">{goal}</span>
-                  {formData.goals.includes(goal) && (
-                    <Check className="w-5 h-5 text-blue-600" />
-                  )}
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      formData.useCases.includes(id)
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className={`font-bold text-xl ${
+                        formData.useCases.includes(id) ? 'text-blue-700' : 'text-gray-900'
+                      }`}>
+                        {label}
+                      </h3>
+                      <p className="text-gray-600 text-base mt-2">{desc}</p>
+                    </div>
+                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center ${
+                      formData.useCases.includes(id)
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {formData.useCases.includes(id) && (
+                        <Check className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -660,19 +682,19 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-xl font-bold text-lg transition-colors duration-200 flex items-center justify-center space-x-3"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-5 h-5" />
                 <span>Back</span>
               </button>
               <button
                 type="button"
                 onClick={handleNextStep}
-                disabled={formData.goals.length === 0}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+                disabled={formData.useCases.length === 0}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:hover:scale-100 group"
               >
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Complete Beta Signup</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </div>
           </div>
@@ -693,28 +715,43 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Account summary</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Name</span>
-                  <span className="font-medium">{formData.fullName}</span>
+            <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                <h3 className="font-bold text-blue-900 text-lg">Early Access Beta Summary</h3>
+              </div>
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Full Name</span>
+                    <p className="font-bold text-gray-900 text-lg mt-1">{formData.fullName}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Email</span>
+                    <p className="font-bold text-gray-900 text-lg mt-1">{formData.email}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Email</span>
-                  <span className="font-medium">{formData.email}</span>
+                
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Interested Features ({formData.interestedFeatures.length})</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.interestedFeatures.map((feature) => (
+                      <span key={feature} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        {feature.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Business type</span>
-                  <span className="font-medium capitalize">{formData.businessType?.replace('_', ' ')}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Team size</span>
-                  <span className="font-medium capitalize">{formData.teamSize}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Goals selected</span>
-                  <span className="font-medium">{formData.goals.length}</span>
+
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Primary Use Cases ({formData.useCases.length})</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.useCases.map((useCase) => (
+                      <span key={useCase} className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                        {useCase.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1093,8 +1130,8 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               {/* Step labels */}
               <div className="flex justify-between mt-4 text-xs font-medium text-gray-500">
                 <span className={currentStep >= 1 ? 'text-blue-600' : ''}>Account</span>
-                <span className={currentStep >= 2 ? 'text-blue-600' : ''}>Business</span>
-                <span className={currentStep >= 3 ? 'text-blue-600' : ''}>Goals</span>
+                <span className={currentStep >= 2 ? 'text-blue-600' : ''}>Features</span>
+                <span className={currentStep >= 3 ? 'text-blue-600' : ''}>Use Cases</span>
                 <span className={currentStep >= 4 ? 'text-blue-600' : ''}>Complete</span>
               </div>
               </div>

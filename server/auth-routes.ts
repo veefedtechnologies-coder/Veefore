@@ -109,6 +109,67 @@ router.post('/verify-email', verifyFirebaseToken, async (req, res) => {
   }
 })
 
+// Complete user signup with early access details
+router.post('/signup', async (req, res) => {
+  try {
+    const { 
+      fullName, 
+      email, 
+      interestedFeatures = [], 
+      useCases = [], 
+      currentPlatforms = [], 
+      monthlyContent, 
+      teamSize, 
+      industry 
+    } = req.body
+
+    console.log(`[EARLY ACCESS SIGNUP] Processing signup for ${email} with early access data`)
+
+    // Get existing user or create new one (assuming they've been verified)
+    let user = await storage.getUserByEmail(email)
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found. Please verify your email first.' })
+    }
+
+    // Update user with early access information
+    const updateData = {
+      displayName: fullName,
+      earlyAccessData: {
+        interestedFeatures,
+        useCases,
+        currentPlatforms,
+        monthlyContent,
+        teamSize,
+        industry,
+        signupDate: new Date()
+      },
+      isOnboarded: true,
+      onboardingCompletedAt: new Date()
+    }
+
+    const updatedUser = await storage.updateUser(user.id, updateData)
+
+    console.log(`[EARLY ACCESS SIGNUP] Successfully updated user ${email} with early access data`)
+
+    res.json({
+      success: true,
+      message: 'Early access signup completed successfully',
+      user: {
+        id: updatedUser._id || updatedUser.id,
+        email: updatedUser.email,
+        displayName: updatedUser.displayName,
+        isEmailVerified: updatedUser.isEmailVerified,
+        isOnboarded: updatedUser.isOnboarded
+      },
+      requiresOnboarding: false
+    })
+  } catch (error: any) {
+    console.error('[EARLY ACCESS SIGNUP] Error:', error)
+    res.status(500).json({ error: 'Failed to complete signup' })
+  }
+})
+
 router.post('/register', async (req, res) => {
   try {
     const { idToken, email, displayName } = req.body
