@@ -529,7 +529,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       <img 
                         src={veeforceLogo} 
                         alt="VeeFore" 
-                        className="w-24 h-24 transform hover:scale-110 transition-all duration-700 ease-out group-hover:rotate-1 filter drop-shadow-lg hover:drop-shadow-2xl animate-pulse hover:animate-none" 
+                        className="w-24 h-24 transform hover:scale-110 transition-all duration-700 ease-out group-hover:rotate-1 filter drop-shadow-lg hover:drop-shadow-2xl animate-[fadeInScale_1.2s_ease-out_forwards] hover:animate-none" 
+                        style={{
+                          animationDelay: '0.3s',
+                          opacity: 0,
+                          transform: 'scale(0.5) translateY(20px)'
+                        }}
                       />
                     </div>
                   </div>
