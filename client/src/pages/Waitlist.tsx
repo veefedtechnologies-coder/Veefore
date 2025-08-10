@@ -618,9 +618,12 @@ const Waitlist = () => {
     }
   };
 
-  if (isSubmitted && waitlistData) {
+  // Success Modal Overlay Component
+  const SuccessModal = () => {
+    if (!isSubmitted || !waitlistData) return null;
+    
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         {/* Professional Success Modal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -1927,6 +1930,9 @@ const Waitlist = () => {
         </div>
       </div>
     )}
+
+    {/* Success Modal Overlay */}
+    <SuccessModal />
     </>
   );
 };
