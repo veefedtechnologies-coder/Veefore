@@ -58,12 +58,14 @@ const Landing = ({ onNavigate }: LandingProps) => {
         const response = await fetch('/api/early-access/check-device')
         if (response.ok) {
           const data = await response.json()
+          console.log('Device check successful:', data)
           setDeviceStatus({
             isOnWaitlist: true,
             user: data.user,
             loading: false
           })
         } else {
+          console.log('Device check failed:', response.status)
           setDeviceStatus({
             isOnWaitlist: false,
             user: null,
@@ -999,6 +1001,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     
                     {/* Interactive Action Center */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      {console.log('Rendering main buttons - Device Status:', deviceStatus)}
                       {deviceStatus.loading ? (
                         // Loading state
                         <div className="flex space-x-4">
