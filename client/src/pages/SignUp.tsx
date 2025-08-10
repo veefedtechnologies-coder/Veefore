@@ -143,9 +143,9 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           if (responseData.developmentOtp && import.meta.env.DEV) {
             console.log('🔑 DEVELOPMENT OTP:', responseData.developmentOtp)
             toast({
-              title: "Verification required!",
-              description: `Check your email for the code. DEV: ${responseData.developmentOtp}`,
-              duration: 15000,
+              title: "🔑 Development Mode - OTP Code:",
+              description: `Use this code: ${responseData.developmentOtp} (Also check your email for real delivery)`,
+              duration: 30000, // Show for 30 seconds in development
             })
           } else {
             toast({
@@ -282,14 +282,26 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         }),
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        throw new Error('Failed to resend verification email')
+        throw new Error(responseData.message || 'Failed to resend verification email')
       }
 
-      toast({
-        title: "Code resent!",
-        description: "A new verification code has been sent to your email.",
-      })
+      // Show development OTP in resend toast too
+      if (responseData.developmentOtp && import.meta.env.DEV) {
+        console.log('🔑 RESENT DEVELOPMENT OTP:', responseData.developmentOtp)
+        toast({
+          title: "🔑 New Development Code:",
+          description: `Use this code: ${responseData.developmentOtp} (Also check your email)`,
+          duration: 30000,
+        })
+      } else {
+        toast({
+          title: "Code resent!",
+          description: "A new verification code has been sent to your email.",
+        })
+      }
       setOtpCode('') // Clear current code
     } catch (error: any) {
       toast({
@@ -1258,6 +1270,19 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                   ))}
                 </div>
               </div>
+
+              {/* Development OTP Display - Only in Development */}
+              {import.meta.env.DEV && (
+                <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 backdrop-blur-xl rounded-xl p-4 border border-orange-400/30 shadow-lg">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
+                    <span className="text-orange-200 font-bold text-sm">DEVELOPMENT MODE</span>
+                  </div>
+                  <p className="text-orange-100 text-sm">
+                    For testing: Use OTP code shown in the toast message
+                  </p>
+                </div>
+              )}
 
               {/* Premium Action Buttons */}
               <div className="space-y-4">
