@@ -19,6 +19,7 @@ import VeeGPT from './pages/VeeGPT'
 import Landing from './pages/Landing'
 import SignUpIntegrated from './pages/SignUpIntegrated'
 import SignUp from './pages/SignUp'
+import Waitlist from './pages/Waitlist'
 import SignIn from './pages/SignIn'
 import ProfessionalOnboarding from './pages/ProfessionalOnboarding'
 import Workspaces from './pages/Workspaces'
@@ -107,6 +108,12 @@ function App() {
       <Route path="/signup">
         <div className="min-h-screen">
           <SignUp onNavigate={(page: string) => setLocation(`/${page}`)} />
+        </div>
+      </Route>
+      
+      <Route path="/waitlist">
+        <div className="min-h-screen">
+          <Waitlist onNavigate={(page: string) => setLocation(`/${page}`)} />
         </div>
       </Route>
       
