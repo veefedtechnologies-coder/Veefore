@@ -30,7 +30,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
   const [typedText, setTypedText] = useState('')
   const [focusedField, setFocusedField] = useState('')
   const [ripples, setRipples] = useState<Array<{id: number, x: number, y: number}>>([])
-  const [particleCount, setParticleCount] = useState(0)
+  const [particleCount] = useState(0)
 
   // Advanced interactive demo data
   const demoScenarios = [
@@ -130,13 +130,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
     }, 1000)
   }
 
-  // Particle counter animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setParticleCount(prev => (prev + 1) % 1000)
-    }, 50)
-    return () => clearInterval(interval)
-  }, [])
+
 
   const handleBackToLanding = () => {
     // Use the prop function for smooth SPA navigation
@@ -444,8 +438,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Wand2 className="w-5 h-5 text-purple-600" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        </div>
                       </div>
                       <div>
                         <span className="text-gray-900 font-semibold text-lg">AI Content Engine</span>
