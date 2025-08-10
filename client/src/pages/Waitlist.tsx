@@ -497,9 +497,12 @@ const Waitlist = () => {
   };
 
   const handleNextQuestion = () => {
+    console.log('[NEXT QUESTION] Current question:', currentQuestion, 'Total questions:', questions.length);
+    
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      console.log('[NEXT QUESTION] Completing survey, calling submitToWaitlist');
       // All questions answered, submit to waitlist with questionnaire data
       submitToWaitlist();
     }
@@ -522,6 +525,12 @@ const Waitlist = () => {
   };
 
   const submitToWaitlist = async () => {
+    console.log('[SUBMIT WAITLIST] Starting submission with data:', { 
+      pendingUser, 
+      questionnaireData,
+      referredBy: formData.referredBy 
+    });
+    
     try {
       const response = await fetch('/api/early-access/join', {
         method: 'POST',
@@ -537,11 +546,15 @@ const Waitlist = () => {
         }),
       });
 
+      console.log('[SUBMIT WAITLIST] Response received, status:', response.status);
+      
       const data = await response.json();
       console.log('[SUBMIT WAITLIST] Response data:', data);
 
       if (data.success) {
         console.log('[SUBMIT WAITLIST] Setting waitlist data and submitted state');
+        console.log('[SUBMIT WAITLIST] Data to set:', data);
+        
         setWaitlistData(data);
         setIsSubmitted(true);
         setShowQuestionnaire(false);
@@ -549,11 +562,14 @@ const Waitlist = () => {
         setOtpCode('');
         setDevelopmentOtp(null);
         
+        console.log('[SUBMIT WAITLIST] State updated, modal should show');
+        
         toast({
           title: "Welcome to VeeFore!",
           description: "Your email has been verified and you've been added to our exclusive waitlist.",
         });
       } else {
+        console.error('[SUBMIT WAITLIST] Failed response:', data);
         toast({
           title: "Waitlist submission failed",
           description: data.message || "Please try again.",
@@ -561,7 +577,7 @@ const Waitlist = () => {
         });
       }
     } catch (error) {
-      console.error('Waitlist submission error:', error);
+      console.error('[SUBMIT WAITLIST] Exception:', error);
       toast({
         title: "Connection error",
         description: "Please check your connection and try again.",
