@@ -4515,6 +4515,15 @@ export class MongoStorage implements IStorage {
     return result.deletedCount || 0;
   }
 
+  async deleteWaitlistUser(id: number | string): Promise<void> {
+    await this.connect();
+    const objectId = typeof id === 'string' ? new mongoose.Types.ObjectId(id) : id;
+    const result = await WaitlistUserModel.findByIdAndDelete(objectId);
+    if (!result) {
+      throw new Error('Waitlist user not found');
+    }
+  }
+
   async clearAllWorkspaces(): Promise<number> {
     await this.connect();
     const result = await WorkspaceModel.deleteMany({});

@@ -278,6 +278,16 @@ export interface IStorage {
   getCompetitorAnalysesByWorkspace(workspaceId: number): Promise<CompetitorAnalysis[]>;
   updateCompetitorAnalysis(id: number, updates: Partial<CompetitorAnalysis>): Promise<CompetitorAnalysis>;
   deleteCompetitorAnalysis(id: number): Promise<void>;
+
+  // Waitlist operations (MongoDB only)
+  createWaitlistUser?(insertWaitlistUser: any): Promise<any>;
+  getWaitlistUser?(id: number | string): Promise<any>;
+  getWaitlistUserByEmail?(email: string): Promise<any>;
+  updateWaitlistUser?(id: number | string, updates: any): Promise<any>;
+  deleteWaitlistUser?(id: number | string): Promise<void>;
+  getAllWaitlistUsers?(): Promise<any[]>;
+  getWaitlistStats?(): Promise<any>;
+  clearAllWaitlistUsers?(): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
