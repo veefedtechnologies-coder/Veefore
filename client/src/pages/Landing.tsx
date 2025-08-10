@@ -2871,9 +2871,21 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   Join the waitlist and be among the first to experience the future of AI-powered content creation and social media management.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <Button className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 animate-button-premium-glow">
-                    Join Early Access
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                  <Button 
+                    onClick={() => deviceStatus.isOnWaitlist ? window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}` : handleNavigation('signup')}
+                    className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 animate-button-premium-glow"
+                  >
+                    {deviceStatus.isOnWaitlist ? (
+                      <>
+                        <CheckCircle className="w-5 h-5 mr-2" />
+                        Check Your Status
+                      </>
+                    ) : (
+                      <>
+                        Join Early Access
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
                   </Button>
                   <div className="flex items-center space-x-2 text-blue-100">
                     <Users className="w-5 h-5" />
