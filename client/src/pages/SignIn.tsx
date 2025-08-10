@@ -523,20 +523,31 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 
                 {/* Clean Professional Header */}
                 <div className="text-center mb-10 relative z-10">
-                  {/* Enhanced Animated VeeFore Logo */}
+                  {/* Next-Gen 3D Holographic VeeFore Logo */}
                   <div className="mb-8 flex justify-center">
-                    <div className="p-6 rounded-3xl hover:scale-105 transition-all duration-500 ease-out group">
+                    <div className="relative p-8 rounded-3xl hover:scale-105 transition-all duration-700 ease-out group perspective-1000">
+                      {/* Holographic Backdrop */}
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 backdrop-blur-sm border border-blue-200/20 group-hover:border-blue-300/30 transition-all duration-700"></div>
+                      
+                      {/* 3D Holographic Logo */}
                       <img 
                         src={veeforceLogo} 
                         alt="VeeFore" 
-                        className="w-24 h-24 transform hover:scale-110 transition-all duration-700 ease-out group-hover:rotate-1 filter drop-shadow-lg hover:drop-shadow-2xl animate-[logoReveal_1.8s_cubic-bezier(0.4,0,0.2,1)_forwards] hover:animate-none" 
+                        className="relative z-10 w-28 h-28 transform hover:scale-110 hover:rotate-y-12 transition-all duration-1000 ease-out animate-[holographicReveal_2.5s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards] hover:animate-none" 
                         style={{
-                          animationDelay: '0.5s',
+                          animationDelay: '0.8s',
                           opacity: 0,
-                          transform: 'scale(0.8) translateY(30px)',
-                          filter: 'blur(10px)'
+                          transform: 'perspective(800px) rotateX(90deg) rotateY(45deg) scale(0.3) translateZ(-100px)',
+                          filter: 'hue-rotate(180deg) brightness(2) blur(8px)',
+                          transformStyle: 'preserve-3d'
                         }}
                       />
+                      
+                      {/* Ambient Glow Effects */}
+                      <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-cyan-400/30 to-blue-400/30 rounded-full blur-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                      </div>
                     </div>
                   </div>
 
