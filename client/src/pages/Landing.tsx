@@ -623,8 +623,26 @@ const Landing = ({ onNavigate }: LandingProps) => {
                   <div className="w-20 h-10 bg-gray-200 animate-pulse rounded-xl"></div>
                   <div className="w-28 h-10 bg-gray-300 animate-pulse rounded-xl"></div>
                 </div>
+              ) : deviceStatus.isOnWaitlist && (deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access') ? (
+                // Approved/Early Access users - show Sign In and Sign Up buttons
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleNavigation('signin')}
+                    className="border border-gray-300 text-gray-700 hover:bg-gray-50 backdrop-blur-sm px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={() => onNavigate('signup')}
+                    className="relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-green-500/25 transition-all duration-300 group"
+                  >
+                    <span className="relative z-10">Create Account</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </Button>
+                </>
               ) : deviceStatus.isOnWaitlist ? (
-                // User is on waitlist - show Sign In and Status buttons
+                // Regular waitlist users - show Sign In and Status buttons
                 <>
                   <Button 
                     variant="outline"
@@ -2921,10 +2939,23 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <Button 
-                    onClick={() => deviceStatus.isOnWaitlist ? window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}` : handleNavigation('signup')}
+                    onClick={() => {
+                      if (deviceStatus.isOnWaitlist && (deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access')) {
+                        onNavigate('signup')
+                      } else if (deviceStatus.isOnWaitlist) {
+                        window.location.href = `/waitlist-status?user=${encodeURIComponent(deviceStatus.user?.email || '')}`
+                      } else {
+                        handleNavigation('waitlist')
+                      }
+                    }}
                     className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 animate-button-premium-glow"
                   >
-                    {deviceStatus.isOnWaitlist ? (
+                    {deviceStatus.isOnWaitlist && (deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access') ? (
+                      <>
+                        <Crown className="w-5 h-5 mr-2" />
+                        Welcome! Create Account
+                      </>
+                    ) : deviceStatus.isOnWaitlist ? (
                       <>
                         <CheckCircle className="w-5 h-5 mr-2" />
                         Check Your Status
