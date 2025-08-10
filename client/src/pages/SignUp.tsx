@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code, Mail } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -30,6 +30,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   const [, setLocation] = useLocation()
   const [isLoading, setIsLoading] = useState(false)
   const [focusedField, setFocusedField] = useState('')
+  const [showOTPModal, setShowOTPModal] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [pendingUser, setPendingUser] = useState<{email: string, firstName: string} | null>(null)
 
   const totalSteps = 4
 
@@ -105,8 +109,10 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
     if (!newErrors.fullName && !newErrors.email && !newErrors.password) {
       setIsLoading(true)
       try {
+        // Create Firebase account first
         await signUpWithEmail(formData.email, formData.password)
         
+        // Create user in database
         await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -118,13 +124,37 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
             goals: formData.goals
           })
         })
+
+        // Store user info for OTP verification
+        setPendingUser({
+          email: formData.email,
+          firstName: formData.fullName.split(' ')[0] || 'User'
+        })
+
+        // Send OTP verification email
+        const response = await fetch('/api/auth/send-verification-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            firstName: formData.fullName.split(' ')[0] || 'User'
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to send verification email')
+        }
+
+        // Show OTP modal instead of redirecting
+        setShowOTPModal(true)
         
         toast({
-          title: "Welcome to VeeFore!",
-          description: "Account created successfully. Check your email for verification.",
+          title: "Verification email sent!",
+          description: "Please check your email for the 6-digit verification code.",
         })
         
-        setLocation('/')
       } catch (error: any) {
         console.error('Signup error:', error)
         toast({
@@ -135,6 +165,90 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       } finally {
         setIsLoading(false)
       }
+    }
+  }
+
+  // OTP Verification Functions
+  const handleOTPSubmit = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      toast({
+        title: "Invalid Code",
+        description: "Please enter the 6-digit verification code.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setOtpLoading(true)
+    try {
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: pendingUser?.email,
+          code: otpCode
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Verification failed')
+      }
+
+      // Success - account verified
+      setShowOTPModal(false)
+      toast({
+        title: "Email verified!",
+        description: "Your account has been activated. Welcome to VeeFore!",
+      })
+      
+      setLocation('/dashboard')
+    } catch (error: any) {
+      toast({
+        title: "Verification failed",
+        description: error.message || "Invalid or expired code. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const handleResendOTP = async () => {
+    if (!pendingUser) return
+
+    setOtpLoading(true)
+    try {
+      const response = await fetch('/api/auth/send-verification-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: pendingUser.email,
+          firstName: pendingUser.firstName
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to resend verification email')
+      }
+
+      toast({
+        title: "Code resent!",
+        description: "A new verification code has been sent to your email.",
+      })
+      setOtpCode('') // Clear current code
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setOtpLoading(false)
     }
   }
 
@@ -575,6 +689,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
   }
 
   return (
+    <>
     <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
       {/* Left side - Advanced Professional Showcase */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-y-auto">
@@ -970,6 +1085,85 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         </div>
       </div>
     </div>
+
+    {/* OTP Verification Modal */}
+    {showOTPModal && (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
+          <div className="text-center space-y-6">
+            {/* Header */}
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto">
+                <Mail className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
+                <p className="text-gray-600">
+                  We've sent a 6-digit verification code to<br />
+                  <span className="font-semibold text-gray-900">{pendingUser?.email}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* OTP Input */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="Enter 6-digit code"
+                  className="w-full text-center text-2xl font-mono tracking-widest border-2 border-gray-300 rounded-xl py-4 px-4 focus:border-blue-500 focus:outline-none transition-colors"
+                  maxLength={6}
+                  autoFocus
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleOTPSubmit}
+                  disabled={otpLoading || otpCode.length !== 6}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  {otpLoading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Verifying...</span>
+                    </div>
+                  ) : (
+                    'Verify Email'
+                  )}
+                </button>
+
+                <div className="text-center text-sm text-gray-600">
+                  Didn't receive the code?{' '}
+                  <button
+                    onClick={handleResendOTP}
+                    disabled={otpLoading}
+                    className="text-blue-600 hover:text-blue-700 font-semibold hover:underline disabled:opacity-50"
+                  >
+                    Resend Code
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Security Note */}
+            <div className="bg-gray-50 rounded-xl p-4 text-xs text-gray-600">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-4 h-4 text-gray-400" />
+                <span>This code expires in 15 minutes for your security</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
