@@ -59,11 +59,11 @@ const Landing = ({ onNavigate }: LandingProps) => {
         if (response.ok) {
           const data = await response.json()
           console.log('Device check successful:', data)
-          setDeviceStatus({
+          setDeviceStatus(prev => ({
             isOnWaitlist: true,
             user: data.user,
             loading: false
-          })
+          }))
         } else {
           console.log('Device check failed:', response.status)
           setDeviceStatus({
@@ -1000,8 +1000,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     </div>
                     
                     {/* Interactive Action Center */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      {console.log('Rendering main buttons - Device Status:', deviceStatus)}
+                    <div key={`buttons-${deviceStatus.loading}-${deviceStatus.isOnWaitlist}`} className="flex flex-col sm:flex-row gap-4 justify-center">
                       {deviceStatus.loading ? (
                         // Loading state
                         <div className="flex space-x-4">
