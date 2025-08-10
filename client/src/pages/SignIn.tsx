@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Sparkles, Zap, Cpu, Network, Brain, Rocket, ChevronRight, Play, Pause } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, ChevronRight, Play, Pause } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -26,6 +26,11 @@ const SignIn = ({ onNavigate }: SignInProps) => {
   const [currentDemo, setCurrentDemo] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isTyping, setIsTyping] = useState(false)
+  const [typedText, setTypedText] = useState('')
+  const [focusedField, setFocusedField] = useState('')
+  const [ripples, setRipples] = useState<Array<{id: number, x: number, y: number}>>([])
+  const [particleCount, setParticleCount] = useState(0)
 
   // Advanced interactive demo data
   const demoScenarios = [
@@ -69,6 +74,69 @@ const SignIn = ({ onNavigate }: SignInProps) => {
     }, 4000)
     return () => clearInterval(interval)
   }, [isPlaying, demoScenarios.length])
+
+  // Advanced typing animation
+  useEffect(() => {
+    const messages = [
+      "Welcome back to VeeFore AI",
+      "Your intelligent workspace awaits",
+      "AI-powered content creation ready",
+      "Advanced analytics at your fingertips"
+    ]
+    
+    let messageIndex = 0
+    let charIndex = 0
+    let isDeleting = false
+    
+    const typeWriter = () => {
+      const currentMessage = messages[messageIndex]
+      
+      if (!isDeleting && charIndex < currentMessage.length) {
+        setTypedText(currentMessage.substring(0, charIndex + 1))
+        setIsTyping(true)
+        charIndex++
+        setTimeout(typeWriter, 100)
+      } else if (isDeleting && charIndex > 0) {
+        setTypedText(currentMessage.substring(0, charIndex - 1))
+        charIndex--
+        setTimeout(typeWriter, 50)
+      } else if (!isDeleting && charIndex === currentMessage.length) {
+        setIsTyping(false)
+        setTimeout(() => {
+          isDeleting = true
+          typeWriter()
+        }, 2000)
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false
+        messageIndex = (messageIndex + 1) % messages.length
+        setTimeout(typeWriter, 500)
+      }
+    }
+    
+    const timeout = setTimeout(typeWriter, 1000)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  // Interactive ripple effects
+  const createRipple = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const newRipple = { id: Date.now(), x, y }
+    
+    setRipples(prev => [...prev, newRipple])
+    setTimeout(() => {
+      setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id))
+    }, 1000)
+  }
+
+  // Particle counter animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticleCount(prev => (prev + 1) % 1000)
+    }, 50)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleBackToLanding = () => {
     // Use the prop function for smooth SPA navigation
@@ -196,11 +264,41 @@ const SignIn = ({ onNavigate }: SignInProps) => {
           }}
         />
 
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.2) 1px, transparent 0)`,
-          backgroundSize: '60px 60px'
+        {/* Advanced animated grid pattern */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `
+            radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.3) 1px, transparent 0),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+            linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px, 30px 30px, 30px 30px',
+          animation: 'gridMove 30s linear infinite'
         }} />
+
+        {/* Interactive floating particles */}
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
+            style={{
+              left: `${10 + (i * 6)}%`,
+              top: `${20 + Math.sin(i) * 30}%`,
+              animation: `particles-float ${3 + (i % 3)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`
+            }}
+          />
+        ))}
+
+        {/* Dynamic mesh overlay */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            background: `
+              radial-gradient(circle at ${25 + mousePosition.x * 0.02}% ${25 + mousePosition.y * 0.02}%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+              radial-gradient(circle at ${75 + mousePosition.x * 0.015}% ${75 + mousePosition.y * 0.015}%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)
+            `
+          }}
+        />
       </div>
 
       {/* Professional Navigation */}
@@ -233,15 +331,27 @@ const SignIn = ({ onNavigate }: SignInProps) => {
         <div className="lg:w-3/5 flex flex-col justify-center p-8 lg:p-16 relative">
           {/* Hero Content */}
           <div className="max-w-2xl mb-16">
-            {/* Status Badge */}
-            <div className="inline-flex items-center bg-white/90 backdrop-blur-xl rounded-full px-8 py-4 mb-12 border border-gray-200/50 shadow-xl group hover:scale-105 transition-all duration-300">
-              <div className="flex items-center space-x-3">
+            {/* Advanced Status Badge with Typing Effect */}
+            <div className="inline-flex items-center bg-white/95 backdrop-blur-xl rounded-full px-8 py-4 mb-12 border border-gray-200/50 shadow-xl group hover:scale-105 transition-all duration-500 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="flex items-center space-x-3 relative z-10">
                 <div className="relative">
-                  <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse" />
-                  <div className="absolute inset-0 w-3 h-3 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-ping opacity-30" />
+                  <div className="w-4 h-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-4 h-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full animate-ping opacity-40" />
+                  <div className="absolute -inset-1 w-6 h-6 bg-gradient-to-r from-emerald-400/20 to-blue-400/20 rounded-full animate-pulse delay-300" />
                 </div>
-                <span className="text-gray-800 font-semibold text-lg">Welcome Back to VeeFore</span>
-                <Sparkles className="w-5 h-5 text-blue-600" />
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-800 font-semibold text-lg min-w-[300px] text-left">
+                    {typedText}
+                    {isTyping && <span className="animate-pulse">|</span>}
+                  </span>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+                <Sparkles className="w-5 h-5 text-blue-600 group-hover:rotate-12 transition-transform duration-500" />
               </div>
             </div>
 
@@ -311,46 +421,96 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                 </div>
 
-                {/* Professional Metrics */}
+                {/* Advanced Metrics with Animations */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   {Object.entries(demoScenarios[currentDemo].metrics).map(([key, value], index) => (
-                    <div key={key} className="bg-gray-50/80 rounded-xl p-4 border border-gray-200/50">
-                      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-                      <div className="text-gray-600 text-sm capitalize">{key}</div>
-                      <div className="w-full h-1 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                        <div 
-                          className={`h-full bg-gradient-to-r ${demoScenarios[currentDemo].gradient} rounded-full`}
-                          style={{ width: `${60 + index * 15}%` }}
-                        />
+                    <div key={key} className="bg-gradient-to-br from-white to-gray-50/80 rounded-xl p-4 border border-gray-200/50 hover:shadow-lg transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10">
+                        <div className="text-3xl font-bold text-gray-900 mb-1 group-hover:scale-110 transition-transform duration-300">{value}</div>
+                        <div className="text-gray-600 text-sm capitalize font-medium">{key}</div>
+                        <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${demoScenarios[currentDemo].gradient} rounded-full transition-all duration-1000 relative`}
+                            style={{ 
+                              width: `${60 + index * 15}%`,
+                              animation: `loading ${2 + index}s ease-in-out infinite alternate`
+                            }}
+                          >
+                            <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse" />
+                          </div>
+                        </div>
+                        {/* Floating indicator */}
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* AI Status Indicator */}
-                <div className="bg-blue-50/50 rounded-2xl p-6 border border-blue-200/30">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-900 font-semibold">AI Processing Status</span>
-                    <div className="flex items-center space-x-2">
-                      <Brain className="w-4 h-4 text-blue-600 animate-pulse" />
-                      <span className="text-blue-600 text-sm">System Active</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
-                      <div key={task} className="flex items-center justify-between">
-                        <span className="text-gray-700 text-sm">{task}</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
-                              style={{ width: `${85 + (index * 5)}%` }}
-                            />
-                          </div>
-                          <span className="text-emerald-600 text-xs">✓</span>
+                {/* Advanced AI Status with Real-time Metrics */}
+                <div className="bg-gradient-to-br from-blue-50/70 to-purple-50/50 rounded-2xl p-6 border border-blue-200/40 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-3">
+                        <div className="relative">
+                          <Brain className="w-6 h-6 text-blue-600 animate-pulse" />
+                          <div className="absolute -inset-1 w-8 h-8 border-2 border-blue-400/30 rounded-full animate-spin" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-bold text-lg">Neural Network</span>
+                          <div className="text-xs text-blue-600 font-medium">Processing {particleCount} operations/sec</div>
                         </div>
                       </div>
-                    ))}
+                      <div className="flex items-center space-x-2 bg-white/60 rounded-full px-3 py-1">
+                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-emerald-700 text-sm font-semibold">Active</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {['Content Analysis', 'Trend Detection', 'Engagement Optimization'].map((task, index) => (
+                        <div key={task} className="relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-gray-800 text-sm font-medium">{task}</span>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-blue-600 text-xs font-bold">{85 + (index * 5)}%</span>
+                              <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                                <span className="text-emerald-600 text-xs font-bold">✓</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-full h-3 bg-white/60 rounded-full overflow-hidden relative">
+                            <div 
+                              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-full transition-all duration-2000 relative"
+                              style={{ 
+                                width: `${85 + (index * 5)}%`,
+                                animation: `loading ${2 + index}s ease-in-out infinite alternate`
+                              }}
+                            >
+                              <div className="absolute inset-0 bg-white/40 rounded-full animate-pulse" />
+                              <div className="absolute right-0 top-0 w-2 h-full bg-white/80 rounded-full animate-pulse" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Real-time activity indicators */}
+                    <div className="mt-6 grid grid-cols-3 gap-3">
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-blue-600">{Math.floor(particleCount / 10)}</div>
+                        <div className="text-xs text-gray-600">Models</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-purple-600">{Math.floor(particleCount / 7)}ms</div>
+                        <div className="text-xs text-gray-600">Response</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/50 rounded-lg">
+                        <div className="text-lg font-bold text-indigo-600">99.{Math.floor(particleCount % 10)}%</div>
+                        <div className="text-xs text-gray-600">Accuracy</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -366,14 +526,48 @@ const SignIn = ({ onNavigate }: SignInProps) => {
               {/* Subtle glow effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-200/50 via-purple-200/50 to-violet-200/50 rounded-3xl blur-xl opacity-60" />
               
-              <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-10 border border-gray-200/60 shadow-2xl">
-                {/* Header */}
-                <div className="text-center mb-10">
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg">
-                    <Sparkles className="w-10 h-10 text-white" />
+              <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-10 border border-gray-200/60 shadow-2xl overflow-hidden">
+                {/* Ripple effects */}
+                {ripples.map(ripple => (
+                  <div
+                    key={ripple.id}
+                    className="absolute pointer-events-none"
+                    style={{
+                      left: ripple.x - 50,
+                      top: ripple.y - 50,
+                      width: 100,
+                      height: 100,
+                    }}
+                  >
+                    <div className="w-full h-full rounded-full bg-gradient-to-r from-blue-400/20 to-purple-400/20 animate-ping" />
                   </div>
-                  <h2 className="text-4xl font-bold text-gray-900 mb-3">Welcome Back</h2>
-                  <p className="text-gray-600 text-lg">Sign in to your VeeFore workspace</p>
+                ))}
+                
+                {/* Header */}
+                <div className="text-center mb-10 relative z-10">
+                  <div className="relative w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg group cursor-pointer" onClick={createRipple}>
+                    <Sparkles className="w-10 h-10 text-white group-hover:rotate-12 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl animate-pulse opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl animate-pulse" />
+                  </div>
+                  <h2 className="text-4xl font-bold text-gray-900 mb-3 hover:text-blue-700 transition-colors duration-300 cursor-default">Welcome Back</h2>
+                  <p className="text-gray-600 text-lg">Sign in to your intelligent VeeFore workspace</p>
+                  
+                  {/* Advanced security indicators */}
+                  <div className="flex items-center justify-center space-x-6 mt-6">
+                    <div className="flex items-center space-x-2 text-emerald-600">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="text-xs font-medium">Secure</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-blue-600">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-300" />
+                      <span className="text-xs font-medium">Encrypted</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-purple-600">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-500" />
+                      <span className="text-xs font-medium">AI-Protected</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Form */}
@@ -389,11 +583,23 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                         id="email"
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField('')}
                         className={`w-full px-6 py-5 bg-white/90 backdrop-blur-xl border-2 ${
                           errors.email ? 'border-red-400' : 'border-gray-200/60 group-hover:border-blue-400/60 focus:border-blue-500'
-                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg focus:ring-4 focus:ring-blue-500/10`}
+                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg focus:ring-4 focus:ring-blue-500/10 relative z-10`}
                         placeholder="Enter your email address"
                       />
+                      {/* Advanced focus indicator */}
+                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 transition-opacity duration-500 ${focusedField === 'email' ? 'opacity-100' : 'opacity-0'}`} />
+                      {/* Typing animation dots */}
+                      {focusedField === 'email' && formData.email && (
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" />
+                          <div className="w-1 h-1 bg-purple-500 rounded-full animate-bounce delay-100" />
+                          <div className="w-1 h-1 bg-indigo-500 rounded-full animate-bounce delay-200" />
+                        </div>
+                      )}
                     </div>
                     {errors.email && (
                       <p className="text-red-500 text-sm font-medium flex items-center space-x-2">
@@ -419,18 +625,45 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                         id="password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
+                        onFocus={() => setFocusedField('password')}
+                        onBlur={() => setFocusedField('')}
                         className={`w-full px-6 py-5 bg-white/90 backdrop-blur-xl border-2 ${
                           errors.password ? 'border-red-400' : 'border-gray-200/60 group-hover:border-blue-400/60 focus:border-blue-500'
-                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg pr-14 focus:ring-4 focus:ring-blue-500/10`}
+                        } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-500 text-lg pr-20 focus:ring-4 focus:ring-blue-500/10 relative z-10`}
                         placeholder="Enter your password"
                       />
+                      {/* Advanced focus indicator */}
+                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 transition-opacity duration-500 ${focusedField === 'password' ? 'opacity-100' : 'opacity-0'}`} />
+                      
+                      {/* Enhanced password visibility toggle */}
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-300"
+                        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-all duration-300 hover:scale-110 relative z-20"
                       >
                         {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
                       </button>
+                      
+                      {/* Password strength indicator */}
+                      {focusedField === 'password' && formData.password && (
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20">
+                          <div className={`w-3 h-3 rounded-full ${formData.password.length >= 8 ? 'bg-emerald-500' : formData.password.length >= 4 ? 'bg-yellow-500' : 'bg-red-500'} animate-pulse`} />
+                        </div>
+                      )}
+                      
+                      {/* Security level indicator */}
+                      {formData.password && (
+                        <div className="absolute bottom-2 left-2 flex space-x-1 z-20">
+                          {[...Array(4)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-1 h-1 rounded-full transition-all duration-300 ${
+                                formData.password.length > i * 2 ? 'bg-blue-500 scale-125' : 'bg-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                     {errors.password && (
                       <p className="text-red-500 text-sm font-medium flex items-center space-x-2">
@@ -440,24 +673,56 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     )}
                   </div>
 
-                  {/* Professional Sign In Button */}
+                  {/* Advanced Sign In Button with Multiple Effects */}
                   <Button 
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    onClick={createRipple}
+                    className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white py-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group"
                   >
-                    <div className="flex items-center justify-center space-x-3">
+                    {/* Animated background overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    
+                    {/* Glowing effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-xl" />
+                    
+                    <div className="flex items-center justify-center space-x-3 relative z-10">
                       {isLoading ? (
                         <>
-                          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Signing you in...</span>
+                          <div className="relative">
+                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-blue-300 rounded-full animate-spin animate-reverse" />
+                          </div>
+                          <span className="animate-pulse">Establishing connection...</span>
+                          <div className="flex space-x-1">
+                            <div className="w-1 h-1 bg-white rounded-full animate-bounce" />
+                            <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-100" />
+                            <div className="w-1 h-1 bg-white rounded-full animate-bounce delay-200" />
+                          </div>
                         </>
                       ) : (
                         <>
-                          <span>Sign In to VeeFore</span>
-                          <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                          <Sparkles className="w-6 h-6 group-hover:rotate-180 transition-transform duration-500" />
+                          <span className="group-hover:tracking-wider transition-all duration-300">Sign In to VeeFore AI</span>
+                          <ChevronRight className="w-6 h-6 group-hover:translate-x-2 group-hover:scale-125 transition-all duration-300" />
                         </>
                       )}
+                    </div>
+                    
+                    {/* Particle effects */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute w-1 h-1 bg-white/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          style={{
+                            left: `${20 + i * 12}%`,
+                            top: `${30 + Math.sin(i) * 20}%`,
+                            animation: `particles-float ${2 + i * 0.5}s ease-in-out infinite`,
+                            animationDelay: `${i * 0.2}s`
+                          }}
+                        />
+                      ))}
                     </div>
                   </Button>
 

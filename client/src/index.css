@@ -129,6 +129,31 @@
   animation: data-flow 3s linear infinite;
 }
 
+/* Advanced animation utilities */
+.animate-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes bounce-dots {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(147, 51, 234, 0.6);
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
