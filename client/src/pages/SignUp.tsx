@@ -819,11 +819,11 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
         </div>
       </div>
 
-      {/* Right side - Enhanced Sign up form */}
-      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30">
-        {/* Mobile header - fixed */}
-        <div className="absolute top-0 left-0 right-0 z-50 lg:hidden">
-          <div className="flex items-center justify-between p-6">
+      {/* Right side - Completely static form container */}
+      <div className="w-full lg:w-1/2 bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 flex flex-col">
+        {/* Mobile header */}
+        <div className="lg:hidden bg-white/95 backdrop-blur-sm p-6 flex-shrink-0">
+          <div className="flex items-center justify-between">
             <button 
               onClick={handleBackToLanding}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -839,13 +839,12 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
 
-        {/* Absolutely fixed form container */}
-        <div className="h-screen relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center p-8">
-            <div className="w-full max-w-lg h-full overflow-y-auto space-y-8 py-8">
-          {/* Enhanced Progress indicator */}
-          <div className="mb-6">
-            <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
+        {/* Static form container with no scroll displacement */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="w-full max-w-lg">
+            <div className="max-h-[calc(100vh-8rem)] overflow-y-auto space-y-6">
+              {/* Progress indicator */}
+              <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-3xl p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
@@ -917,14 +916,15 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
                 <span className={currentStep >= 3 ? 'text-blue-600' : ''}>Goals</span>
                 <span className={currentStep >= 4 ? 'text-blue-600' : ''}>Complete</span>
               </div>
-            </div>
-          </div>
+              </div>
 
-          <form onSubmit={handleSubmit}>
-            {renderStepContent()}
-          </form>
+              {/* Form Steps */}
+              <form onSubmit={handleSubmit}>
+                {renderStepContent()}
+              </form>
 
-          <div className="mt-6 text-center">
+              {/* Trust indicators */}
+              <div className="text-center">
             <div className="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6">
               <p className="text-gray-700 text-lg font-medium mb-4">
                 Already have an account?{' '}
