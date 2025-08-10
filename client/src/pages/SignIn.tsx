@@ -310,8 +310,8 @@ const SignIn = ({ onNavigate }: SignInProps) => {
 
           <div className="flex items-center space-x-4 bg-white/80 backdrop-blur-xl rounded-2xl px-6 py-3 border border-gray-200/50 shadow-lg">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <svg viewBox="0 0 200 200" className="w-6 h-6 text-white" fill="currentColor">
-                <path d="M40 40 L80 160 L120 40 L160 40 L160 160 L120 160 L120 80 L80 80 L80 160 L40 160 Z"/>
+              <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
+                <path d="M12 2L4 22h3l1.5-4h7L17 22h3L12 2zm0 6l2.5 6h-5L12 8z"/>
               </svg>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -442,8 +442,8 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                         <div className="w-5 h-5 flex items-center justify-center">
-                          <svg viewBox="0 0 200 200" className="w-4 h-4 text-white" fill="currentColor">
-                            <path d="M40 40 L80 160 L120 40 L160 40 L160 160 L120 160 L120 80 L80 80 L80 160 L40 160 Z"/>
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="currentColor">
+                            <path d="M12 2L4 22h3l1.5-4h7L17 22h3L12 2zm0 6l2.5 6h-5L12 8z"/>
                           </svg>
                         </div>
                       </div>
