@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code, Mail } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Check, X, ArrowRight, Sparkles, Shield, Zap, Users, Target, Rocket, Brain, Globe, BarChart3, Star, Lock, Briefcase, ChevronRight, TrendingUp, Code, Mail, Clock } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
