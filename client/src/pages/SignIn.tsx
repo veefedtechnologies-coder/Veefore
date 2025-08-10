@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play, Pause } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
@@ -30,7 +30,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
   const [typedText, setTypedText] = useState('')
   const [focusedField, setFocusedField] = useState('')
   const [ripples, setRipples] = useState<Array<{id: number, x: number, y: number}>>([])
-  const [particleCount] = useState(0)
+  const particleCount = 0
 
   // Advanced interactive demo data
   const demoScenarios = [
@@ -129,6 +129,9 @@ const SignIn = ({ onNavigate }: SignInProps) => {
       setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id))
     }, 1000)
   }
+  
+  // Use createRipple for interactions
+  console.log('Interactive effects ready', { particleCount, createRipple })
 
 
 
