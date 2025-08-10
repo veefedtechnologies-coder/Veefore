@@ -83,7 +83,9 @@ export default function AdminPanel() {
   // Check admin authentication
   useEffect(() => {
     const adminToken = localStorage.getItem('adminToken')
+    console.log('Admin token:', adminToken ? 'exists' : 'missing')
     if (!adminToken) {
+      console.log('No admin token found, redirecting to admin-login')
       setLocation('/admin-login')
       return
     }
@@ -101,29 +103,61 @@ export default function AdminPanel() {
   
   const pageSize = 20
 
-  // Custom API request with admin token
-  const adminApiRequest = (url: string, options: any = {}) => {
+  // Custom API request with admin token (bypass Firebase auth)
+  const adminApiRequest = async (url: string, options: any = {}) => {
     const adminToken = localStorage.getItem('adminToken')
-    return apiRequest(url, {
+    
+    const response = await fetch(url, {
       ...options,
       headers: {
+        'Content-Type': 'application/json',
         ...options.headers,
         Authorization: `Bearer ${adminToken}`
       }
     })
+
+    if (!response.ok) {
+      const errorData = await response.text()
+      throw new Error(errorData || `${response.status}: ${response.statusText}`)
+    }
+
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      return response.json()
+    }
+    
+    return response.text()
   }
 
   // Fetch waitlist users
-  const { data: waitlistData, isLoading: isLoadingUsers, refetch: refetchUsers } = useQuery({
+  const { data: waitlistData, isLoading: isLoadingUsers, refetch: refetchUsers, error: waitlistError } = useQuery({
     queryKey: ['/api/admin/waitlist', currentPage, searchTerm, statusFilter],
-    queryFn: () => adminApiRequest(`/api/admin/waitlist?page=${currentPage}&limit=${pageSize}&search=${searchTerm}&filter=${statusFilter}`)
+    queryFn: () => {
+      console.log('Fetching waitlist data...')
+      return adminApiRequest(`/api/admin/waitlist?page=${currentPage}&limit=${pageSize}&search=${searchTerm}&filter=${statusFilter}`)
+    },
+    retry: false
   })
 
+  // Log any errors
+  if (waitlistError) {
+    console.error('Waitlist fetch error:', waitlistError)
+  }
+
   // Fetch waitlist stats
-  const { data: stats, isLoading: isLoadingStats } = useQuery({
+  const { data: stats, isLoading: isLoadingStats, error: statsError } = useQuery({
     queryKey: ['/api/admin/waitlist/stats'],
-    queryFn: () => adminApiRequest('/api/admin/waitlist/stats')
+    queryFn: () => {
+      console.log('Fetching stats data...')
+      return adminApiRequest('/api/admin/waitlist/stats')
+    },
+    retry: false
   })
+
+  // Log any errors
+  if (statsError) {
+    console.error('Stats fetch error:', statsError)
+  }
 
   // User action mutations
   const userActionMutation = useMutation({
