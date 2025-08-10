@@ -1651,6 +1651,7 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
