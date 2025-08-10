@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { 
   Crown, Clock, Gift, Share2, Copy, Check, Users, TrendingUp, 
   Star, Calendar, Mail, Trophy, Zap, Sparkles, BarChart3, 
-  Globe, BookOpen, MessageSquare, HeartHandshake, PartyPopper, 
-  Gem, Diamond, ArrowLeft, Rocket, Shield, Bell, Settings, 
-  Download, Play, Layers, Palette, Lightbulb, Target,
-  ChevronRight, ExternalLink, Activity, Briefcase, Award
+  Globe, BookOpen, MessageSquare, HeartHandshake, 
+  Gem, ArrowLeft, Rocket, Shield, Bell, Settings, 
+  Download, Target, ChevronRight, Activity, Briefcase, Award
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface WaitlistUser {
@@ -111,14 +109,14 @@ const WaitlistStatus = () => {
   const [user, setUser] = useState<WaitlistUser | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(true);
   const [copiedReferral, setCopiedReferral] = useState(false);
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalUsers: 1247,
     avgWaitTime: '2-3 weeks',
     launchProgress: 78
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [notifications, setNotifications] = useState([
+  const [notifications] = useState([
     { id: 1, type: 'info', message: 'Beta testing phase has begun!', time: '2 hours ago', read: false },
     { id: 2, type: 'success', message: 'Your position moved up by 15 spots', time: '1 day ago', read: false },
     { id: 3, type: 'update', message: 'New feature preview available', time: '3 days ago', read: true }
@@ -526,80 +524,147 @@ const WaitlistStatus = () => {
             transition={{ duration: 0.4 }}
           >
             {activeTab === 'overview' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Launch Progress */}
+              <div className="space-y-8">
+                {/* Personal Waitlist Status */}
                 <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                        <Rocket className="w-6 h-6 text-white" />
+                  <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center">
+                          <Crown className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-2xl font-bold text-gray-900">Your Waitlist Status</CardTitle>
+                          <p className="text-gray-600">Welcome back, {user?.name}!</p>
+                        </div>
                       </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Launch Timeline</CardTitle>
-                        <p className="text-gray-600">Track our progress to launch</p>
-                      </div>
+                      <Badge className="bg-green-100 text-green-800 px-4 py-2 text-lg font-semibold">
+                        Active
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="p-8">
-                    <CreativeProgress value={stats.launchProgress} label="Platform Development" />
-                    
-                    <div className="mt-8 space-y-4">
-                      {[
-                        { phase: "Beta Testing", status: "current", progress: 85 },
-                        { phase: "Security Audit", status: "upcoming", progress: 60 },
-                        { phase: "Launch Preparation", status: "planned", progress: 30 }
-                      ].map((phase, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-3 h-3 rounded-full ${
-                              phase.status === 'current' ? 'bg-green-500' :
-                              phase.status === 'upcoming' ? 'bg-yellow-500' : 'bg-gray-400'
-                            }`} />
-                            <span className="font-medium text-gray-900">{phase.phase}</span>
-                          </div>
-                          <span className="text-sm text-gray-500">{phase.progress}%</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="text-center">
+                        <div className="text-5xl font-black text-indigo-600 mb-3">
+                          #{user?.position || '247'}
                         </div>
-                      ))}
+                        <div className="text-gray-600 font-medium">Your Position</div>
+                        <p className="text-sm text-gray-500 mt-2">You're ahead of {stats.totalUsers - (user?.position || 247)} people!</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-5xl font-black text-purple-600 mb-3">
+                          {user?.referralCount || 0}
+                        </div>
+                        <div className="text-gray-600 font-medium">Friends Invited</div>
+                        <p className="text-sm text-gray-500 mt-2">Each referral moves you up 5 spots</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-5xl font-black text-blue-600 mb-3">
+                          {user?.credits || 0}
+                        </div>
+                        <div className="text-gray-600 font-medium">Early Access Credits</div>
+                        <p className="text-sm text-gray-500 mt-2">Bonus credits for being early</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Community Stats */}
-                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-100">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                        <Globe className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Community</CardTitle>
-                        <p className="text-gray-600">Growing every day</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-8">
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-                        <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ duration: 3, repeat: Infinity }}
-                          className="text-4xl font-black text-gray-900 mb-2"
-                        >
-                          {stats.totalUsers.toLocaleString()}
-                        </motion.div>
-                        <div className="text-gray-600 mb-3">Total Members</div>
-                        <div className="flex items-center justify-center space-x-1">
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                          <span className="text-sm text-green-600 font-medium">+247 today</span>
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 shadow-lg">
+                    <CardContent className="p-8">
+                      <div className="flex items-center space-x-4 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                          <Share2 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">Share & Skip Ahead</h3>
+                          <p className="text-gray-600">Invite friends to move up faster</p>
                         </div>
                       </div>
+                      <Button 
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium py-3"
+                        onClick={() => setActiveTab('referrals')}
+                      >
+                        Get My Referral Link
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+                    <CardContent className="p-8">
+                      <div className="flex items-center space-x-4 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                          <Bell className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">Stay Updated</h3>
+                          <p className="text-gray-600">Get notified about your status</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 font-medium py-3"
+                        onClick={() => setActiveTab('notifications')}
+                      >
+                        View Notifications
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Platform Overview */}
+                <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-gray-100">
+                    <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
+                      <Rocket className="w-8 h-8 text-green-600 mr-3" />
+                      What's VeeFore?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <h4 className="text-lg font-bold text-gray-900 mb-4">AI-Powered Social Media Management</h4>
+                        <ul className="space-y-3">
+                          <li className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-700">Automated content creation and scheduling</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-700">Intelligent audience engagement</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-700">Advanced analytics and insights</span>
+                          </li>
+                          <li className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-700">Multi-platform management</span>
+                          </li>
+                        </ul>
+                      </div>
                       
-                      <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-100">
-                        <div className="text-4xl font-black text-gray-900 mb-2">{stats.avgWaitTime}</div>
-                        <div className="text-gray-600 mb-3">Average Wait Time</div>
-                        <div className="flex items-center justify-center space-x-1">
-                          <Clock className="w-4 h-4 text-purple-500" />
-                          <span className="text-sm text-purple-600 font-medium">Decreasing</span>
+                      <div>
+                        <h4 className="text-lg font-bold text-gray-900 mb-4">Community Stats</h4>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <span className="text-gray-700">Total Waitlist Members</span>
+                            <span className="font-bold text-gray-900">{stats.totalUsers.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <span className="text-gray-700">Average Wait Time</span>
+                            <span className="font-bold text-gray-900">{stats.avgWaitTime}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <span className="text-gray-700">Development Progress</span>
+                            <span className="font-bold text-green-600">{stats.launchProgress}%</span>
+                          </div>
                         </div>
                       </div>
                     </div>
