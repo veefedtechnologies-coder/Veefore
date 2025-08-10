@@ -1119,65 +1119,129 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
       </div>
     </div>
 
-    {/* OTP Verification Modal */}
+    {/* Revolutionary OTP Verification Experience */}
     {showOTPModal && (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
-          <div className="text-center space-y-6">
-            {/* Header */}
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto">
-                <Mail className="w-8 h-8 text-white" />
+      <div className="fixed inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-blue-900/90 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-r from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        </div>
+
+        <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20">
+          <div className="text-center space-y-8">
+            {/* Premium Header */}
+            <div className="space-y-6">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
+                  <Mail className="w-10 h-10 text-white" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-3 border-white flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-2xl blur-xl animate-pulse"></div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
-                <p className="text-gray-600">
-                  We've sent a 6-digit verification code to<br />
-                  <span className="font-semibold text-gray-900">{pendingUser?.email}</span>
-                </p>
+              
+              <div className="space-y-3">
+                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Verify Your Email</h2>
+                <div className="space-y-2">
+                  <p className="text-gray-600 font-medium">
+                    We've sent a 6-digit verification code to
+                  </p>
+                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-xl border border-blue-200/50">
+                    <Mail className="w-4 h-4 text-blue-600" />
+                    <span className="font-bold text-blue-900">{pendingUser?.email}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* OTP Input */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="Enter 6-digit code"
-                  className="w-full text-center text-2xl font-mono tracking-widest border-2 border-gray-300 rounded-xl py-4 px-4 focus:border-blue-500 focus:outline-none transition-colors"
-                  maxLength={6}
-                  autoFocus
-                />
+            {/* Revolutionary OTP Input Grid */}
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="text-sm font-bold text-gray-900 tracking-wide">VERIFICATION CODE</div>
+                <div className="flex justify-center space-x-3">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className="relative">
+                      <input
+                        type="text"
+                        value={otpCode[index] || ''}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '')
+                          if (value.length <= 1) {
+                            const newCode = otpCode.split('')
+                            newCode[index] = value
+                            setOtpCode(newCode.join('').slice(0, 6))
+                            
+                            // Auto-focus next input
+                            if (value && index < 5) {
+                              const nextInput = e.target.parentElement?.parentElement?.children[index + 1]?.querySelector('input')
+                              nextInput?.focus()
+                            }
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Handle backspace to focus previous input
+                          if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+                            const prevInput = e.target.parentElement?.parentElement?.children[index - 1]?.querySelector('input')
+                            prevInput?.focus()
+                          }
+                        }}
+                        className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl transition-all duration-300 ${
+                          otpCode[index] 
+                            ? 'border-green-400 bg-green-50 text-green-800 shadow-lg shadow-green-200/50' 
+                            : 'border-gray-300 bg-white focus:border-blue-500 focus:bg-blue-50 focus:shadow-lg focus:shadow-blue-200/50'
+                        }`}
+                        maxLength={1}
+                        autoFocus={index === 0}
+                      />
+                      {otpCode[index] && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Progress indicator */}
+                <div className="flex justify-center space-x-1">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className={`h-1 w-8 rounded-full transition-all duration-300 ${
+                      otpCode[index] ? 'bg-green-400' : 'bg-gray-200'
+                    }`}></div>
+                  ))}
+                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
+              {/* Premium Action Buttons */}
+              <div className="space-y-4">
                 <button
                   onClick={handleOTPSubmit}
                   disabled={otpLoading || otpCode.length !== 6}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden group"
                 >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   {otpLoading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Verifying...</span>
+                    <div className="flex items-center justify-center space-x-3 relative z-10">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Verifying Your Code...</span>
                     </div>
                   ) : (
-                    'Verify Email'
+                    <div className="flex items-center justify-center space-x-3 relative z-10">
+                      <span>Verify & Continue</span>
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    </div>
                   )}
                 </button>
 
-                <div className="text-center text-sm text-gray-600">
-                  Didn't receive the code?{' '}
+                <div className="flex items-center justify-center space-x-4 text-sm">
+                  <span className="text-gray-600">Didn't receive the code?</span>
                   <button
                     onClick={handleResendOTP}
                     disabled={otpLoading}
-                    className="text-blue-600 hover:text-blue-700 font-semibold hover:underline disabled:opacity-50"
+                    className="text-blue-600 hover:text-blue-700 font-bold hover:underline disabled:opacity-50 transition-colors duration-200"
                   >
                     Resend Code
                   </button>
@@ -1185,11 +1249,15 @@ const SignUp = ({ onNavigate }: SignUpProps) => {
               </div>
             </div>
 
-            {/* Security Note */}
-            <div className="bg-gray-50 rounded-xl p-4 text-xs text-gray-600">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-gray-400" />
-                <span>This code expires in 15 minutes for your security</span>
+            {/* Enhanced Security Note */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-2xl p-4">
+              <div className="flex items-center justify-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm text-amber-800 font-semibold">
+                  Code expires in 15 minutes • Bank-level security
+                </div>
               </div>
             </div>
           </div>
