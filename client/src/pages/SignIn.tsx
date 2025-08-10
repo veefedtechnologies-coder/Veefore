@@ -672,15 +672,20 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   </div>
                 </div>
 
-                {/* Modern Professional Sign In Form */}
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Modern Email Field */}
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <div className="absolute -top-2 left-4 bg-white px-2 z-10">
-                        <span className="text-sm font-semibold text-gray-700">Email Address</span>
-                      </div>
-                      <div className="relative group">
+                {/* Completely New Card-Style Sign In Form */}
+                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-8 rounded-3xl border border-blue-100/50 shadow-xl backdrop-blur-sm">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Card-Style Email Field */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                          </svg>
+                        </div>
                         <input
                           type="email"
                           id="email"
@@ -688,149 +693,154 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           onFocus={() => setFocusedField('email')}
                           onBlur={() => setFocusedField('')}
-                          className={`w-full px-6 py-4 bg-white border-2 ${
+                          className={`w-full pl-12 pr-12 py-4 bg-white/90 border-2 ${
                             errors.email 
-                              ? 'border-red-400' 
+                              ? 'border-red-400 focus:border-red-500' 
                               : focusedField === 'email'
-                                ? 'border-blue-500'
-                                : 'border-gray-300 hover:border-gray-400'
-                          } rounded-xl focus:outline-none transition-all duration-300 text-gray-900 text-lg`}
-                          placeholder="your@email.com"
+                                ? 'border-blue-500 focus:border-blue-600'
+                                : 'border-transparent hover:border-blue-200'
+                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
+                          placeholder="Enter your email address"
                         />
                         
-                        {/* Professional border glow effect */}
-                        <div className={`absolute inset-0 rounded-xl transition-all duration-300 ${
-                          focusedField === 'email' 
-                            ? 'ring-4 ring-blue-500/20 shadow-lg' 
-                            : 'shadow-sm hover:shadow-md'
-                        }`} />
-                        
-                        {/* Email validation check */}
+                        {/* Success/Error Icon */}
                         {formData.email && (
                           <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                             {formData.email.includes('@') && formData.email.includes('.') ? (
-                              <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                               </div>
                             ) : (
-                              <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
-                                <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                              <div className="w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
                               </div>
                             )}
                           </div>
                         )}
                       </div>
                       
-                      {/* Error message */}
+                      {/* Enhanced Error Display */}
                       {errors.email && (
-                        <div className="mt-2 text-red-600 text-sm font-medium bg-red-50 px-3 py-2 rounded-lg border border-red-200">
-                          {errors.email}
+                        <div className="bg-red-100/80 border border-red-300/50 rounded-xl p-3 flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          <div>
+                            <p className="text-red-800 text-sm font-medium">{errors.email}</p>
+                          </div>
                         </div>
                       )}
                     </div>
-                  </div>
 
-                  {/* Modern Password Field */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div className="relative">
-                        <div className="absolute -top-2 left-4 bg-white px-2 z-10">
-                          <span className="text-sm font-semibold text-gray-700">Password</span>
-                        </div>
+                    {/* Card-Style Password Field */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+                          Password
+                        </label>
+                        <Link 
+                          href="/forgot-password" 
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline transition-colors bg-blue-100/50 hover:bg-blue-200/50 px-3 py-1 rounded-full"
+                        >
+                          Forgot?
+                        </Link>
                       </div>
-                      <Link 
-                        href="/forgot-password" 
-                        className="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline transition-colors"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    
-                    <div className="relative group">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        onFocus={() => setFocusedField('password')}
-                        onBlur={() => setFocusedField('')}
-                        className={`w-full px-6 py-4 bg-white border-2 ${
-                          errors.password 
-                            ? 'border-red-400' 
-                            : focusedField === 'password'
-                              ? 'border-blue-500'
-                              : 'border-gray-300 hover:border-gray-400'
-                        } rounded-xl focus:outline-none transition-all duration-300 text-gray-900 text-lg pr-20`}
-                        placeholder="Enter your password"
-                      />
                       
-                      {/* Professional border glow effect */}
-                      <div className={`absolute inset-0 rounded-xl transition-all duration-300 ${
-                        focusedField === 'password' 
-                          ? 'ring-4 ring-blue-500/20 shadow-lg' 
-                          : 'shadow-sm hover:shadow-md'
-                      }`} />
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        </div>
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          id="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          onFocus={() => setFocusedField('password')}
+                          onBlur={() => setFocusedField('')}
+                          className={`w-full pl-12 pr-16 py-4 bg-white/90 border-2 ${
+                            errors.password 
+                              ? 'border-red-400 focus:border-red-500' 
+                              : focusedField === 'password'
+                                ? 'border-blue-500 focus:border-blue-600'
+                                : 'border-transparent hover:border-blue-200'
+                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
+                          placeholder="Enter your password"
+                        />
+                        
+                        {/* Enhanced Password Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-200/80 hover:bg-gray-300/80 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-300"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                       
-                      {/* Enhanced password visibility toggle */}
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700 transition-colors rounded-lg hover:bg-gray-100"
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                      
-                      {/* Password strength indicator */}
+                      {/* Enhanced Password Strength */}
                       {formData.password && (
-                        <div className="mt-3">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-600 font-medium">Strength:</span>
-                            <div className="flex-1 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                  formData.password.length >= 8 
-                                    ? 'bg-green-500 w-full' 
-                                    : formData.password.length >= 6 
-                                      ? 'bg-yellow-500 w-3/4'
-                                      : formData.password.length >= 4
-                                        ? 'bg-orange-500 w-1/2'
-                                        : 'bg-red-500 w-1/4'
-                                }`}
-                              />
-                            </div>
-                            <span className={`text-xs font-medium ${
+                        <div className="bg-white/60 rounded-xl p-3 border border-gray-200/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold text-gray-700">Password Strength</span>
+                            <span className={`text-xs font-bold ${
                               formData.password.length >= 8 
-                                ? 'text-green-600' 
+                                ? 'text-emerald-600' 
                                 : formData.password.length >= 6 
-                                  ? 'text-yellow-600'
+                                  ? 'text-amber-600'
                                   : formData.password.length >= 4
                                     ? 'text-orange-600'
                                     : 'text-red-600'
                             }`}>
                               {formData.password.length >= 8 
-                                ? 'Strong' 
+                                ? 'STRONG' 
                                 : formData.password.length >= 6 
-                                  ? 'Good'
+                                  ? 'GOOD'
                                   : formData.password.length >= 4
-                                    ? 'Fair'
-                                    : 'Weak'}
+                                    ? 'FAIR'
+                                    : 'WEAK'}
                             </span>
+                          </div>
+                          <div className="flex space-x-1">
+                            {[...Array(4)].map((_, i) => (
+                              <div
+                                key={i}
+                                className={`flex-1 h-3 rounded-full transition-all duration-500 ${
+                                  formData.password.length > i * 2 
+                                    ? formData.password.length >= 8 
+                                      ? 'bg-emerald-500' 
+                                      : formData.password.length >= 6 
+                                        ? 'bg-amber-500'
+                                        : formData.password.length >= 4
+                                          ? 'bg-orange-500'
+                                          : 'bg-red-500'
+                                    : 'bg-gray-200'
+                                }`}
+                              />
+                            ))}
                           </div>
                         </div>
                       )}
                       
-                      {/* Error message */}
+                      {/* Enhanced Error Display */}
                       {errors.password && (
-                        <div className="mt-2 text-red-600 text-sm font-medium bg-red-50 px-3 py-2 rounded-lg border border-red-200">
-                          {errors.password}
+                        <div className="bg-red-100/80 border border-red-300/50 rounded-xl p-3 flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          <div>
+                            <p className="text-red-800 text-sm font-medium">{errors.password}</p>
+                          </div>
                         </div>
                       )}
                     </div>
-                  </div>
 
-                  {/* Advanced Sign In Button with Multiple Effects */}
+                    {/* Advanced Sign In Button with Multiple Effects */}
                   <Button 
                     type="submit" 
                     disabled={isLoading}
@@ -911,7 +921,8 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       <span>{isLoading ? 'Signing in...' : 'Continue with Google'}</span>
                     </div>
                   </Button>
-                </form>
+                  </form>
+                </div>
 
                 {/* Sign Up Link */}
                 <div className="text-center mt-10">
