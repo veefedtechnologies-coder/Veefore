@@ -44,6 +44,9 @@ const convertToMarkdown = (text: string): string => {
   // Convert "**Title: Something**" or "Title: Something" to "# Something" 
   result = result.replace(/^\*\*Title:\s*(.+)\*\*$/gm, '# $1');
   result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
+  // Convert "**Job Title: Something**" or "Job Title: Something" to "# Something" (MAIN TITLE)
+  result = result.replace(/^\*\*Job Title:\s*(.+)\*\*$/gm, '# $1');
+  result = result.replace(/^Job Title:\s*(.+)$/gm, '# $1');
   
   // Convert section headers ending with colon to ## headers (H2 - large) 
   result = result.replace(/^(About Us):\s*$/gm, '## $1');
@@ -69,9 +72,9 @@ const convertToMarkdown = (text: string): string => {
   
   // Convert sub-headings with colons to ### headers (H3 - medium)
   result = result.replace(/^(\d+\.\s*)?([A-Z][A-Za-z\s&]+):\s*$/gm, '### $2');
-  // Convert patterns like "Job Title: Something" to ### headers - handle bold syntax too
-  result = result.replace(/^\*\*([A-Z][A-Za-z\s]+):\*\*\s*(.+)$/gm, '### $1\n$2');
-  result = result.replace(/^([A-Z][A-Za-z\s]+):\s*(.+)$/gm, '### $1\n$2');
+  // Convert patterns like "Position: Something" to ### headers (but NOT Job Title - that's handled above)
+  result = result.replace(/^\*\*(?!Job Title)([A-Z][A-Za-z\s]+):\*\*\s*(.+)$/gm, '### $1\n$2');
+  result = result.replace(/^(?!Job Title)([A-Z][A-Za-z\s]+):\s*(.+)$/gm, '### $1\n$2');
   
   // Convert "Effects of Something" and "Causes of Something" patterns
   result = result.replace(/^(Effects? of [A-Za-z\s]+)$/gm, '## $1');
