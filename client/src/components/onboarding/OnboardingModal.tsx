@@ -85,9 +85,6 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
       </div>
     </div>
   )
-  
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
