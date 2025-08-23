@@ -1283,7 +1283,273 @@ export default function VeeGPT() {
       
       {/* Content - Above Background */}
       <div className="relative z-10 w-full h-full flex">
+        {/* Sidebar - show if conversations exist */}
+        {shouldShowSidebar && (
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r border-slate-700/50 flex flex-col transition-all duration-300 shadow-2xl`}>
+            {/* Top Logo/Brand with Toggle */}
+            <div className="p-6 border-b border-slate-700/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-violet-400/20">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  {!sidebarCollapsed && (
+                    <div>
+                      <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">VeeGPT</h1>
+                      <p className="text-xs text-slate-400 font-medium">AI Assistant</p>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  className="p-2 hover:bg-slate-700/50 rounded-lg transition-all duration-200 group"
+                >
+                  {sidebarCollapsed ? (
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                  ) : (
+                    <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                  )}
+                </button>
+              </div>
+            </div>
 
+            {/* Navigation Menu */}
+            <div className="p-4 space-y-2">
+              <button
+                onClick={startNewChat}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 rounded-xl transition-all duration-200 shadow-lg hover:shadow-violet-500/25 group"
+                title={sidebarCollapsed ? "New chat" : ""}
+              >
+                <Edit className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                {!sidebarCollapsed && <span>New Chat</span>}
+              </button>
+              
+              <button 
+                onClick={() => setShowSearchInput(!showSearchInput)}
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all duration-200 group"
+                title={sidebarCollapsed ? "Search chats" : ""}
+              >
+                <Search className="w-5 h-5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                {!sidebarCollapsed && <span>Search Chats</span>}
+              </button>
+              
+              <div className="h-px bg-slate-700/50 my-4"></div>
+              
+              <button 
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all duration-200 group"
+                title={sidebarCollapsed ? "Content Assistant" : ""}
+              >
+                <Zap className="w-5 h-5 flex-shrink-0 text-amber-400 group-hover:scale-110 transition-transform" />
+                {!sidebarCollapsed && <span>Content Assistant</span>}
+              </button>
+              
+              <button 
+                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all duration-200 group"
+                title={sidebarCollapsed ? "Analytics" : ""}
+              >
+                <BarChart3 className="w-5 h-5 flex-shrink-0 text-emerald-400 group-hover:scale-110 transition-transform" />
+                {!sidebarCollapsed && <span>Analytics</span>}
+              </button>
+            </div>
+
+            {/* Search Input */}
+            {showSearchInput && !sidebarCollapsed && (
+              <div className="px-4 pb-4">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search conversations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 text-sm bg-slate-800/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all duration-200"
+                    autoFocus
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Conversations Section */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4">
+                {!sidebarCollapsed && (
+                  <div className="text-xs font-semibold text-slate-400 mb-4 px-2 uppercase tracking-wider">
+                    Recent Chats
+                  </div>
+                )}
+                <div className="space-y-1">
+                  {filteredConversations.map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      className="relative"
+                      onMouseEnter={() => setHoveredChatId(conversation.id)}
+                      onMouseLeave={() => {
+                        setHoveredChatId(null)
+                        if (dropdownOpen === conversation.id) {
+                          setTimeout(() => setDropdownOpen(null), 200)
+                        }
+                      }}
+                    >
+                      <button
+                        onClick={() => selectConversation(conversation.id)}
+                        className={`w-full text-left px-4 py-3 text-sm rounded-xl transition-all duration-200 group ${
+                          currentConversationId === conversation.id
+                            ? 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-white border border-violet-500/30 shadow-lg'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-700/30 border border-transparent'
+                        }`}
+                        title={sidebarCollapsed ? conversation.title : ""}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <MessageSquare className={`w-4 h-4 flex-shrink-0 ${
+                              currentConversationId === conversation.id
+                                ? 'text-violet-400'
+                                : 'text-slate-400 group-hover:text-slate-300'
+                            }`} />
+                            {!sidebarCollapsed && (
+                              <div className="flex-1 min-w-0">
+                                <div className="truncate text-sm font-medium">
+                                  {renamingChatId === conversation.id ? (
+                                    <input
+                                      type="text"
+                                      value={newChatTitle}
+                                      onChange={(e) => setNewChatTitle(e.target.value)}
+                                      onBlur={() => {
+                                        if (newChatTitle.trim()) {
+                                          renameConversationMutation.mutate({
+                                            conversationId: conversation.id,
+                                            newTitle: newChatTitle.trim()
+                                          })
+                                        } else {
+                                          setRenamingChatId(null)
+                                          setNewChatTitle('')
+                                        }
+                                      }}
+                                      onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                          if (newChatTitle.trim()) {
+                                            renameConversationMutation.mutate({
+                                              conversationId: conversation.id,
+                                              newTitle: newChatTitle.trim()
+                                            })
+                                          } else {
+                                            setRenamingChatId(null)
+                                            setNewChatTitle('')
+                                          }
+                                        } else if (e.key === 'Escape') {
+                                          setRenamingChatId(null)
+                                          setNewChatTitle('')
+                                        }
+                                      }}
+                                      className="w-full text-sm bg-slate-700/50 border border-slate-500/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    conversation.title
+                                  )}
+                                </div>
+                                <div className="text-xs text-slate-400 mt-1">
+                                  {formatLastInteractionDate(conversation.lastMessageAt || conversation.updatedAt)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {!sidebarCollapsed && (hoveredChatId === conversation.id || dropdownOpen === conversation.id) && (
+                            <div className="relative">
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
+                                }}
+                                className="p-1 hover:bg-slate-600/50 rounded transition-colors cursor-pointer"
+                              >
+                                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                              </div>
+                              
+                              {dropdownOpen === conversation.id && (
+                                <div className="absolute right-0 top-8 w-48 bg-slate-800 rounded-lg shadow-lg border border-slate-600 py-2 z-50">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      console.log('Share conversation:', conversation.id)
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
+                                  >
+                                    <Share className="w-4 h-4" />
+                                    <span>Share</span>
+                                  </button>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setRenamingChatId(conversation.id)
+                                      setNewChatTitle(conversation.title)
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                    <span>Rename</span>
+                                  </button>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      archiveConversationMutation.mutate(conversation.id)
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
+                                  >
+                                    <Archive className="w-4 h-4" />
+                                    <span>Archive</span>
+                                  </button>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                                        deleteConversationMutation.mutate(conversation.id)
+                                      }
+                                      setDropdownOpen(null)
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 flex items-center space-x-3"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom User Section */}
+            <div className="p-4 border-t border-slate-700/50">
+              <div className="flex items-center space-x-3 px-3 py-2 hover:bg-slate-700/50 rounded-xl transition-colors cursor-pointer">
+                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                {!sidebarCollapsed && (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-white truncate">Arpit Choudhary</div>
+                      <div className="text-xs text-slate-400">Business Plan</div>
+                    </div>
+                    <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white relative">
