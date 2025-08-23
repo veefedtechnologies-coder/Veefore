@@ -81,10 +81,10 @@ const tourSteps: TourStep[] = [
     position: "top"
   },
   {
-    title: "🔍 Smart Search",
-    description: "Use AI-powered search to quickly find posts, analytics, insights, and content across your entire social media presence.",
-    target: ".search-container",
-    position: "bottom"
+    title: "🔍 View Details & Analytics",
+    description: "Click 'View Details' to dive deeper into your performance analytics, get AI-powered insights, and track your growth metrics.",
+    target: ".view-details",
+    position: "left"
   }
 ]
 
@@ -130,33 +130,31 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
           case 7: // Create
             element = document.querySelector('[data-nav="create"]')
             break
-          case 8: // Dashboard Cards
-            element = document.querySelector('.dashboard-cards') || 
-                     document.querySelector('.grid') ||
-                     document.querySelector('[data-testid="dashboard-cards"]') ||
-                     document.querySelector('.grid-cols-2, .grid-cols-4')
+          case 8: // Dashboard Cards (Quick Actions)
+            element = document.querySelector('[data-testid="quick-actions"]') as HTMLElement ||
+                     document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4') as HTMLElement ||
+                     document.querySelector('.grid-cols-2') as HTMLElement ||
+                     document.querySelector('.grid-cols-4') as HTMLElement
             break
           case 9: // Performance Overview
-            element = document.querySelector('.performance-overview') ||
-                     document.querySelector('[data-testid="performance-overview"]') ||
-                     document.querySelector('h2:contains("Performance Overview")') ||
-                     document.querySelector('h3:contains("Performance")') ||
-                     Array.from(document.querySelectorAll('h2, h3')).find(el => 
-                       el.textContent?.toLowerCase().includes('performance'))
+            element = document.querySelector('[data-testid="performance-score"]') as HTMLElement ||
+                     (Array.from(document.querySelectorAll('h2, h3')).find(el => 
+                       el.textContent?.toLowerCase().includes('performance overview')) as HTMLElement) ||
+                     (Array.from(document.querySelectorAll('.text-xl')).find(el => 
+                       el.textContent?.toLowerCase().includes('performance overview')) as HTMLElement)
             break
           case 10: // Connected Platforms
-            element = document.querySelector('.connected-platforms') ||
-                     document.querySelector('[data-testid="connected-platforms"]') ||
-                     Array.from(document.querySelectorAll('h2, h3')).find(el => 
-                       el.textContent?.toLowerCase().includes('connected') || 
-                       el.textContent?.toLowerCase().includes('platform'))
+            element = (Array.from(document.querySelectorAll('h3')).find(el => 
+                       el.textContent?.toLowerCase().includes('connected platforms')) as HTMLElement) ||
+                     document.querySelector('[data-testid="connected-platforms"]') as HTMLElement ||
+                     (Array.from(document.querySelectorAll('.text-lg')).find(el => 
+                       el.textContent?.toLowerCase().includes('connected platforms')) as HTMLElement)
             break
-          case 11: // Smart Search
-            element = document.querySelector('.search-container') ||
-                     document.querySelector('[data-testid="search"]') ||
-                     document.querySelector('input[placeholder*="Search"]') ||
-                     document.querySelector('input[placeholder*="search"]') ||
-                     document.querySelector('.search-input')
+          case 11: // View Details Button (part of performance section)
+            element = (Array.from(document.querySelectorAll('button')).find(el => 
+                       el.textContent?.toLowerCase().includes('view details')) as HTMLElement) ||
+                     document.querySelector('[data-testid="view-details"]') as HTMLElement ||
+                     document.querySelector('.btn-secondary') as HTMLElement
             break
         }
 
