@@ -41,7 +41,8 @@ import remarkGfm from 'remark-gfm'
 const convertToMarkdown = (text: string): string => {
   let result = text;
   
-  // Convert "Title: Something" to "# Something" 
+  // Convert "**Title: Something**" or "Title: Something" to "# Something" 
+  result = result.replace(/^\*\*Title:\s*(.+)\*\*$/gm, '# $1');
   result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
   
   // Convert section headers ending with colon to ## headers (H2 - large)
