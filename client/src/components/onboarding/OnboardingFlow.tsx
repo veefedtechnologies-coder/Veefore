@@ -409,39 +409,44 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Liquid Glass Backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/30 backdrop-blur-xl" />
+        {/* Solid Backdrop - Completely Hide Dashboard */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-slate-800/95" />
         
-        {/* Floating Glass Modal */}
+        {/* Floating Liquid Glass Modal */}
         <div className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden">
-          {/* Glass Container with Liquid Effect */}
-          <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl shadow-black/20 overflow-hidden">
-            {/* Animated Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-blue-500/10 animate-pulse" />
+          {/* Liquid Glass Container */}
+          <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 overflow-hidden">
+            {/* Animated Liquid Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/8 via-blue-400/5 to-purple-400/8 animate-pulse" />
             
-            {/* Content Container */}
-            <div className="relative bg-white/90 backdrop-blur-sm m-1 rounded-[22px] p-8 overflow-y-auto max-h-[80vh]">
-              {/* Close Button */}
+            {/* Glass Reflection Effect */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-transparent rounded-3xl" />
+            
+            {/* Content Container with Frosted Glass */}
+            <div className="relative bg-white/95 backdrop-blur-xl m-1.5 rounded-[20px] p-8 overflow-y-auto max-h-[80vh] shadow-inner">
+              {/* Liquid Glass Close Button */}
               <button 
-                className="absolute right-6 top-6 w-8 h-8 rounded-full bg-gray-100/80 backdrop-blur-sm hover:bg-gray-200/80 transition-all duration-200 flex items-center justify-center group"
+                className="absolute right-6 top-6 w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 hover:border-white/30 transition-all duration-300 flex items-center justify-center group shadow-lg"
                 onClick={() => {}}
               >
-                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              {/* Header */}
+              {/* Premium Header */}
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/25 mb-4">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 shadow-2xl shadow-emerald-500/30 mb-6 relative overflow-hidden">
+                  {/* Glass highlight */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-white/10 to-transparent rounded-3xl" />
+                  <svg className="w-10 h-10 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-2">
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-3">
                   Welcome to VeeFore
                 </h1>
-                <p className="text-lg text-gray-600 font-medium">
+                <p className="text-xl text-gray-600 font-medium">
                   Let's create something amazing together
                 </p>
               </div>
@@ -484,10 +489,14 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 ))}
               </div>
 
-              {/* Step Content with Glass Effect */}
-              <div className="min-h-[400px] relative">
-                <div className="relative p-6 rounded-2xl bg-white/40 backdrop-blur-sm border border-white/20 shadow-lg">
-                  {renderStep()}
+              {/* Step Content with Enhanced Glass Effect */}
+              <div className="min-h-[420px] relative">
+                <div className="relative p-8 rounded-3xl bg-white/30 backdrop-blur-xl border border-white/30 shadow-xl overflow-hidden">
+                  {/* Inner glass reflection */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-3xl" />
+                  <div className="relative z-10">
+                    {renderStep()}
+                  </div>
                 </div>
               </div>
 
