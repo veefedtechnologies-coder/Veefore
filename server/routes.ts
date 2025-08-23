@@ -12429,7 +12429,7 @@ Create a detailed growth strategy in JSON format:
         role: mapBusinessTypeToRole(questionnaireData.businessType),
         companySize: mapTeamSizeToCompanySize(questionnaireData.teamSize),
         primaryGoals: questionnaireData.primaryGoal ? [mapPrimaryGoalToOnboardingGoal(questionnaireData.primaryGoal)] : [],
-        contentTypes: questionnaireData.contentTypes || [],
+        contentTypes: questionnaireData.contentTypes ? questionnaireData.contentTypes.map(mapContentTypeToOnboardingFormat) : [],
         platforms: [] // Not collected in waitlist, keep empty
       };
 
@@ -12469,6 +12469,20 @@ Create a detailed growth strategy in JSON format:
       'efficiency': 'Save time on content'
     };
     return mapping[primaryGoal] || primaryGoal;
+  }
+
+  function mapContentTypeToOnboardingFormat(contentType: string): string {
+    const mapping: { [key: string]: string } = {
+      'stories': 'Stories',
+      'posts': 'Photos',
+      'videos': 'Videos',
+      'reels': 'Reels/Shorts',
+      'carousels': 'Carousels',
+      'text': 'Text posts',
+      'live': 'Live streams',
+      'ugc': 'User-generated content'
+    };
+    return mapping[contentType] || contentType.charAt(0).toUpperCase() + contentType.slice(1);
   }
 
   // Register comprehensive admin routes with JWT authentication
