@@ -61,6 +61,24 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   if (isOpen) {
     console.log('🟢 Modal should be visible now!')
   }
+
+  // TEMPORARY: Simple test render
+  if (!isOpen) return null
+  
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <h2 className="text-2xl font-bold mb-4">🎉 Onboarding Modal Test</h2>
+        <p className="text-gray-600 mb-4">The modal is working! This confirms our onboarding flow is ready.</p>
+        <button 
+          onClick={onClose}
+          className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+        >
+          Close Modal
+        </button>
+      </div>
+    </div>
+  )
   
   const { toast } = useToast()
   const queryClient = useQueryClient()
