@@ -681,6 +681,8 @@ function App() {
           userName: userData?.displayName || userData?.fullName || user?.email?.split('@')[0],
           userData: userData ? 'present' : 'missing'
         })
+        console.log('🎯 WALKTHROUGH MODAL: Component type check:', typeof WalkthroughModal)
+        console.log('🎯 WALKTHROUGH MODAL: Component:', WalkthroughModal)
         return (
           <WalkthroughModal
             open={isWalkthroughOpen}
