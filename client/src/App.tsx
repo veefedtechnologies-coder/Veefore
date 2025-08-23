@@ -247,6 +247,7 @@ function App() {
             {/* Multi-Step Onboarding Flow */}
             <OnboardingFlow 
               open={!userData.isOnboarded && !isWalkthroughOpen}
+              userData={userData}
               onComplete={async (onboardingData) => {
                 console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
                 try {

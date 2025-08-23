@@ -10,9 +10,10 @@ import { ChevronRight, ChevronLeft, CheckCircle, User, Target, Settings, Rocket,
 interface OnboardingFlowProps {
   open: boolean
   onComplete: (data: any) => void
+  userData?: any
 }
 
-export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
+export default function OnboardingFlow({ open, onComplete, userData }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoadingPrefill, setIsLoadingPrefill] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
@@ -41,9 +42,31 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
   // Fetch prefill data when modal opens
   useEffect(() => {
     if (open && !prefillDataApplied) {
-      fetchPrefillData()
+      // If user is already onboarded, use their existing preferences
+      if (userData && userData.isOnboarded && userData.preferences) {
+        console.log('[ONBOARDING] Using existing user preferences for prefill:', userData.preferences)
+        const prefs = userData.preferences
+        setFormData({
+          fullName: prefs.fullName || '',
+          role: prefs.role || '',
+          companyName: prefs.companyName || '',
+          companySize: prefs.companySize || '',
+          primaryGoals: Array.isArray(prefs.primaryGoals) ? prefs.primaryGoals : [],
+          currentChallenges: prefs.currentChallenges || '',
+          monthlyBudget: prefs.monthlyBudget || '',
+          platforms: Array.isArray(prefs.platforms) ? prefs.platforms : [],
+          contentTypes: Array.isArray(prefs.contentTypes) ? prefs.contentTypes : [],
+          postingFrequency: prefs.postingFrequency || '',
+          selectedPlan: prefs.selectedPlan || 'free'
+        })
+        setPrefillDataApplied(true)
+        console.log('[ONBOARDING] Form data updated with existing preferences')
+      } else {
+        // For new users, fetch waitlist prefill data
+        fetchPrefillData()
+      }
     }
-  }, [open, prefillDataApplied])
+  }, [open, prefillDataApplied, userData])
 
   const fetchPrefillData = async () => {
     try {
