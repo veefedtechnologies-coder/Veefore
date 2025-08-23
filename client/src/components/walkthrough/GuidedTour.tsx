@@ -169,24 +169,25 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     <>
       {/* Overlay with spotlight effect */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 pointer-events-none"
+        className="fixed inset-0 z-50 pointer-events-none"
         style={{
           background: targetElement 
-            ? `radial-gradient(circle at ${targetElement.getBoundingClientRect().left + targetElement.getBoundingClientRect().width/2}px ${targetElement.getBoundingClientRect().top + targetElement.getBoundingClientRect().height/2}px, transparent 0px, transparent ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 20}px, rgba(0,0,0,0.6) ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 25}px)`
-            : 'rgba(0,0,0,0.6)'
+            ? `radial-gradient(circle at ${targetElement.getBoundingClientRect().left + targetElement.getBoundingClientRect().width/2}px ${targetElement.getBoundingClientRect().top + targetElement.getBoundingClientRect().height/2}px, transparent 0px, transparent ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 60}px, rgba(0,0,0,0.4) ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 80}px)`
+            : 'rgba(0,0,0,0.3)'
         }}
       />
 
       {/* Highlight border around target element */}
       {targetElement && (
         <div
-          className="fixed z-50 pointer-events-none border-4 border-blue-500 rounded-lg shadow-2xl animate-pulse"
+          className="fixed z-50 pointer-events-none border-3 border-blue-400 rounded-lg shadow-lg"
           style={{
-            top: targetElement.getBoundingClientRect().top - 4,
-            left: targetElement.getBoundingClientRect().left - 4,
-            width: targetElement.getBoundingClientRect().width + 8,
-            height: targetElement.getBoundingClientRect().height + 8,
-            boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.5)'
+            top: targetElement.getBoundingClientRect().top - 6,
+            left: targetElement.getBoundingClientRect().left - 6,
+            width: targetElement.getBoundingClientRect().width + 12,
+            height: targetElement.getBoundingClientRect().height + 12,
+            boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 30px rgba(59, 130, 246, 0.4)',
+            animation: 'pulse 2s infinite'
           }}
         />
       )}
