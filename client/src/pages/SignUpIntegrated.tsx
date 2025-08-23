@@ -190,31 +190,7 @@ const SignUpIntegrated = ({ onNavigate }: SignUpIntegratedProps) => {
     }
   })
 
-  // Complete onboarding
-  const completeOnboardingMutation = useMutation({
-    mutationFn: (data: any) => 
-      apiRequest('/api/user/complete-onboarding', {
-        method: 'POST',
-        body: JSON.stringify({
-          preferences: data || {}
-        })
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] })
-      toast({
-        title: "Welcome to VeeFore!",
-        description: "Your account has been set up successfully.",
-      })
-      setLocation('/')
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to complete onboarding",
-        variant: "destructive",
-      })
-    }
-  })
+  // Removed old onboarding mutation - now handled by modal
 
   // Timer effect for verification email
   useEffect(() => {

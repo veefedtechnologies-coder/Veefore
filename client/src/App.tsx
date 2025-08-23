@@ -66,7 +66,7 @@ function App() {
           console.log('Redirecting fully onboarded user to home page')
           setLocation('/')
         }
-        // Close onboarding modal if open
+        // Close onboarding modal if open and ensure user stays on dashboard
         setIsOnboardingModalOpen(false)
       }
       
@@ -74,8 +74,9 @@ function App() {
       else if (user && userData && !userData.isOnboarded) {
         console.log('User is authenticated but not onboarded - showing onboarding modal')
         setIsOnboardingModalOpen(true)
-        // Redirect away from auth pages to dashboard
+        // Redirect away from auth pages to dashboard - CRITICAL: This forces modal to show
         if (location === '/signin' || location === '/signup' || location === '/onboarding') {
+          console.log('Redirecting to dashboard for modal onboarding')
           setLocation('/')
         }
       }
@@ -139,12 +140,7 @@ function App() {
         </div>
       </Route>
 
-      {/* Onboarding page - full screen without sidebar */}
-      <Route path="/onboarding">
-        <div className="min-h-screen">
-          <ProfessionalOnboarding />
-        </div>
-      </Route>
+      {/* Removed old onboarding route - now handled by modal */}
 
       {/* VeeGPT Route - Accessible to everyone */}
       <Route path="/veegpt">
