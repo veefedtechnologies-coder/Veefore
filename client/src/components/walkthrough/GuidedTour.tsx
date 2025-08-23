@@ -91,6 +91,15 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     const findAndHighlightElement = () => {
       let element: HTMLElement | null = null
       
+      // Debug what elements exist
+      console.log(`🎯 Step ${currentStep}: Looking for elements...`)
+      console.log('📍 All data-nav elements:')
+      document.querySelectorAll('[data-nav]').forEach(el => {
+        console.log(`  - data-nav="${el.getAttribute('data-nav')}"`, el)
+      })
+      console.log('📍 VeeGPT element:', document.querySelector('.veegpt-nav-item'))
+      console.log('📍 Create element:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
+      
       // Simple direct targeting based on step ID
       switch (currentStep) {
         case 0: // Welcome
@@ -120,6 +129,8 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
         default:
           element = document.querySelector(currentStepData.target) as HTMLElement
       }
+      
+      console.log(`🎯 Step ${currentStep} (${currentStepData.title}): Element found =`, element)
       
       if (element) {
         setTargetElement(element)
