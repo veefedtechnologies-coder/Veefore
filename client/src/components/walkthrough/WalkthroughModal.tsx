@@ -93,32 +93,31 @@ const walkthroughSteps = [
   },
   {
     id: 5,
-    title: "Multi-Platform Management", 
-    subtitle: "One dashboard, all your accounts",
-    description: "Manage Instagram, Twitter, LinkedIn, TikTok, and more from a single powerful dashboard. Switch between accounts instantly.",
+    title: "Multi-Platform Management",
+    subtitle: "One dashboard, all your social accounts",
+    description: "Connect and manage Instagram, Twitter, LinkedIn, TikTok and more from a single powerful dashboard. Post everywhere with one click.",
     icon: Users,
     gradient: "from-indigo-500 to-purple-500",
     features: [
-      "Instagram, Twitter, LinkedIn, TikTok",
+      "Connect multiple accounts",
+      "Cross-platform posting",
       "Unified inbox management",
-      "Cross-platform content adaptation",
-      "Team collaboration tools"
+      "Brand consistency tools"
     ],
-    visual: "platforms",
-    platforms: ['Instagram', 'Twitter', 'LinkedIn', 'TikTok', 'YouTube', 'Pinterest']
+    visual: "platforms"
   },
   {
     id: 6,
     title: "You're All Set!",
-    subtitle: "Start your social media transformation",
-    description: "Ready to 10x your social media presence? Let's create your first AI-generated post and connect your accounts.",
+    subtitle: "Ready to dominate social media",
+    description: "Start creating amazing content with AI, schedule your posts, and watch your audience grow. VeeFore is your secret weapon for social media success.",
     icon: Target,
     gradient: "from-pink-500 to-rose-500",
     features: [
-      "Connect your first platform",
-      "Generate your first post",
-      "Set up automated scheduling",
-      "Explore advanced features"
+      "Start creating content with AI",
+      "Schedule your first posts",
+      "Connect your social accounts",
+      "Track your growth"
     ],
     visual: "success",
     cta: "Create Your First Post"
@@ -128,27 +127,59 @@ const walkthroughSteps = [
 export default function WalkthroughModal({ open, onClose, userName }: WalkthroughModalProps) {
   console.log('🎯 WALKTHROUGH MODAL: Component rendering with open:', open, 'userName:', userName)
   
-  // Simple test render first
+  const [currentStep, setCurrentStep] = useState(1)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+
+  const currentStepData = walkthroughSteps.find(step => step.id === currentStep)
+  const totalSteps = walkthroughSteps.length
+
+  // Auto-advance demo for certain steps
+  useEffect(() => {
+    if (isPlaying && currentStepData?.demo) {
+      const timer = setTimeout(() => {
+        setIsPlaying(false)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [isPlaying, currentStepData])
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCompletedSteps(prev => [...prev, currentStep])
+      setCurrentStep(prev => prev + 1)
+    } else {
+      onClose()
+    }
+  }
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1)
+    }
+  }
+
+  const skipWalkthrough = () => {
+    onClose()
+  }
+
+  const playDemo = () => {
+    setIsPlaying(true)
+  }
+
   if (!open) {
     console.log('🎯 WALKTHROUGH MODAL: Open is false, not rendering')
     return null
   }
 
-  console.log('🎯 WALKTHROUGH MODAL: About to render simple test dialog')
+  if (!currentStepData) {
+    console.log('🎯 WALKTHROUGH MODAL: No currentStepData found, returning null')
+    return null
+  }
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <div className="p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">🎯 VeeFore Walkthrough</h2>
-          <p className="mb-4">Welcome, {userName}! This is a test of the walkthrough modal.</p>
-          <Button onClick={onClose} className="w-full">
-            Close Test Modal
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
+  console.log('🎯 WALKTHROUGH MODAL: About to render dialog with step:', currentStep)
+
+  const IconComponent = currentStepData.icon
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -179,39 +210,31 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
               <div className="space-y-6">
                 {/* Step Indicator */}
                 <div className="flex items-center space-x-2">
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${currentStepData.gradient} flex items-center justify-center`}>
-                    <IconComponent className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Step {currentStep} of {totalSteps}
-                  </div>
+                  <span className="text-sm font-medium text-purple-600">Step {currentStep} of {totalSteps}</span>
                 </div>
 
-                {/* Title */}
-                <div className="space-y-2">
-                  {currentStep === 1 && userName && (
-                    <div className="text-lg text-gray-600">
-                      Hey {userName}! 👋
-                    </div>
-                  )}
-                  <h1 className="text-3xl font-bold text-gray-900">
-                    {currentStepData.title}
-                  </h1>
-                  <p className="text-xl text-gray-600">
-                    {currentStepData.subtitle}
-                  </p>
+                {/* Icon & Title */}
+                <div className="space-y-4">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${currentStepData.gradient} flex items-center justify-center`}>
+                    <IconComponent className="h-8 w-8 text-white" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      {currentStepData.title.replace('VeeFore', userName ? `VeeFore, ${userName}` : 'VeeFore')}
+                    </h1>
+                    <p className="text-lg text-gray-600">{currentStepData.subtitle}</p>
+                  </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-700 text-lg leading-relaxed">
-                  {currentStepData.description}
-                </p>
+                <p className="text-gray-700 leading-relaxed">{currentStepData.description}</p>
 
                 {/* Features List */}
                 <div className="space-y-3">
                   {currentStepData.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${currentStepData.gradient} flex items-center justify-center`}>
+                      <div className={`w-5 h-5 rounded-full bg-gradient-to-r ${currentStepData.gradient} flex items-center justify-center`}>
                         <Check className="h-3 w-3 text-white" />
                       </div>
                       <span className="text-gray-700">{feature}</span>
@@ -223,89 +246,96 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
                 {currentStepData.demo && (
                   <button
                     onClick={playDemo}
-                    disabled={isPlaying}
-                    className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm text-gray-700"
+                    className={`inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r ${currentStepData.gradient} hover:opacity-90 text-white rounded-lg font-medium transition-opacity`}
                     data-testid="button-play-demo"
                   >
                     <Play className="h-4 w-4" />
-                    <span>{isPlaying ? 'Playing...' : 'Try Demo'}</span>
+                    <span>Try Demo</span>
                   </button>
                 )}
               </div>
             </div>
 
             {/* Right Side - Visual */}
-            <div className="flex-1 p-8 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="flex-1 p-8 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
               {currentStepData.visual === 'welcome' && (
-                <div className="relative">
-                  <div className="w-64 h-64 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center animate-pulse">
+                <div className="text-center space-y-8">
+                  <div className="w-48 h-48 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto animate-pulse">
                     <Sparkles className="h-24 w-24 text-white" />
                   </div>
-                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
-                    <Zap className="h-8 w-8 text-white" />
+                  <div className="space-y-4">
+                    <div className="text-6xl">🎉</div>
+                    <div className="text-xl font-semibold text-gray-900">Welcome to the future!</div>
                   </div>
                 </div>
               )}
 
               {currentStepData.visual === 'ai-content' && (
-                <div className="space-y-4 w-full max-w-sm">
-                  <div className="bg-white p-4 rounded-lg shadow-lg border">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Bot className="h-5 w-5 text-blue-500" />
-                      <span className="text-sm font-medium">AI Assistant</span>
+                <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <Bot className="h-5 w-5 text-white" />
                     </div>
-                    <div className={`text-sm text-gray-600 ${isPlaying ? 'animate-pulse' : ''}`}>
-                      {isPlaying ? currentStepData.demo : "Ready to create amazing content..."}
-                    </div>
+                    <div className="text-sm font-medium text-gray-900">AI Content Generator</div>
                   </div>
-                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-lg text-white">
-                    <MessageSquare className="h-8 w-8 mb-2" />
-                    <div className="text-sm">
-                      "5 productivity tips that will change your workflow forever ✨"
-                    </div>
+                  <div className="space-y-3">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
                   </div>
+                  <div className="text-sm text-gray-500">Generating content...</div>
+                  {isPlaying && (
+                    <div className="mt-2 text-xs text-green-600 animate-pulse">
+                      {currentStepData.demo}
+                    </div>
+                  )}
                 </div>
               )}
 
               {currentStepData.visual === 'scheduling' && (
-                <div className="w-full max-w-sm">
-                  <div className="bg-white p-6 rounded-lg shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <Calendar className="h-6 w-6 text-green-500" />
-                      <span className="text-sm text-gray-500">This Week</span>
+                <div className="grid grid-cols-7 gap-2 bg-white rounded-xl shadow-lg p-6">
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Su</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Mo</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Tu</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">We</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Th</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Fr</div>
+                  <div className="text-xs font-medium text-gray-500 text-center py-2">Sa</div>
+                  {Array.from({ length: 35 }, (_, i) => (
+                    <div key={i} className="aspect-square bg-gray-100 rounded text-xs flex items-center justify-center">
+                      {Math.floor(Math.random() * 30) + 1}
                     </div>
-                    <div className="space-y-3">
-                      {[
-                        { time: '9:00 AM', platform: 'Instagram', color: 'bg-pink-500' },
-                        { time: '1:00 PM', platform: 'Twitter', color: 'bg-blue-500' },
-                        { time: '5:00 PM', platform: 'LinkedIn', color: 'bg-indigo-500' }
-                      ].map((post, index) => (
-                        <div key={index} className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full ${post.color}`} />
-                          <span className="text-sm text-gray-600">{post.time}</span>
-                          <span className="text-sm font-medium">{post.platform}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
 
               {currentStepData.visual === 'analytics' && (
-                <div className="w-full max-w-sm space-y-4">
-                  <div className="bg-white p-6 rounded-lg shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <TrendingUp className="h-6 w-6 text-orange-500" />
-                      <span className="text-sm text-green-600 font-medium">↑ 23.5%</span>
+                <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4">
+                  <div className="text-sm font-medium text-gray-900">Performance Overview</div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">12.5K</div>
+                      <div className="text-xs text-gray-500">Followers</div>
                     </div>
-                    <div className="text-2xl font-bold text-gray-900 mb-1">2.3K</div>
-                    <div className="text-sm text-gray-500">Total Impressions</div>
-                    {isPlaying && (
-                      <div className="mt-2 text-xs text-green-600 animate-pulse">
-                        {currentStepData.demo}
-                      </div>
-                    )}
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">8.2%</div>
+                      <div className="text-xs text-gray-500">Engagement</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">45</div>
+                      <div className="text-xs text-gray-500">Posts</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-600">128K</div>
+                      <div className="text-xs text-gray-500">Total Impressions</div>
+                    </div>
                   </div>
+                  <div className="text-sm text-gray-500">Total Impressions</div>
+                  {isPlaying && (
+                    <div className="mt-2 text-xs text-green-600 animate-pulse">
+                      {currentStepData.demo}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -411,3 +441,5 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
     </Dialog>
   )
 }
+
+export { WalkthroughModal }
