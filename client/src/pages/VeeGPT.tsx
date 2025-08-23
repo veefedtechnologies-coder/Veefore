@@ -44,9 +44,8 @@ const convertToMarkdown = (text: string): string => {
   // Convert "Title: Something" to "# Something" 
   result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
   
-  // Convert H4 and H3 headings to H2 for larger size
-  result = result.replace(/^####\s*(.+)$/gm, '## $1');
-  result = result.replace(/^###\s*(.+)$/gm, '## $1');
+  // Keep H3 and H4 headings as they are for proper hierarchy
+  // Don't convert them to H2 - let them maintain their smaller sizes
   
   // Convert specific heading patterns to ## headers (catch variations)
   result = result.replace(/^(The Evolution of Communication.*)$/gm, '## $1');
@@ -1647,8 +1646,8 @@ export default function VeeGPT() {
                               components={{
                                 h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
                                 h2: ({children}) => <h2 className="font-black mb-4 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                                h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h3>,
-                                h4: ({children}) => <h4 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h4>,
+                                h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                                h4: ({children}) => <h4 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
                                 p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                                 ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
@@ -1670,8 +1669,8 @@ export default function VeeGPT() {
                             components={{
                               h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
                               h2: ({children}) => <h2 className="font-black mb-4 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                              h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h3>,
-                              h4: ({children}) => <h4 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h4>,
+                              h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                              h4: ({children}) => <h4 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
                               p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                               strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                               ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
