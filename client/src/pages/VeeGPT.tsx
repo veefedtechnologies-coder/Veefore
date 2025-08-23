@@ -1560,7 +1560,9 @@ export default function VeeGPT() {
             {displayMessages.map((message) => (
               <div
                 key={message.id}
-                className="flex flex-col space-y-2"
+                className={`flex flex-col space-y-2 ${
+                  message.role === 'user' ? 'items-end' : 'items-start'
+                }`}
               >
                 <div className={`${
                   message.role === 'user' 
@@ -1636,7 +1638,9 @@ export default function VeeGPT() {
                   </div>
                   {/* Show timestamp for all messages */}
                   {(
-                    <div className="mt-2 text-xs text-gray-500 text-left">
+                    <div className={`mt-2 text-xs text-gray-500 ${
+                      message.role === 'user' ? 'text-right' : 'text-left'
+                    }`}>
                       {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { 
                         hour: '2-digit', 
                         minute: '2-digit' 
