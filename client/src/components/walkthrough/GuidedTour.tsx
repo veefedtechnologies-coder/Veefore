@@ -344,13 +344,12 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
 
   return (
     <>
-      {/* Background overlay - consistent dark background */}
+      {/* Background overlay - light transparent overlay to block interactions only */}
       <div 
         className="fixed inset-0 z-50"
         style={{
-          background: 'rgba(0, 0, 0, 0.75)',
-          overscrollBehavior: 'contain',
-          backdropFilter: 'blur(2px)'
+          background: 'rgba(0, 0, 0, 0.1)',
+          overscrollBehavior: 'contain'
         }}
         onWheel={(e) => e.preventDefault()}
         onTouchMove={(e) => e.preventDefault()}
