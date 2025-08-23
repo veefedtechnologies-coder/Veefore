@@ -236,19 +236,11 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
 
   return (
     <>
-      {/* Background overlay with spotlight effect */}
+      {/* Background overlay - solid dark background without spotlight */}
       <div 
         className="fixed inset-0 z-50"
         style={{
-          background: targetElement ? (() => {
-            const rect = targetElement.getBoundingClientRect()
-            const centerX = rect.left + rect.width / 2
-            const centerY = rect.top + rect.height / 2
-            const spotlightRadius = Math.max(rect.width, rect.height) + (window.innerWidth < 768 ? 40 : 60)
-            const fadeRadius = spotlightRadius + 20
-            
-            return `radial-gradient(circle at ${centerX}px ${centerY}px, transparent 0px, transparent ${spotlightRadius}px, rgba(0,0,0,0.4) ${fadeRadius}px)`
-          })() : 'rgba(0,0,0,0.3)',
+          background: 'rgba(0,0,0,0.4)',
           overscrollBehavior: 'contain'
         }}
         onWheel={(e) => e.preventDefault()}
