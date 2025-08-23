@@ -1683,8 +1683,8 @@ export default function VeeGPT() {
                       >
                         {streamingContent[message.id] !== undefined ? (
                           <div>
+                          <div className="markdown-content">
                             <ReactMarkdown 
-                              className="markdown-content"
                               remarkPlugins={[remarkGfm]}
                               components={{
                                 h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
@@ -1702,30 +1702,32 @@ export default function VeeGPT() {
                             >
                               {convertToMarkdown(streamingContent[message.id] || '')}
                             </ReactMarkdown>
+                          </div>
                             {isGenerating && streamingContent[message.id] !== undefined && (
                               <span className="animate-pulse text-blue-500 ml-1">▋</span>
                             )}
                           </div>
                         ) : (
-                          <ReactMarkdown 
-                            className="markdown-content"
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
-                              h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                              h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
-                              h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
-                              p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
-                              strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                              ul: ({children}) => <ul className="mb-2 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.5'}}>{children}</ul>,
-                              ol: ({children}) => <ol className="mb-2 ml-0 font-semibold" style={{fontSize: '1rem', lineHeight: '1.5', listStyle: 'decimal', paddingLeft: '1.5rem', counterReset: 'list-counter'}}>{children}</ol>,
-                              li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.3rem', lineHeight: '1.5', display: 'list-item', listStyleType: 'decimal', listStylePosition: 'outside', paddingLeft: '0.25rem'}}>{children}</li>,
-                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
-                              pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
-                            }}
-                          >
-                            {convertToMarkdown(message.content)}
-                          </ReactMarkdown>
+                          <div className="markdown-content">
+                            <ReactMarkdown 
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                                h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                                h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                                h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
+                                p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
+                                strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                                ul: ({children}) => <ul className="mb-2 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.5'}}>{children}</ul>,
+                                ol: ({children}) => <ol className="mb-2 ml-0 font-semibold" style={{fontSize: '1rem', lineHeight: '1.5', listStyle: 'decimal', paddingLeft: '1.5rem', counterReset: 'list-counter'}}>{children}</ol>,
+                                li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.3rem', lineHeight: '1.5', display: 'list-item', listStyleType: 'decimal', listStylePosition: 'outside', paddingLeft: '0.25rem'}}>{children}</li>,
+                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
+                              }}
+                            >
+                              {convertToMarkdown(message.content)}
+                            </ReactMarkdown>
+                          </div>
                         )}
 
                       </div>
