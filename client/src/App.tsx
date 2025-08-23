@@ -699,11 +699,11 @@ function App() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundColor: 'rgba(255, 0, 0, 0.9)', // RED background to make it VERY visible
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 9999
+              zIndex: 999999 // Much higher z-index
             }}
             onClick={() => {
               console.log('🎯 INLINE SIMPLE: Background clicked, closing modal')
