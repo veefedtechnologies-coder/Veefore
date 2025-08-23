@@ -32,6 +32,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { getAuth } from 'firebase/auth'
 import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 // Real-time streaming - no animation, chunks appear immediately as they arrive
 
@@ -1581,7 +1583,7 @@ export default function VeeGPT() {
                   }}>
                     {message.role === 'assistant' ? (
                       <div 
-                        className="leading-relaxed font-semibold"
+                        className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
@@ -1594,18 +1596,52 @@ export default function VeeGPT() {
                         }}
                       >
                         {streamingContent[message.id] !== undefined ? (
-                          <span>
-                            {streamingContent[message.id] || ''}
+                          <div>
+                            <ReactMarkdown 
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                h1: ({children}) => <h1 className="text-2xl font-bold mb-4 text-gray-900">{children}</h1>,
+                                h2: ({children}) => <h2 className="text-xl font-bold mb-3 text-gray-900">{children}</h2>,
+                                h3: ({children}) => <h3 className="text-lg font-bold mb-2 text-gray-900">{children}</h3>,
+                                p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
+                                strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
+                                ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc">{children}</ul>,
+                                ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal">{children}</ol>,
+                                li: ({children}) => <li className="leading-relaxed">{children}</li>,
+                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3">{children}</pre>
+                              }}
+                            >
+                              {streamingContent[message.id] || ''}
+                            </ReactMarkdown>
                             {isGenerating && streamingContent[message.id] !== undefined && (
                               <span className="animate-pulse text-blue-500 ml-1">▋</span>
                             )}
-                          </span>
-                        ) : message.content}
+                          </div>
+                        ) : (
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({children}) => <h1 className="text-2xl font-bold mb-4 text-gray-900">{children}</h1>,
+                              h2: ({children}) => <h2 className="text-xl font-bold mb-3 text-gray-900">{children}</h2>,
+                              h3: ({children}) => <h3 className="text-lg font-bold mb-2 text-gray-900">{children}</h3>,
+                              p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
+                              strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
+                              ul: ({children}) => <ul className="mb-3 ml-4 space-y-1">{children}</ul>,
+                              ol: ({children}) => <ol className="mb-3 ml-4 space-y-1 list-decimal">{children}</ol>,
+                              li: ({children}) => <li className="leading-relaxed">{children}</li>,
+                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                              pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3">{children}</pre>
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        )}
 
                       </div>
                     ) : (
                       <div 
-                        className="leading-relaxed font-semibold"
+                        className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
