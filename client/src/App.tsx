@@ -182,7 +182,8 @@ function App() {
           </div>
         ) : !user && hasFirebaseAuth ? (
           <LoadingSpinner />
-        ) : user && userData && userData.isOnboarded ? (
+        ) : user && userData ? (
+          // Authenticated users (both onboarded and non-onboarded) see dashboard
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
