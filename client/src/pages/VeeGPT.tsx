@@ -1693,8 +1693,8 @@ export default function VeeGPT() {
                                 p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                                 ul: ({children}) => <ul className="mb-1 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ul>,
-                                ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ol>,
-                                li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.1rem', lineHeight: '1.3'}}>{children}</li>,
+                                ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.6'}}>{children}</ol>,
+                                li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.25rem', lineHeight: '1.6', display: 'list-item'}}>{children}</li>,
                                 code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
@@ -1716,8 +1716,8 @@ export default function VeeGPT() {
                               p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                               strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                               ul: ({children}) => <ul className="mb-1 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ul>,
-                              ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ol>,
-                              li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.1rem', lineHeight: '1.3'}}>{children}</li>,
+                              ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.6'}}>{children}</ol>,
+                              li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.25rem', lineHeight: '1.6', display: 'list-item'}}>{children}</li>,
                               code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                               pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                             }}
