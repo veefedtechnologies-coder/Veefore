@@ -237,22 +237,17 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
       const isDashboardStep = currentStep >= 1 && currentStep <= 6
       
       if (isDashboardStep) {
-        // For dashboard components, prefer positioning that doesn't cover the content
-        const elementCenterX = rect.left + rect.width / 2
+        // For dashboard components, ALWAYS position modal to the RIGHT to avoid covering content
+        top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
+        left = rect.right + 20
         
-        // Try to position modal away from the center of the element
-        if (elementCenterX > viewport.width / 2) {
-          // Element is on right side, position modal to the left
-          top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
-          left = Math.max(padding, rect.left - (tooltip?.width || 0) - 20)
-        } else {
-          // Element is on left side, position modal to the right
-          top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
-          left = Math.min(viewport.width - (tooltip?.width || 0) - padding, rect.right + 20)
+        // If modal goes off-screen to the right, position to the left instead
+        if (left + (tooltip?.width || 0) > viewport.width - padding) {
+          left = rect.left - (tooltip?.width || 0) - 20
         }
         
-        // If modal would still overlap vertically, try positioning above/below
-        if (top + (tooltip?.height || 0) > rect.top && top < rect.bottom) {
+        // If still off-screen, position above/below
+        if (left < padding) {
           if (rect.top > (tooltip?.height || 0) + 40) {
             // Position above if there's space
             top = rect.top - (tooltip?.height || 0) - 20
