@@ -81,33 +81,34 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
       case 1:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-emerald-600" />
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 backdrop-blur-sm border border-emerald-200/30 shadow-lg mb-6">
+                <User className="w-10 h-10 text-emerald-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Tell us about yourself</h3>
-              <p className="text-gray-600 mt-2">Help us personalize your VeeFore experience</p>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">Tell us about yourself</h3>
+              <p className="text-gray-600 text-lg">Help us personalize your VeeFore experience</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <Label htmlFor="fullName">Full Name *</Label>
+                <Label htmlFor="fullName" className="text-sm font-semibold text-gray-700 mb-2 block">Full Name *</Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
                   placeholder="Enter your full name"
                   required
+                  className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-sm focus:bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
                 />
               </div>
 
               <div>
-                <Label htmlFor="role">Your Role *</Label>
+                <Label htmlFor="role" className="text-sm font-semibold text-gray-700 mb-2 block">Your Role *</Label>
                 <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-sm focus:bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl bg-white/95 backdrop-blur-xl border border-white/30 shadow-xl">
                     <SelectItem value="founder">Founder/CEO</SelectItem>
                     <SelectItem value="marketing-manager">Marketing Manager</SelectItem>
                     <SelectItem value="social-media-manager">Social Media Manager</SelectItem>
@@ -121,22 +122,23 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
               </div>
 
               <div>
-                <Label htmlFor="companyName">Company/Brand Name</Label>
+                <Label htmlFor="companyName" className="text-sm font-semibold text-gray-700 mb-2 block">Company/Brand Name</Label>
                 <Input
                   id="companyName"
                   value={formData.companyName}
                   onChange={(e) => handleInputChange('companyName', e.target.value)}
                   placeholder="Enter your company or brand name"
+                  className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-sm focus:bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
                 />
               </div>
 
               <div>
-                <Label htmlFor="companySize">Company Size</Label>
+                <Label htmlFor="companySize" className="text-sm font-semibold text-gray-700 mb-2 block">Company Size</Label>
                 <Select value={formData.companySize} onValueChange={(value) => handleInputChange('companySize', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-sm focus:bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200">
                     <SelectValue placeholder="Select company size" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl bg-white/95 backdrop-blur-xl border border-white/30 shadow-xl">
                     <SelectItem value="solo">Just me</SelectItem>
                     <SelectItem value="2-10">2-10 employees</SelectItem>
                     <SelectItem value="11-50">11-50 employees</SelectItem>
@@ -406,77 +408,135 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold text-emerald-600">
-            Welcome to VeeFore!
-          </DialogTitle>
-        </DialogHeader>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Liquid Glass Backdrop */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/30 backdrop-blur-xl" />
         
-        {/* Progress Indicator */}
-        <div className="flex items-center justify-center space-x-4 mb-6">
-          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-            <div key={step} className="flex items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  step === currentStep
-                    ? 'bg-emerald-600 text-white'
-                    : step < currentStep
-                    ? 'bg-emerald-100 text-emerald-600'
-                    : 'bg-gray-100 text-gray-400'
-                }`}
+        {/* Floating Glass Modal */}
+        <div className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden">
+          {/* Glass Container with Liquid Effect */}
+          <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl shadow-black/20 overflow-hidden">
+            {/* Animated Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-blue-500/10 animate-pulse" />
+            
+            {/* Content Container */}
+            <div className="relative bg-white/90 backdrop-blur-sm m-1 rounded-[22px] p-8 overflow-y-auto max-h-[80vh]">
+              {/* Close Button */}
+              <button 
+                className="absolute right-6 top-6 w-8 h-8 rounded-full bg-gray-100/80 backdrop-blur-sm hover:bg-gray-200/80 transition-all duration-200 flex items-center justify-center group"
+                onClick={() => {}}
               >
-                {step < currentStep ? (
-                  <CheckCircle className="w-5 h-5" />
+                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/25 mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-2">
+                  Welcome to VeeFore
+                </h1>
+                <p className="text-lg text-gray-600 font-medium">
+                  Let's create something amazing together
+                </p>
+              </div>
+        
+              {/* Liquid Glass Progress Indicator */}
+              <div className="flex items-center justify-center space-x-3 mb-8">
+                {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+                  <div key={step} className="flex items-center">
+                    <div className="relative">
+                      {/* Glass Background */}
+                      <div className={`w-12 h-12 rounded-2xl backdrop-blur-xl border transition-all duration-500 ${
+                        step === currentStep
+                          ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 border-emerald-400/50 shadow-lg shadow-emerald-500/25 scale-110'
+                          : step < currentStep
+                          ? 'bg-gradient-to-br from-emerald-100 to-emerald-200 border-emerald-300/30 shadow-md'
+                          : 'bg-white/50 border-gray-200/30 shadow-sm'
+                      }`} />
+                      
+                      {/* Icon */}
+                      <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                        step === currentStep ? 'text-white' : step < currentStep ? 'text-emerald-600' : 'text-gray-400'
+                      }`}>
+                        {step < currentStep ? (
+                          <CheckCircle className="w-6 h-6" />
+                        ) : (
+                          getStepIcon(step)
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Connection Line */}
+                    {step < totalSteps && (
+                      <div className={`w-12 h-0.5 mx-2 rounded-full transition-all duration-500 ${
+                        step < currentStep 
+                          ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' 
+                          : 'bg-gray-200/50'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Step Content with Glass Effect */}
+              <div className="min-h-[400px] relative">
+                <div className="relative p-6 rounded-2xl bg-white/40 backdrop-blur-sm border border-white/20 shadow-lg">
+                  {renderStep()}
+                </div>
+              </div>
+
+              {/* Liquid Glass Navigation */}
+              <div className="flex justify-between items-center pt-8">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${
+                    currentStep === 1
+                      ? 'opacity-30 cursor-not-allowed bg-gray-100/50'
+                      : 'bg-white/60 backdrop-blur-sm border border-white/30 shadow-lg hover:bg-white/80 hover:shadow-xl hover:scale-105 text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </div>
+                </button>
+
+                {currentStep === totalSteps ? (
+                  <button
+                    onClick={handleComplete}
+                    disabled={!isStepValid()}
+                    className="group px-8 py-3 rounded-2xl font-bold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span>Complete Setup</span>
+                      <Rocket className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </button>
                 ) : (
-                  getStepIcon(step)
+                  <button
+                    onClick={nextStep}
+                    disabled={!isStepValid()}
+                    className="group px-8 py-3 rounded-2xl font-bold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span>Next Step</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </button>
                 )}
               </div>
-              {step < totalSteps && (
-                <div className={`w-8 h-0.5 ${step < currentStep ? 'bg-emerald-600' : 'bg-gray-200'}`} />
-              )}
             </div>
-          ))}
+          </div>
         </div>
-
-        {/* Step Content */}
-        <div className="min-h-[400px]">
-          {renderStep()}
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Previous
-          </Button>
-
-          {currentStep === totalSteps ? (
-            <Button
-              onClick={handleComplete}
-              disabled={!isStepValid()}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              Complete Setup
-              <Rocket className="w-4 h-4 ml-2" />
-            </Button>
-          ) : (
-            <Button
-              onClick={nextStep}
-              disabled={!isStepValid()}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              Next Step
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          )}
-        </div>
-      </DialogContent>
+      </div>
     </Dialog>
   )
 }
