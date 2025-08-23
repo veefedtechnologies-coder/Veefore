@@ -163,6 +163,7 @@ export default function VeeGPT() {
   // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
   const [aiStatus, setAiStatus] = useState<string | null>(null)
+  const [isContentStreaming, setIsContentStreaming] = useState(false)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
   // WebSocket for real-time streaming
@@ -540,9 +541,13 @@ export default function VeeGPT() {
 
     switch (data.type) {
       case 'status':
-        // Real-time AI processing status updates
-        console.log('VeeGPT: STATUS UPDATE:', data.content || data.status)
-        setAiStatus(data.content || data.status)
+        // Real-time AI processing status updates - but only if not already streaming content
+        if (!isContentStreaming) {
+          console.log('VeeGPT: STATUS UPDATE:', data.content || data.status)
+          setAiStatus(data.content || data.status)
+        } else {
+          console.log('VeeGPT: STATUS UPDATE IGNORED (content streaming):', data.content || data.status)
+        }
         break
 
       case 'userMessage':
@@ -609,8 +614,9 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current
         })
         
-        // Clear AI status when first chunk arrives (AI started writing)
+        // IMMEDIATELY clear status and set streaming flag when ANY chunk arrives
         setAiStatus(null)
+        setIsContentStreaming(true)
         
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
@@ -678,6 +684,7 @@ export default function VeeGPT() {
         
         // Generation completed - reset generation state
         setIsGenerating(false)
+        setIsContentStreaming(false) // Reset streaming flag - allow status updates again
         console.log('VeeGPT: REF SET TO FALSE in complete event')
         isGeneratingRef.current = false
         
@@ -792,6 +799,7 @@ export default function VeeGPT() {
     // Show status IMMEDIATELY without waiting for WebSocket
     setAiStatus('🧠 Analyzing question complexity and AI routing strategy...')
     setIsGenerating(true)
+    setIsContentStreaming(false) // Reset streaming flag for new message
     isGeneratingRef.current = true
     
     // Clear input immediately for responsive UI
@@ -832,8 +840,11 @@ export default function VeeGPT() {
         })
       }
     } catch (error) {
-      // Clear status on error
+      // Clear status and reset streaming flag on error
       setAiStatus(null)
+      setIsContentStreaming(false)
+      setIsGenerating(false)
+      isGeneratingRef.current = false
       console.error('VeeGPT: Error sending message:', error)
       // Restore input text if there was an error
       setInputText(messageContent)
