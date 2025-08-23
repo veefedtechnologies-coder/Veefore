@@ -23,7 +23,6 @@ import Workspaces from './pages/Workspaces'
 import Waitlist from './pages/Waitlist'
 import WaitlistStatus from './pages/WaitlistStatus'
 import OnboardingFlow from './components/onboarding/OnboardingFlow'
-import WalkthroughModal from './components/walkthrough/WalkthroughModal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -675,7 +674,16 @@ function App() {
       )}
       
       {/* Walkthrough Modal - Direct JSX without IIFE */}
-      {isWalkthroughOpen && (
+      {(() => {
+        console.log('🎯 CONDITIONAL CHECK: isWalkthroughOpen =', isWalkthroughOpen, '(type:', typeof isWalkthroughOpen, ')')
+        if (isWalkthroughOpen) {
+          console.log('🎯 CONDITIONAL CHECK: Modal SHOULD render now!')
+          return true
+        } else {
+          console.log('🎯 CONDITIONAL CHECK: Modal should NOT render (isWalkthroughOpen is false)')
+          return false
+        }
+      })() && isWalkthroughOpen && (
         <div 
           style={{
             position: 'fixed',
