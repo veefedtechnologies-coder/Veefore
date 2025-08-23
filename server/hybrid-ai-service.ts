@@ -359,12 +359,9 @@ Provide creative, actionable insights focused on content creation and social med
    */
   async* generateHybridStreamingResponse(messages: ChatMessage[], statusCallback?: (status: string) => void): AsyncGenerator<string, void, unknown> {
     try {
-      console.log('[HYBRID AI] 🔥 Service called! Status callback provided:', !!statusCallback);
       const userMessage = messages[messages.length - 1]?.content || '';
       
-      console.log('[HYBRID AI] 🧠 About to call first status callback...');
       statusCallback?.('🧠 Analyzing question complexity and AI routing strategy...');
-      console.log('[HYBRID AI] ✅ First status callback executed');
       const analysis = this.analyzeQuestion(userMessage);
       
       console.log(`[HYBRID AI] Analysis:`, analysis);
