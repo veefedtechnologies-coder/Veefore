@@ -13,13 +13,11 @@ import {
   Target,
   Check,
   Play,
-  ArrowRight,
   Instagram,
   Twitter,
   Linkedin,
   MessageSquare,
   TrendingUp,
-  Clock,
   Bot
 } from 'lucide-react'
 
