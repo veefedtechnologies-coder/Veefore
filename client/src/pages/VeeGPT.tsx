@@ -1772,13 +1772,20 @@ export default function VeeGPT() {
                     VeeGPT
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      </div>
-                      <span className="text-sm font-medium text-blue-600">{aiStatus}</span>
+                    <div className="flex items-center text-gray-600">
+                      <span 
+                        className="text-sm font-medium text-gray-500"
+                        style={{
+                          background: 'linear-gradient(90deg, #9CA3AF 25%, #D1D5DB 50%, #9CA3AF 75%)',
+                          backgroundSize: '200% 100%',
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          animation: 'shimmer 2s infinite'
+                        }}
+                      >
+                        {aiStatus}
+                      </span>
                     </div>
                   </div>
                 </div>
