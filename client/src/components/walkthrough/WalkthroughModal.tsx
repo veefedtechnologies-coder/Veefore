@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { 
   ChevronRight, 
@@ -181,7 +181,6 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
       <DialogContent className="max-w-4xl w-full h-[600px] p-0 overflow-hidden border-0 bg-white rounded-2xl shadow-2xl">
         {/* Header */}
         <div className="relative h-full flex flex-col">
