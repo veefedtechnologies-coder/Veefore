@@ -120,7 +120,18 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
 
         if (element) {
           setTargetElement(element)
-          positionTooltip(element)
+          
+          // Scroll element into view so users can see it
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+          })
+          
+          // Position tooltip after scroll
+          setTimeout(() => {
+            positionTooltip(element)
+          }, 300) // Wait for scroll animation to complete
         }
       }, 150)
     }
