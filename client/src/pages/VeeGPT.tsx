@@ -789,6 +789,11 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
+    // Show status IMMEDIATELY without waiting for WebSocket
+    setAiStatus('🧠 Analyzing question complexity and AI routing strategy...')
+    setIsGenerating(true)
+    isGeneratingRef.current = true
+    
     // Clear input immediately for responsive UI
     setInputText('')
     
@@ -802,14 +807,22 @@ export default function VeeGPT() {
       textareaRef.current.value = ''
     }
     
-    // Clear any previous status - new status will come from WebSocket
-    setAiStatus(null)
+    // Keep the immediate status we just set - don't clear it!
 
     try {
       if (!currentConversationId) {
         // Create new conversation
         console.log('VeeGPT: Creating new conversation')
-        await createConversationMutation.mutateAsync(messageContent)
+        const result = await createConversationMutation.mutateAsync(messageContent)
+        
+        // Immediately subscribe to WebSocket for the new conversation
+        if (wsRef.current && result?.conversation?.id) {
+          console.log(`[WebSocket] Pre-subscribing to new conversation ${result.conversation.id}`)
+          wsRef.current.send(JSON.stringify({
+            type: 'subscribe',
+            conversationId: result.conversation.id
+          }))
+        }
       } else {
         // Send message to existing conversation
         console.log('VeeGPT: Sending to existing conversation:', currentConversationId)
