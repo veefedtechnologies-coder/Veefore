@@ -13812,10 +13812,11 @@ Create a detailed growth strategy in JSON format:
             conversationId: convId
           });
 
-          // Generate streaming AI response via WebSocket
-          const { OpenAIService } = await import('./openai-service');
+          // Generate streaming AI response via WebSocket using Hybrid AI
+          const { HybridAIService } = await import('./hybrid-ai-service');
+          const hybridAI = new HybridAIService();
           
-          for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
+          for await (const chunk of hybridAI.generateHybridStreamingResponse(chatHistory)) {
             // Check if generation was stopped
             if (!activeGenerations.get(convId)) {
               console.log(`[WEBSOCKET STREAM] Generation stopped for conversation ${convId}`);
@@ -13984,8 +13985,9 @@ Create a detailed growth strategy in JSON format:
 
       // Generate conversation title
       console.log('[CHAT] Generating title for content:', content.trim());
-      const { OpenAIService } = await import('./openai-service');
-      const title = await OpenAIService.generateChatTitle(content.trim());
+      const { HybridAIService } = await import('./hybrid-ai-service');
+      const hybridAI = new HybridAIService();
+      const title = await hybridAI.generateChatTitle(content.trim());
       console.log('[CHAT] Generated title:', title);
 
       // Create new conversation
@@ -14048,10 +14050,11 @@ Create a detailed growth strategy in JSON format:
             conversationId: conversation.id
           });
 
-          // Generate streaming AI response via WebSocket
-          const { OpenAIService } = await import('./openai-service');
+          // Generate streaming AI response via WebSocket using Hybrid AI
+          const { HybridAIService } = await import('./hybrid-ai-service');
+          const hybridAI = new HybridAIService();
           
-          for await (const chunk of OpenAIService.generateStreamingResponse(chatHistory)) {
+          for await (const chunk of hybridAI.generateHybridStreamingResponse(chatHistory)) {
             // Check if generation was stopped
             if (!activeGenerations.get(conversation.id)) {
               console.log(`[WEBSOCKET STREAM] Generation stopped for conversation ${conversation.id}`);
