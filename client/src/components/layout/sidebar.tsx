@@ -130,7 +130,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
       {/* VeeGPT Logo */}
       <div 
         className={cn(
-          "flex flex-col items-center cursor-pointer transition-all duration-500 group py-2 mb-4 transform-gpu",
+          "flex flex-col items-center cursor-pointer transition-all duration-500 group py-2 mb-4 transform-gpu veegpt-nav-item",
           activeView === 'veegpt' 
             ? "text-blue-600" 
             : "text-gray-500 hover:text-blue-600"
@@ -220,6 +220,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           <div
             key={item.label}
             data-testid={item.isCreateButton ? "create-dropdown-trigger" : undefined}
+            data-nav={item.key}
             onClick={(e) => {
               if (item.isCreateButton) {
                 handleCreateClick(e)
@@ -228,7 +229,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
               }
             }}
             className={cn(
-              "flex flex-col items-center cursor-pointer transition-all duration-300 relative group py-2",
+              "flex flex-col items-center cursor-pointer transition-all duration-300 relative group py-2 sidebar-nav-item",
               activeView === item.key 
                 ? "text-blue-600" 
                 : "text-gray-500 hover:text-blue-600"

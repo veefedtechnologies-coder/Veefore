@@ -16,50 +16,57 @@ const tourSteps: TourStep[] = [
     id: 'welcome',
     target: '[data-testid="dashboard-header"]',
     title: 'Welcome to VeeFore!',
-    description: 'Let me show you around your powerful social media dashboard. We\'ll go through each feature step by step.',
+    description: 'Your AI-powered social media command center. Let me show you the core features that make VeeFore the most advanced social media platform.',
     position: 'bottom'
   },
   {
-    id: 'quick-actions',
-    target: '[data-testid="quick-actions"]',
-    title: 'Quick Actions Hub',
-    description: 'Start here to create content quickly. Post to multiple platforms, generate AI content, or schedule posts with just one click.',
+    id: 'veegpt-nav',
+    target: '.veegpt-nav-item',
+    title: '🤖 VeeGPT - Your AI Assistant',
+    description: 'Meet your personal AI assistant! VeeGPT helps with content creation, strategy planning, analytics insights, and answers any questions about your social media.',
     position: 'right'
   },
   {
-    id: 'performance-score',
-    target: '[data-testid="performance-score"]',
-    title: 'Performance Overview', 
-    description: 'Track your social media performance at a glance. See your overall score and key metrics across all platforms.',
-    position: 'left'
+    id: 'video-generator-nav',
+    target: '.sidebar-nav-item[data-nav="video-generator"]',
+    title: '🎬 AI Video Generator',
+    description: 'Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.',
+    position: 'right'
   },
   {
-    id: 'social-accounts',
-    target: '[data-testid="social-accounts"]',
-    title: 'Connected Accounts',
-    description: 'Manage all your social media accounts from one place. Connect new platforms and monitor account health.',
-    position: 'top'
-  },
-  {
-    id: 'scheduled-posts',
-    target: '[data-testid="scheduled-posts"]',
-    title: 'Content Calendar',
-    description: 'View and manage your upcoming posts. See what\'s scheduled across all your social platforms.',
-    position: 'left'
-  },
-  {
-    id: 'recommendations',
-    target: '[data-testid="recommendations"]',
-    title: 'AI Recommendations',
-    description: 'Get personalized tips to improve your social media strategy. Our AI analyzes your performance and suggests optimizations.',
-    position: 'top'
+    id: 'automation-nav',
+    target: '.sidebar-nav-item[data-nav="automation"]',
+    title: '⚡ Smart Automation',
+    description: 'Automate your social media interactions! Set up AI-powered DM responses, comment replies, keyword triggers, and engagement automation.',
+    position: 'right'
   },
   {
     id: 'create-button',
     target: '[data-testid="create-dropdown-trigger"]',
-    title: 'Create Content',
-    description: 'Click here anytime to create new content. Choose from posts, stories, videos, or let AI generate content for you.',
-    position: 'bottom'
+    title: '✨ AI Content Creation',
+    description: 'Create content with AI enhancement! Generate captions, hashtags, images, and optimize content for each platform with our AI tools.',
+    position: 'right'
+  },
+  {
+    id: 'analytics-nav',
+    target: '.sidebar-nav-item[data-nav="analytics"]',
+    title: '📊 Advanced Analytics',
+    description: 'Deep insights powered by AI! Track performance across all platforms, get predictive analytics, and receive smart recommendations.',
+    position: 'right'
+  },
+  {
+    id: 'workspaces-nav',
+    target: '.sidebar-nav-item[data-nav="workspaces"]',
+    title: '👥 AI-Powered Workspaces',
+    description: 'Collaborate with custom AI personalities! Each workspace can have its own AI assistant with unique personality and expertise.',
+    position: 'right'
+  },
+  {
+    id: 'integration-nav',
+    target: '.sidebar-nav-item[data-nav="integration"]',
+    title: '🔗 Platform Integration',
+    description: 'Connect all your social platforms! Manage Instagram, YouTube, Twitter, LinkedIn, and more from one unified dashboard.',
+    position: 'right'
   }
 ]
 
