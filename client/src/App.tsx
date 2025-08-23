@@ -156,12 +156,6 @@ function App() {
 
       {/* Removed old onboarding route - now handled by modal */}
 
-      {/* VeeGPT Route - Accessible to everyone */}
-      <Route path="/veegpt">
-        <div className="min-h-screen">
-          <VeeGPT />
-        </div>
-      </Route>
 
       {/* Admin Login - Accessible to everyone */}
       <Route path="/admin-login">
@@ -620,6 +614,25 @@ function App() {
                 <main className="flex-1 overflow-y-auto">
                   <AutomationStepByStep />
                 </main>
+              </div>
+            </div>
+          </Route>
+
+          {/* VeeGPT Route - with main sidebar */}
+          <Route path="/veegpt">
+            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+              {/* Sidebar - Fixed height with independent scrolling */}
+              <div className="h-screen overflow-y-auto">
+                <Sidebar 
+                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
+                  isCreateDropdownOpen={isCreateDropdownOpen}
+                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                />
+              </div>
+
+              {/* Main Content Area - VeeGPT takes full remaining space */}
+              <div className="flex-1 h-screen overflow-hidden">
+                <VeeGPT />
               </div>
             </div>
           </Route>

@@ -793,9 +793,8 @@ export default function VeeGPT() {
 
 
 
-  // Welcome screen layout (when no conversation is active)
-  // Always show sidebar for better navigation experience
-  const shouldShowSidebar = true
+  // Always show sidebar if conversations exist, regardless of whether it's a new chat or refresh
+  const shouldShowSidebar = conversations.length > 0
   
   // Show welcome screen when starting a new chat or when no conversation is selected
   // Always show sidebar if conversations exist, regardless of new chat state
