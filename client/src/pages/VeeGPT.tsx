@@ -541,8 +541,8 @@ export default function VeeGPT() {
     switch (data.type) {
       case 'status':
         // Real-time AI processing status updates
-        console.log('VeeGPT: STATUS UPDATE:', data.status)
-        setAiStatus(data.status)
+        console.log('VeeGPT: STATUS UPDATE:', data.content || data.status)
+        setAiStatus(data.content || data.status)
         break
 
       case 'userMessage':
