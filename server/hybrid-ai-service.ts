@@ -172,35 +172,60 @@ Always provide practical, actionable advice tailored to content creation and soc
    */
   private async getPerplexityResponse(userMessage: string): Promise<AIResponse> {
     try {
-      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      console.log('[PERPLEXITY] Making API call for message:', userMessage.substring(0, 50) + '...');
+      console.log('[PERPLEXITY] API Key configured:', !!process.env.PERPLEXITY_API_KEY);
+      
+      // Use dynamic import for node-fetch if native fetch fails
+      let fetchFunction = globalThis.fetch;
+      if (!fetchFunction) {
+        const { default: fetch } = await import('node-fetch');
+        fetchFunction = fetch as any;
+      }
+      
+      const requestBody = {
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a research-focused AI assistant specializing in current trends, data, and up-to-date information for content creators and social media professionals. Provide well-sourced, current information with citations when possible.'
+          },
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ],
+        max_tokens: 800,
+        temperature: 0.3,
+        top_p: 0.9,
+        return_images: false,
+        return_related_questions: false,
+        search_recency_filter: 'month',
+        stream: false
+      };
+      
+      console.log('[PERPLEXITY] Request body:', JSON.stringify(requestBody, null, 2));
+      
+      const response = await fetchFunction('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'llama-3.1-sonar-small-128k-online',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a research-focused AI assistant specializing in current trends, data, and up-to-date information for content creators and social media professionals. Provide well-sourced, current information with citations when possible.'
-            },
-            {
-              role: 'user',
-              content: userMessage
-            }
-          ],
-          max_tokens: 800,
-          temperature: 0.3,
-          top_p: 0.9,
-          return_images: false,
-          return_related_questions: false,
-          search_recency_filter: 'month',
-          stream: false
-        })
+        body: JSON.stringify(requestBody)
       });
 
+      console.log('[PERPLEXITY] Response status:', response.status);
+      console.log('[PERPLEXITY] Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[PERPLEXITY] API error response:', errorText);
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
+      }
+
       const data = await response.json();
+      console.log('[PERPLEXITY] Response data keys:', Object.keys(data));
+      console.log('[PERPLEXITY] Response data:', JSON.stringify(data, null, 2));
       
       return {
         content: data.choices[0]?.message?.content || 'Unable to fetch research data.',
@@ -212,7 +237,9 @@ Always provide practical, actionable advice tailored to content creation and soc
         }
       };
     } catch (error) {
-      console.error('Perplexity API error:', error);
+      console.error('[PERPLEXITY] API error details:', error);
+      console.error('[PERPLEXITY] Error message:', error.message);
+      console.error('[PERPLEXITY] Error stack:', error.stack);
       return {
         content: 'I encountered an issue accessing current research data. Please try again.',
         provider: 'perplexity',
