@@ -37,6 +37,30 @@ import remarkGfm from 'remark-gfm'
 
 // Real-time streaming - no animation, chunks appear immediately as they arrive
 
+// Function to convert text patterns to proper markdown headings
+const convertToMarkdown = (text: string): string => {
+  return text
+    // Convert "Title: Something" to "# Something" 
+    .replace(/^Title:\s*(.+)$/gm, '# $1')
+    // Convert standalone lines that look like section headers to ## headers
+    .replace(/^([A-Z][A-Za-z\s]+)(?:\s*:?\s*)$/gm, (match, title) => {
+      // Only convert if it's a short line (likely a heading) and not a sentence
+      if (title.length < 50 && !title.includes('.') && !title.includes(',')) {
+        return `## ${title.replace(/:\s*$/, '')}`;
+      }
+      return match;
+    })
+    // Convert "Effects of Something" pattern to ## headers
+    .replace(/^(Introduction|Conclusion|Overview|Summary|Effects? of [^.]+|Causes? of [^.]+|Benefits? of [^.]+|Types? of [^.]+|Examples? of [^.]+|Steps? to [^.]+|Ways? to [^.]+|How to [^.]+|What is [^.]+|Why [^.]+|When [^.]+|Where [^.]+|Key [^.]+|Important [^.]+|Main [^.]+|Primary [^.]+|Secondary [^.]+)(?:\s*:?\s*)$/gmi, '## $1')
+    // Convert numbered sections like "1. Something" to ### headers if they're short
+    .replace(/^\d+\.\s+([A-Z][A-Za-z\s]+)(?:\s*:?\s*)$/gm, (match, title) => {
+      if (title.length < 40 && !title.includes('.') && !title.includes(',')) {
+        return `### ${title}`;
+      }
+      return match;
+    });
+};
+
 type ChatConversation = {
   id: number
   userId: string
@@ -1612,7 +1636,7 @@ export default function VeeGPT() {
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
                             >
-                              {streamingContent[message.id] || ''}
+                              {convertToMarkdown(streamingContent[message.id] || '')}
                             </ReactMarkdown>
                             {isGenerating && streamingContent[message.id] !== undefined && (
                               <span className="animate-pulse text-blue-500 ml-1">▋</span>
@@ -1634,7 +1658,7 @@ export default function VeeGPT() {
                               pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                             }}
                           >
-                            {message.content}
+                            {convertToMarkdown(message.content)}
                           </ReactMarkdown>
                         )}
 
