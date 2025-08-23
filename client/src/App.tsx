@@ -224,7 +224,12 @@ function App() {
                     {/* Temporary Walkthrough Trigger */}
                     <div className="mt-4 flex justify-end">
                       <button
-                        onClick={() => setIsWalkthroughOpen(true)}
+                        onClick={() => {
+                          console.log('🎯 WALKTHROUGH: Button clicked, opening modal...')
+                          console.log('🎯 WALKTHROUGH: Current isWalkthroughOpen state:', isWalkthroughOpen)
+                          setIsWalkthroughOpen(true)
+                          console.log('🎯 WALKTHROUGH: setIsWalkthroughOpen(true) called')
+                        }}
                         className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
                       >
                         🎯 Start Walkthrough
@@ -673,11 +678,23 @@ function App() {
       )}
       
       {/* Walkthrough Modal - Appears after successful onboarding */}
-      <WalkthroughModal
-        open={isWalkthroughOpen}
-        onClose={() => setIsWalkthroughOpen(false)}
-        userName={userData?.displayName || userData?.fullName || user?.email?.split('@')[0]}
-      />
+      {(() => {
+        console.log('🎯 WALKTHROUGH MODAL: Rendering with props:', {
+          open: isWalkthroughOpen,
+          userName: userData?.displayName || userData?.fullName || user?.email?.split('@')[0],
+          userData: userData ? 'present' : 'missing'
+        })
+        return (
+          <WalkthroughModal
+            open={isWalkthroughOpen}
+            onClose={() => {
+              console.log('🎯 WALKTHROUGH: Modal close requested')
+              setIsWalkthroughOpen(false)
+            }}
+            userName={userData?.displayName || userData?.fullName || user?.email?.split('@')[0]}
+          />
+        )
+      })()}
     </Switch>
   )
 }
