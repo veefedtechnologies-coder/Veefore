@@ -12410,6 +12410,67 @@ Create a detailed growth strategy in JSON format:
 
   // ===== ADMIN PANEL ROUTES =====
   
+  // Get waitlist data for onboarding pre-fill
+  app.get('/api/onboarding/prefill', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const user = req.user!;
+      
+      // Get waitlist data for the current user's email
+      const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
+      
+      if (!waitlistUser || !waitlistUser.questionnaireData) {
+        return res.json({ success: true, prefillData: null });
+      }
+
+      // Map waitlist data to onboarding form structure
+      const questionnaireData = waitlistUser.questionnaireData;
+      const prefillData = {
+        fullName: waitlistUser.name || '',
+        role: mapBusinessTypeToRole(questionnaireData.businessType),
+        companySize: mapTeamSizeToCompanySize(questionnaireData.teamSize),
+        primaryGoals: questionnaireData.primaryGoal ? [mapPrimaryGoalToOnboardingGoal(questionnaireData.primaryGoal)] : [],
+        contentTypes: questionnaireData.contentTypes || [],
+        platforms: [] // Not collected in waitlist, keep empty
+      };
+
+      res.json({ success: true, prefillData });
+    } catch (error: any) {
+      console.error('[ONBOARDING PREFILL] Error:', error);
+      res.status(500).json({ error: 'Failed to get prefill data' });
+    }
+  });
+
+  // Helper functions for mapping waitlist data to onboarding fields
+  function mapBusinessTypeToRole(businessType: string): string {
+    const mapping: { [key: string]: string } = {
+      'creator': 'content-creator',
+      'business': 'founder',
+      'agency': 'agency-owner',
+      'freelancer': 'freelancer'
+    };
+    return mapping[businessType] || '';
+  }
+
+  function mapTeamSizeToCompanySize(teamSize: string): string {
+    const mapping: { [key: string]: string } = {
+      'solo': '1',
+      'small': '2-10',
+      'medium': '11-50',
+      'large': '51-200'
+    };
+    return mapping[teamSize] || '';
+  }
+
+  function mapPrimaryGoalToOnboardingGoal(primaryGoal: string): string {
+    const mapping: { [key: string]: string } = {
+      'growth': 'Increase followers',
+      'engagement': 'Boost engagement',
+      'sales': 'Increase sales',
+      'efficiency': 'Save time on content'
+    };
+    return mapping[primaryGoal] || primaryGoal;
+  }
+
   // Register comprehensive admin routes with JWT authentication
   registerAdminRoutes(app);
   

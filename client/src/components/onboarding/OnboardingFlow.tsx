@@ -1,12 +1,10 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ChevronRight, ChevronLeft, CheckCircle, User, Target, Settings, Rocket } from 'lucide-react'
+import { ChevronRight, ChevronLeft, CheckCircle, User, Target, Settings, Rocket, Loader2 } from 'lucide-react'
 
 interface OnboardingFlowProps {
   open: boolean
@@ -15,6 +13,8 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(1)
+  const [isLoadingPrefill, setIsLoadingPrefill] = useState(false)
+  const [prefillDataApplied, setPrefillDataApplied] = useState(false)
   const [formData, setFormData] = useState({
     // Step 1: Personal Info
     fullName: '',
@@ -35,6 +35,55 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
     // Step 4: Subscription Plan
     selectedPlan: 'free'
   })
+
+  // Fetch prefill data when modal opens
+  useEffect(() => {
+    if (open && !prefillDataApplied) {
+      fetchPrefillData()
+    }
+  }, [open, prefillDataApplied])
+
+  const fetchPrefillData = async () => {
+    try {
+      setIsLoadingPrefill(true)
+      
+      const authToken = localStorage.getItem('firebase_token')
+      if (!authToken) return
+
+      const response = await fetch('/api/onboarding/prefill', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) throw new Error('Failed to fetch prefill data')
+
+      const result = await response.json()
+      
+      if (result.success && result.prefillData) {
+        const prefill = result.prefillData
+        
+        // Apply prefill data to form
+        setFormData(prev => ({
+          ...prev,
+          fullName: prefill.fullName || prev.fullName,
+          role: prefill.role || prev.role,
+          companySize: prefill.companySize || prev.companySize,
+          primaryGoals: prefill.primaryGoals?.length > 0 ? prefill.primaryGoals : prev.primaryGoals,
+          contentTypes: prefill.contentTypes?.length > 0 ? prefill.contentTypes : prev.contentTypes,
+          platforms: prefill.platforms?.length > 0 ? prefill.platforms : prev.platforms
+        }))
+        
+        console.log('[ONBOARDING] Pre-filled data from waitlist:', prefill)
+        setPrefillDataApplied(true)
+      }
+    } catch (error) {
+      console.error('[ONBOARDING] Failed to fetch prefill data:', error)
+    } finally {
+      setIsLoadingPrefill(false)
+    }
+  }
 
   const totalSteps = 4
 
@@ -158,6 +207,18 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
               <p className="text-sm text-gray-600 max-w-md mx-auto">
                 Help us personalize your VeeFore experience with some basic information about you and your business.
               </p>
+              {isLoadingPrefill && (
+                <div className="flex items-center justify-center mt-3 text-sm text-blue-600">
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Loading your waitlist preferences...
+                </div>
+              )}
+              {prefillDataApplied && !isLoadingPrefill && (
+                <div className="flex items-center justify-center mt-3 text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2 mx-auto w-fit">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  We've pre-filled some information from your waitlist signup
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
