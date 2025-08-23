@@ -20,6 +20,44 @@ const tourSteps: TourStep[] = [
     target: "h1",
     position: "bottom"
   },
+  // DASHBOARD COMPONENTS FIRST
+  {
+    title: "🎨 Smart Content Creation Cards",
+    description: "These AI-powered creation options help you generate content instantly. Choose from creating from scratch, posting across networks, trending topics, or starting with AI assistance.",
+    target: ".dashboard-cards",
+    position: "top"
+  },
+  {
+    title: "📈 Performance Overview",
+    description: "Monitor your social media performance with real-time analytics. Track engagement, reach, followers, and content performance across all connected platforms.",
+    target: ".performance-overview",
+    position: "top"
+  },
+  {
+    title: "🔌 Connected Platforms",
+    description: "View and manage all your connected social media accounts in one place. See connection status, account details, and manage platform integrations.",
+    target: ".connected-platforms",
+    position: "top"
+  },
+  {
+    title: "🔍 View Details & Analytics",
+    description: "Click 'View Details' to dive deeper into your performance analytics, get AI-powered insights, and track your growth metrics.",
+    target: ".view-details",
+    position: "left"
+  },
+  {
+    title: "🎧 Social Listening Dashboard",
+    description: "Monitor mentions, hashtags, and conversations about your brand across social platforms. Get AI-powered sentiment analysis and trend insights.",
+    target: ".social-listening",
+    position: "top"
+  },
+  {
+    title: "🤖 AI Recommendations Engine",
+    description: "Get personalized content suggestions, optimal posting times, and engagement strategies powered by AI analysis of your audience and performance data.",
+    target: ".ai-recommendations",
+    position: "top"
+  },
+  // SIDEBAR COMPONENTS SECOND
   {
     title: "🤖 VeeGPT - Your AI Assistant", 
     description: "Meet VeeGPT, your intelligent AI assistant that helps you create content, generate ideas, and manage your social media strategy with advanced AI capabilities.",
@@ -61,30 +99,6 @@ const tourSteps: TourStep[] = [
     description: "Use our AI content creation tools to generate posts, stories, captions, and more with just a few clicks.",
     target: "[data-nav='create']",
     position: "right"
-  },
-  {
-    title: "🎨 Smart Content Creation Cards",
-    description: "These AI-powered creation options help you generate content instantly. Choose from creating from scratch, posting across networks, trending topics, or starting with AI assistance.",
-    target: ".dashboard-cards",
-    position: "top"
-  },
-  {
-    title: "📈 Performance Overview",
-    description: "Monitor your social media performance with real-time analytics. Track engagement, reach, followers, and content performance across all connected platforms.",
-    target: ".performance-overview",
-    position: "top"
-  },
-  {
-    title: "🔌 Connected Platforms",
-    description: "View and manage all your connected social media accounts in one place. See connection status, account details, and manage platform integrations.",
-    target: ".connected-platforms",
-    position: "top"
-  },
-  {
-    title: "🔍 View Details & Analytics",
-    description: "Click 'View Details' to dive deeper into your performance analytics, get AI-powered insights, and track your growth metrics.",
-    target: ".view-details",
-    position: "left"
   }
 ]
 
@@ -105,56 +119,73 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
         let element: HTMLElement | null = null
 
         // Use data-nav attributes and dashboard selectors for precise targeting
+        // NEW ORDER: Dashboard components first (1-6), then sidebar components (7-13)
         switch (currentStep) {
           case 0: // Welcome - target main heading
             element = document.querySelector('h1') || document.querySelector('.text-3xl') || document.querySelector('.text-2xl')
             break
-          case 1: // VeeGPT
-            element = document.querySelector('[data-nav="veegpt"]')
-            break
-          case 2: // Video Generator
-            element = document.querySelector('[data-nav="video-generator"]')
-            break
-          case 3: // Automation
-            element = document.querySelector('[data-nav="automation"]')
-            break
-          case 4: // Analytics
-            element = document.querySelector('[data-nav="analytics"]')
-            break
-          case 5: // Workspaces
-            element = document.querySelector('[data-nav="workspaces"]')
-            break
-          case 6: // Integration
-            element = document.querySelector('[data-nav="integration"]')
-            break
-          case 7: // Create
-            element = document.querySelector('[data-nav="create"]')
-            break
-          case 8: // Dashboard Cards (Quick Actions)
+          // DASHBOARD COMPONENTS (1-6)
+          case 1: // Smart Content Creation Cards (Quick Actions)
             element = document.querySelector('[data-testid="quick-actions"]') as HTMLElement ||
                      document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4') as HTMLElement ||
                      document.querySelector('.grid-cols-2') as HTMLElement ||
                      document.querySelector('.grid-cols-4') as HTMLElement
             break
-          case 9: // Performance Overview
+          case 2: // Performance Overview
             element = document.querySelector('[data-testid="performance-score"]') as HTMLElement ||
                      (Array.from(document.querySelectorAll('h2, h3')).find(el => 
                        el.textContent?.toLowerCase().includes('performance overview')) as HTMLElement) ||
                      (Array.from(document.querySelectorAll('.text-xl')).find(el => 
                        el.textContent?.toLowerCase().includes('performance overview')) as HTMLElement)
             break
-          case 10: // Connected Platforms
+          case 3: // Connected Platforms
             element = (Array.from(document.querySelectorAll('h3')).find(el => 
                        el.textContent?.toLowerCase().includes('connected platforms')) as HTMLElement) ||
                      document.querySelector('[data-testid="connected-platforms"]') as HTMLElement ||
                      (Array.from(document.querySelectorAll('.text-lg')).find(el => 
                        el.textContent?.toLowerCase().includes('connected platforms')) as HTMLElement)
             break
-          case 11: // View Details Button (part of performance section)
+          case 4: // View Details & Analytics Button
             element = (Array.from(document.querySelectorAll('button')).find(el => 
                        el.textContent?.toLowerCase().includes('view details')) as HTMLElement) ||
                      document.querySelector('[data-testid="view-details"]') as HTMLElement ||
                      document.querySelector('.btn-secondary') as HTMLElement
+            break
+          case 5: // Social Listening Dashboard
+            element = (Array.from(document.querySelectorAll('h3, h2')).find(el => 
+                       el.textContent?.toLowerCase().includes('social listening')) as HTMLElement) ||
+                     document.querySelector('[data-testid="social-listening"]') as HTMLElement ||
+                     (Array.from(document.querySelectorAll('.text-xl')).find(el => 
+                       el.textContent?.toLowerCase().includes('listening')) as HTMLElement)
+            break
+          case 6: // AI Recommendations Engine
+            element = document.querySelector('[data-testid="recommendations"]') as HTMLElement ||
+                     (Array.from(document.querySelectorAll('h3, h2')).find(el => 
+                       el.textContent?.toLowerCase().includes('recommendations')) as HTMLElement) ||
+                     (Array.from(document.querySelectorAll('.text-xl')).find(el => 
+                       el.textContent?.toLowerCase().includes('recommendations')) as HTMLElement)
+            break
+          // SIDEBAR COMPONENTS (7-13)
+          case 7: // VeeGPT
+            element = document.querySelector('[data-nav="veegpt"]')
+            break
+          case 8: // Video Generator
+            element = document.querySelector('[data-nav="video-generator"]')
+            break
+          case 9: // Automation
+            element = document.querySelector('[data-nav="automation"]')
+            break
+          case 10: // Analytics
+            element = document.querySelector('[data-nav="analytics"]')
+            break
+          case 11: // Workspaces
+            element = document.querySelector('[data-nav="workspaces"]')
+            break
+          case 12: // Integration
+            element = document.querySelector('[data-nav="integration"]')
+            break
+          case 13: // Create
+            element = document.querySelector('[data-nav="create"]')
             break
         }
 
