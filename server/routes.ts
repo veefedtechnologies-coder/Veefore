@@ -12418,12 +12418,14 @@ Create a detailed growth strategy in JSON format:
       // Get waitlist data for the current user's email
       const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
       
-      if (!waitlistUser || !waitlistUser.questionnaireData) {
+      if (!waitlistUser || !waitlistUser.metadata?.questionnaire) {
+        console.log('[ONBOARDING PREFILL] No questionnaire data found for user:', user.email);
         return res.json({ success: true, prefillData: null });
       }
 
       // Map waitlist data to onboarding form structure
-      const questionnaireData = waitlistUser.questionnaireData;
+      const questionnaireData = waitlistUser.metadata.questionnaire;
+      console.log('[ONBOARDING PREFILL] Found questionnaire data:', questionnaireData);
       const prefillData = {
         fullName: waitlistUser.name || '',
         role: mapBusinessTypeToRole(questionnaireData.businessType),
@@ -12433,6 +12435,7 @@ Create a detailed growth strategy in JSON format:
         platforms: [] // Not collected in waitlist, keep empty
       };
 
+      console.log('[ONBOARDING PREFILL] Returning prefill data:', prefillData);
       res.json({ success: true, prefillData });
     } catch (error: any) {
       console.error('[ONBOARDING PREFILL] Error:', error);
@@ -12453,7 +12456,7 @@ Create a detailed growth strategy in JSON format:
 
   function mapTeamSizeToCompanySize(teamSize: string): string {
     const mapping: { [key: string]: string } = {
-      'solo': '1',
+      'solo': 'solo',
       'small': '2-10',
       'medium': '11-50',
       'large': '51-200'

@@ -48,9 +48,18 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
     try {
       setIsLoadingPrefill(true)
       
-      const authToken = localStorage.getItem('firebase_token')
-      if (!authToken) return
+      // Get Firebase auth token from the current user
+      const { getAuth } = await import('firebase/auth')
+      const auth = getAuth()
+      const user = auth.currentUser
+      
+      if (!user) {
+        console.log('[ONBOARDING] No authenticated user found')
+        return
+      }
 
+      const authToken = await user.getIdToken()
+      
       const response = await fetch('/api/onboarding/prefill', {
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -58,12 +67,17 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
         }
       })
 
-      if (!response.ok) throw new Error('Failed to fetch prefill data')
+      if (!response.ok) {
+        console.error('[ONBOARDING] API response error:', response.status, response.statusText)
+        throw new Error('Failed to fetch prefill data')
+      }
 
       const result = await response.json()
+      console.log('[ONBOARDING] API response received:', result)
       
       if (result.success && result.prefillData) {
         const prefill = result.prefillData
+        console.log('[ONBOARDING] Pre-fill data from waitlist:', prefill)
         
         // Apply prefill data to form
         setFormData(prev => ({
@@ -76,8 +90,10 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
           platforms: prefill.platforms?.length > 0 ? prefill.platforms : prev.platforms
         }))
         
-        console.log('[ONBOARDING] Pre-filled data from waitlist:', prefill)
         setPrefillDataApplied(true)
+        console.log('[ONBOARDING] Form data updated with pre-fill values')
+      } else {
+        console.log('[ONBOARDING] No waitlist data to pre-fill')
       }
     } catch (error) {
       console.error('[ONBOARDING] Failed to fetch prefill data:', error)
