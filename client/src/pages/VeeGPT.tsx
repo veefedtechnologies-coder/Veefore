@@ -803,11 +803,11 @@ export default function VeeGPT() {
   
   if (showWelcomeScreen) {
     return (
-      <div className="h-full w-full bg-emerald-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
+      <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
         {/* Static Background - No Scroll Animations */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {/* Static background elements - no scroll interaction */}
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-emerald-100/60 to-emerald-200/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
           
           {/* Static stars - slow automatic animation only */}
           <div className="absolute inset-0 opacity-20">
@@ -846,7 +846,7 @@ export default function VeeGPT() {
         <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-emerald-50/80 border-r border-emerald-200 flex flex-col transition-all duration-300 shadow-sm`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -908,7 +908,7 @@ export default function VeeGPT() {
                 className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Analytics" : ""}
               >
-                <BarChart3 className="w-4 h-4 flex-shrink-0 text-blue-500" />
+                <BarChart3 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
                 {!sidebarCollapsed && <span>Analytics</span>}
               </button>
             </div>
@@ -989,7 +989,7 @@ export default function VeeGPT() {
                                         setNewChatTitle('')
                                       }
                                     }}
-                                    className="w-full bg-emerald-50 border border-emerald-300 rounded px-2 py-1 text-sm"
+                                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm"
                                     autoFocus
                                     onClick={(e) => e.stopPropagation()}
                                   />
@@ -1012,7 +1012,7 @@ export default function VeeGPT() {
                               </button>
                               
                               {dropdownOpen === conversation.id && (
-                                <div className="absolute right-0 top-full mt-1 bg-emerald-50 border border-emerald-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
+                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
@@ -1020,7 +1020,7 @@ export default function VeeGPT() {
                                       setNewChatTitle(conversation.title)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-100 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                     <span>Rename</span>
@@ -1032,7 +1032,7 @@ export default function VeeGPT() {
                                       archiveConversationMutation.mutate(conversation.id)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-emerald-100 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
                                   >
                                     <Archive className="w-4 h-4" />
                                     <span>Archive</span>
@@ -1098,7 +1098,7 @@ export default function VeeGPT() {
 
             {/* Main Input */}
             <div 
-              className="owlygpt-chatbox bg-emerald-50/80 rounded-2xl shadow-sm mb-8"
+              className="owlygpt-chatbox bg-white rounded-2xl shadow-sm mb-8"
               style={{
                 border: '1px solid #d1d5db',
                 borderRadius: '16px',
@@ -1284,7 +1284,7 @@ export default function VeeGPT() {
       <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-emerald-50/80 border-r border-emerald-200 flex flex-col transition-all duration-300 shadow-sm`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -1346,7 +1346,7 @@ export default function VeeGPT() {
                 className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Analytics" : ""}
               >
-                <BarChart3 className="w-4 h-4 flex-shrink-0 text-blue-500" />
+                <BarChart3 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
                 {!sidebarCollapsed && <span>Analytics</span>}
               </button>
             </div>
@@ -1530,9 +1530,9 @@ export default function VeeGPT() {
         )}
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-emerald-50/40 relative">
+        <div className="flex-1 flex flex-col bg-white relative">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-200 bg-emerald-50/60">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">V</span>
@@ -1555,7 +1555,7 @@ export default function VeeGPT() {
           </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-emerald-50/60 to-emerald-100/40" style={{ paddingBottom: '140px' }}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8 overflow-x-hidden">
             {displayMessages.map((message) => (
               <div
