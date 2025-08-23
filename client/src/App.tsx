@@ -193,9 +193,27 @@ function App() {
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to VeeFore!</h1>
                 <p className="text-gray-600 mb-8 text-lg">Complete your onboarding to access your dashboard</p>
                 <button 
-                  onClick={() => {
-                    console.log('🎯 COMPLETING ONBOARDING - No modal needed!')
-                    setIsOnboardingModalOpen(false)
+                  onClick={async () => {
+                    console.log('🎯 COMPLETING ONBOARDING - Updating database!')
+                    try {
+                      const response = await fetch('/api/user/complete-onboarding', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${await user?.getIdToken()}`
+                        }
+                      })
+                      if (response.ok) {
+                        console.log('✅ Onboarding completed successfully!')
+                        setIsOnboardingModalOpen(false)
+                        // Trigger a re-fetch of user data
+                        window.location.reload()
+                      } else {
+                        console.error('❌ Failed to complete onboarding')
+                      }
+                    } catch (error) {
+                      console.error('❌ Onboarding completion error:', error)
+                    }
                   }}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-colors"
                 >
