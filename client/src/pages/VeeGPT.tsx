@@ -213,7 +213,7 @@ export default function VeeGPT() {
   const { data: conversations = [] } = useQuery<ChatConversation[]>({
     queryKey: ['/api/chat/conversations'],
     queryFn: () => apiRequest('/api/chat/conversations'),
-    enabled: false // Disable for now to allow demo without auth
+    enabled: true // Enable to load conversation history
   })
 
   // Filter conversations based on search query
