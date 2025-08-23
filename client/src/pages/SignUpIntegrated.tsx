@@ -131,11 +131,26 @@ const SignUpIntegrated = ({ onNavigate }: SignUpIntegratedProps) => {
       })
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send verification email",
-        variant: "destructive",
-      })
+      console.error('Verification error:', error)
+      
+      // Handle specific error for existing users
+      if (error.message && error.message.includes('already exists')) {
+        toast({
+          title: "Account exists",
+          description: "You already have an account. Please sign in instead.",
+          variant: "destructive",
+        })
+        // TODO: Redirect to sign in page
+        setTimeout(() => {
+          setLocation('/signin')
+        }, 2000)
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to send verification email",
+          variant: "destructive",
+        })
+      }
     }
   })
 
