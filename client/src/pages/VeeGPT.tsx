@@ -44,10 +44,15 @@ const convertToMarkdown = (text: string): string => {
   // Convert "Title: Something" to "# Something" 
   result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
   
-  // Keep H3 and H4 headings as they are for proper hierarchy
-  // Don't convert them to H2 - let them maintain their smaller sizes
+  // Convert section headers ending with colon to ## headers (H2 - large)
+  result = result.replace(/^([A-Z][A-Za-z\s]+):\s*$/gm, '## $1');
   
   // Convert specific heading patterns to ## headers (catch variations)
+  result = result.replace(/^(About Us):\s*$/gm, '## $1');
+  result = result.replace(/^(Position Overview):\s*$/gm, '## $1');
+  result = result.replace(/^(Key Responsibilities):\s*$/gm, '## $1');
+  result = result.replace(/^(Requirements):\s*$/gm, '## $1');
+  result = result.replace(/^(Qualifications):\s*$/gm, '## $1');
   result = result.replace(/^(The Evolution of Communication.*)$/gm, '## $1');
   result = result.replace(/^(Community Building and Networking.*)$/gm, '## $1');
   result = result.replace(/^(Content Creation and.*)$/gm, '## $1');
@@ -56,6 +61,9 @@ const convertToMarkdown = (text: string): string => {
   result = result.replace(/^(Conclusion.*)$/gm, '## $1');
   result = result.replace(/^(Overview.*)$/gm, '## $1');
   result = result.replace(/^(Summary.*)$/gm, '## $1');
+  
+  // Convert sub-headings with colons to ### headers (H3 - medium)
+  result = result.replace(/^(\d+\.\s*)?([A-Z][A-Za-z\s&]+):\s*$/gm, '### $2');
   
   // Convert "Effects of Something" and "Causes of Something" patterns
   result = result.replace(/^(Effects? of [A-Za-z\s]+)$/gm, '## $1');
@@ -66,7 +74,7 @@ const convertToMarkdown = (text: string): string => {
   result = result.replace(/^(Impact of [A-Za-z\s]+)$/gm, '## $1');
   result = result.replace(/^(Importance of [A-Za-z\s]+)$/gm, '## $1');
   
-  // Convert common action-based headings (catch variations)
+  // Convert common action-based headings
   result = result.replace(/^(Raising [A-Za-z\s]+)$/gm, '## $1');
   result = result.replace(/^(Building [A-Za-z\s]+)$/gm, '## $1');
   result = result.replace(/^(Creating [A-Za-z\s]+)$/gm, '## $1');
@@ -1651,8 +1659,8 @@ export default function VeeGPT() {
                                 p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                                 ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
-                                ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
-                                li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
+                                ol: ({children}) => <ol className="mb-3 ml-6 space-y-2 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
+                                li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900 mb-2">{children}</li>,
                                 code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
@@ -1674,8 +1682,8 @@ export default function VeeGPT() {
                               p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                               strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
                               ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
-                              ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
-                              li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
+                              ol: ({children}) => <ol className="mb-3 ml-6 space-y-2 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
+                              li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900 mb-2">{children}</li>,
                               code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                               pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                             }}
