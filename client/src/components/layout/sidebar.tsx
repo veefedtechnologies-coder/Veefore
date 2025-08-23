@@ -135,6 +135,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
             ? "text-blue-600" 
             : "text-gray-500 hover:text-blue-600"
         )}
+        data-nav="veegpt"
         onClick={() => setLocation('/veegpt')}
       >
         <div className={cn(

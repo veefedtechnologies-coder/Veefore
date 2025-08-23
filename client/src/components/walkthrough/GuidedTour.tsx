@@ -91,49 +91,44 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     const findAndHighlightElement = () => {
       let element: HTMLElement | null = null
       
-      // Use CSS selector that matches the sidebar structure exactly
-      const sidebarItems = document.querySelectorAll('.sidebar-nav-item')
-      
+      // Target specific sidebar items using exact data-nav values
       switch (currentStep) {
         case 0: // Welcome
           element = document.querySelector('h1') || document.querySelector('h2') || document.querySelector('.text-3xl')
           break
         case 1: // VeeGPT
-          element = document.querySelector('.veegpt-nav-item')
+          element = document.querySelector('[data-nav="veegpt"]')
           break
-        case 2: // Video Generator - find by text content
-          element = Array.from(sidebarItems).find(item => {
-            const text = item.textContent?.toLowerCase()
-            return text?.includes('video') || text?.includes('gen')
-          }) as HTMLElement
+        case 2: // Video Generator
+          element = document.querySelector('[data-nav="video-generator"]')
           break
-        case 3: // Automation
-          element = Array.from(sidebarItems).find(item => {
-            return item.textContent?.toLowerCase().includes('automation')
-          }) as HTMLElement
+        case 3: // Automation  
+          element = document.querySelector('[data-nav="automation"]')
           break
         case 4: // Create
-          element = Array.from(sidebarItems).find(item => {
-            return item.textContent?.toLowerCase().includes('create')
-          }) as HTMLElement || document.querySelector('[data-testid="create-dropdown-trigger"]')
+          element = document.querySelector('[data-nav="create"]') || document.querySelector('[data-testid="create-dropdown-trigger"]')
           break
         case 5: // Analytics
-          element = Array.from(sidebarItems).find(item => {
-            return item.textContent?.toLowerCase().includes('analytics')
-          }) as HTMLElement
+          element = document.querySelector('[data-nav="analytics"]')
           break
         case 6: // Workspaces
-          element = Array.from(sidebarItems).find(item => {
-            return item.textContent?.toLowerCase().includes('workspaces')
-          }) as HTMLElement
+          element = document.querySelector('[data-nav="workspaces"]')
           break
         case 7: // Integration
-          element = Array.from(sidebarItems).find(item => {
-            return item.textContent?.toLowerCase().includes('integration')
-          }) as HTMLElement
+          element = document.querySelector('[data-nav="integration"]')
           break
         default:
           element = document.querySelector(currentStepData.target) as HTMLElement
+      }
+      
+      // Debug: Show which element we found
+      console.log(`Step ${currentStep}: Looking for ${currentStepData.title}`)
+      console.log('Found element:', element)
+      if (!element) {
+        console.log('Available data-nav elements:')
+        document.querySelectorAll('[data-nav]').forEach(el => {
+          console.log(`- [data-nav="${el.getAttribute('data-nav')}"]`, el)
+        })
       }
       
       if (element) {
