@@ -556,8 +556,7 @@ export default function VeeGPT() {
         break
 
       case 'aiMessageStart':
-        // Clear AI status when streaming starts
-        setAiStatus(null)
+        // Don't clear status yet - wait for first chunk
         
         // Initialize streaming content for this message
         if (data.messageId) {
@@ -603,6 +602,10 @@ export default function VeeGPT() {
           isGenerating,
           isGeneratingRef: isGeneratingRef.current
         })
+        
+        // Clear AI status when first chunk arrives (AI started writing)
+        setAiStatus(null)
+        
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
         isGeneratingRef.current = true
