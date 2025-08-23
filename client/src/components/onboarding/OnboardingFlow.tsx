@@ -81,18 +81,18 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
       case 1:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <User className="w-10 h-10 text-emerald-600" />
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <User className="w-8 h-8 text-emerald-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">Tell us about yourself</h2>
-              <p className="text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Tell us about yourself</h2>
+              <p className="text-gray-600 max-w-md mx-auto">
                 Help us personalize your VeeFore experience with some basic information about you and your business.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
                 <Label htmlFor="fullName" className="text-sm font-semibold text-gray-700">Full Name *</Label>
                 <Input
                   id="fullName"
@@ -100,17 +100,17 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
                   placeholder="Enter your full name"
                   required
-                  className="h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
+                  className="h-10 px-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="role" className="text-sm font-semibold text-gray-700">Your Role *</Label>
                 <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-                  <SelectTrigger className="h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-emerald-500">
+                  <SelectTrigger className="h-10 px-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-2 shadow-xl">
+                  <SelectContent className="rounded-lg border-2 shadow-xl">
                     <SelectItem value="founder">Founder/CEO</SelectItem>
                     <SelectItem value="marketing-manager">Marketing Manager</SelectItem>
                     <SelectItem value="social-media-manager">Social Media Manager</SelectItem>
@@ -123,24 +123,24 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="companyName" className="text-sm font-semibold text-gray-700">Company/Brand Name</Label>
                 <Input
                   id="companyName"
                   value={formData.companyName}
                   onChange={(e) => handleInputChange('companyName', e.target.value)}
                   placeholder="Enter your company or brand name"
-                  className="h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
+                  className="h-10 px-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="companySize" className="text-sm font-semibold text-gray-700">Company Size</Label>
                 <Select value={formData.companySize} onValueChange={(value) => handleInputChange('companySize', value)}>
-                  <SelectTrigger className="h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-emerald-500">
+                  <SelectTrigger className="h-10 px-3 rounded-lg border-2 border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="Select company size" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-2 shadow-xl">
+                  <SelectContent className="rounded-lg border-2 shadow-xl">
                     <SelectItem value="solo">Just me</SelectItem>
                     <SelectItem value="2-10">2-10 employees</SelectItem>
                     <SelectItem value="11-50">11-50 employees</SelectItem>
@@ -419,28 +419,28 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header Section */}
-          <div className="relative bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 px-8 py-6">
+        <div className="relative w-full max-w-4xl h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+          {/* Header Section - Compact */}
+          <div className="relative bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 px-6 py-4 flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-teal-600/90"></div>
             <div className="relative">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Welcome to VeeFore</h1>
+                    <h1 className="text-xl font-bold text-white">Welcome to VeeFore</h1>
                     <p className="text-emerald-50/90 text-sm">Let's set up your account in {totalSteps} simple steps</p>
                   </div>
                 </div>
                 <button 
-                  className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center backdrop-blur-sm"
+                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center backdrop-blur-sm"
                   onClick={() => {}}
                 >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -448,8 +448,8 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="px-8 py-4 bg-gray-50/50 border-b">
+          {/* Progress Bar - Compact */}
+          <div className="px-6 py-3 bg-gray-50/50 border-b flex-shrink-0">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-600">Step {currentStep} of {totalSteps}</span>
               <span className="text-sm text-gray-500">{Math.round((currentStep / totalSteps) * 100)}% complete</span>
@@ -462,35 +462,35 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             </div>
           </div>
 
-          {/* Steps Indicator */}
-          <div className="px-8 py-6 border-b bg-white">
-            <div className="flex items-center justify-center space-x-6">
+          {/* Steps Indicator - Compact */}
+          <div className="px-6 py-4 border-b bg-white flex-shrink-0">
+            <div className="flex items-center justify-center space-x-4">
               {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
                 <div key={step} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 transition-all duration-300 ${
                         step === currentStep
-                          ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg scale-110'
+                          ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg scale-105'
                           : step < currentStep
                           ? 'bg-emerald-100 border-emerald-200 text-emerald-600'
                           : 'bg-gray-100 border-gray-200 text-gray-400'
                       }`}
                     >
                       {step < currentStep ? (
-                        <CheckCircle className="w-6 h-6" />
+                        <CheckCircle className="w-5 h-5" />
                       ) : (
                         getStepIcon(step)
                       )}
                     </div>
-                    <span className={`text-xs mt-2 font-medium transition-colors ${
+                    <span className={`text-xs mt-1 font-medium transition-colors ${
                       step === currentStep ? 'text-emerald-600' : step < currentStep ? 'text-emerald-500' : 'text-gray-400'
                     }`}>
                       {step === 1 ? 'Profile' : step === 2 ? 'Goals' : step === 3 ? 'Platforms' : 'Workspace'}
                     </span>
                   </div>
                   {step < totalSteps && (
-                    <div className={`w-16 h-0.5 mx-4 rounded-full transition-all duration-300 ${
+                    <div className={`w-12 h-0.5 mx-3 rounded-full transition-all duration-300 ${
                       step < currentStep ? 'bg-emerald-300' : 'bg-gray-200'
                     }`} />
                   )}
@@ -499,26 +499,26 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             </div>
           </div>
 
-          {/* Content Area */}
-          <div className="px-8 py-8 overflow-y-auto max-h-96">
-            <div className="max-w-2xl mx-auto">
+          {/* Content Area - Flexible Height */}
+          <div className="flex-1 px-6 py-4 overflow-hidden">
+            <div className="max-w-2xl mx-auto h-full flex flex-col justify-center">
               {renderStep()}
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="px-8 py-6 bg-gray-50/50 border-t flex items-center justify-between">
+          {/* Footer - Compact */}
+          <div className="px-6 py-4 bg-gray-50/50 border-t flex items-center justify-between flex-shrink-0">
             <button
               type="button"
               onClick={prevStep}
               disabled={currentStep === 1}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 currentStep === 1
                   ? 'text-gray-400 cursor-not-allowed'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
               }`}
             >
-              <ChevronLeft className="w-4 h-4 mr-2 inline" />
+              <ChevronLeft className="w-4 h-4 mr-1 inline" />
               Previous
             </button>
 
@@ -527,7 +527,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 <button
                   onClick={handleComplete}
                   disabled={!isStepValid()}
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
                   Complete Setup
                   <Rocket className="w-4 h-4 ml-2" />
@@ -536,7 +536,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 <button
                   onClick={nextStep}
                   disabled={!isStepValid()}
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
                   Continue
                   <ChevronRight className="w-4 h-4 ml-2" />
