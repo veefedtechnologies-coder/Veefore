@@ -25,7 +25,8 @@ function SignUpIntegrated() {
   const [otpData, setOtpData] = useState({
     code: '',
     timeRemaining: 0,
-    canResend: false
+    canResend: false,
+    developmentOtp: '' // Store development OTP for display
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -237,7 +238,8 @@ function SignUpIntegrated() {
         setOtpData({
           code: '',
           timeRemaining: 900, // 15 minutes
-          canResend: false
+          canResend: false,
+          developmentOtp: data.developmentOtp || '' // Store development OTP
         })
 
         setCurrentStep('verification')
@@ -354,7 +356,8 @@ function SignUpIntegrated() {
         setOtpData({
           code: '',
           timeRemaining: 900, // Reset to 15 minutes
-          canResend: false
+          canResend: false,
+          developmentOtp: data.developmentOtp || '' // Store new development OTP
         })
 
         toast({
@@ -766,6 +769,32 @@ function SignUpIntegrated() {
                             <p className="text-red-500 text-sm mt-2 text-center">{errors.otp}</p>
                           )}
                         </div>
+
+                        {/* Development OTP Display */}
+                        {process.env.NODE_ENV === 'development' && otpData.developmentOtp && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                              <span className="text-yellow-700 font-medium text-sm">Development Mode</span>
+                            </div>
+                            <div className="text-center">
+                              <span className="text-gray-600 text-sm">Your verification code:</span>
+                              <div className="text-2xl font-mono font-bold text-yellow-700 mt-1 tracking-[0.3em]">
+                                {otpData.developmentOtp}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOtpData(prev => ({ ...prev, code: otpData.developmentOtp }))
+                                  if (errors.otp) setErrors(prev => ({ ...prev, otp: '' }))
+                                }}
+                                className="text-xs text-yellow-600 hover:text-yellow-700 underline mt-2"
+                              >
+                                Click to auto-fill
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Timer */}
                         <div className="flex items-center justify-center space-x-2 text-gray-600">
