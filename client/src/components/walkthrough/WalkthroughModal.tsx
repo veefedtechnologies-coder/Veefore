@@ -84,5 +84,3 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
     )
   }
 }
-
-export { WalkthroughModal }
