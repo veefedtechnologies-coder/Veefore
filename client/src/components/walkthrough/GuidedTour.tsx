@@ -89,7 +89,20 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     if (!isActive) return
 
     const findAndHighlightElement = () => {
+      console.log(`🎯 TOUR: Looking for element with selector: "${currentStepData.target}"`)
+      
+      // Debug: log available elements
+      console.log('🔍 Available sidebar items:')
+      document.querySelectorAll('.sidebar-nav-item').forEach((el, i) => {
+        const navKey = el.getAttribute('data-nav')
+        console.log(`  ${i}: data-nav="${navKey}"`, el)
+      })
+      console.log('🔍 VeeGPT element:', document.querySelector('.veegpt-nav-item'))
+      console.log('🔍 Create button:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
+      
       const element = document.querySelector(currentStepData.target) as HTMLElement
+      console.log(`${element ? '✅' : '❌'} Found element:`, element)
+      
       if (element) {
         setTargetElement(element)
         
@@ -144,7 +157,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     }
 
     // Small delay to ensure DOM is updated
-    const timer = setTimeout(findAndHighlightElement, 100)
+    const timer = setTimeout(findAndHighlightElement, 200)
     return () => clearTimeout(timer)
   }, [currentStep, isActive, currentStepData])
 
