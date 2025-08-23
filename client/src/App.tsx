@@ -676,75 +676,32 @@ function App() {
       
     </Switch>
 
-    {/* Walkthrough Modal - OUTSIDE Switch to avoid conflicts */}
-    {(() => {
-      console.log('🎯 OUTSIDE SWITCH: isWalkthroughOpen =', isWalkthroughOpen, '(type:', typeof isWalkthroughOpen, ')')
-      if (isWalkthroughOpen) {
-        console.log('🎯 OUTSIDE SWITCH: Modal SHOULD render now!')
-        return (
-          <div 
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(255, 0, 0, 0.9)', // RED background to make it VERY visible
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 999999 // Much higher z-index
-            }}
-            onClick={() => {
-              console.log('🎯 OUTSIDE SWITCH: Background clicked, closing modal')
-              setIsWalkthroughOpen(false)
-            }}
+    {/* Walkthrough Modal */}
+    {isWalkthroughOpen && (
+      <div 
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        onClick={() => setIsWalkthroughOpen(false)}
+      >
+        <div 
+          className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-90 mx-4 text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h1 className="text-2xl font-bold mb-4 text-gray-800">
+            🎯 VeeFore Walkthrough
+          </h1>
+          <p className="mb-6 text-gray-600 text-lg">
+            Welcome, {userData?.displayName || userData?.fullName || user?.email?.split('@')[0] || 'User'}! 
+            <br />Let's get you started with VeeFore.
+          </p>
+          <button 
+            onClick={() => setIsWalkthroughOpen(false)}
+            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
-            <div 
-              style={{
-                backgroundColor: 'white',
-                padding: '3rem',
-                borderRadius: '1rem',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                maxWidth: '500px',
-                width: '90%',
-                textAlign: 'center'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
-                🎯 VeeFore Walkthrough
-              </h1>
-              <p style={{ marginBottom: '2rem', color: '#6b7280', fontSize: '1.1rem' }}>
-                Welcome, {userData?.displayName || userData?.fullName || user?.email?.split('@')[0] || 'User'}! 
-                <br />This modal is OUTSIDE the Switch component!
-              </p>
-              <button 
-                onClick={() => {
-                  console.log('🎯 OUTSIDE SWITCH: Close button clicked')
-                  setIsWalkthroughOpen(false)
-                }}
-                style={{
-                  backgroundColor: '#8b5cf6',
-                  color: 'white',
-                  padding: '1rem 2rem',
-                  borderRadius: '0.5rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
-                ✨ Close Modal
-              </button>
-            </div>
-          </div>
-        )
-      } else {
-        console.log('🎯 OUTSIDE SWITCH: Modal should NOT render (isWalkthroughOpen is false)')
-        return null
-      }
-    })()}
+            ✨ Get Started
+          </button>
+        </div>
+      </div>
+    )}
     </>
   )
 }
