@@ -316,11 +316,8 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs font-semibold text-gray-700">Primary Goals</Label>
-                <Select>
-                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder={formData.primaryGoals.length > 0 ? `${formData.primaryGoals.length} goals selected` : "Select your goals"} />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       'Increase followers',
                       'Drive website traffic', 
@@ -331,17 +328,17 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                       'Save time on content',
                       'Improve content quality'
                     ].map((goal) => (
-                      <div key={goal} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 cursor-pointer" 
-                           onClick={() => handleArrayToggle('primaryGoals', goal)}>
+                      <label key={goal} className="flex items-center space-x-2 p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                         <Checkbox
                           checked={formData.primaryGoals.includes(goal)}
+                          onCheckedChange={() => handleArrayToggle('primaryGoals', goal)}
                           className="rounded-sm"
                         />
-                        <span className="text-sm text-gray-900">{goal}</span>
-                      </div>
+                        <span className="text-xs text-gray-900 flex-1">{goal}</span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -419,11 +416,8 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
               <div className="space-y-1">
                 <Label className="text-xs font-semibold text-gray-700">Content Types</Label>
-                <Select>
-                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder={formData.contentTypes.length > 0 ? `${formData.contentTypes.length} content types selected` : "Select content types"} />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       'Photos',
                       'Videos',
@@ -434,17 +428,17 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                       'Live streams',
                       'User-generated content'
                     ].map((type) => (
-                      <div key={type} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 cursor-pointer" 
-                           onClick={() => handleArrayToggle('contentTypes', type)}>
+                      <label key={type} className="flex items-center space-x-2 p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                         <Checkbox
                           checked={formData.contentTypes.includes(type)}
+                          onCheckedChange={() => handleArrayToggle('contentTypes', type)}
                           className="rounded-sm"
                         />
-                        <span className="text-sm text-gray-900">{type}</span>
-                      </div>
+                        <span className="text-xs text-gray-900 flex-1">{type}</span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">

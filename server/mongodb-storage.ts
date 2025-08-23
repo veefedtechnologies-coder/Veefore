@@ -4329,17 +4329,7 @@ export class MongoStorage implements IStorage {
 
   async getWaitlistUserByEmail(email: string): Promise<WaitlistUser | undefined> {
     await this.connect();
-    console.log('[MONGODB DEBUG] Searching for waitlist user with email:', email);
     const user = await WaitlistUserModel.findOne({ email });
-    console.log('[MONGODB DEBUG] Waitlist user query result:', !!user);
-    if (user) {
-      console.log('[MONGODB DEBUG] Waitlist user data:', {
-        id: user._id,
-        email: user.email,
-        hasMetadata: !!user.metadata,
-        metadata: user.metadata
-      });
-    }
     return user ? this.convertWaitlistUser(user) : undefined;
   }
 

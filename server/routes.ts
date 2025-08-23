@@ -12416,18 +12416,14 @@ Create a detailed growth strategy in JSON format:
       const user = req.user!;
       
       // Get waitlist data for the current user's email
-      console.log('[ONBOARDING PREFILL] Looking up waitlist user for email:', user.email);
       const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
-      console.log('[ONBOARDING PREFILL] Waitlist user found:', !!waitlistUser);
       
       if (!waitlistUser || !waitlistUser.metadata?.questionnaire) {
-        console.log('[ONBOARDING PREFILL] No questionnaire data found for user:', user.email);
         return res.json({ success: true, prefillData: null });
       }
 
       // Map waitlist data to onboarding form structure
       const questionnaireData = waitlistUser.metadata.questionnaire;
-      console.log('[ONBOARDING PREFILL] Found questionnaire data:', questionnaireData);
       const prefillData = {
         fullName: waitlistUser.name || '',
         role: mapBusinessTypeToRole(questionnaireData.businessType),
@@ -12437,7 +12433,6 @@ Create a detailed growth strategy in JSON format:
         platforms: [] // Not collected in waitlist, keep empty
       };
 
-      console.log('[ONBOARDING PREFILL] Returning prefill data:', prefillData);
       res.json({ success: true, prefillData });
     } catch (error: any) {
       console.error('[ONBOARDING PREFILL] Error:', error);
