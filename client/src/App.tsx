@@ -24,6 +24,7 @@ import ProfessionalOnboarding from './pages/ProfessionalOnboarding'
 import Workspaces from './pages/Workspaces'
 import Waitlist from './pages/Waitlist'
 import WaitlistStatus from './pages/WaitlistStatus'
+import OnboardingModal from './components/onboarding/OnboardingModal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import LoadingSpinner from './components/LoadingSpinner'
@@ -38,6 +39,7 @@ import AdminLogin from './pages/AdminLogin'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false)
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
 
@@ -64,19 +66,23 @@ function App() {
           console.log('Redirecting fully onboarded user to home page')
           setLocation('/')
         }
+        // Close onboarding modal if open
+        setIsOnboardingModalOpen(false)
       }
       
-      // If user is authenticated but NOT onboarded, keep them on signup page
+      // If user is authenticated but NOT onboarded, show onboarding modal
       else if (user && userData && !userData.isOnboarded) {
-        if (location === '/signin' || location === '/onboarding') {
-          console.log('Redirecting authenticated but not onboarded user to signup page')
-          setLocation('/signup')
+        console.log('User is authenticated but not onboarded - showing onboarding modal')
+        setIsOnboardingModalOpen(true)
+        // Redirect away from auth pages to dashboard
+        if (location === '/signin' || location === '/signup' || location === '/onboarding') {
+          setLocation('/')
         }
-        // Allow them to stay on /signup and root route
       }
       
-      // If user is definitively not authenticated (not loading), redirect from protected routes
+      // If user is definitively not authenticated (not loading), close modal and redirect from protected routes
       else if (!user && !loading) {
+        setIsOnboardingModalOpen(false)
         if (location === '/onboarding') {
           console.log('Redirecting unauthenticated user to root page')
           setLocation('/')
@@ -613,6 +619,12 @@ function App() {
           </Route>
         </>
       )}
+      
+      {/* Global Onboarding Modal - appears over any route */}
+      <OnboardingModal 
+        isOpen={isOnboardingModalOpen} 
+        onClose={() => setIsOnboardingModalOpen(false)}
+      />
     </Switch>
   )
 }
