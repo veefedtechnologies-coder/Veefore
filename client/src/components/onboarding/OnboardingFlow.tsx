@@ -15,6 +15,7 @@ interface OnboardingFlowProps {
 export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoadingPrefill, setIsLoadingPrefill] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false)
   const [prefillDataApplied, setPrefillDataApplied] = useState(false)
   const [formData, setFormData] = useState({
     // Step 1: Personal Info
@@ -129,8 +130,15 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
     }
   }
 
-  const handleComplete = () => {
-    onComplete(formData)
+  const handleComplete = async () => {
+    if (isCompleting) return // Prevent multiple clicks
+    setIsCompleting(true)
+    try {
+      await onComplete(formData)
+    } catch (error) {
+      console.error('Failed to complete onboarding:', error)
+      setIsCompleting(false) // Re-enable button on error
+    }
   }
 
   const handlePlatformConnect = (platform: string) => {
@@ -777,11 +785,20 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
               {currentStep === totalSteps ? (
                 <button
                   onClick={handleComplete}
-                  disabled={!isStepValid()}
+                  disabled={!isStepValid() || isCompleting}
                   className="px-5 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  Complete Setup
-                  <Rocket className="w-4 h-4 ml-2" />
+                  {isCompleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Completing...
+                    </>
+                  ) : (
+                    <>
+                      Complete Setup
+                      <Rocket className="w-4 h-4 ml-2" />
+                    </>
+                  )}
                 </button>
               ) : (
                 <button

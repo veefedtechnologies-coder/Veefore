@@ -246,7 +246,7 @@ function App() {
 
             {/* Multi-Step Onboarding Flow */}
             <OnboardingFlow 
-              open={!userData.isOnboarded}
+              open={!userData.isOnboarded && !isWalkthroughOpen}
               onComplete={async (onboardingData) => {
                 console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
                 try {
@@ -260,10 +260,10 @@ function App() {
                   })
                   if (response.ok) {
                     console.log('✅ Onboarding completed successfully!')
-                    // Invalidate and refetch user data to update onboarded status
-                    await queryClient.invalidateQueries({ queryKey: ['/api/user'] })
-                    // Open walkthrough modal for the newly onboarded user
+                    // Immediately open walkthrough modal
                     setIsWalkthroughOpen(true)
+                    // Invalidate and refetch user data in background
+                    queryClient.invalidateQueries({ queryKey: ['/api/user'] })
                   } else {
                     console.error('❌ Failed to complete onboarding')
                   }
