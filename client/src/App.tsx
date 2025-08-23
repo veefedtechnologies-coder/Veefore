@@ -23,6 +23,7 @@ import Workspaces from './pages/Workspaces'
 import Waitlist from './pages/Waitlist'
 import WaitlistStatus from './pages/WaitlistStatus'
 import OnboardingModal from './components/onboarding/OnboardingModal'
+import OnboardingFlow from './components/onboarding/OnboardingFlow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog'
 import { Button } from './components/ui/button'
@@ -241,65 +242,31 @@ function App() {
               </main>
             </div>
 
-            {/* Onboarding Modal - appears over dashboard when user is not onboarded */}
-            <Dialog open={!userData.isOnboarded} onOpenChange={() => {}}>
-              <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                  <DialogTitle className="text-center text-2xl font-bold text-emerald-600">
-                    🎉 Welcome to VeeFore!
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-6 py-4">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <div className="w-10 h-10 bg-emerald-600 rounded-full"></div>
-                    </div>
-                    <p className="text-gray-600 text-lg">
-                      Complete your onboarding to unlock all features and start managing your social media like a pro!
-                    </p>
-                  </div>
-                  <div className="space-y-3 text-sm text-gray-600">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                      <span>Connect your social media accounts</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                      <span>Set up AI-powered content generation</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                      <span>Create your first workspace</span>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={async () => {
-                      console.log('🎯 COMPLETING ONBOARDING - Modal button clicked!')
-                      try {
-                        const response = await fetch('/api/user/complete-onboarding', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${await user?.getIdToken()}`
-                          }
-                        })
-                        if (response.ok) {
-                          console.log('✅ Onboarding completed successfully!')
-                          window.location.reload()
-                        } else {
-                          console.error('❌ Failed to complete onboarding')
-                        }
-                      } catch (error) {
-                        console.error('❌ Onboarding completion error:', error)
-                      }
-                    }}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 text-lg"
-                  >
-                    Complete Onboarding & Get Started
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            {/* Multi-Step Onboarding Flow */}
+            <OnboardingFlow 
+              open={!userData.isOnboarded}
+              onComplete={async (onboardingData) => {
+                console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
+                try {
+                  const response = await fetch('/api/user/complete-onboarding', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${await user?.getIdToken()}`
+                    },
+                    body: JSON.stringify({ preferences: onboardingData })
+                  })
+                  if (response.ok) {
+                    console.log('✅ Onboarding completed successfully!')
+                    window.location.reload()
+                  } else {
+                    console.error('❌ Failed to complete onboarding')
+                  }
+                } catch (error) {
+                  console.error('❌ Onboarding completion error:', error)
+                }
+              }}
+            />
           </div>
         ) : (
           <LoadingSpinner />
