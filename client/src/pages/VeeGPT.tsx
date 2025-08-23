@@ -1560,18 +1560,24 @@ export default function VeeGPT() {
             {displayMessages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className="flex flex-col space-y-2"
               >
-                <div className={`${
-                  message.role === 'user' 
-                    ? 'max-w-md' 
-                    : 'max-w-3xl'
-                }`} style={{
+                <div className="w-full" style={{
                   minWidth: 0,
                   overflow: 'hidden'
                 }}>
+                  {message.role === 'user' && (
+                    <div className="text-xs font-medium text-gray-600 mb-2 flex items-center">
+                      <User className="w-3 h-3 mr-1" />
+                      You
+                    </div>
+                  )}
+                  {message.role === 'assistant' && (
+                    <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
+                      <Bot className="w-3 h-3 mr-1" />
+                      VeeGPT
+                    </div>
+                  )}
                   <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
                       ? 'bg-gray-200 text-gray-900'
@@ -1626,9 +1632,7 @@ export default function VeeGPT() {
                   </div>
                   {/* Show timestamp for all messages */}
                   {(
-                    <div className={`mt-2 text-xs text-gray-500 ${
-                      message.role === 'user' ? 'text-right' : 'text-left'
-                    }`}>
+                    <div className="mt-2 text-xs text-gray-500 text-left">
                       {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { 
                         hour: '2-digit', 
                         minute: '2-digit' 
