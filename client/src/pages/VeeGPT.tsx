@@ -1658,50 +1658,24 @@ export default function VeeGPT() {
                           lineBreak: 'anywhere'
                         }}
                       >
-                        {streamingContent[message.id] !== undefined ? (
-                          <div>
-                            <ReactMarkdown 
-                              remarkPlugins={[remarkGfm]}
-                              components={{
-                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
-                                h2: ({children}) => <h2 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                                h3: ({children}) => <h3 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
-                                h4: ({children}) => <h4 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
-                                p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
-                                strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                                ul: ({children}) => <ul className="mb-1 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ul>,
-                                ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ol>,
-                                li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.1rem', lineHeight: '1.3'}}>{children}</li>,
-                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
-                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
-                              }}
-                            >
-                              {convertToMarkdown(streamingContent[message.id] || '')}
-                            </ReactMarkdown>
-                            {isGenerating && streamingContent[message.id] !== undefined && (
-                              <span className="animate-pulse text-blue-500 ml-1">▋</span>
-                            )}
-                          </div>
-                        ) : (
-                          <ReactMarkdown 
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
-                              h2: ({children}) => <h2 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                              h3: ({children}) => <h3 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
-                              h4: ({children}) => <h4 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
-                              p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
-                              strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                              ul: ({children}) => <ul className="mb-1 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ul>,
-                              ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ol>,
-                              li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.1rem', lineHeight: '1.3'}}>{children}</li>,
-                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
-                              pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
-                            }}
-                          >
-                            {convertToMarkdown(message.content)}
-                          </ReactMarkdown>
-                        )}
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                            h2: ({children}) => <h2 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                            h3: ({children}) => <h3 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                            h4: ({children}) => <h4 className="font-black mb-2 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
+                            p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
+                            strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                            ul: ({children}) => <ul className="mb-1 ml-6 list-disc font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ul>,
+                            ol: ({children}) => <ol className="mb-1 ml-6 list-decimal font-semibold" style={{fontSize: '1rem', lineHeight: '1.3'}}>{children}</ol>,
+                            li: ({children}) => <li className="font-semibold text-gray-900" style={{marginBottom: '0.1rem', lineHeight: '1.3'}}>{children}</li>,
+                            code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
+                            pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
+                          }}
+                        >
+                          {convertToMarkdown(streamingContent[message.id] || message.content)}
+                        </ReactMarkdown>
 
                       </div>
                     ) : (
