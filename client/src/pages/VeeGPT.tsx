@@ -1600,15 +1600,15 @@ export default function VeeGPT() {
                             <ReactMarkdown 
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                h1: ({children}) => <h1 className="text-5xl font-black mb-6 text-gray-900 leading-tight">{children}</h1>,
-                                h2: ({children}) => <h2 className="text-3xl font-black mb-4 text-gray-900 leading-tight">{children}</h2>,
-                                h3: ({children}) => <h3 className="text-2xl font-black mb-3 text-gray-900 leading-tight">{children}</h3>,
-                                p: ({children}) => <p className="text-base mb-3 leading-relaxed font-semibold text-gray-900">{children}</p>,
+                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                                h2: ({children}) => <h2 className="font-black mb-4 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                                h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                                p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                                ul: ({children}) => <ul className="text-base mb-3 ml-6 space-y-1 list-disc font-semibold">{children}</ul>,
-                                ol: ({children}) => <ol className="text-base mb-3 ml-6 space-y-1 list-decimal font-semibold">{children}</ol>,
+                                ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
+                                ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
                                 li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
-                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono font-semibold">{children}</code>,
+                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
                             >
@@ -1622,15 +1622,15 @@ export default function VeeGPT() {
                           <ReactMarkdown 
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              h1: ({children}) => <h1 className="text-5xl font-black mb-6 text-gray-900 leading-tight">{children}</h1>,
-                              h2: ({children}) => <h2 className="text-3xl font-black mb-4 text-gray-900 leading-tight">{children}</h2>,
-                              h3: ({children}) => <h3 className="text-2xl font-black mb-3 text-gray-900 leading-tight">{children}</h3>,
-                              p: ({children}) => <p className="text-base mb-3 leading-relaxed font-semibold text-gray-900">{children}</p>,
+                              h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                              h2: ({children}) => <h2 className="font-black mb-4 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                              h3: ({children}) => <h3 className="font-black mb-3 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                              p: ({children}) => <p className="mb-3 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                               strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                              ul: ({children}) => <ul className="text-base mb-3 ml-6 space-y-1 list-disc font-semibold">{children}</ul>,
-                              ol: ({children}) => <ol className="text-base mb-3 ml-6 space-y-1 list-decimal font-semibold">{children}</ol>,
+                              ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc font-semibold" style={{fontSize: '1rem'}}>{children}</ul>,
+                              ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal font-semibold" style={{fontSize: '1rem'}}>{children}</ol>,
                               li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
-                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono font-semibold">{children}</code>,
+                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                               pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                             }}
                           >
