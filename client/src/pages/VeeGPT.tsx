@@ -1693,9 +1693,9 @@ export default function VeeGPT() {
                                 h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
                                 p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                                ul: ({children}) => <ul className="font-semibold">{children}</ul>,
-                                ol: ({children}) => <ol className="font-semibold">{children}</ol>,
-                                li: ({children}) => <li className="font-semibold text-gray-900">{children}</li>,
+                                ul: ({children}) => <ul>{children}</ul>,
+                                ol: ({children}) => <ol>{children}</ol>,
+                                li: ({children}) => <li>{children}</li>,
                                 code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
@@ -1718,9 +1718,9 @@ export default function VeeGPT() {
                                 h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
                                 p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
                                 strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
-                                ul: ({children}) => <ul className="font-semibold">{children}</ul>,
-                                ol: ({children}) => <ol className="font-semibold">{children}</ol>,
-                                li: ({children}) => <li className="font-semibold text-gray-900">{children}</li>,
+                                ul: ({children}) => <ul>{children}</ul>,
+                                ol: ({children}) => <ol>{children}</ol>,
+                                li: ({children}) => <li>{children}</li>,
                                 code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
                                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}

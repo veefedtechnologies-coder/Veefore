@@ -10,39 +10,17 @@
   100% { background-position: 200% 0; }
 }
 
-/* Fix list formatting - force inline numbers */
-.markdown-content ol {
-  list-style: none !important;
-  counter-reset: list-counter !important;
-  margin: 0.5rem 0 !important;
-  padding-left: 0 !important;
-}
-
-.markdown-content ol li {
-  counter-increment: list-counter !important;
-  margin-bottom: 0.5rem !important;
-  line-height: 1.6 !important;
-  position: relative !important;
-  padding-left: 0 !important;
-  display: block !important;
-}
-
-.markdown-content ol li::before {
-  content: counter(list-counter) ". " !important;
-  font-weight: bold !important;
-  display: inline !important;
-  margin-right: 0 !important;
-}
-
+/* Simple list formatting - use browser defaults */
+.markdown-content ol,
 .markdown-content ul {
-  list-style-type: disc !important;
-  margin: 0.5rem 0 !important;
-  padding-left: 1.5rem !important;
+  margin: 1rem 0;
+  padding-left: 2rem;
 }
 
+.markdown-content ol li,
 .markdown-content ul li {
-  margin-bottom: 0.25rem !important;
-  line-height: 1.6 !important;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
 
 @keyframes gradient-shift {
