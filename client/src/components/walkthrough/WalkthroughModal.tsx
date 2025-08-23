@@ -128,6 +128,8 @@ const walkthroughSteps = [
 ]
 
 export default function WalkthroughModal({ open, onClose, userName }: WalkthroughModalProps) {
+  console.log('🎯 WALKTHROUGH MODAL: Component rendering with open:', open, 'userName:', userName)
+  
   const [currentStep, setCurrentStep] = useState(1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
@@ -168,7 +170,12 @@ export default function WalkthroughModal({ open, onClose, userName }: Walkthroug
     setIsPlaying(true)
   }
 
-  if (!currentStepData) return null
+  if (!currentStepData) {
+    console.log('🎯 WALKTHROUGH MODAL: No currentStepData found, returning null')
+    return null
+  }
+
+  console.log('🎯 WALKTHROUGH MODAL: About to render Dialog with open:', open)
 
   const IconComponent = currentStepData.icon
 
