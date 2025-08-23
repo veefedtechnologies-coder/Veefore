@@ -155,67 +155,74 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
       case 2:
         return (
-          <div className="space-y-8">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Target className="w-10 h-10 text-blue-600" />
+          <div className="space-y-4 overflow-y-auto max-h-80">
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Target className="w-6 h-6 text-blue-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">What are your goals?</h2>
-              <p className="text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
-                Help us understand what you want to achieve with VeeFore so we can tailor your experience.
+              <h2 className="text-xl font-bold text-gray-900 mb-1">What are your goals?</h2>
+              <p className="text-sm text-gray-600 max-w-md mx-auto">
+                Help us understand what you want to achieve with VeeFore.
               </p>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <Label className="text-sm font-semibold text-gray-700 mb-4 block">Primary Goals (select all that apply)</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {[
-                    'Increase followers',
-                    'Drive website traffic',
-                    'Generate leads',
-                    'Boost engagement',
-                    'Build brand awareness',
-                    'Increase sales',
-                    'Save time on content',
-                    'Improve content quality'
-                  ].map((goal) => (
-                    <div key={goal} className={`flex items-center space-x-3 p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                      formData.primaryGoals.includes(goal)
-                        ? 'border-emerald-300 bg-emerald-50'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`} onClick={() => handleArrayToggle('primaryGoals', goal)}>
-                      <Checkbox
-                        id={goal}
-                        checked={formData.primaryGoals.includes(goal)}
-                        onCheckedChange={() => handleArrayToggle('primaryGoals', goal)}
-                        className="rounded-md"
-                      />
-                      <Label htmlFor={goal} className="text-sm font-medium cursor-pointer">{goal}</Label>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Primary Goals</Label>
+                <Select 
+                  value={formData.primaryGoals.length > 0 ? formData.primaryGoals.join(',') : ''} 
+                  onValueChange={(value) => {
+                    if (value) {
+                      handleInputChange('primaryGoals', value.split(','));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
+                    <SelectValue placeholder={`${formData.primaryGoals.length} goals selected`} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
+                    {[
+                      'Increase followers',
+                      'Drive website traffic', 
+                      'Generate leads',
+                      'Boost engagement',
+                      'Build brand awareness',
+                      'Increase sales',
+                      'Save time on content',
+                      'Improve content quality'
+                    ].map((goal) => (
+                      <div key={goal} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 cursor-pointer" 
+                           onClick={() => handleArrayToggle('primaryGoals', goal)}>
+                        <Checkbox
+                          checked={formData.primaryGoals.includes(goal)}
+                          className="rounded-sm"
+                        />
+                        <span className="text-sm">{goal}</span>
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="currentChallenges" className="text-sm font-semibold text-gray-700">What's your biggest social media challenge?</Label>
+              <div className="space-y-1">
+                <Label htmlFor="currentChallenges" className="text-xs font-semibold text-gray-700">Biggest social media challenge?</Label>
                 <Textarea
                   id="currentChallenges"
                   value={formData.currentChallenges}
                   onChange={(e) => handleInputChange('currentChallenges', e.target.value)}
-                  placeholder="Tell us about your main challenges with social media management..."
-                  rows={4}
-                  className="px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors resize-none"
+                  placeholder="Tell us your main challenges..."
+                  rows={3}
+                  className="px-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors resize-none"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="monthlyBudget" className="text-sm font-semibold text-gray-700">Monthly Marketing Budget</Label>
+              <div className="space-y-1">
+                <Label htmlFor="monthlyBudget" className="text-xs font-semibold text-gray-700">Monthly Marketing Budget</Label>
                 <Select value={formData.monthlyBudget} onValueChange={(value) => handleInputChange('monthlyBudget', value)}>
-                  <SelectTrigger className="h-12 px-4 rounded-xl border-2 border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder="Select your budget range" />
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
+                    <SelectValue placeholder="Select budget range" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-2 shadow-xl">
+                  <SelectContent className="rounded-lg border shadow-xl">
                     <SelectItem value="0-500">$0 - $500</SelectItem>
                     <SelectItem value="500-1000">$500 - $1,000</SelectItem>
                     <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
@@ -230,73 +237,97 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
       case 3:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Settings className="w-8 h-8 text-emerald-600" />
+          <div className="space-y-4 overflow-y-auto max-h-80">
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Settings className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Social Media Preferences</h3>
-              <p className="text-gray-600 mt-2">Configure your content strategy</p>
+              <h3 className="text-xl font-semibold text-gray-900">Configure your content strategy</h3>
+              <p className="text-sm text-gray-600 mt-1">Tell us about your social media preferences</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label>Which platforms do you use? (select all that apply)</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  {[
-                    'Instagram',
-                    'Facebook',
-                    'Twitter/X',
-                    'LinkedIn',
-                    'TikTok',
-                    'YouTube',
-                    'Pinterest',
-                    'Snapchat'
-                  ].map((platform) => (
-                    <div key={platform} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={platform}
-                        checked={formData.platforms.includes(platform)}
-                        onCheckedChange={() => handleArrayToggle('platforms', platform)}
-                      />
-                      <Label htmlFor={platform} className="text-sm font-normal">{platform}</Label>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Which platforms do you use?</Label>
+                <Select 
+                  value={formData.platforms.length > 0 ? formData.platforms.join(',') : ''} 
+                  onValueChange={(value) => {
+                    if (value) {
+                      handleInputChange('platforms', value.split(','));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
+                    <SelectValue placeholder={`${formData.platforms.length} platforms selected`} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
+                    {[
+                      'Instagram',
+                      'Facebook',
+                      'Twitter/X',
+                      'LinkedIn',
+                      'TikTok',
+                      'YouTube',
+                      'Pinterest',
+                      'Snapchat'
+                    ].map((platform) => (
+                      <div key={platform} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 cursor-pointer" 
+                           onClick={() => handleArrayToggle('platforms', platform)}>
+                        <Checkbox
+                          checked={formData.platforms.includes(platform)}
+                          className="rounded-sm"
+                        />
+                        <span className="text-sm">{platform}</span>
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <Label>Content Types (select all that apply)</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  {[
-                    'Photos',
-                    'Videos',
-                    'Stories',
-                    'Reels/Shorts',
-                    'Carousels',
-                    'Text posts',
-                    'Live streams',
-                    'User-generated content'
-                  ].map((type) => (
-                    <div key={type} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={type}
-                        checked={formData.contentTypes.includes(type)}
-                        onCheckedChange={() => handleArrayToggle('contentTypes', type)}
-                      />
-                      <Label htmlFor={type} className="text-sm font-normal">{type}</Label>
-                    </div>
-                  ))}
-                </div>
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-gray-700">Content Types</Label>
+                <Select 
+                  value={formData.contentTypes.length > 0 ? formData.contentTypes.join(',') : ''} 
+                  onValueChange={(value) => {
+                    if (value) {
+                      handleInputChange('contentTypes', value.split(','));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
+                    <SelectValue placeholder={`${formData.contentTypes.length} content types selected`} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
+                    {[
+                      'Photos',
+                      'Videos',
+                      'Stories',
+                      'Reels/Shorts',
+                      'Carousels',
+                      'Text posts',
+                      'Live streams',
+                      'User-generated content'
+                    ].map((type) => (
+                      <div key={type} className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 cursor-pointer" 
+                           onClick={() => handleArrayToggle('contentTypes', type)}>
+                        <Checkbox
+                          checked={formData.contentTypes.includes(type)}
+                          className="rounded-sm"
+                        />
+                        <span className="text-sm">{type}</span>
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <Label htmlFor="postingFrequency">How often do you post?</Label>
+              <div className="space-y-1">
+                <Label htmlFor="postingFrequency" className="text-xs font-semibold text-gray-700">How often do you post?</Label>
                 <Select value={formData.postingFrequency} onValueChange={(value) => handleInputChange('postingFrequency', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="Select posting frequency" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-lg border shadow-xl">
                     <SelectItem value="multiple-daily">Multiple times per day</SelectItem>
                     <SelectItem value="daily">Once per day</SelectItem>
                     <SelectItem value="few-weekly">Few times per week</SelectItem>
@@ -312,34 +343,35 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
       case 4:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Rocket className="w-8 h-8 text-emerald-600" />
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Rocket className="w-6 h-6 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900">Setup Your Workspace</h3>
-              <p className="text-gray-600 mt-2">Create your personalized workspace</p>
+              <p className="text-sm text-gray-600 mt-1">Create your personalized workspace</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="workspaceName">Workspace Name *</Label>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="workspaceName" className="text-xs font-semibold text-gray-700">Workspace Name *</Label>
                 <Input
                   id="workspaceName"
                   value={formData.workspaceName}
                   onChange={(e) => handleInputChange('workspaceName', e.target.value)}
                   placeholder="e.g., 'My Brand', 'Agency Clients', 'Personal'"
                   required
+                  className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
                 />
               </div>
 
-              <div>
-                <Label htmlFor="industry">Industry</Label>
+              <div className="space-y-1">
+                <Label htmlFor="industry" className="text-xs font-semibold text-gray-700">Industry</Label>
                 <Select value={formData.industry} onValueChange={(value) => handleInputChange('industry', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="Select your industry" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
                     <SelectItem value="ecommerce">E-commerce/Retail</SelectItem>
                     <SelectItem value="technology">Technology</SelectItem>
                     <SelectItem value="healthcare">Healthcare</SelectItem>
@@ -358,13 +390,13 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="timezone">Timezone</Label>
+              <div className="space-y-1">
+                <Label htmlFor="timezone" className="text-xs font-semibold text-gray-700">Timezone</Label>
                 <Select value={formData.timezone} onValueChange={(value) => handleInputChange('timezone', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="Select your timezone" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
                     <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
                     <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
                     <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
