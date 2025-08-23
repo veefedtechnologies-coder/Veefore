@@ -128,54 +128,27 @@ const walkthroughSteps = [
 export default function WalkthroughModal({ open, onClose, userName }: WalkthroughModalProps) {
   console.log('🎯 WALKTHROUGH MODAL: Component rendering with open:', open, 'userName:', userName)
   
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
-
-  const currentStepData = walkthroughSteps.find(step => step.id === currentStep)
-  const totalSteps = walkthroughSteps.length
-
-  // Auto-advance demo for certain steps
-  useEffect(() => {
-    if (isPlaying && currentStepData?.demo) {
-      const timer = setTimeout(() => {
-        setIsPlaying(false)
-      }, 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [isPlaying, currentStepData])
-
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCompletedSteps(prev => [...prev, currentStep])
-      setCurrentStep(prev => prev + 1)
-    } else {
-      onClose()
-    }
-  }
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1)
-    }
-  }
-
-  const skipWalkthrough = () => {
-    onClose()
-  }
-
-  const playDemo = () => {
-    setIsPlaying(true)
-  }
-
-  if (!currentStepData) {
-    console.log('🎯 WALKTHROUGH MODAL: No currentStepData found, returning null')
+  // Simple test render first
+  if (!open) {
+    console.log('🎯 WALKTHROUGH MODAL: Open is false, not rendering')
     return null
   }
 
-  console.log('🎯 WALKTHROUGH MODAL: About to render Dialog with open:', open)
+  console.log('🎯 WALKTHROUGH MODAL: About to render simple test dialog')
 
-  const IconComponent = currentStepData.icon
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <div className="p-6 text-center">
+          <h2 className="text-2xl font-bold mb-4">🎯 VeeFore Walkthrough</h2>
+          <p className="mb-4">Welcome, {userName}! This is a test of the walkthrough modal.</p>
+          <Button onClick={onClose} className="w-full">
+            Close Test Modal
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
