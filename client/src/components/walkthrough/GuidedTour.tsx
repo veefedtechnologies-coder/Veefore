@@ -14,56 +14,56 @@ interface TourStep {
 const tourSteps: TourStep[] = [
   {
     id: 'welcome',
-    target: '[data-testid="dashboard-header"]',
+    target: 'h1',
     title: 'Welcome to VeeFore!',
     description: 'Your AI-powered social media command center. Let me show you the core features that make VeeFore the most advanced social media platform.',
     position: 'bottom'
   },
   {
     id: 'veegpt-nav',
-    target: '.veegpt-nav-item',
+    target: 'div:has(span:contains("VeeGPT"))',
     title: '🤖 VeeGPT - Your AI Assistant',
     description: 'Meet your personal AI assistant! VeeGPT helps with content creation, strategy planning, analytics insights, and answers any questions about your social media.',
     position: 'right'
   },
   {
     id: 'video-generator-nav',
-    target: '[data-nav="video-generator"]',
+    target: 'div:has(span:contains("Video Gen"))',
     title: '🎬 AI Video Generator',
     description: 'Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.',
     position: 'right'
   },
   {
     id: 'automation-nav',
-    target: '[data-nav="automation"]',
+    target: 'div:has(span:contains("Automation"))',
     title: '⚡ Smart Automation',
     description: 'Automate your social media interactions! Set up AI-powered DM responses, comment replies, keyword triggers, and engagement automation.',
     position: 'right'
   },
   {
     id: 'create-button',
-    target: '[data-testid="create-dropdown-trigger"]',
+    target: 'div:has(span:contains("Create"))',
     title: '✨ AI Content Creation',
     description: 'Create content with AI enhancement! Generate captions, hashtags, images, and optimize content for each platform with our AI tools.',
     position: 'right'
   },
   {
     id: 'analytics-nav',
-    target: '[data-nav="analytics"]',
+    target: 'div:has(span:contains("Analytics"))',
     title: '📊 Advanced Analytics',
     description: 'Deep insights powered by AI! Track performance across all platforms, get predictive analytics, and receive smart recommendations.',
     position: 'right'
   },
   {
     id: 'workspaces-nav',
-    target: '[data-nav="workspaces"]',
+    target: 'div:has(span:contains("Workspaces"))',
     title: '👥 AI-Powered Workspaces',
     description: 'Collaborate with custom AI personalities! Each workspace can have its own AI assistant with unique personality and expertise.',
     position: 'right'
   },
   {
     id: 'integration-nav',
-    target: '[data-nav="integration"]',
+    target: 'div:has(span:contains("Integration"))',
     title: '🔗 Platform Integration',
     description: 'Connect all your social platforms! Manage Instagram, YouTube, Twitter, LinkedIn, and more from one unified dashboard.',
     position: 'right'
@@ -89,16 +89,33 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     if (!isActive) return
 
     const findAndHighlightElement = () => {
-      console.log(`🎯 Looking for: "${currentStepData.target}"`)
-      console.log('🔍 All elements with data-nav:')
-      document.querySelectorAll('[data-nav]').forEach(el => {
-        console.log(`- data-nav="${el.getAttribute('data-nav')}"`, el)
-      })
-      console.log('🔍 VeeGPT:', document.querySelector('.veegpt-nav-item'))
-      console.log('🔍 Create:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
+      // Try multiple fallback selectors for each target
+      let element: HTMLElement | null = null
       
-      const element = document.querySelector(currentStepData.target) as HTMLElement
-      console.log(`${element ? '✅' : '❌'} Found:`, element)
+      // Map of fallback selectors for each step
+      const fallbackSelectors: Record<string, string[]> = {
+        'h1': ['h1', '[data-testid="dashboard-header"]', '.text-3xl', '.text-2xl'],
+        'div:has(span:contains("VeeGPT"))': ['.veegpt-nav-item', 'div:contains("VeeGPT")', '[data-nav="veegpt"]'],
+        'div:has(span:contains("Video Gen"))': ['[data-nav="video-generator"]', 'div:contains("Video")', '.sidebar-nav-item:has([data-nav="video-generator"])'],
+        'div:has(span:contains("Automation"))': ['[data-nav="automation"]', 'div:contains("Automation")', '.sidebar-nav-item:has([data-nav="automation"])'],
+        'div:has(span:contains("Create"))': ['[data-testid="create-dropdown-trigger"]', '[data-nav="create"]', 'div:contains("Create")'],
+        'div:has(span:contains("Analytics"))': ['[data-nav="analytics"]', 'div:contains("Analytics")', '.sidebar-nav-item:has([data-nav="analytics"])'],
+        'div:has(span:contains("Workspaces"))': ['[data-nav="workspaces"]', 'div:contains("Workspaces")', '.sidebar-nav-item:has([data-nav="workspaces"])'],
+        'div:has(span:contains("Integration"))': ['[data-nav="integration"]', 'div:contains("Integration")', '.sidebar-nav-item:has([data-nav="integration"])']
+      }
+      
+      const selectors = fallbackSelectors[currentStepData.target] || [currentStepData.target]
+      
+      for (const selector of selectors) {
+        try {
+          element = document.querySelector(selector) as HTMLElement
+          if (element) break
+        } catch (e) {
+          // Continue to next selector
+        }
+      }
+      
+      console.log(`🎯 Found element for "${currentStepData.title}":`, element)
       
       if (element) {
         setTargetElement(element)
