@@ -796,19 +796,63 @@ export default function VeeGPT() {
       textareaRef.current.value = ''
     }
     
-    // Add random AI status messages like Perplexity
-    const statusMessages = [
-      "Understanding your request...",
-      "Analyzing content...", 
-      "Processing information...",
-      "Thinking...",
-      "Gathering insights...",
-      "Reviewing context...",
-      "Formulating response...",
-      "Preparing answer..."
-    ]
-    const randomStatus = statusMessages[Math.floor(Math.random() * statusMessages.length)]
-    setAiStatus(randomStatus)
+    // Generate contextual AI status based on user question
+    const getContextualStatus = (userMessage: string) => {
+      const message = userMessage.toLowerCase()
+      
+      // Social media related
+      if (message.includes('instagram') || message.includes('reels') || message.includes('tiktok') || message.includes('social media')) {
+        return "Analyzing social media strategies..."
+      }
+      
+      // Content creation
+      if (message.includes('content') || message.includes('video') || message.includes('post')) {
+        return "Processing content creation insights..."
+      }
+      
+      // Marketing and growth
+      if (message.includes('marketing') || message.includes('growth') || message.includes('audience') || message.includes('followers')) {
+        return "Reviewing marketing strategies..."
+      }
+      
+      // YouTube specific
+      if (message.includes('youtube') || message.includes('channel')) {
+        return "Analyzing YouTube optimization tactics..."
+      }
+      
+      // Business related
+      if (message.includes('business') || message.includes('entrepreneur') || message.includes('startup')) {
+        return "Processing business insights..."
+      }
+      
+      // Strategy questions
+      if (message.includes('how to') || message.includes('strategy') || message.includes('plan')) {
+        return "Formulating strategic recommendations..."
+      }
+      
+      // Tips and advice
+      if (message.includes('tips') || message.includes('advice') || message.includes('help')) {
+        return "Gathering expert insights..."
+      }
+      
+      // Analytics and data
+      if (message.includes('analytics') || message.includes('metrics') || message.includes('data')) {
+        return "Processing analytical insights..."
+      }
+      
+      // Default contextual messages
+      const contextualMessages = [
+        "Understanding your request...",
+        "Analyzing your question...", 
+        "Processing information...",
+        "Gathering relevant insights...",
+        "Reviewing context...",
+        "Preparing detailed response..."
+      ]
+      return contextualMessages[Math.floor(Math.random() * contextualMessages.length)]
+    }
+    
+    setAiStatus(getContextualStatus(content || ''))
 
     try {
       if (!currentConversationId) {
