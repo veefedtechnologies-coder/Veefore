@@ -1581,7 +1581,7 @@ export default function VeeGPT() {
                   }}>
                     {message.role === 'assistant' ? (
                       <div 
-                        className="leading-relaxed"
+                        className="leading-relaxed font-semibold"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
@@ -1605,7 +1605,7 @@ export default function VeeGPT() {
                       </div>
                     ) : (
                       <div 
-                        className="leading-relaxed"
+                        className="leading-relaxed font-semibold"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
