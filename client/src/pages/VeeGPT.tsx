@@ -215,14 +215,6 @@ export default function VeeGPT() {
     enabled: true // Enable to load conversation history
   })
 
-  console.log('VeeGPT component rendering', { 
-    conversationsLength: conversations.length,
-    currentConversationId,
-    hasSentFirstMessage,
-    hasUserStartedNewChat,
-    optimisticMessagesLength: optimisticMessages.length,
-    shouldShowSidebar: conversations.length > 0
-  })
 
   // Filter conversations based on search query
   const filteredConversations = conversations.filter(conv => 
@@ -808,7 +800,6 @@ export default function VeeGPT() {
   // Always show sidebar if conversations exist, regardless of new chat state
   // Don't show welcome screen if we have optimistic messages (instant UI transition)
   const showWelcomeScreen = !currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0
-  console.log('VeeGPT render decision:', { showWelcomeScreen, currentConversationId, hasSentFirstMessage, hasUserStartedNewChat })
   
   if (showWelcomeScreen) {
     return (
@@ -961,7 +952,7 @@ export default function VeeGPT() {
                         onClick={() => selectConversation(conversation.id)}
                         className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
                           currentConversationId === conversation.id
-                            ? 'bg-gray-200 text-gray-900'
+                            ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm font-medium'
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
                         title={sidebarCollapsed ? conversation.title : ""}
@@ -1399,8 +1390,8 @@ export default function VeeGPT() {
                         onClick={() => selectConversation(conversation.id)}
                         className={`w-full text-left px-4 py-3 text-sm rounded-xl transition-all duration-200 group ${
                           currentConversationId === conversation.id
-                            ? 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-white border border-violet-500/30 shadow-lg'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-700/30 border border-transparent'
+                            ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm font-medium'
+                            : 'text-gray-700 hover:bg-gray-100 border border-transparent'
                         }`}
                         title={sidebarCollapsed ? conversation.title : ""}
                       >
@@ -1408,8 +1399,8 @@ export default function VeeGPT() {
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
                             <MessageSquare className={`w-4 h-4 flex-shrink-0 ${
                               currentConversationId === conversation.id
-                                ? 'text-violet-400'
-                                : 'text-slate-400 group-hover:text-slate-300'
+                                ? 'text-blue-600'
+                                : 'text-gray-400 group-hover:text-gray-600'
                             }`} />
                             {!sidebarCollapsed && (
                               <div className="flex-1 min-w-0">
