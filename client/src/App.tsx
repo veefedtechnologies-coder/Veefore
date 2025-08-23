@@ -631,46 +631,42 @@ function App() {
       {isOnboardingModalOpen && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 99999
+          top: '0px',
+          left: '0px',
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'red',
+          display: 'block',
+          zIndex: 999999
         }}>
-          {console.log('🚀 INLINE MODAL RENDERING NOW!')}
+          {console.log('🚀 RED SCREEN MODAL RENDERING NOW!')}
           <div style={{
-            backgroundColor: 'white',
-            padding: '30px',
-            borderRadius: '12px',
-            maxWidth: '500px',
-            width: '90%',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'yellow',
+            padding: '50px',
+            border: '10px solid blue',
+            fontSize: '30px',
+            fontWeight: 'bold',
+            color: 'black',
             textAlign: 'center'
           }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '20px', color: '#059669' }}>
-              🎉 SUCCESS! Onboarding Modal Works!
-            </h2>
-            <p style={{ marginBottom: '20px', color: '#666', fontSize: '16px' }}>
-              The strict signup flow is working correctly. Your authentication and onboarding system is now properly enforced.
-            </p>
+            🎉 CAN YOU SEE THIS BRIGHT MODAL?! 🎉
+            <br/><br/>
             <button 
               onClick={() => setIsOnboardingModalOpen(false)}
               style={{
-                backgroundColor: '#059669',
+                backgroundColor: 'green',
                 color: 'white',
-                padding: '15px 30px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: 'pointer',
-                width: '100%',
-                fontSize: '18px',
-                fontWeight: 'bold'
+                padding: '20px 40px',
+                fontSize: '24px',
+                border: '5px solid black',
+                cursor: 'pointer'
               }}
             >
-              Complete Onboarding
+              COMPLETE ONBOARDING
             </button>
           </div>
         </div>
