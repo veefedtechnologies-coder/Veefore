@@ -241,7 +241,7 @@ function App() {
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Target className="w-8 h-8 text-emerald-600" />
+                <div className="w-8 h-8 rounded-full bg-emerald-600"></div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to VeeFore!</h2>
               <p className="text-gray-600 mb-4">Let's get you set up with a quick onboarding process.</p>
@@ -636,7 +636,6 @@ function App() {
       )}
       
       {/* Global Onboarding Modal - appears over any route */}
-      {console.log('Rendering OnboardingModal with isOpen:', isOnboardingModalOpen)}
       <OnboardingModal 
         isOpen={isOnboardingModalOpen} 
         onClose={() => setIsOnboardingModalOpen(false)}
