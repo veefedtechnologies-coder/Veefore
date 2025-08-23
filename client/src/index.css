@@ -10,6 +10,27 @@
   100% { background-position: 200% 0; }
 }
 
+/* Fix numbered list inline formatting */
+.markdown-content ol {
+  list-style: none !important;
+  counter-reset: item !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.markdown-content ol > li {
+  display: block !important;
+  margin-bottom: 0.3rem !important;
+  counter-increment: item !important;
+}
+
+.markdown-content ol > li:before {
+  content: counter(item) ". " !important;
+  font-weight: bold !important;
+  display: inline !important;
+  margin-right: 0.5rem !important;
+}
+
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
