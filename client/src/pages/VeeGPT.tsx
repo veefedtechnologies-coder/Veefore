@@ -1560,13 +1560,13 @@ export default function VeeGPT() {
             {displayMessages.map((message) => (
               <div
                 key={message.id}
-                className={`flex items-end space-x-3 mb-6 ${
+                className={`flex space-x-4 ${
                   message.role === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
                 {message.role === 'assistant' && (
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg ring-2 ring-blue-100">
-                    <Bot className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
+                    <Bot className="w-4 h-4 text-blue-600" />
                   </div>
                 )}
                 <div className={`${
@@ -1577,10 +1577,10 @@ export default function VeeGPT() {
                   minWidth: 0,
                   overflow: 'hidden'
                 }}>
-                  <div className={`px-5 py-4 shadow-sm transition-all duration-200 ${
+                  <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl rounded-br-md'
-                      : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-bl-md'
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'bg-transparent text-gray-900'
                   }`} style={{
                     wordWrap: 'break-word',
                     wordBreak: 'break-word',
@@ -1589,7 +1589,7 @@ export default function VeeGPT() {
                   }}>
                     {message.role === 'assistant' ? (
                       <div 
-                        className="leading-relaxed text-base"
+                        className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
@@ -1613,7 +1613,7 @@ export default function VeeGPT() {
                       </div>
                     ) : (
                       <div 
-                        className="leading-relaxed text-base font-medium"
+                        className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
                           wordBreak: 'break-all',
@@ -1631,8 +1631,8 @@ export default function VeeGPT() {
                   </div>
                   {/* Show timestamp for all messages */}
                   {(
-                    <div className={`mt-3 text-xs ${
-                      message.role === 'user' ? 'text-right text-blue-200' : 'text-left text-gray-400'
+                    <div className={`mt-2 text-xs text-gray-500 ${
+                      message.role === 'user' ? 'text-right' : 'text-left'
                     }`}>
                       {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { 
                         hour: '2-digit', 
@@ -1645,8 +1645,8 @@ export default function VeeGPT() {
                   )}
                 </div>
                 {message.role === 'user' && (
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-gray-700 to-gray-900 shadow-lg ring-2 ring-gray-200">
-                    <User className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600 text-white">
+                    <User className="w-4 h-4" />
                   </div>
                 )}
               </div>
@@ -1667,41 +1667,38 @@ export default function VeeGPT() {
           pointerEvents: 'none',
           zIndex: 1000
         }}>
-          {/* Enhanced professional input container */}
+          {/* Pill-shaped transparent container */}
           <div style={{
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '14px',
-            padding: '16px 20px',
-            border: '1px solid rgba(209, 213, 219, 0.3)',
-            borderRadius: '28px',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05)',
-            transition: 'all 0.3s ease',
+            gap: '12px',
+            padding: '12px 16px',
+            border: '1px solid rgba(209, 213, 219, 0.2)',
+            borderRadius: '25px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
+            transition: 'all 0.2s ease',
             pointerEvents: 'auto',
-            minHeight: '52px'
+            minHeight: '44px'
           }}>
               <button style={{
                 background: 'transparent',
                 backgroundColor: 'transparent',
                 border: 'none',
                 outline: 'none',
-                padding: '6px',
+                padding: '4px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: '2px',
-                borderRadius: '8px',
-                transition: 'all 0.2s ease'
-              }} onMouseEnter={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'} 
-                 onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                marginTop: '2px'
+              }}>
                 <Paperclip style={{ 
-                  width: '22px', 
-                  height: '22px',
+                  width: '20px', 
+                  height: '20px',
                   color: '#6b7280'
                 }} />
               </button>
@@ -1771,32 +1768,19 @@ export default function VeeGPT() {
                 <button
                   onClick={handleStopGeneration}
                   style={{
-                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                    backgroundColor: '#ef4444',
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    padding: '8px',
+                    padding: '4px',
                     cursor: 'pointer',
-                    color: 'white',
+                    color: '#ef4444',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginTop: '2px',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
-                    transition: 'all 0.3s ease'
+                    marginTop: '2px'
                   }}
                   title="Stop generation"
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.05)'
-                    e.target.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)'
-                    e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)'
-                  }}
                 >
                   <Square style={{ width: '18px', height: '18px' }} />
                 </button>
@@ -1805,35 +1789,20 @@ export default function VeeGPT() {
                   onClick={handleSendMessage}
                   disabled={!inputText.trim()}
                   style={{
-                    background: inputText.trim() ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)',
-                    backgroundColor: inputText.trim() ? '#3b82f6' : '#e5e7eb',
+                    background: 'transparent',
+                    backgroundColor: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    padding: '8px',
+                    padding: '4px',
                     cursor: inputText.trim() ? 'pointer' : 'not-allowed',
-                    color: inputText.trim() ? 'white' : '#9ca3af',
+                    color: inputText.trim() ? '#1f2937' : '#9ca3af',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginTop: '2px',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    boxShadow: inputText.trim() ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (inputText.trim()) {
-                      e.target.style.transform = 'scale(1.05)'
-                      e.target.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.4)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)'
-                    e.target.style.boxShadow = inputText.trim() ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.1)'
+                    marginTop: '2px'
                   }}
                 >
-                  <Send style={{ width: '22px', height: '22px' }} />
+                  <Send style={{ width: '20px', height: '20px' }} />
                 </button>
               )}
 
