@@ -91,16 +91,9 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     const findAndHighlightElement = () => {
       let element: HTMLElement | null = null
       
-      // Debug what elements exist
-      console.log(`🎯 Step ${currentStep}: Looking for elements...`)
-      console.log('📍 All data-nav elements:')
-      document.querySelectorAll('[data-nav]').forEach(el => {
-        console.log(`  - data-nav="${el.getAttribute('data-nav')}"`, el)
-      })
-      console.log('📍 VeeGPT element:', document.querySelector('.veegpt-nav-item'))
-      console.log('📍 Create element:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
+      // Use CSS selector that matches the sidebar structure exactly
+      const sidebarItems = document.querySelectorAll('.sidebar-nav-item')
       
-      // Simple direct targeting based on step ID
       switch (currentStep) {
         case 0: // Welcome
           element = document.querySelector('h1') || document.querySelector('h2') || document.querySelector('.text-3xl')
@@ -108,29 +101,40 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
         case 1: // VeeGPT
           element = document.querySelector('.veegpt-nav-item')
           break
-        case 2: // Video Generator
-          element = document.querySelector('[data-nav="video-generator"]')
+        case 2: // Video Generator - find by text content
+          element = Array.from(sidebarItems).find(item => {
+            const text = item.textContent?.toLowerCase()
+            return text?.includes('video') || text?.includes('gen')
+          }) as HTMLElement
           break
         case 3: // Automation
-          element = document.querySelector('[data-nav="automation"]')
+          element = Array.from(sidebarItems).find(item => {
+            return item.textContent?.toLowerCase().includes('automation')
+          }) as HTMLElement
           break
         case 4: // Create
-          element = document.querySelector('[data-testid="create-dropdown-trigger"]') || document.querySelector('[data-nav="create"]')
+          element = Array.from(sidebarItems).find(item => {
+            return item.textContent?.toLowerCase().includes('create')
+          }) as HTMLElement || document.querySelector('[data-testid="create-dropdown-trigger"]')
           break
         case 5: // Analytics
-          element = document.querySelector('[data-nav="analytics"]')
+          element = Array.from(sidebarItems).find(item => {
+            return item.textContent?.toLowerCase().includes('analytics')
+          }) as HTMLElement
           break
         case 6: // Workspaces
-          element = document.querySelector('[data-nav="workspaces"]')
+          element = Array.from(sidebarItems).find(item => {
+            return item.textContent?.toLowerCase().includes('workspaces')
+          }) as HTMLElement
           break
         case 7: // Integration
-          element = document.querySelector('[data-nav="integration"]')
+          element = Array.from(sidebarItems).find(item => {
+            return item.textContent?.toLowerCase().includes('integration')
+          }) as HTMLElement
           break
         default:
           element = document.querySelector(currentStepData.target) as HTMLElement
       }
-      
-      console.log(`🎯 Step ${currentStep} (${currentStepData.title}): Element found =`, element)
       
       if (element) {
         setTargetElement(element)
@@ -212,18 +216,33 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     onClose()
   }
 
+  // Block body scroll when tour is active
+  useEffect(() => {
+    if (isActive) {
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = 'unset'
+      }
+    }
+  }, [isActive])
+
   if (!isActive) return null
 
   return (
     <>
-      {/* Overlay with spotlight effect */}
+      {/* Overlay with spotlight effect - blocks all background interactions */}
       <div 
-        className="fixed inset-0 z-50 pointer-events-none"
+        className="fixed inset-0 z-50"
         style={{
           background: targetElement 
             ? `radial-gradient(circle at ${targetElement.getBoundingClientRect().left + targetElement.getBoundingClientRect().width/2}px ${targetElement.getBoundingClientRect().top + targetElement.getBoundingClientRect().height/2}px, transparent 0px, transparent ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 60}px, rgba(0,0,0,0.4) ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 80}px)`
-            : 'rgba(0,0,0,0.3)'
+            : 'rgba(0,0,0,0.3)',
+          overscrollBehavior: 'contain'
         }}
+        onWheel={(e) => e.preventDefault()}
+        onTouchMove={(e) => e.preventDefault()}
+        onScroll={(e) => e.preventDefault()}
+        onMouseDown={(e) => e.preventDefault()}
       />
 
       {/* Highlight border around target element */}
