@@ -803,7 +803,7 @@ export default function VeeGPT() {
   
   if (showWelcomeScreen) {
     return (
-      <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
+      <div className="h-full w-full bg-emerald-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
         {/* Static Background - No Scroll Animations */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {/* Static background elements - no scroll interaction */}
@@ -846,7 +846,7 @@ export default function VeeGPT() {
         <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-emerald-50/80 border-r border-emerald-200 flex flex-col transition-all duration-300 shadow-sm`}>
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -1284,7 +1284,7 @@ export default function VeeGPT() {
       <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-emerald-50/80 border-r border-emerald-200 flex flex-col transition-all duration-300 shadow-sm`}>
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -1530,9 +1530,9 @@ export default function VeeGPT() {
         )}
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-white relative">
+        <div className="flex-1 flex flex-col bg-emerald-50/40 relative">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-200 bg-emerald-50/60">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">V</span>
@@ -1555,7 +1555,7 @@ export default function VeeGPT() {
           </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-emerald-50/60 to-emerald-100/40" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8 overflow-x-hidden">
             {displayMessages.map((message) => (
               <div
