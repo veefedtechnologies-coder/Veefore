@@ -34,6 +34,7 @@ import AutomationStepByStep from './pages/AutomationStepByStep'
 import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 import AdminPanel from './pages/AdminPanel'
 import AdminLogin from './pages/AdminLogin'
+import { WalkthroughModal } from './components/walkthrough/WalkthroughModal'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -676,32 +677,12 @@ function App() {
       
     </Switch>
 
-    {/* Walkthrough Modal */}
-    {isWalkthroughOpen && (
-      <div 
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-        onClick={() => setIsWalkthroughOpen(false)}
-      >
-        <div 
-          className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-90 mx-4 text-center"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h1 className="text-2xl font-bold mb-4 text-gray-800">
-            🎯 VeeFore Walkthrough
-          </h1>
-          <p className="mb-6 text-gray-600 text-lg">
-            Welcome, {userData?.displayName || userData?.fullName || user?.email?.split('@')[0] || 'User'}! 
-            <br />Let's get you started with VeeFore.
-          </p>
-          <button 
-            onClick={() => setIsWalkthroughOpen(false)}
-            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            ✨ Get Started
-          </button>
-        </div>
-      </div>
-    )}
+    {/* Premium Walkthrough Modal */}
+    <WalkthroughModal
+      isOpen={isWalkthroughOpen}
+      onClose={() => setIsWalkthroughOpen(false)}
+      userData={userData}
+    />
     </>
   )
 }
