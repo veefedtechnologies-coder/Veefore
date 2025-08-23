@@ -169,16 +169,9 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs font-semibold text-gray-700">Primary Goals</Label>
-                <Select 
-                  value={formData.primaryGoals.length > 0 ? formData.primaryGoals.join(',') : ''} 
-                  onValueChange={(value) => {
-                    if (value) {
-                      handleInputChange('primaryGoals', value.split(','));
-                    }
-                  }}
-                >
+                <Select>
                   <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder={`${formData.primaryGoals.length} goals selected`} />
+                    <SelectValue placeholder={formData.primaryGoals.length > 0 ? `${formData.primaryGoals.length} goals selected` : "Select your goals"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
                     {[
@@ -197,7 +190,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                           checked={formData.primaryGoals.includes(goal)}
                           className="rounded-sm"
                         />
-                        <span className="text-sm">{goal}</span>
+                        <span className="text-sm text-gray-900">{goal}</span>
                       </div>
                     ))}
                   </SelectContent>
@@ -249,16 +242,9 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
             <div className="space-y-3">
               <div className="space-y-1">
                 <Label className="text-xs font-semibold text-gray-700">Which platforms do you use?</Label>
-                <Select 
-                  value={formData.platforms.length > 0 ? formData.platforms.join(',') : ''} 
-                  onValueChange={(value) => {
-                    if (value) {
-                      handleInputChange('platforms', value.split(','));
-                    }
-                  }}
-                >
+                <Select>
                   <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder={`${formData.platforms.length} platforms selected`} />
+                    <SelectValue placeholder={formData.platforms.length > 0 ? `${formData.platforms.length} platforms selected` : "Select platforms"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
                     {[
@@ -277,7 +263,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                           checked={formData.platforms.includes(platform)}
                           className="rounded-sm"
                         />
-                        <span className="text-sm">{platform}</span>
+                        <span className="text-sm text-gray-900">{platform}</span>
                       </div>
                     ))}
                   </SelectContent>
@@ -286,16 +272,9 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
               <div className="space-y-1">
                 <Label className="text-xs font-semibold text-gray-700">Content Types</Label>
-                <Select 
-                  value={formData.contentTypes.length > 0 ? formData.contentTypes.join(',') : ''} 
-                  onValueChange={(value) => {
-                    if (value) {
-                      handleInputChange('contentTypes', value.split(','));
-                    }
-                  }}
-                >
+                <Select>
                   <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder={`${formData.contentTypes.length} content types selected`} />
+                    <SelectValue placeholder={formData.contentTypes.length > 0 ? `${formData.contentTypes.length} content types selected` : "Select content types"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
                     {[
@@ -314,7 +293,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                           checked={formData.contentTypes.includes(type)}
                           className="rounded-sm"
                         />
-                        <span className="text-sm">{type}</span>
+                        <span className="text-sm text-gray-900">{type}</span>
                       </div>
                     ))}
                   </SelectContent>
@@ -409,13 +388,13 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                 </Select>
               </div>
 
-              <div>
-                <Label htmlFor="teamSize">Team Size</Label>
+              <div className="space-y-1">
+                <Label htmlFor="teamSize" className="text-xs font-semibold text-gray-700">Team Size</Label>
                 <Select value={formData.teamSize} onValueChange={(value) => handleInputChange('teamSize', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
                     <SelectValue placeholder="How many people will use this workspace?" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-lg border shadow-xl">
                     <SelectItem value="1">Just me</SelectItem>
                     <SelectItem value="2-5">2-5 people</SelectItem>
                     <SelectItem value="6-10">6-10 people</SelectItem>
