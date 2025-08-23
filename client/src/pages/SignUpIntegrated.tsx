@@ -286,7 +286,7 @@ function SignUpIntegrated() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          otp: otpData.code
+          code: otpData.code
         })
       })
 
