@@ -164,13 +164,21 @@ const SignUpIntegrated = ({ onNavigate }: SignUpIntegratedProps) => {
           code: code 
         })
       }),
-    onSuccess: () => {
-      setCurrentStep(2)
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] })
       toast({
         title: "Email verified!",
         description: "Your email has been successfully verified.",
       })
+      
+      // If user needs onboarding, redirect to dashboard where modal will show
+      if (data.requiresOnboarding) {
+        console.log('Redirecting to dashboard for modal onboarding')
+        setLocation('/')
+      } else {
+        // Continue with old flow if not requiring onboarding
+        setCurrentStep(2)
+      }
     },
     onError: (error: any) => {
       console.error('Verification error:', error)
