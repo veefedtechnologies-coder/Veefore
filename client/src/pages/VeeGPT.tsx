@@ -164,6 +164,7 @@ export default function VeeGPT() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [aiStatus, setAiStatus] = useState<string | null>(null)
   const [isContentStreaming, setIsContentStreaming] = useState(false)
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
   // WebSocket for real-time streaming
@@ -263,6 +264,15 @@ export default function VeeGPT() {
     // Subscribe after a small delay to ensure WebSocket is ready
     setTimeout(subscribe, 200)
   }, [currentConversationId])
+  
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const quickPrompts = [
     { icon: Lightbulb, text: "Inspire me!" },
@@ -545,6 +555,17 @@ export default function VeeGPT() {
         if (!isContentStreaming) {
           console.log('VeeGPT: STATUS UPDATE:', data.content || data.status)
           setAiStatus(data.content || data.status)
+          
+          // Clear any existing timeout
+          if (statusTimeoutRef.current) {
+            clearTimeout(statusTimeoutRef.current)
+          }
+          
+          // Auto-clear status after 2 seconds max to prevent lingering
+          statusTimeoutRef.current = setTimeout(() => {
+            console.log('VeeGPT: STATUS AUTO-TIMEOUT - clearing status')
+            setAiStatus(null)
+          }, 2000)
         } else {
           console.log('VeeGPT: STATUS UPDATE IGNORED (content streaming):', data.content || data.status)
         }
@@ -617,6 +638,12 @@ export default function VeeGPT() {
         // IMMEDIATELY clear status and set streaming flag when ANY chunk arrives
         setAiStatus(null)
         setIsContentStreaming(true)
+        
+        // Clear status timeout since content is now streaming
+        if (statusTimeoutRef.current) {
+          clearTimeout(statusTimeoutRef.current)
+          statusTimeoutRef.current = null
+        }
         
         // Ensure isGenerating state is true during chunks to show stop button
         setIsGenerating(true)
@@ -802,6 +829,12 @@ export default function VeeGPT() {
     setIsContentStreaming(false) // Reset streaming flag for new message
     isGeneratingRef.current = true
     
+    // Clear any existing status timeout
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current)
+      statusTimeoutRef.current = null
+    }
+    
     // Clear input immediately for responsive UI
     setInputText('')
     
@@ -845,6 +878,13 @@ export default function VeeGPT() {
       setIsContentStreaming(false)
       setIsGenerating(false)
       isGeneratingRef.current = false
+      
+      // Clear status timeout on error
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current)
+        statusTimeoutRef.current = null
+      }
+      
       console.error('VeeGPT: Error sending message:', error)
       // Restore input text if there was an error
       setInputText(messageContent)
