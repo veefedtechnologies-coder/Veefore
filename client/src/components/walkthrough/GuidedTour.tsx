@@ -233,24 +233,56 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
       let left = 0
       const padding = viewport.width < 768 ? 16 : 20
 
-      // Position based on step preference
-      switch (currentStepData.position) {
-        case 'right':
+      // Special positioning for dashboard components (steps 1-6) to avoid covering them
+      const isDashboardStep = currentStep >= 1 && currentStep <= 6
+      
+      if (isDashboardStep) {
+        // For dashboard components, prefer positioning that doesn't cover the content
+        const elementCenterX = rect.left + rect.width / 2
+        
+        // Try to position modal away from the center of the element
+        if (elementCenterX > viewport.width / 2) {
+          // Element is on right side, position modal to the left
           top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
-          left = rect.right + 20
-          break
-        case 'bottom':
-          top = rect.bottom + 20
-          left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
-          break
-        case 'left':
+          left = Math.max(padding, rect.left - (tooltip?.width || 0) - 20)
+        } else {
+          // Element is on left side, position modal to the right
           top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
-          left = rect.left - (tooltip?.width || 0) - 20
-          break
-        case 'top':
-          top = rect.top - (tooltip?.height || 0) - 20
-          left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
-          break
+          left = Math.min(viewport.width - (tooltip?.width || 0) - padding, rect.right + 20)
+        }
+        
+        // If modal would still overlap vertically, try positioning above/below
+        if (top + (tooltip?.height || 0) > rect.top && top < rect.bottom) {
+          if (rect.top > (tooltip?.height || 0) + 40) {
+            // Position above if there's space
+            top = rect.top - (tooltip?.height || 0) - 20
+            left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+          } else {
+            // Position below
+            top = rect.bottom + 20
+            left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+          }
+        }
+      } else {
+        // Original positioning for sidebar components (steps 7-14)
+        switch (currentStepData.position) {
+          case 'right':
+            top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
+            left = rect.right + 20
+            break
+          case 'bottom':
+            top = rect.bottom + 20
+            left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+            break
+          case 'left':
+            top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
+            left = rect.left - (tooltip?.width || 0) - 20
+            break
+          case 'top':
+            top = rect.top - (tooltip?.height || 0) - 20
+            left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+            break
+        }
       }
 
       // Keep tooltip in viewport
