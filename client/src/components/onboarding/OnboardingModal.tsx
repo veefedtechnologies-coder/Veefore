@@ -55,7 +55,13 @@ interface OnboardingData {
 const TOTAL_STEPS = 4
 
 export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
-  console.log('OnboardingModal rendered - isOpen:', isOpen)
+  console.log('🔵 OnboardingModal rendered - isOpen:', isOpen)
+  
+  // FORCE RENDER TEST
+  if (isOpen) {
+    console.log('🟢 Modal should be visible now!')
+  }
+  
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
