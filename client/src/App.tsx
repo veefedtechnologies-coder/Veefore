@@ -51,45 +51,56 @@ function App() {
     retry: false
   })
   
-  // Authentication and onboarding guard logic
+  // Authentication and onboarding guard logic - STRICT ENFORCEMENT
   useEffect(() => {
     // Wait for both loading states to complete to prevent timing issues
     if (!loading && !userDataLoading) {
       console.log('Auth guard - User:', user?.email || 'Not authenticated', 'Location:', location)
       console.log('User data:', userData)
+      console.log('Onboarding modal state:', isOnboardingModalOpen)
       
-      // If user is authenticated and fully onboarded, redirect from auth pages to home
+      // If user is authenticated and fully onboarded, allow full access
       if (user && userData && userData.isOnboarded) {
         if (location === '/signin' || location === '/signup' || location === '/onboarding') {
           console.log('Redirecting fully onboarded user to home page')
           setLocation('/')
         }
-        // Close onboarding modal if open and ensure user stays on dashboard
-        setIsOnboardingModalOpen(false)
+        // Close onboarding modal if open
+        if (isOnboardingModalOpen) {
+          console.log('Closing onboarding modal for completed user')
+          setIsOnboardingModalOpen(false)
+        }
       }
       
-      // If user is authenticated but NOT onboarded, show onboarding modal
+      // STRICT: If user is authenticated but NOT onboarded, FORCE onboarding modal
       else if (user && userData && !userData.isOnboarded) {
-        console.log('User is authenticated but not onboarded - showing onboarding modal')
-        setIsOnboardingModalOpen(true)
-        // Redirect away from auth pages to dashboard - CRITICAL: This forces modal to show
-        if (location === '/signin' || location === '/signup' || location === '/onboarding') {
-          console.log('Redirecting to dashboard for modal onboarding')
+        console.log('🚨 ENFORCING ONBOARDING: User authenticated but not onboarded')
+        
+        // Always ensure modal is open for non-onboarded users
+        if (!isOnboardingModalOpen) {
+          console.log('🔴 OPENING ONBOARDING MODAL - User cannot proceed without onboarding')
+          setIsOnboardingModalOpen(true)
+        }
+        
+        // Redirect away from auth pages to dashboard where modal will show
+        if (location === '/signin' || location === '/signup') {
+          console.log('Redirecting to dashboard for MANDATORY onboarding')
           setLocation('/')
         }
       }
       
-      // If user is definitively not authenticated (not loading), close modal and redirect from protected routes
+      // If user is not authenticated, close modal and restrict access
       else if (!user && !loading) {
-        setIsOnboardingModalOpen(false)
+        if (isOnboardingModalOpen) {
+          setIsOnboardingModalOpen(false)
+        }
         if (location === '/onboarding') {
           console.log('Redirecting unauthenticated user to root page')
           setLocation('/')
         }
-        // Allow unauthenticated users to access /signup and /signin
       }
     }
-  }, [user, loading, userData, userDataLoading, location, setLocation])
+  }, [user, loading, userData, userDataLoading, location, setLocation, isOnboardingModalOpen])
 
   // Show loading spinner while checking authentication and user data
   if (loading || (user && userDataLoading)) {
@@ -169,7 +180,7 @@ function App() {
           </div>
         ) : !user && hasFirebaseAuth ? (
           <LoadingSpinner />
-        ) : user && userData ? (
+        ) : user && userData && userData.isOnboarded ? (
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
@@ -225,13 +236,25 @@ function App() {
               </main>
             </div>
           </div>
+        ) : user && userData && !userData.isOnboarded ? (
+          // Non-onboarded users see a blocking message until onboarding modal completes
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Target className="w-8 h-8 text-emerald-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to VeeFore!</h2>
+              <p className="text-gray-600 mb-4">Let's get you set up with a quick onboarding process.</p>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600 mx-auto"></div>
+            </div>
+          </div>
         ) : (
           <LoadingSpinner />
         )}
       </Route>
 
-      {/* Protected routes with sidebar layout - only accessible when authenticated */}
-      {user && (
+      {/* Protected routes with sidebar layout - STRICT: only accessible when authenticated AND onboarded */}
+      {user && userData && userData.isOnboarded && (
         <>
           <Route path="/plan">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
@@ -613,6 +636,7 @@ function App() {
       )}
       
       {/* Global Onboarding Modal - appears over any route */}
+      {console.log('Rendering OnboardingModal with isOpen:', isOnboardingModalOpen)}
       <OnboardingModal 
         isOpen={isOnboardingModalOpen} 
         onClose={() => setIsOnboardingModalOpen(false)}
