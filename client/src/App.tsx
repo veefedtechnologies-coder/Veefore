@@ -221,6 +221,15 @@ function App() {
                   {/* Quick Actions - Top Section */}
                   <div className="mb-8">
                     <QuickActions />
+                    {/* Temporary Walkthrough Trigger */}
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        onClick={() => setIsWalkthroughOpen(true)}
+                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
+                      >
+                        🎯 Start Walkthrough
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Main Dashboard Layout - Hootsuite Style */}
@@ -244,11 +253,12 @@ function App() {
               </main>
             </div>
 
-            {/* Multi-Step Onboarding Flow */}
-            <OnboardingFlow 
-              open={!userData.isOnboarded && !isWalkthroughOpen}
-              userData={userData}
-              onComplete={async (onboardingData) => {
+            {/* Multi-Step Onboarding Flow - FIXED LOGIC */}
+            {userData && (
+              <OnboardingFlow 
+                open={!userData.isOnboarded && !isWalkthroughOpen}
+                userData={userData}
+                onComplete={async (onboardingData) => {
                 console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
                 try {
                   const response = await fetch('/api/user/complete-onboarding', {
@@ -272,7 +282,8 @@ function App() {
                   console.error('❌ Onboarding completion error:', error)
                 }
               }}
-            />
+              />
+            )}
           </div>
         ) : (
           <LoadingSpinner />
