@@ -32,11 +32,8 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
     contentTypes: [] as string[],
     postingFrequency: '',
     
-    // Step 4: Workspace Setup
-    workspaceName: '',
-    timezone: '',
-    teamSize: '',
-    industry: ''
+    // Step 4: Subscription Plan
+    selectedPlan: 'free'
   })
 
   const totalSteps = 4
@@ -420,87 +417,160 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
 
       case 4:
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto max-h-80">
             <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Rocket className="w-6 h-6 text-emerald-600" />
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Setup Your Workspace</h3>
-              <p className="text-sm text-gray-600 mt-1">Create your personalized workspace</p>
+              <h3 className="text-xl font-semibold text-gray-900">Choose Your Plan</h3>
+              <p className="text-sm text-gray-600 mt-1">Select the perfect plan for your social media needs</p>
             </div>
 
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <Label htmlFor="workspaceName" className="text-xs font-semibold text-gray-700">Workspace Name *</Label>
-                <Input
-                  id="workspaceName"
-                  value={formData.workspaceName}
-                  onChange={(e) => handleInputChange('workspaceName', e.target.value)}
-                  placeholder="e.g., 'My Brand', 'Agency Clients', 'Personal'"
-                  required
-                  className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
-                />
+            <div className="grid grid-cols-1 gap-3">
+              {/* Free Plan */}
+              <div 
+                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData.selectedPlan === 'free' 
+                    ? 'border-emerald-500 bg-emerald-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => handleInputChange('selectedPlan', 'free')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        formData.selectedPlan === 'free' 
+                          ? 'border-emerald-500 bg-emerald-500' 
+                          : 'border-gray-300'
+                      } flex items-center justify-center`}>
+                        {formData.selectedPlan === 'free' && (
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-900">Free Plan</h4>
+                        <p className="text-xs text-gray-600">Perfect for getting started</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 ml-7">
+                      <p className="text-lg font-bold text-gray-900">$0<span className="text-xs font-normal">/month</span></p>
+                      <ul className="text-xs text-gray-600 mt-1 space-y-1">
+                        <li>• 1 social account</li>
+                        <li>• 10 posts per month</li>
+                        <li>• Basic analytics</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {formData.selectedPlan === 'free' && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-emerald-500 text-white text-xs px-2 py-1 rounded-full">Selected</div>
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="industry" className="text-xs font-semibold text-gray-700">Industry</Label>
-                <Select value={formData.industry} onValueChange={(value) => handleInputChange('industry', value)}>
-                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder="Select your industry" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
-                    <SelectItem value="ecommerce">E-commerce/Retail</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="healthcare">Healthcare</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                    <SelectItem value="education">Education</SelectItem>
-                    <SelectItem value="real-estate">Real Estate</SelectItem>
-                    <SelectItem value="fitness">Fitness/Wellness</SelectItem>
-                    <SelectItem value="food">Food & Beverage</SelectItem>
-                    <SelectItem value="travel">Travel & Tourism</SelectItem>
-                    <SelectItem value="fashion">Fashion & Beauty</SelectItem>
-                    <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="consulting">Consulting</SelectItem>
-                    <SelectItem value="non-profit">Non-profit</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Basic Plan */}
+              <div 
+                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData.selectedPlan === 'basic' 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => handleInputChange('selectedPlan', 'basic')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        formData.selectedPlan === 'basic' 
+                          ? 'border-blue-500 bg-blue-500' 
+                          : 'border-gray-300'
+                      } flex items-center justify-center`}>
+                        {formData.selectedPlan === 'basic' && (
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-900">Basic Plan</h4>
+                        <p className="text-xs text-gray-600">For small businesses</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 ml-7">
+                      <p className="text-lg font-bold text-gray-900">$19<span className="text-xs font-normal">/month</span></p>
+                      <ul className="text-xs text-gray-600 mt-1 space-y-1">
+                        <li>• 3 social accounts</li>
+                        <li>• 100 posts per month</li>
+                        <li>• Advanced analytics</li>
+                        <li>• Content scheduling</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {formData.selectedPlan === 'basic' && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Selected</div>
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="timezone" className="text-xs font-semibold text-gray-700">Timezone</Label>
-                <Select value={formData.timezone} onValueChange={(value) => handleInputChange('timezone', value)}>
-                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder="Select your timezone" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border shadow-xl max-h-60 overflow-y-auto">
-                    <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
-                    <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
-                    <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
-                    <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
-                    <SelectItem value="Europe/London">Greenwich Mean Time (GMT)</SelectItem>
-                    <SelectItem value="Europe/Paris">Central European Time (CET)</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Japan Standard Time (JST)</SelectItem>
-                    <SelectItem value="Australia/Sydney">Australian Eastern Time (AET)</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Pro Plan */}
+              <div 
+                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData.selectedPlan === 'pro' 
+                    ? 'border-purple-500 bg-purple-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => handleInputChange('selectedPlan', 'pro')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        formData.selectedPlan === 'pro' 
+                          ? 'border-purple-500 bg-purple-500' 
+                          : 'border-gray-300'
+                      } flex items-center justify-center`}>
+                        {formData.selectedPlan === 'pro' && (
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-900">Pro Plan</h4>
+                        <p className="text-xs text-gray-600">Most popular choice</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 ml-7">
+                      <p className="text-lg font-bold text-gray-900">$49<span className="text-xs font-normal">/month</span></p>
+                      <ul className="text-xs text-gray-600 mt-1 space-y-1">
+                        <li>• 10 social accounts</li>
+                        <li>• Unlimited posts</li>
+                        <li>• AI content generation</li>
+                        <li>• Team collaboration</li>
+                        <li>• Priority support</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                {formData.selectedPlan === 'pro' && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Selected</div>
+                  </div>
+                )}
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full">
+                    Most Popular
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="teamSize" className="text-xs font-semibold text-gray-700">Team Size</Label>
-                <Select value={formData.teamSize} onValueChange={(value) => handleInputChange('teamSize', value)}>
-                  <SelectTrigger className="h-8 px-3 text-sm rounded-lg border border-gray-200 focus:border-emerald-500">
-                    <SelectValue placeholder="How many people will use this workspace?" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border shadow-xl">
-                    <SelectItem value="1">Just me</SelectItem>
-                    <SelectItem value="2-5">2-5 people</SelectItem>
-                    <SelectItem value="6-10">6-10 people</SelectItem>
-                    <SelectItem value="11-25">11-25 people</SelectItem>
-                    <SelectItem value="25+">25+ people</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="text-center mt-4">
+              <p className="text-xs text-gray-500">
+                You can upgrade or downgrade your plan anytime from your dashboard
+              </p>
             </div>
           </div>
         )
@@ -519,7 +589,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
       case 3:
         return formData.platforms.length > 0
       case 4:
-        return formData.workspaceName
+        return formData.selectedPlan
       default:
         return true
     }
@@ -595,7 +665,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                     <span className={`text-xs mt-1 font-medium transition-colors ${
                       step === currentStep ? 'text-emerald-600' : step < currentStep ? 'text-emerald-500' : 'text-gray-400'
                     }`}>
-                      {step === 1 ? 'Profile' : step === 2 ? 'Goals' : step === 3 ? 'Platforms' : 'Workspace'}
+                      {step === 1 ? 'Profile' : step === 2 ? 'Goals' : step === 3 ? 'Platforms' : 'Plan'}
                     </span>
                   </div>
                   {step < totalSteps && (
