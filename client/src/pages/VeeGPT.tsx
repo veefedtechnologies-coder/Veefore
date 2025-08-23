@@ -1560,19 +1560,14 @@ export default function VeeGPT() {
             {displayMessages.map((message) => (
               <div
                 key={message.id}
-                className={`flex space-x-4 ${
+                className={`flex ${
                   message.role === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-100">
-                    <Bot className="w-4 h-4 text-blue-600" />
-                  </div>
-                )}
                 <div className={`${
                   message.role === 'user' 
-                    ? 'max-w-md ml-auto' 
-                    : 'flex-1 max-w-3xl'
+                    ? 'max-w-md' 
+                    : 'max-w-3xl'
                 }`} style={{
                   minWidth: 0,
                   overflow: 'hidden'
@@ -1644,11 +1639,6 @@ export default function VeeGPT() {
                     </div>
                   )}
                 </div>
-                {message.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600 text-white">
-                    <User className="w-4 h-4" />
-                  </div>
-                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
