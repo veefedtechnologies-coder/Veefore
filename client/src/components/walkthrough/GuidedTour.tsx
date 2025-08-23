@@ -89,7 +89,16 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     if (!isActive) return
 
     const findAndHighlightElement = () => {
+      console.log(`🎯 Looking for: "${currentStepData.target}"`)
+      console.log('🔍 All elements with data-nav:')
+      document.querySelectorAll('[data-nav]').forEach(el => {
+        console.log(`- data-nav="${el.getAttribute('data-nav')}"`, el)
+      })
+      console.log('🔍 VeeGPT:', document.querySelector('.veegpt-nav-item'))
+      console.log('🔍 Create:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
+      
       const element = document.querySelector(currentStepData.target) as HTMLElement
+      console.log(`${element ? '✅' : '❌'} Found:`, element)
       
       if (element) {
         setTargetElement(element)
