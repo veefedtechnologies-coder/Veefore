@@ -80,15 +80,23 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
         console.log('[ONBOARDING] Pre-fill data from waitlist:', prefill)
         
         // Apply prefill data to form
-        setFormData(prev => ({
-          ...prev,
-          fullName: prefill.fullName || prev.fullName,
-          role: prefill.role || prev.role,
-          companySize: prefill.companySize || prev.companySize,
-          primaryGoals: prefill.primaryGoals?.length > 0 ? prefill.primaryGoals : prev.primaryGoals,
-          contentTypes: prefill.contentTypes?.length > 0 ? prefill.contentTypes : prev.contentTypes,
-          platforms: prefill.platforms?.length > 0 ? prefill.platforms : prev.platforms
-        }))
+        setFormData(prev => {
+          console.log('[ONBOARDING] Previous contentTypes:', prev.contentTypes)
+          console.log('[ONBOARDING] Prefill contentTypes:', prefill.contentTypes)
+          
+          const newFormData = {
+            ...prev,
+            fullName: prefill.fullName || prev.fullName,
+            role: prefill.role || prev.role,
+            companySize: prefill.companySize || prev.companySize,
+            primaryGoals: prefill.primaryGoals?.length > 0 ? prefill.primaryGoals : prev.primaryGoals,
+            contentTypes: prefill.contentTypes?.length > 0 ? prefill.contentTypes : prev.contentTypes,
+            platforms: prefill.platforms?.length > 0 ? prefill.platforms : prev.platforms
+          }
+          
+          console.log('[ONBOARDING] Final contentTypes:', newFormData.contentTypes)
+          return newFormData
+        })
         
         setPrefillDataApplied(true)
         console.log('[ONBOARDING] Form data updated with pre-fill values')
