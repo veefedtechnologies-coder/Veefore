@@ -8,7 +8,6 @@ import {
   Sparkles, 
   Calendar, 
   BarChart3, 
-  Zap, 
   Users, 
   Target,
   Check,
@@ -17,7 +16,6 @@ import {
   Twitter,
   Linkedin,
   MessageSquare,
-  TrendingUp,
   Bot
 } from 'lucide-react'
 
