@@ -21,49 +21,49 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 'veegpt-nav',
-    target: 'div:has(span:contains("VeeGPT"))',
+    target: '.veegpt-nav-item',
     title: '🤖 VeeGPT - Your AI Assistant',
     description: 'Meet your personal AI assistant! VeeGPT helps with content creation, strategy planning, analytics insights, and answers any questions about your social media.',
     position: 'right'
   },
   {
     id: 'video-generator-nav',
-    target: 'div:has(span:contains("Video Gen"))',
+    target: '[data-nav="video-generator"]',
     title: '🎬 AI Video Generator',
     description: 'Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.',
     position: 'right'
   },
   {
     id: 'automation-nav',
-    target: 'div:has(span:contains("Automation"))',
+    target: '[data-nav="automation"]',
     title: '⚡ Smart Automation',
     description: 'Automate your social media interactions! Set up AI-powered DM responses, comment replies, keyword triggers, and engagement automation.',
     position: 'right'
   },
   {
     id: 'create-button',
-    target: 'div:has(span:contains("Create"))',
+    target: '[data-nav="create"]',
     title: '✨ AI Content Creation',
     description: 'Create content with AI enhancement! Generate captions, hashtags, images, and optimize content for each platform with our AI tools.',
     position: 'right'
   },
   {
     id: 'analytics-nav',
-    target: 'div:has(span:contains("Analytics"))',
+    target: '[data-nav="analytics"]',
     title: '📊 Advanced Analytics',
     description: 'Deep insights powered by AI! Track performance across all platforms, get predictive analytics, and receive smart recommendations.',
     position: 'right'
   },
   {
     id: 'workspaces-nav',
-    target: 'div:has(span:contains("Workspaces"))',
+    target: '[data-nav="workspaces"]',
     title: '👥 AI-Powered Workspaces',
     description: 'Collaborate with custom AI personalities! Each workspace can have its own AI assistant with unique personality and expertise.',
     position: 'right'
   },
   {
     id: 'integration-nav',
-    target: 'div:has(span:contains("Integration"))',
+    target: '[data-nav="integration"]',
     title: '🔗 Platform Integration',
     description: 'Connect all your social platforms! Manage Instagram, YouTube, Twitter, LinkedIn, and more from one unified dashboard.',
     position: 'right'
@@ -89,33 +89,37 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     if (!isActive) return
 
     const findAndHighlightElement = () => {
-      // Try multiple fallback selectors for each target
       let element: HTMLElement | null = null
       
-      // Map of fallback selectors for each step
-      const fallbackSelectors: Record<string, string[]> = {
-        'h1': ['h1', '[data-testid="dashboard-header"]', '.text-3xl', '.text-2xl'],
-        'div:has(span:contains("VeeGPT"))': ['.veegpt-nav-item', 'div:contains("VeeGPT")', '[data-nav="veegpt"]'],
-        'div:has(span:contains("Video Gen"))': ['[data-nav="video-generator"]', 'div:contains("Video")', '.sidebar-nav-item:has([data-nav="video-generator"])'],
-        'div:has(span:contains("Automation"))': ['[data-nav="automation"]', 'div:contains("Automation")', '.sidebar-nav-item:has([data-nav="automation"])'],
-        'div:has(span:contains("Create"))': ['[data-testid="create-dropdown-trigger"]', '[data-nav="create"]', 'div:contains("Create")'],
-        'div:has(span:contains("Analytics"))': ['[data-nav="analytics"]', 'div:contains("Analytics")', '.sidebar-nav-item:has([data-nav="analytics"])'],
-        'div:has(span:contains("Workspaces"))': ['[data-nav="workspaces"]', 'div:contains("Workspaces")', '.sidebar-nav-item:has([data-nav="workspaces"])'],
-        'div:has(span:contains("Integration"))': ['[data-nav="integration"]', 'div:contains("Integration")', '.sidebar-nav-item:has([data-nav="integration"])']
+      // Simple direct targeting based on step ID
+      switch (currentStep) {
+        case 0: // Welcome
+          element = document.querySelector('h1') || document.querySelector('h2') || document.querySelector('.text-3xl')
+          break
+        case 1: // VeeGPT
+          element = document.querySelector('.veegpt-nav-item')
+          break
+        case 2: // Video Generator
+          element = document.querySelector('[data-nav="video-generator"]')
+          break
+        case 3: // Automation
+          element = document.querySelector('[data-nav="automation"]')
+          break
+        case 4: // Create
+          element = document.querySelector('[data-testid="create-dropdown-trigger"]') || document.querySelector('[data-nav="create"]')
+          break
+        case 5: // Analytics
+          element = document.querySelector('[data-nav="analytics"]')
+          break
+        case 6: // Workspaces
+          element = document.querySelector('[data-nav="workspaces"]')
+          break
+        case 7: // Integration
+          element = document.querySelector('[data-nav="integration"]')
+          break
+        default:
+          element = document.querySelector(currentStepData.target) as HTMLElement
       }
-      
-      const selectors = fallbackSelectors[currentStepData.target] || [currentStepData.target]
-      
-      for (const selector of selectors) {
-        try {
-          element = document.querySelector(selector) as HTMLElement
-          if (element) break
-        } catch (e) {
-          // Continue to next selector
-        }
-      }
-      
-      console.log(`🎯 Found element for "${currentStepData.title}":`, element)
       
       if (element) {
         setTargetElement(element)
