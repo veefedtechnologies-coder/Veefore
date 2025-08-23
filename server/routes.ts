@@ -9002,9 +9002,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'User not found' });
       }
 
-      // Check if already verified
-      if (user.isEmailVerified) {
-        return res.status(400).json({ message: 'Email already verified' });
+      // Check if already verified AND onboarded
+      if (user.isEmailVerified && user.isOnboarded) {
+        return res.status(400).json({ 
+          message: 'Account is already fully set up. Please sign in instead.',
+          userExists: true,
+          shouldSignIn: true
+        });
+      }
+
+      // If user is verified but not onboarded, allow them to proceed to onboarding
+      if (user.isEmailVerified && !user.isOnboarded) {
+        console.log(`[EMAIL VERIFICATION] User ${email} is verified but not onboarded - proceeding to onboarding`);
+        return res.json({ 
+          message: 'Email verified successfully',
+          user: {
+            id: user.id,
+            email: user.email,
+            displayName: user.displayName,
+            isEmailVerified: true,
+            isOnboarded: false
+          },
+          requiresOnboarding: true
+        });
       }
 
       // Verify OTP and expiry
@@ -9065,8 +9085,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ message: 'User not found' });
       }
 
-      if (user.isEmailVerified) {
-        return res.status(400).json({ message: 'Email already verified' });
+      if (user.isEmailVerified && user.isOnboarded) {
+        return res.status(400).json({ 
+          message: 'Account is already fully set up. Please sign in instead.',
+          userExists: true,
+          shouldSignIn: true
+        });
       }
 
       // Generate new OTP
