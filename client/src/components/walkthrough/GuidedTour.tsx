@@ -1,210 +1,192 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, ChevronLeft, ChevronRight, Target, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { X, Target, ArrowRight, ArrowLeft } from 'lucide-react'
 
 interface TourStep {
-  id: string
-  target: string // CSS selector for the element to highlight
   title: string
   description: string
+  target: string
   position: 'top' | 'bottom' | 'left' | 'right'
-  action?: () => void
+}
+
+interface GuidedTourProps {
+  isActive: boolean
+  onClose: () => void
 }
 
 const tourSteps: TourStep[] = [
   {
-    id: 'welcome',
-    target: 'h1',
-    title: 'Welcome to VeeFore!',
-    description: 'Your AI-powered social media command center. Let me show you the core features that make VeeFore the most advanced social media platform.',
-    position: 'bottom'
+    title: "Welcome to VeeFore!",
+    description: "Let's take a quick tour of your AI-powered social media management platform and discover how AI can transform your content strategy.",
+    target: "h1",
+    position: "bottom"
   },
   {
-    id: 'veegpt-nav',
-    target: '.veegpt-nav-item',
-    title: '🤖 VeeGPT - Your AI Assistant',
-    description: 'Meet your personal AI assistant! VeeGPT helps with content creation, strategy planning, analytics insights, and answers any questions about your social media.',
-    position: 'right'
+    title: "🤖 VeeGPT - Your AI Assistant", 
+    description: "Meet VeeGPT, your intelligent AI assistant that helps you create content, generate ideas, and manage your social media strategy with advanced AI capabilities.",
+    target: "[data-nav='veegpt']",
+    position: "right"
   },
   {
-    id: 'video-generator-nav',
-    target: '[data-nav="video-generator"]',
-    title: '🎬 AI Video Generator',
-    description: 'Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.',
-    position: 'right'
+    title: "🎬 AI Video Generator",
+    description: "Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.",
+    target: "[data-nav='video-generator']", 
+    position: "right"
   },
   {
-    id: 'automation-nav',
-    target: '[data-nav="automation"]',
-    title: '⚡ Smart Automation',
-    description: 'Automate your social media interactions! Set up AI-powered DM responses, comment replies, keyword triggers, and engagement automation.',
-    position: 'right'
+    title: "⚡ Automation Hub",
+    description: "Automate your social media interactions! Set up AI-powered DM responses, comment replies, and engagement automation to save time and boost efficiency.",
+    target: "[data-nav='automation']",
+    position: "right"
   },
   {
-    id: 'create-button',
-    target: '[data-nav="create"]',
-    title: '✨ AI Content Creation',
-    description: 'Create content with AI enhancement! Generate captions, hashtags, images, and optimize content for each platform with our AI tools.',
-    position: 'right'
+    title: "📊 AI Analytics Dashboard", 
+    description: "Get AI-powered insights about your content performance, audience engagement, and growth opportunities across all your social platforms.",
+    target: "[data-nav='analytics']",
+    position: "right"
   },
   {
-    id: 'analytics-nav',
-    target: '[data-nav="analytics"]',
-    title: '📊 Advanced Analytics',
-    description: 'Deep insights powered by AI! Track performance across all platforms, get predictive analytics, and receive smart recommendations.',
-    position: 'right'
+    title: "👥 Team Workspaces",
+    description: "Collaborate with your team using AI-powered workspaces. Each workspace can have its own AI personality and content strategy.",
+    target: "[data-nav='workspaces']", 
+    position: "right"
   },
   {
-    id: 'workspaces-nav',
-    target: '[data-nav="workspaces"]',
-    title: '👥 AI-Powered Workspaces',
-    description: 'Collaborate with custom AI personalities! Each workspace can have its own AI assistant with unique personality and expertise.',
-    position: 'right'
+    title: "🔗 Social Platform Integration",
+    description: "Connect all your social media accounts and manage them from one AI-powered dashboard with seamless integrations.",
+    target: "[data-nav='integration']",
+    position: "right"
   },
   {
-    id: 'integration-nav',
-    target: '[data-nav="integration"]',
-    title: '🔗 Platform Integration',
-    description: 'Connect all your social platforms! Manage Instagram, YouTube, Twitter, LinkedIn, and more from one unified dashboard.',
-    position: 'right'
+    title: "✨ AI Content Creation",
+    description: "Use our AI content creation tools to generate posts, stories, captions, and more with just a few clicks.",
+    target: "[data-nav='create']",
+    position: "right"
   }
 ]
 
-interface GuidedTourProps {
-  isActive: boolean
-  onComplete: () => void
-  onClose: () => void
-}
-
-export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
+export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
   const tooltipRef = useRef<HTMLDivElement>(null)
 
   const currentStepData = tourSteps[currentStep]
-  const isLastStep = currentStep === tourSteps.length - 1
 
+  // Find and highlight the target element for current step
   useEffect(() => {
     if (!isActive) return
 
-    const findAndHighlightElement = () => {
-      let element: HTMLElement | null = null
-      
-      // Target specific sidebar items using exact data-nav values
-      switch (currentStep) {
-        case 0: // Welcome
-          element = document.querySelector('h1') || document.querySelector('h2') || document.querySelector('.text-3xl')
-          break
-        case 1: // VeeGPT
-          element = document.querySelector('[data-nav="veegpt"]')
-          break
-        case 2: // Video Generator
-          element = document.querySelector('[data-nav="video-generator"]')
-          break
-        case 3: // Automation  
-          element = document.querySelector('[data-nav="automation"]')
-          break
-        case 4: // Create
-          element = document.querySelector('[data-nav="create"]') || document.querySelector('[data-testid="create-dropdown-trigger"]')
-          break
-        case 5: // Analytics
-          element = document.querySelector('[data-nav="analytics"]')
-          break
-        case 6: // Workspaces
-          element = document.querySelector('[data-nav="workspaces"]')
-          break
-        case 7: // Integration
-          element = document.querySelector('[data-nav="integration"]')
-          break
-        default:
-          element = document.querySelector(currentStepData.target) as HTMLElement
-      }
-      
-      // Debug: Show which element we found
-      console.log(`Step ${currentStep}: Looking for ${currentStepData.title}`)
-      console.log('Found element:', element)
-      if (!element) {
-        console.log('Available data-nav elements:')
-        document.querySelectorAll('[data-nav]').forEach(el => {
-          console.log(`- [data-nav="${el.getAttribute('data-nav')}"]`, el)
-        })
-      }
-      
-      if (element) {
-        setTargetElement(element)
-        
-        // Scroll element into view
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center'
-        })
+    const findElement = () => {
+      setTimeout(() => {
+        let element: HTMLElement | null = null
 
-        // Calculate tooltip position
-        const rect = element.getBoundingClientRect()
-        const tooltipRect = tooltipRef.current?.getBoundingClientRect()
-        
-        let top = 0
-        let left = 0
-
-        switch (currentStepData.position) {
-          case 'top':
-            top = rect.top - (tooltipRect?.height || 0) - 20
-            left = rect.left + (rect.width / 2) - ((tooltipRect?.width || 0) / 2)
+        // Use data-nav attributes for precise targeting
+        switch (currentStep) {
+          case 0: // Welcome - target main heading
+            element = document.querySelector('h1') || document.querySelector('.text-3xl') || document.querySelector('.text-2xl')
             break
-          case 'bottom':
-            top = rect.bottom + 20
-            left = rect.left + (rect.width / 2) - ((tooltipRect?.width || 0) / 2)
+          case 1: // VeeGPT
+            element = document.querySelector('[data-nav="veegpt"]')
             break
-          case 'left':
-            top = rect.top + (rect.height / 2) - ((tooltipRect?.height || 0) / 2)
-            left = rect.left - (tooltipRect?.width || 0) - 20
+          case 2: // Video Generator
+            element = document.querySelector('[data-nav="video-generator"]')
             break
-          case 'right':
-            top = rect.top + (rect.height / 2) - ((tooltipRect?.height || 0) / 2)  
-            left = rect.right + 20
+          case 3: // Automation
+            element = document.querySelector('[data-nav="automation"]')
+            break
+          case 4: // Analytics
+            element = document.querySelector('[data-nav="analytics"]')
+            break
+          case 5: // Workspaces
+            element = document.querySelector('[data-nav="workspaces"]')
+            break
+          case 6: // Integration
+            element = document.querySelector('[data-nav="integration"]')
+            break
+          case 7: // Create
+            element = document.querySelector('[data-nav="create"]')
             break
         }
 
-        // Responsive viewport constraints
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-        const padding = viewportWidth < 768 ? 16 : 20  // Responsive padding
+        console.log(`🎯 Step ${currentStep + 1}: Looking for "${currentStepData.title}"`)
+        console.log('📍 Found element:', element?.tagName, element?.textContent?.trim())
         
-        if (left < padding) left = padding
-        if (left + (tooltipRect?.width || 0) > viewportWidth - padding) {
-          left = viewportWidth - (tooltipRect?.width || 0) - padding
-        }
-        if (top < padding) top = padding
-        if (top + (tooltipRect?.height || 0) > viewportHeight - padding) {
-          top = viewportHeight - (tooltipRect?.height || 0) - padding
+        if (!element) {
+          console.log('❌ Element not found! Available elements:')
+          document.querySelectorAll('[data-nav]').forEach(el => {
+            console.log(`- [data-nav="${el.getAttribute('data-nav')}"]`)
+          })
         }
 
-        setTooltipPosition({ top, left })
-      }
+        if (element) {
+          setTargetElement(element)
+          positionTooltip(element)
+        }
+      }, 150)
     }
 
-    // Small delay to ensure DOM is updated
-    const timer = setTimeout(findAndHighlightElement, 200)
-    return () => clearTimeout(timer)
-  }, [currentStep, isActive, currentStepData])
+    findElement()
+  }, [currentStep, isActive])
 
+  // Position tooltip relative to target element
+  const positionTooltip = (element: HTMLElement) => {
+    if (!tooltipRef.current) return
+
+    setTimeout(() => {
+      const rect = element.getBoundingClientRect()
+      const tooltip = tooltipRef.current?.getBoundingClientRect()
+      const viewport = { width: window.innerWidth, height: window.innerHeight }
+      
+      let top = 0
+      let left = 0
+      const padding = viewport.width < 768 ? 16 : 20
+
+      // Position based on step preference
+      switch (currentStepData.position) {
+        case 'right':
+          top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
+          left = rect.right + 20
+          break
+        case 'bottom':
+          top = rect.bottom + 20
+          left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+          break
+        case 'left':
+          top = rect.top + (rect.height / 2) - (tooltip?.height || 0) / 2
+          left = rect.left - (tooltip?.width || 0) - 20
+          break
+        case 'top':
+          top = rect.top - (tooltip?.height || 0) - 20
+          left = rect.left + (rect.width / 2) - (tooltip?.width || 0) / 2
+          break
+      }
+
+      // Keep tooltip in viewport
+      if (left < padding) left = padding
+      if (left + (tooltip?.width || 0) > viewport.width - padding) {
+        left = viewport.width - (tooltip?.width || 0) - padding
+      }
+      if (top < padding) top = padding
+      if (top + (tooltip?.height || 0) > viewport.height - padding) {
+        top = viewport.height - (tooltip?.height || 0) - padding
+      }
+
+      setTooltipPosition({ top, left })
+    }, 50)
+  }
+
+  // Navigation functions
   const nextStep = () => {
-    if (currentStepData.action) {
-      currentStepData.action()
-    }
-    
-    if (isLastStep) {
-      onComplete()
+    if (currentStep < tourSteps.length - 1) {
+      setCurrentStep(currentStep + 1)
     } else {
-      setCurrentStep(prev => prev + 1)
+      onClose()
     }
   }
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1)
+      setCurrentStep(currentStep - 1)
     }
   }
 
@@ -212,7 +194,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     onClose()
   }
 
-  // Block body scroll when tour is active
+  // Block body scroll and interactions
   useEffect(() => {
     if (isActive) {
       document.body.style.overflow = 'hidden'
@@ -222,19 +204,12 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     }
   }, [isActive])
 
-  // Responsive resize handling
+  // Handle window resize
   useEffect(() => {
-    if (!isActive) return
+    if (!isActive || !targetElement) return
 
     const handleResize = () => {
-      // Force re-calculation of positions when window resizes
-      if (targetElement) {
-        const rect = targetElement.getBoundingClientRect()
-        // Trigger re-positioning
-        setTimeout(() => {
-          setTargetElement(targetElement)
-        }, 100)
-      }
+      positionTooltip(targetElement)
     }
 
     window.addEventListener('resize', handleResize)
@@ -250,7 +225,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
 
   return (
     <>
-      {/* Responsive overlay with spotlight effect - blocks all background interactions */}
+      {/* Background overlay with spotlight effect */}
       <div 
         className="fixed inset-0 z-50"
         style={{
@@ -258,13 +233,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
             const rect = targetElement.getBoundingClientRect()
             const centerX = rect.left + rect.width / 2
             const centerY = rect.top + rect.height / 2
-            const viewportWidth = window.innerWidth
-            
-            // Responsive spotlight size based on screen size
-            const baseRadius = Math.max(rect.width, rect.height)
-            const spotlightRadius = viewportWidth < 768 
-              ? baseRadius + 40  // Smaller on mobile
-              : baseRadius + 60  // Larger on desktop
+            const spotlightRadius = Math.max(rect.width, rect.height) + (window.innerWidth < 768 ? 40 : 60)
             const fadeRadius = spotlightRadius + 20
             
             return `radial-gradient(circle at ${centerX}px ${centerY}px, transparent 0px, transparent ${spotlightRadius}px, rgba(0,0,0,0.4) ${fadeRadius}px)`
@@ -277,15 +246,11 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
         onMouseDown={(e) => e.preventDefault()}
       />
 
-      {/* Responsive highlight border around target element */}
+      {/* Highlight border around target element */}
       {targetElement && (() => {
         const rect = targetElement.getBoundingClientRect()
-        const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
-        
-        // Responsive padding based on screen size
-        const padding = viewportWidth < 768 ? 4 : 6
-        const shadowSize = viewportWidth < 768 ? 20 : 30
+        const padding = window.innerWidth < 768 ? 4 : 6
+        const shadowSize = window.innerWidth < 768 ? 20 : 30
         
         return (
           <div
@@ -302,7 +267,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
         )
       })()}
 
-      {/* Responsive Tooltip */}
+      {/* Tooltip */}
       <div
         ref={tooltipRef}
         className="fixed z-50 bg-white rounded-2xl shadow-2xl p-4 md:p-6 max-w-xs md:max-w-sm border border-gray-200 pointer-events-auto"
@@ -310,7 +275,6 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
           top: tooltipPosition.top,
           left: tooltipPosition.left,
           maxWidth: window.innerWidth < 768 ? '280px' : '384px',
-          transform: tooltipPosition.top < 100 ? 'translateY(0)' : 'translateY(0)'
         }}
       >
         {/* Progress indicator */}
@@ -341,63 +305,38 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
 
         {/* Content */}
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center">
-            <Sparkles className="w-5 h-5 text-blue-500 mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {currentStepData.title}
           </h3>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-600 text-sm leading-relaxed">
             {currentStepData.description}
           </p>
         </div>
 
-        {/* Navigation */}
+        {/* Navigation buttons */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
+          <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2"
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentStep === 0
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" />
             <span>Previous</span>
-          </Button>
+          </button>
 
-          <div className="flex items-center space-x-2">
-            {tourSteps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentStep 
-                    ? 'bg-blue-500 w-4' 
-                    : index < currentStep 
-                    ? 'bg-green-500' 
-                    : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
-
-          <Button
+          <button
             onClick={nextStep}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 hover:from-blue-600 hover:to-purple-700 flex items-center space-x-2"
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
           >
-            <span>{isLastStep ? 'Finish' : 'Next'}</span>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+            <span>{currentStep === tourSteps.length - 1 ? 'Finish' : 'Next'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
-
-        {/* Arrow pointing to target */}
-        <div 
-          className={`absolute w-4 h-4 bg-white border border-gray-200 transform rotate-45 ${
-            currentStepData.position === 'top' ? '-bottom-2 left-1/2 -translate-x-1/2' :
-            currentStepData.position === 'bottom' ? '-top-2 left-1/2 -translate-x-1/2' :
-            currentStepData.position === 'left' ? '-right-2 top-1/2 -translate-y-1/2' :
-            '-left-2 top-1/2 -translate-y-1/2'
-          }`}
-        />
       </div>
     </>
   )
 }
-
-export default GuidedTour
