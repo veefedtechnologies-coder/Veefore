@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export function ScheduledPostsSection() {
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
+    <Card data-testid="scheduled-posts" className="bg-white shadow-sm border border-gray-200">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

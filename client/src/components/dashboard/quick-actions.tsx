@@ -88,7 +88,7 @@ const quickActions = [
 
 export function QuickActions() {
   return (
-    <div className="mb-16">
+    <div className="mb-16" data-testid="quick-actions">
       {/* Quick Actions Grid - Large Hootsuite Style */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-10 px-3 sm:px-4 lg:px-6">
         {quickActions.map((action, index) => (

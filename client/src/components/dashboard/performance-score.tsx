@@ -22,7 +22,7 @@ export function PerformanceScore() {
 
   if (isLoading) {
     return (
-      <Card className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
+      <Card data-testid="performance-score" className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
         <CardHeader className="text-center pb-4">
           <div className="animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-48 mx-auto mb-2"></div>
@@ -77,7 +77,7 @@ export function PerformanceScore() {
   }
 
   return (
-    <Card className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
+    <Card data-testid="performance-score" className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div className="flex items-center space-x-3">
           <CardTitle className="text-xl font-bold text-gray-900">Performance Overview</CardTitle>

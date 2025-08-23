@@ -25,7 +25,7 @@ const recommendations = [
 
 export function Recommendations() {
   return (
-    <Card className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
+    <Card data-testid="recommendations" className="border-gray-200/50 bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-gray-900">Your recommendations</CardTitle>
       </CardHeader>

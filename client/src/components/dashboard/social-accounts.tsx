@@ -23,7 +23,7 @@ export function SocialAccounts() {
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-lg border border-gray-200/50 overflow-hidden">
+      <Card data-testid="social-accounts" className="bg-white shadow-lg border border-gray-200/50 overflow-hidden">
         <CardContent className="p-6">
           <div className="animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
@@ -96,7 +96,7 @@ export function SocialAccounts() {
   }
 
   return (
-    <Card className="bg-white shadow-lg border border-gray-200/50 overflow-hidden">
+    <Card data-testid="social-accounts" className="bg-white shadow-lg border border-gray-200/50 overflow-hidden">
       <CardContent className="p-0">
         {/* Enhanced Header */}
         <div className="p-6 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-100">

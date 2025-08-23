@@ -34,7 +34,7 @@ import AutomationStepByStep from './pages/AutomationStepByStep'
 import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 import AdminPanel from './pages/AdminPanel'
 import AdminLogin from './pages/AdminLogin'
-import { InteractiveWalkthrough } from './components/walkthrough/InteractiveWalkthrough'
+import { GuidedTour } from './components/walkthrough/GuidedTour'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -677,11 +677,11 @@ function App() {
       
     </Switch>
 
-    {/* Premium Interactive Walkthrough */}
-    <InteractiveWalkthrough
-      isOpen={isWalkthroughOpen}
+    {/* Guided Tour */}
+    <GuidedTour
+      isActive={isWalkthroughOpen}
+      onComplete={() => setIsWalkthroughOpen(false)}
       onClose={() => setIsWalkthroughOpen(false)}
-      userData={userData}
     />
     </>
   )

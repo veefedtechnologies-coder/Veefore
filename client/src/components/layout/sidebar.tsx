@@ -219,6 +219,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
         {sidebarItems.map((item, index) => (
           <div
             key={item.label}
+            data-testid={item.isCreateButton ? "create-dropdown-trigger" : undefined}
             onClick={(e) => {
               if (item.isCreateButton) {
                 handleCreateClick(e)

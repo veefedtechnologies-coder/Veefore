@@ -28,7 +28,7 @@ export function Header({ className, onCreateClick }: HeaderProps) {
   }
 
   return (
-    <header className={cn("h-32 bg-white/98 backdrop-blur-xl border-b border-gray-200/60 flex items-center justify-between px-10 shadow-lg flex-shrink-0", className)}>
+    <header data-testid="dashboard-header" className={cn("h-32 bg-white/98 backdrop-blur-xl border-b border-gray-200/60 flex items-center justify-between px-10 shadow-lg flex-shrink-0", className)}>
       {/* Left Section */}
       <div className="flex items-center space-x-8">
         <div className="flex flex-col space-y-3">
