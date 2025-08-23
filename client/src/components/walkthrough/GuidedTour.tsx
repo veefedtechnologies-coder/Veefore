@@ -61,6 +61,30 @@ const tourSteps: TourStep[] = [
     description: "Use our AI content creation tools to generate posts, stories, captions, and more with just a few clicks.",
     target: "[data-nav='create']",
     position: "right"
+  },
+  {
+    title: "🎨 Smart Content Creation Cards",
+    description: "These AI-powered creation options help you generate content instantly. Choose from creating from scratch, posting across networks, trending topics, or starting with AI assistance.",
+    target: ".dashboard-cards",
+    position: "top"
+  },
+  {
+    title: "📈 Performance Overview",
+    description: "Monitor your social media performance with real-time analytics. Track engagement, reach, followers, and content performance across all connected platforms.",
+    target: ".performance-overview",
+    position: "top"
+  },
+  {
+    title: "🔌 Connected Platforms",
+    description: "View and manage all your connected social media accounts in one place. See connection status, account details, and manage platform integrations.",
+    target: ".connected-platforms",
+    position: "top"
+  },
+  {
+    title: "🔍 Smart Search",
+    description: "Use AI-powered search to quickly find posts, analytics, insights, and content across your entire social media presence.",
+    target: ".search-container",
+    position: "bottom"
   }
 ]
 
@@ -80,7 +104,7 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
       setTimeout(() => {
         let element: HTMLElement | null = null
 
-        // Use data-nav attributes for precise targeting
+        // Use data-nav attributes and dashboard selectors for precise targeting
         switch (currentStep) {
           case 0: // Welcome - target main heading
             element = document.querySelector('h1') || document.querySelector('.text-3xl') || document.querySelector('.text-2xl')
@@ -105,6 +129,34 @@ export function GuidedTour({ isActive, onClose }: GuidedTourProps) {
             break
           case 7: // Create
             element = document.querySelector('[data-nav="create"]')
+            break
+          case 8: // Dashboard Cards
+            element = document.querySelector('.dashboard-cards') || 
+                     document.querySelector('.grid') ||
+                     document.querySelector('[data-testid="dashboard-cards"]') ||
+                     document.querySelector('.grid-cols-2, .grid-cols-4')
+            break
+          case 9: // Performance Overview
+            element = document.querySelector('.performance-overview') ||
+                     document.querySelector('[data-testid="performance-overview"]') ||
+                     document.querySelector('h2:contains("Performance Overview")') ||
+                     document.querySelector('h3:contains("Performance")') ||
+                     Array.from(document.querySelectorAll('h2, h3')).find(el => 
+                       el.textContent?.toLowerCase().includes('performance'))
+            break
+          case 10: // Connected Platforms
+            element = document.querySelector('.connected-platforms') ||
+                     document.querySelector('[data-testid="connected-platforms"]') ||
+                     Array.from(document.querySelectorAll('h2, h3')).find(el => 
+                       el.textContent?.toLowerCase().includes('connected') || 
+                       el.textContent?.toLowerCase().includes('platform'))
+            break
+          case 11: // Smart Search
+            element = document.querySelector('.search-container') ||
+                     document.querySelector('[data-testid="search"]') ||
+                     document.querySelector('input[placeholder*="Search"]') ||
+                     document.querySelector('input[placeholder*="search"]') ||
+                     document.querySelector('.search-input')
             break
         }
 
