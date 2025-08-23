@@ -802,8 +802,8 @@ export default function VeeGPT() {
       textareaRef.current.value = ''
     }
     
-    // Set initial status - will be replaced by real AI status via WebSocket
-    setAiStatus('🧠 Initializing hybrid AI analysis...')
+    // Clear any previous status - new status will come from WebSocket
+    setAiStatus(null)
 
     try {
       if (!currentConversationId) {
