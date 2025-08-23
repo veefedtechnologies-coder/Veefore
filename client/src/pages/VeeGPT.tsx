@@ -48,6 +48,7 @@ const convertToMarkdown = (text: string): string => {
   result = result.replace(/^The Evolution of Communication$/gm, '## The Evolution of Communication');
   result = result.replace(/^Community Building and Networking$/gm, '## Community Building and Networking');
   result = result.replace(/^Content Creation and the Creator Economy$/gm, '## Content Creation and the Creator Economy');
+  result = result.replace(/^Raising Awareness and Education$/gm, '## Raising Awareness and Education');
   result = result.replace(/^Introduction$/gm, '## Introduction');
   result = result.replace(/^Conclusion$/gm, '## Conclusion');
   result = result.replace(/^Overview$/gm, '## Overview');
@@ -58,6 +59,18 @@ const convertToMarkdown = (text: string): string => {
   result = result.replace(/^(Causes? of [A-Za-z\s]+)$/gm, '## $1');
   result = result.replace(/^(Benefits? of [A-Za-z\s]+)$/gm, '## $1');
   result = result.replace(/^(Types? of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Role of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Impact of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Importance of [A-Za-z\s]+)$/gm, '## $1');
+  
+  // Convert common action-based headings
+  result = result.replace(/^(Raising [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Building [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Creating [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Developing [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Promoting [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Understanding [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Addressing [A-Za-z\s]+)$/gm, '## $1');
   
   return result;
 };
