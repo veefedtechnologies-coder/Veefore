@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import fetch from 'node-fetch';
 
 // Types for AI responses and routing
 export interface AIProvider {
@@ -171,17 +172,11 @@ Always provide practical, actionable advice tailored to content creation and soc
    * Perplexity API Call (Research & Trending Data)
    */
   private async getPerplexityResponse(userMessage: string): Promise<AIResponse> {
+    console.log('[PERPLEXITY] Starting API call for message:', userMessage.substring(0, 50) + '...');
+    console.log('[PERPLEXITY] API Key configured:', !!process.env.PERPLEXITY_API_KEY);
+    console.log('[PERPLEXITY] API Key length:', process.env.PERPLEXITY_API_KEY?.length || 0);
+    
     try {
-      console.log('[PERPLEXITY] Making API call for message:', userMessage.substring(0, 50) + '...');
-      console.log('[PERPLEXITY] API Key configured:', !!process.env.PERPLEXITY_API_KEY);
-      
-      // Use dynamic import for node-fetch if native fetch fails
-      let fetchFunction = globalThis.fetch;
-      if (!fetchFunction) {
-        const { default: fetch } = await import('node-fetch');
-        fetchFunction = fetch as any;
-      }
-      
       const requestBody = {
         model: 'llama-3.1-sonar-small-128k-online',
         messages: [
@@ -203,9 +198,9 @@ Always provide practical, actionable advice tailored to content creation and soc
         stream: false
       };
       
-      console.log('[PERPLEXITY] Request body:', JSON.stringify(requestBody, null, 2));
+      console.log('[PERPLEXITY] Making fetch request to Perplexity API...');
       
-      const response = await fetchFunction('https://api.perplexity.ai/chat/completions', {
+      const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
@@ -215,20 +210,24 @@ Always provide practical, actionable advice tailored to content creation and soc
       });
 
       console.log('[PERPLEXITY] Response status:', response.status);
+      console.log('[PERPLEXITY] Response statusText:', response.statusText);
       console.log('[PERPLEXITY] Response ok:', response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('[PERPLEXITY] API error response:', errorText);
-        throw new Error(`API Error: ${response.status} - ${errorText}`);
+        throw new Error(`API Error: ${response.status} - ${response.statusText} - ${errorText}`);
       }
 
-      const data = await response.json();
-      console.log('[PERPLEXITY] Response data keys:', Object.keys(data));
-      console.log('[PERPLEXITY] Response data:', JSON.stringify(data, null, 2));
+      const data = await response.json() as any;
+      console.log('[PERPLEXITY] Response data received, keys:', Object.keys(data));
+      console.log('[PERPLEXITY] Full response:', JSON.stringify(data, null, 2));
+      
+      const content = data.choices?.[0]?.message?.content;
+      console.log('[PERPLEXITY] Extracted content:', content ? content.substring(0, 100) + '...' : 'No content');
       
       return {
-        content: data.choices[0]?.message?.content || 'Unable to fetch research data.',
+        content: content || 'Unable to fetch research data from Perplexity.',
         provider: 'perplexity',
         metadata: {
           sources: data.citations || [],
@@ -236,14 +235,16 @@ Always provide practical, actionable advice tailored to content creation and soc
           reasoning: 'Perplexity research with current data'
         }
       };
-    } catch (error) {
-      console.error('[PERPLEXITY] API error details:', error);
+    } catch (error: any) {
+      console.error('[PERPLEXITY] API error occurred:', error);
+      console.error('[PERPLEXITY] Error name:', error.name);
       console.error('[PERPLEXITY] Error message:', error.message);
       console.error('[PERPLEXITY] Error stack:', error.stack);
+      
       return {
-        content: 'I encountered an issue accessing current research data. Please try again.',
+        content: `I encountered an issue accessing current research data: ${error.message}. Please try again.`,
         provider: 'perplexity',
-        metadata: { confidence: 0, reasoning: 'API error' }
+        metadata: { confidence: 0, reasoning: 'API error: ' + error.message }
       };
     }
   }
