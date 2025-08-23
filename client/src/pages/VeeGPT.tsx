@@ -225,7 +225,7 @@ export default function VeeGPT() {
   const { data: messages = [] } = useQuery<ChatMessage[]>({
     queryKey: ['/api/chat/conversations', currentConversationId, 'messages'],
     queryFn: () => apiRequest(`/api/chat/conversations/${currentConversationId}/messages`),
-    enabled: false // Disable for demo without auth
+    enabled: !!currentConversationId // Enable when conversation is selected
   })
 
   // Combine real messages, optimistic messages, and streaming messages for display
