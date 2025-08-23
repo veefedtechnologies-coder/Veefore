@@ -70,6 +70,28 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
     onComplete(formData)
   }
 
+  const handlePlatformConnect = (platform: string) => {
+    // Placeholder for platform connection logic
+    // This would typically redirect to OAuth flow or open connection modal
+    console.log(`Connecting to ${platform}...`)
+    // For now, just show an alert
+    alert(`Opening ${platform} connection flow...`)
+  }
+
+  const getPlatformIcon = (platform: string) => {
+    const iconMap: { [key: string]: string } = {
+      'Instagram': '📷',
+      'Facebook': '👥', 
+      'Twitter/X': '🐦',
+      'LinkedIn': '💼',
+      'TikTok': '🎵',
+      'YouTube': '📹',
+      'Pinterest': '📌',
+      'Snapchat': '👻'
+    }
+    return iconMap[platform] || '🔗'
+  }
+
   const getStepIcon = (step: number) => {
     const icons = [User, Target, Settings, Rocket]
     const Icon = icons[step - 1]
@@ -316,6 +338,29 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Connect Platform Section */}
+              {formData.platforms.length > 0 && (
+                <div className="space-y-2 mt-4 pt-3 border-t border-gray-200">
+                  <Label className="text-xs font-semibold text-gray-700">Connect Your Platforms</Label>
+                  <p className="text-xs text-gray-500">Connect your selected platforms to start managing them</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {formData.platforms.map((platform) => (
+                      <button
+                        key={platform}
+                        onClick={() => handlePlatformConnect(platform)}
+                        className="flex items-center justify-center space-x-2 px-3 py-2 text-xs font-medium text-white bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-colors"
+                      >
+                        <span className="w-4 h-4 bg-white/20 rounded-sm flex items-center justify-center">
+                          {getPlatformIcon(platform)}
+                        </span>
+                        <span>Connect {platform}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-400 italic">You can skip this step and connect platforms later from your dashboard</p>
+                </div>
+              )}
             </div>
           </div>
         )
