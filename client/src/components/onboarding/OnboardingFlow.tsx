@@ -409,22 +409,23 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Completely Opaque Backdrop - Hide Dashboard */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800" />
+        {/* Liquid Glass Backdrop - Show Dashboard Through Glass */}
+        <div className="absolute inset-0 backdrop-blur-xl bg-black/20" />
         
         {/* Floating Liquid Glass Modal */}
         <div className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden">
-          {/* Liquid Glass Container */}
-          <div className="relative bg-white/8 backdrop-blur-3xl border border-white/15 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
+          {/* True Liquid Glass Container */}
+          <div className="relative bg-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl shadow-black/30 overflow-hidden">
             {/* Animated Liquid Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/12 via-blue-400/8 to-purple-400/10 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/8 via-blue-400/5 to-purple-400/6" />
             
-            {/* Multiple Glass Reflection Layers */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/8 via-white/3 to-transparent rounded-3xl" />
-            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent rounded-t-3xl" />
+            {/* Apple Glass Reflection Effects */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-white/3 to-transparent rounded-3xl" />
+            <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/8 to-transparent rounded-t-3xl" />
+            <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/6 to-transparent rounded-br-3xl" />
             
-            {/* Content Container with Enhanced Frosted Glass */}
-            <div className="relative bg-white/92 backdrop-blur-2xl m-2 rounded-[18px] p-8 overflow-y-auto max-h-[80vh] shadow-inner border border-white/20">
+            {/* Content Container with Subtle Glass */}
+            <div className="relative bg-white/85 backdrop-blur-md m-1 rounded-[22px] p-8 overflow-y-auto max-h-[80vh] shadow-inner border border-white/30">
               {/* Liquid Glass Close Button */}
               <button 
                 className="absolute right-6 top-6 w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 hover:border-white/30 transition-all duration-300 flex items-center justify-center group shadow-lg"
