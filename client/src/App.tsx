@@ -253,10 +253,10 @@ function App() {
               </main>
             </div>
 
-            {/* Multi-Step Onboarding Flow - FIXED LOGIC */}
-            {userData && (
+            {/* ONBOARDING DISABLED - USER IS ALREADY ONBOARDED */}
+            {false && userData && (
               <OnboardingFlow 
-                open={!userData.isOnboarded && !isWalkthroughOpen}
+                open={false}
                 userData={userData}
                 onComplete={async (onboardingData) => {
                 console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
