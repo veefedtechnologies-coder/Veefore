@@ -24,6 +24,8 @@ import Waitlist from './pages/Waitlist'
 import WaitlistStatus from './pages/WaitlistStatus'
 import OnboardingModal from './components/onboarding/OnboardingModal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog'
+import { Button } from './components/ui/button'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import LoadingSpinner from './components/LoadingSpinner'
 import { useQuery } from '@tanstack/react-query'
@@ -182,46 +184,6 @@ function App() {
           </div>
         ) : !user && hasFirebaseAuth ? (
           <LoadingSpinner />
-        ) : user && userData && !userData.isOnboarded ? (
-          // NON-ONBOARDED users get a full-screen onboarding page (no modal needed)
-          <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white flex items-center justify-center">
-            <div className="max-w-lg w-full mx-auto p-8 bg-white rounded-2xl shadow-2xl border border-emerald-100">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <div className="w-10 h-10 bg-emerald-600 rounded-full"></div>
-                </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to VeeFore!</h1>
-                <p className="text-gray-600 mb-8 text-lg">Complete your onboarding to access your dashboard</p>
-                <button 
-                  onClick={async () => {
-                    console.log('🎯 COMPLETING ONBOARDING - Updating database!')
-                    try {
-                      const response = await fetch('/api/user/complete-onboarding', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${await user?.getIdToken()}`
-                        }
-                      })
-                      if (response.ok) {
-                        console.log('✅ Onboarding completed successfully!')
-                        setIsOnboardingModalOpen(false)
-                        // Trigger a re-fetch of user data
-                        window.location.reload()
-                      } else {
-                        console.error('❌ Failed to complete onboarding')
-                      }
-                    } catch (error) {
-                      console.error('❌ Onboarding completion error:', error)
-                    }
-                  }}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-colors"
-                >
-                  Complete Onboarding
-                </button>
-              </div>
-            </div>
-          </div>
         ) : user && userData ? (
           // ONBOARDED users see dashboard
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
@@ -278,6 +240,66 @@ function App() {
                 </>
               </main>
             </div>
+
+            {/* Onboarding Modal - appears over dashboard when user is not onboarded */}
+            <Dialog open={!userData.isOnboarded} onOpenChange={() => {}}>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-center text-2xl font-bold text-emerald-600">
+                    🎉 Welcome to VeeFore!
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-10 h-10 bg-emerald-600 rounded-full"></div>
+                    </div>
+                    <p className="text-gray-600 text-lg">
+                      Complete your onboarding to unlock all features and start managing your social media like a pro!
+                    </p>
+                  </div>
+                  <div className="space-y-3 text-sm text-gray-600">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span>Connect your social media accounts</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span>Set up AI-powered content generation</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span>Create your first workspace</span>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={async () => {
+                      console.log('🎯 COMPLETING ONBOARDING - Modal button clicked!')
+                      try {
+                        const response = await fetch('/api/user/complete-onboarding', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${await user?.getIdToken()}`
+                          }
+                        })
+                        if (response.ok) {
+                          console.log('✅ Onboarding completed successfully!')
+                          window.location.reload()
+                        } else {
+                          console.error('❌ Failed to complete onboarding')
+                        }
+                      } catch (error) {
+                        console.error('❌ Onboarding completion error:', error)
+                      }
+                    }}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 text-lg"
+                  >
+                    Complete Onboarding & Get Started
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         ) : (
           <LoadingSpinner />
