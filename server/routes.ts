@@ -13816,7 +13816,18 @@ Create a detailed growth strategy in JSON format:
           const { HybridAIService } = await import('./hybrid-ai-service');
           const hybridAI = new HybridAIService();
           
-          for await (const chunk of hybridAI.generateHybridStreamingResponse(chatHistory)) {
+          // Status callback for real-time AI processing updates
+          const statusCallback = (status: string) => {
+            console.log(`[HYBRID AI STATUS] ${status}`);
+            (global as any).broadcastToConversation(convId, {
+              type: 'status',
+              status: status,
+              conversationId: convId,
+              messageId: aiMessage.id
+            });
+          };
+          
+          for await (const chunk of hybridAI.generateHybridStreamingResponse(chatHistory, statusCallback)) {
             // Check if generation was stopped
             if (!activeGenerations.get(convId)) {
               console.log(`[WEBSOCKET STREAM] Generation stopped for conversation ${convId}`);

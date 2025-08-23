@@ -355,22 +355,28 @@ Provide creative, actionable insights focused on content creation and social med
   }
 
   /**
-   * Main hybrid AI generation with streaming
+   * Main hybrid AI generation with streaming and status updates
    */
-  async* generateHybridStreamingResponse(messages: ChatMessage[]): AsyncGenerator<string, void, unknown> {
+  async* generateHybridStreamingResponse(messages: ChatMessage[], statusCallback?: (status: string) => void): AsyncGenerator<string, void, unknown> {
     try {
       const userMessage = messages[messages.length - 1]?.content || '';
+      
+      statusCallback?.('🧠 Analyzing question complexity and AI routing strategy...');
       const analysis = this.analyzeQuestion(userMessage);
       
       console.log(`[HYBRID AI] Analysis:`, analysis);
+      statusCallback?.(`🎯 Strategy: ${analysis.recommendedStrategy} | Primary AI: ${analysis.primaryProvider} | ${analysis.reasoning}`);
       
       // Single AI strategy - stream directly
       if (analysis.recommendedStrategy === 'single') {
         if (analysis.primaryProvider === 'openai') {
+          statusCallback?.('🚀 Connecting to OpenAI GPT-4o for strategic analysis...');
           yield* this.generateOpenAIStreamingResponse(messages);
         } else if (analysis.primaryProvider === 'perplexity') {
+          statusCallback?.('🔍 Fetching current trends and research data from Perplexity AI...');
           const response = await this.getPerplexityResponse(userMessage);
           
+          statusCallback?.('📝 Streaming research findings...');
           // Simulate streaming for perplexity
           const words = response.content.split(' ');
           for (const word of words) {
@@ -378,8 +384,10 @@ Provide creative, actionable insights focused on content creation and social med
             await new Promise(resolve => setTimeout(resolve, 50)); // Simulate streaming delay
           }
         } else if (analysis.primaryProvider === 'gemini') {
+          statusCallback?.('✨ Generating creative insights with Google Gemini...');
           const response = await this.getGeminiResponse(userMessage);
           
+          statusCallback?.('📝 Streaming creative content...');
           // Simulate streaming for gemini
           const words = response.content.split(' ');
           for (const word of words) {
@@ -392,23 +400,27 @@ Provide creative, actionable insights focused on content creation and social med
 
       // Hybrid/Enhanced strategy - combine multiple AIs
       console.log(`[HYBRID AI] Using ${analysis.recommendedStrategy} strategy with multiple AIs`);
+      statusCallback?.(`⚡ Using hybrid strategy - combining multiple AI providers...`);
       
       const responses: AIResponse[] = [];
       
       // Get responses from multiple AIs based on strategy
       if (analysis.requiresTrending) {
+        statusCallback?.('🔍 Step 1/3: Fetching trending data from Perplexity AI...');
         console.log('[HYBRID AI] Fetching trending data from Perplexity...');
         const perplexityResponse = await this.getPerplexityResponse(userMessage);
         responses.push(perplexityResponse);
       }
       
       if (analysis.requiresDeepAnalysis) {
+        statusCallback?.('🚀 Step 2/3: Getting strategic analysis from OpenAI GPT-4o...');
         console.log('[HYBRID AI] Getting strategic analysis from OpenAI...');
         const openaiResponse = await this.getOpenAIResponse(messages);
         responses.push(openaiResponse);
       }
       
       if (userMessage.toLowerCase().includes('creative') || userMessage.toLowerCase().includes('ideas')) {
+        statusCallback?.('✨ Step 3/3: Adding creative insights from Google Gemini...');
         console.log('[HYBRID AI] Adding creative insights from Gemini...');
         const geminiResponse = await this.getGeminiResponse(userMessage);
         responses.push(geminiResponse);
@@ -416,14 +428,17 @@ Provide creative, actionable insights focused on content creation and social med
       
       // If no specific responses, default to OpenAI
       if (responses.length === 0) {
+        statusCallback?.('🚀 Using OpenAI GPT-4o for comprehensive analysis...');
         console.log('[HYBRID AI] Defaulting to OpenAI for comprehensive response');
         const openaiResponse = await this.getOpenAIResponse(messages);
         responses.push(openaiResponse);
       }
       
       // Combine and stream the final response
+      statusCallback?.('🤖 Combining insights from multiple AI providers...');
       const combinedContent = this.combineResponses(responses, analysis.recommendedStrategy);
       
+      statusCallback?.('📝 Generating final response...');
       // Stream the combined response
       const words = combinedContent.split(' ');
       for (const word of words) {
@@ -433,6 +448,7 @@ Provide creative, actionable insights focused on content creation and social med
       
     } catch (error) {
       console.error('[HYBRID AI] Error:', error);
+      statusCallback?.('❌ Error occurred - attempting fallback response...');
       yield 'I apologize, but I encountered an error processing your request. Please try again.';
     }
   }

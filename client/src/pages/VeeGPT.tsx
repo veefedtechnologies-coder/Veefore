@@ -539,6 +539,12 @@ export default function VeeGPT() {
     })
 
     switch (data.type) {
+      case 'status':
+        // Real-time AI processing status updates
+        console.log('VeeGPT: STATUS UPDATE:', data.status)
+        setAiStatus(data.status)
+        break
+
       case 'userMessage':
         // Add user message to cache immediately
         if (currentConversationId && data.message) {
@@ -796,63 +802,8 @@ export default function VeeGPT() {
       textareaRef.current.value = ''
     }
     
-    // Generate contextual AI status based on user question
-    const getContextualStatus = (userMessage: string) => {
-      const message = userMessage.toLowerCase()
-      
-      // Social media related
-      if (message.includes('instagram') || message.includes('reels') || message.includes('tiktok') || message.includes('social media')) {
-        return "Analyzing social media strategies..."
-      }
-      
-      // Content creation
-      if (message.includes('content') || message.includes('video') || message.includes('post')) {
-        return "Processing content creation insights..."
-      }
-      
-      // Marketing and growth
-      if (message.includes('marketing') || message.includes('growth') || message.includes('audience') || message.includes('followers')) {
-        return "Reviewing marketing strategies..."
-      }
-      
-      // YouTube specific
-      if (message.includes('youtube') || message.includes('channel')) {
-        return "Analyzing YouTube optimization tactics..."
-      }
-      
-      // Business related
-      if (message.includes('business') || message.includes('entrepreneur') || message.includes('startup')) {
-        return "Processing business insights..."
-      }
-      
-      // Strategy questions
-      if (message.includes('how to') || message.includes('strategy') || message.includes('plan')) {
-        return "Formulating strategic recommendations..."
-      }
-      
-      // Tips and advice
-      if (message.includes('tips') || message.includes('advice') || message.includes('help')) {
-        return "Gathering expert insights..."
-      }
-      
-      // Analytics and data
-      if (message.includes('analytics') || message.includes('metrics') || message.includes('data')) {
-        return "Processing analytical insights..."
-      }
-      
-      // Default contextual messages
-      const contextualMessages = [
-        "Understanding your request...",
-        "Analyzing your question...", 
-        "Processing information...",
-        "Gathering relevant insights...",
-        "Reviewing context...",
-        "Preparing detailed response..."
-      ]
-      return contextualMessages[Math.floor(Math.random() * contextualMessages.length)]
-    }
-    
-    setAiStatus(getContextualStatus(content || ''))
+    // Set initial status - will be replaced by real AI status via WebSocket
+    setAiStatus('🧠 Initializing hybrid AI analysis...')
 
     try {
       if (!currentConversationId) {
