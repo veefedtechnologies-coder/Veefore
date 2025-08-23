@@ -1672,13 +1672,11 @@ export default function VeeGPT() {
                         className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
-                          wordBreak: 'break-all',
-                          overflowWrap: 'anywhere',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
                           whiteSpace: 'pre-wrap',
                           maxWidth: '100%',
-                          width: '100%',
-                          hyphens: 'auto',
-                          lineBreak: 'anywhere'
+                          width: '100%'
                         }}
                       >
                         {streamingContent[message.id] !== undefined ? (
@@ -1736,13 +1734,11 @@ export default function VeeGPT() {
                         className="leading-relaxed"
                         style={{
                           wordWrap: 'break-word',
-                          wordBreak: 'break-all',
-                          overflowWrap: 'anywhere',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
                           whiteSpace: 'pre-wrap',
                           maxWidth: '100%',
-                          width: '100%',
-                          hyphens: 'auto',
-                          lineBreak: 'anywhere'
+                          width: '100%'
                         }}
                       >
                         <div className="font-semibold text-gray-900">{message.content}</div>

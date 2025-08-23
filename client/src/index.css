@@ -13,12 +13,14 @@
 /* Restore list formatting (Tailwind base removes it) */
 .markdown-content ol {
   list-style-type: decimal;
+  list-style-position: outside;
   margin: 1rem 0;
   padding-left: 1.5rem;
 }
 
 .markdown-content ul {
   list-style-type: disc;
+  list-style-position: outside;
   margin: 1rem 0;
   padding-left: 1.5rem;
 }
@@ -28,6 +30,14 @@
   margin-bottom: 0.5rem;
   line-height: 1.6;
   display: list-item;
+  word-break: keep-all;
+  white-space: normal;
+}
+
+/* Prevent aggressive word breaking on list markers */
+.markdown-content ol li::marker,
+.markdown-content ul li::marker {
+  white-space: nowrap;
 }
 
 @keyframes gradient-shift {
