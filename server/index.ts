@@ -248,6 +248,9 @@ app.use((req, res, next) => {
   // Store WebSocket connections by conversation ID
   const wsConnections = new Map<number, Set<any>>();
   
+  // Store buffered messages for conversations without active connections
+  const messageBuffer = new Map<number, any[]>();
+  
   wss.on('connection', (ws, req) => {
     console.log('[WebSocket] New client connected for chat streaming');
     
@@ -264,7 +267,19 @@ app.use((req, res, next) => {
           wsConnections.get(convId)!.add(ws);
           console.log(`[WebSocket] Client subscribed to conversation ${convId}`);
           
+          // Send subscription confirmation
           ws.send(JSON.stringify({ type: 'subscribed', conversationId: convId }));
+          
+          // Send any buffered messages immediately
+          const buffered = messageBuffer.get(convId);
+          if (buffered && buffered.length > 0) {
+            console.log(`[WebSocket] Sending ${buffered.length} buffered messages to new client`);
+            buffered.forEach(message => {
+              ws.send(JSON.stringify(message));
+            });
+            // Clear buffer after sending
+            messageBuffer.delete(convId);
+          }
         }
       } catch (error) {
         console.error('[WebSocket] Parse error:', error);
@@ -297,8 +312,17 @@ app.use((req, res, next) => {
         }
       });
     } else {
-      console.log(`[WebSocket] No active connections for conversation ${conversationId}`);
-      console.log(`[WebSocket] Active conversations:`, Array.from(wsConnections.keys()));
+      // Buffer the message for when client connects
+      if (data.type === 'status') {
+        if (!messageBuffer.has(conversationId)) {
+          messageBuffer.set(conversationId, []);
+        }
+        messageBuffer.get(conversationId)!.push(data);
+        console.log(`[WebSocket] Buffered ${data.type} message for conversation ${conversationId}`);
+      } else {
+        console.log(`[WebSocket] No active connections for conversation ${conversationId}`);
+        console.log(`[WebSocket] Active conversations:`, Array.from(wsConnections.keys()));
+      }
     }
   };
 

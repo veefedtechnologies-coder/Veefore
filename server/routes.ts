@@ -13783,9 +13783,8 @@ Create a detailed growth strategy in JSON format:
         conversationId: convId
       });
 
-      // Start AI response generation in background using WebSocket
-      // Add small delay to ensure WebSocket connection is established
-      setTimeout(async () => {
+      // Start AI response generation immediately in background using WebSocket
+      setImmediate(async () => {
         try {
           // Get conversation history for AI context
           const messages = await storage.getChatMessages(convId);
@@ -13886,7 +13885,7 @@ Create a detailed growth strategy in JSON format:
           // Mark generation as complete
           activeGenerations.set(convId, false);
         }
-      }, 1000); // Wait 1 second for WebSocket connection
+      });
 
     } catch (error: any) {
       console.error('[CHAT] Create message error:', error);
@@ -14039,9 +14038,8 @@ Create a detailed growth strategy in JSON format:
         streaming: true
       });
 
-      // Start AI response generation in background using WebSocket streaming
-      // Add small delay to ensure WebSocket connection is established
-      setTimeout(async () => {
+      // Start AI response generation immediately with status buffering
+      setImmediate(async () => {
         try {
           const chatHistory = [{ role: 'user' as const, content: content.trim() }];
           let aiResponseContent = '';
@@ -14139,7 +14137,7 @@ Create a detailed growth strategy in JSON format:
           // Clean up active generation
           activeGenerations.delete(conversation.id);
         }
-      }, 1000); // Wait 1 second for WebSocket connection
+      });
     } catch (error: any) {
       console.error('[CHAT] Create conversation error:', error);
       res.status(500).json({ error: 'Failed to create conversation' });
