@@ -125,6 +125,7 @@ function App() {
   }
 
   return (
+    <>
     <Switch>
       {/* Waitlist pages - full screen without sidebar */}
       <Route path="/waitlist">
@@ -744,6 +745,7 @@ function App() {
         return null
       }
     })()}
+    </>
   )
 }
 
