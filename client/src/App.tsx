@@ -673,76 +673,77 @@ function App() {
         </>
       )}
       
-      {/* Walkthrough Modal - Direct JSX without IIFE */}
-      {(() => {
-        console.log('🎯 CONDITIONAL CHECK: isWalkthroughOpen =', isWalkthroughOpen, '(type:', typeof isWalkthroughOpen, ')')
-        if (isWalkthroughOpen) {
-          console.log('🎯 CONDITIONAL CHECK: Modal SHOULD render now!')
-          return true
-        } else {
-          console.log('🎯 CONDITIONAL CHECK: Modal should NOT render (isWalkthroughOpen is false)')
-          return false
-        }
-      })() && isWalkthroughOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(255, 0, 0, 0.9)', // RED background to make it VERY visible
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999999 // Much higher z-index
-          }}
-          onClick={() => {
-            console.log('🎯 DIRECT JSX: Background clicked, closing modal')
-            setIsWalkthroughOpen(false)
-          }}
-        >
+    </Switch>
+
+    {/* Walkthrough Modal - OUTSIDE Switch to avoid conflicts */}
+    {(() => {
+      console.log('🎯 OUTSIDE SWITCH: isWalkthroughOpen =', isWalkthroughOpen, '(type:', typeof isWalkthroughOpen, ')')
+      if (isWalkthroughOpen) {
+        console.log('🎯 OUTSIDE SWITCH: Modal SHOULD render now!')
+        return (
           <div 
             style={{
-              backgroundColor: 'white',
-              padding: '3rem',
-              borderRadius: '1rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              maxWidth: '500px',
-              width: '90%',
-              textAlign: 'center'
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(255, 0, 0, 0.9)', // RED background to make it VERY visible
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 999999 // Much higher z-index
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => {
+              console.log('🎯 OUTSIDE SWITCH: Background clicked, closing modal')
+              setIsWalkthroughOpen(false)
+            }}
           >
-            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
-              🎯 VeeFore Walkthrough
-            </h1>
-            <p style={{ marginBottom: '2rem', color: '#6b7280', fontSize: '1.1rem' }}>
-              Welcome, {userData?.displayName || userData?.fullName || user?.email?.split('@')[0] || 'User'}! 
-              <br />This DIRECT JSX modal should DEFINITELY work!
-            </p>
-            <button 
-              onClick={() => {
-                console.log('🎯 DIRECT JSX: Close button clicked')
-                setIsWalkthroughOpen(false)
-              }}
+            <div 
               style={{
-                backgroundColor: '#8b5cf6',
-                color: 'white',
-                padding: '1rem 2rem',
-                borderRadius: '0.5rem',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                fontWeight: '600'
+                backgroundColor: 'white',
+                padding: '3rem',
+                borderRadius: '1rem',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                maxWidth: '500px',
+                width: '90%',
+                textAlign: 'center'
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              ✨ Close Modal
-            </button>
+              <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
+                🎯 VeeFore Walkthrough
+              </h1>
+              <p style={{ marginBottom: '2rem', color: '#6b7280', fontSize: '1.1rem' }}>
+                Welcome, {userData?.displayName || userData?.fullName || user?.email?.split('@')[0] || 'User'}! 
+                <br />This modal is OUTSIDE the Switch component!
+              </p>
+              <button 
+                onClick={() => {
+                  console.log('🎯 OUTSIDE SWITCH: Close button clicked')
+                  setIsWalkthroughOpen(false)
+                }}
+                style={{
+                  backgroundColor: '#8b5cf6',
+                  color: 'white',
+                  padding: '1rem 2rem',
+                  borderRadius: '0.5rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}
+              >
+                ✨ Close Modal
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </Switch>
+        )
+      } else {
+        console.log('🎯 OUTSIDE SWITCH: Modal should NOT render (isWalkthroughOpen is false)')
+        return null
+      }
+    })()}
   )
 }
 
