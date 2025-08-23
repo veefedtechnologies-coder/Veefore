@@ -182,8 +182,30 @@ function App() {
           </div>
         ) : !user && hasFirebaseAuth ? (
           <LoadingSpinner />
+        ) : user && userData && !userData.isOnboarded ? (
+          // NON-ONBOARDED users get a full-screen onboarding page (no modal needed)
+          <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white flex items-center justify-center">
+            <div className="max-w-lg w-full mx-auto p-8 bg-white rounded-2xl shadow-2xl border border-emerald-100">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-10 h-10 bg-emerald-600 rounded-full"></div>
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to VeeFore!</h1>
+                <p className="text-gray-600 mb-8 text-lg">Complete your onboarding to access your dashboard</p>
+                <button 
+                  onClick={() => {
+                    console.log('🎯 COMPLETING ONBOARDING - No modal needed!')
+                    setIsOnboardingModalOpen(false)
+                  }}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-colors"
+                >
+                  Complete Onboarding
+                </button>
+              </div>
+            </div>
+          </div>
         ) : user && userData ? (
-          // Authenticated users (both onboarded and non-onboarded) see dashboard
+          // ONBOARDED users see dashboard
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
@@ -626,51 +648,7 @@ function App() {
         </>
       )}
       
-      {/* Global Onboarding Modal - appears over any route */}
-      {console.log('🟡 Rendering OnboardingModal with isOpen:', isOnboardingModalOpen)}
-      {isOnboardingModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '0px',
-          left: '0px',
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'red',
-          display: 'block',
-          zIndex: 999999
-        }}>
-          {console.log('🚀 RED SCREEN MODAL RENDERING NOW!')}
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'yellow',
-            padding: '50px',
-            border: '10px solid blue',
-            fontSize: '30px',
-            fontWeight: 'bold',
-            color: 'black',
-            textAlign: 'center'
-          }}>
-            🎉 CAN YOU SEE THIS BRIGHT MODAL?! 🎉
-            <br/><br/>
-            <button 
-              onClick={() => setIsOnboardingModalOpen(false)}
-              style={{
-                backgroundColor: 'green',
-                color: 'white',
-                padding: '20px 40px',
-                fontSize: '24px',
-                border: '5px solid black',
-                cursor: 'pointer'
-              }}
-            >
-              COMPLETE ONBOARDING
-            </button>
-          </div>
-        </div>
-      )}
+      {/* No modal needed - onboarding handled as full page above */}
     </Switch>
   )
 }
