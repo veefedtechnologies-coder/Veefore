@@ -55,26 +55,32 @@ interface OnboardingData {
 const TOTAL_STEPS = 4
 
 export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
-  console.log('🔵 OnboardingModal rendered - isOpen:', isOpen)
+  console.log('🔵 OnboardingModal function called - isOpen:', isOpen)
   
-  // FORCE RENDER TEST
   if (isOpen) {
-    console.log('🟢 Modal should be visible now!')
+    console.log('🟢 Modal should be visible - rendering overlay!')
   }
 
-  // TEMPORARY: Simple test render
-  if (!isOpen) return null
+  if (!isOpen) {
+    console.log('🔴 Modal is closed - returning null')
+    return null
+  }
+  
+  console.log('✅ Rendering modal JSX now!')
   
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      style={{ zIndex: 99999 }}
+    >
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <h2 className="text-2xl font-bold mb-4">🎉 Onboarding Modal Test</h2>
-        <p className="text-gray-600 mb-4">The modal is working! This confirms our onboarding flow is ready.</p>
+        <p className="text-gray-600 mb-4">Success! The strict signup flow is working.</p>
         <button 
           onClick={onClose}
-          className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+          className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 w-full"
         >
-          Close Modal
+          Complete Onboarding
         </button>
       </div>
     </div>

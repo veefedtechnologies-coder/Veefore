@@ -636,6 +636,7 @@ function App() {
       )}
       
       {/* Global Onboarding Modal - appears over any route */}
+      {console.log('🟡 Rendering OnboardingModal with isOpen:', isOnboardingModalOpen)}
       <OnboardingModal 
         isOpen={isOnboardingModalOpen} 
         onClose={() => setIsOnboardingModalOpen(false)}
