@@ -24,13 +24,14 @@ import Waitlist from './pages/Waitlist'
 import WaitlistStatus from './pages/WaitlistStatus'
 import OnboardingModal from './components/onboarding/OnboardingModal'
 import OnboardingFlow from './components/onboarding/OnboardingFlow'
+import WalkthroughModal from './components/walkthrough/WalkthroughModal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog'
 import { Button } from './components/ui/button'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
 import LoadingSpinner from './components/LoadingSpinner'
 import { useQuery } from '@tanstack/react-query'
-import { apiRequest } from '@/lib/queryClient'
+import { apiRequest, queryClient } from '@/lib/queryClient'
 import Profile from './pages/Profile'
 import Integration from './pages/Integration'
 import AutomationStepByStep from './pages/AutomationStepByStep'
@@ -41,6 +42,7 @@ import AdminLogin from './pages/AdminLogin'
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
   const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false)
+  const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false)
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
 
@@ -258,7 +260,10 @@ function App() {
                   })
                   if (response.ok) {
                     console.log('✅ Onboarding completed successfully!')
-                    window.location.reload()
+                    // Invalidate and refetch user data to update onboarded status
+                    await queryClient.invalidateQueries({ queryKey: ['/api/user'] })
+                    // Open walkthrough modal for the newly onboarded user
+                    setIsWalkthroughOpen(true)
                   } else {
                     console.error('❌ Failed to complete onboarding')
                   }
@@ -655,7 +660,12 @@ function App() {
         </>
       )}
       
-      {/* No modal needed - onboarding handled as full page above */}
+      {/* Walkthrough Modal - Appears after successful onboarding */}
+      <WalkthroughModal
+        open={isWalkthroughOpen}
+        onClose={() => setIsWalkthroughOpen(false)}
+        userName={userData?.displayName || userData?.fullName || user?.email?.split('@')[0]}
+      />
     </Switch>
   )
 }
