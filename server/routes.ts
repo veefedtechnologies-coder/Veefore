@@ -12416,7 +12416,9 @@ Create a detailed growth strategy in JSON format:
       const user = req.user!;
       
       // Get waitlist data for the current user's email
+      console.log('[ONBOARDING PREFILL] Looking up waitlist user for email:', user.email);
       const waitlistUser = await storage.getWaitlistUserByEmail(user.email);
+      console.log('[ONBOARDING PREFILL] Waitlist user found:', !!waitlistUser);
       
       if (!waitlistUser || !waitlistUser.metadata?.questionnaire) {
         console.log('[ONBOARDING PREFILL] No questionnaire data found for user:', user.email);
