@@ -34,7 +34,7 @@ import AutomationStepByStep from './pages/AutomationStepByStep'
 import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 import AdminPanel from './pages/AdminPanel'
 import AdminLogin from './pages/AdminLogin'
-import { WalkthroughModal } from './components/walkthrough/WalkthroughModal'
+import { InteractiveWalkthrough } from './components/walkthrough/InteractiveWalkthrough'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -677,8 +677,8 @@ function App() {
       
     </Switch>
 
-    {/* Premium Walkthrough Modal */}
-    <WalkthroughModal
+    {/* Premium Interactive Walkthrough */}
+    <InteractiveWalkthrough
       isOpen={isWalkthroughOpen}
       onClose={() => setIsWalkthroughOpen(false)}
       userData={userData}
