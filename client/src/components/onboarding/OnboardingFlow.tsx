@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog'
 import { ChevronRight, ChevronLeft, CheckCircle, User, Target, Settings, Rocket, Loader2 } from 'lucide-react'
 
 interface OnboardingFlowProps {
