@@ -387,29 +387,25 @@ Provide creative, actionable insights focused on content creation and social med
       // Single AI strategy - stream directly
       if (analysis.recommendedStrategy === 'single') {
         if (analysis.primaryProvider === 'openai') {
-          statusCallback?.('🚀 Single AI Strategy: OpenAI GPT-4o processing your request with advanced reasoning, pattern recognition, and comprehensive knowledge analysis...');
+          statusCallback?.('🚀 OpenAI GPT-4o processing...');
           yield* this.generateOpenAIStreamingResponse(messages);
         } else if (analysis.primaryProvider === 'perplexity') {
-          statusCallback?.('🔍 Single AI Strategy: Perplexity AI connecting to internet databases, scanning real-time sources, and gathering current trending data from across the web...');
+          statusCallback?.('🔍 Perplexity AI researching...');
           const response = await this.getPerplexityResponse(userMessage);
           
-          statusCallback?.('📝 Streaming live research findings with citations and current data...');
-          // Simulate streaming for perplexity
+          // Stream immediately without extra status
           const words = response.content.split(' ');
           for (const word of words) {
             yield word + ' ';
-            await new Promise(resolve => setTimeout(resolve, 50)); // Simulate streaming delay
           }
         } else if (analysis.primaryProvider === 'gemini') {
-          statusCallback?.('✨ Single AI Strategy: Google Gemini engaging multimodal intelligence to generate creative content, innovative ideas, and artistic perspectives...');
+          statusCallback?.('✨ Gemini creating...');
           const response = await this.getGeminiResponse(userMessage);
           
-          statusCallback?.('📝 Streaming creative insights and innovative content suggestions...');
-          // Simulate streaming for gemini
+          // Stream immediately without extra status  
           const words = response.content.split(' ');
           for (const word of words) {
             yield word + ' ';
-            await new Promise(resolve => setTimeout(resolve, 50)); // Simulate streaming delay
           }
         }
         return;
@@ -475,11 +471,11 @@ Provide creative, actionable insights focused on content creation and social med
       const combinedContent = this.combineResponses(responses, analysis.recommendedStrategy);
       
       statusCallback?.('📝 Streaming comprehensive multi-AI response...');
-      // Stream the combined response
+      // Stream the combined response immediately without artificial delays
       const words = combinedContent.split(' ');
       for (const word of words) {
         yield word + ' ';
-        await new Promise(resolve => setTimeout(resolve, 30)); // Faster streaming for combined content
+        // No delays - stream as fast as possible
       }
       
     } catch (error) {
