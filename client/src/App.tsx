@@ -219,20 +219,6 @@ function App() {
                   {/* Quick Actions - Top Section */}
                   <div className="mb-8">
                     <QuickActions />
-                    {/* Temporary Walkthrough Trigger */}
-                    <div className="mt-4 flex justify-end">
-                      <button
-                        onClick={() => {
-                          console.log('🎯 WALKTHROUGH: Button clicked, opening modal...')
-                          console.log('🎯 WALKTHROUGH: Current isWalkthroughOpen state:', isWalkthroughOpen)
-                          setIsWalkthroughOpen(true)
-                          console.log('🎯 WALKTHROUGH: setIsWalkthroughOpen(true) called')
-                        }}
-                        className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
-                      >
-                        🎯 Start Walkthrough
-                      </button>
-                    </div>
                   </div>
                   
                   {/* Main Dashboard Layout - Hootsuite Style */}
@@ -256,10 +242,10 @@ function App() {
               </main>
             </div>
 
-            {/* ONBOARDING DISABLED - USER IS ALREADY ONBOARDED */}
-            {false && userData && (
+            {/* Onboarding Flow for new users */}
+            {userData && !userData.isOnboarded && (
               <OnboardingFlow 
-                open={false}
+                open={isOnboardingModalOpen}
                 userData={userData}
                 onComplete={async (onboardingData) => {
                 console.log('🎯 COMPLETING ONBOARDING with data:', onboardingData)
@@ -680,7 +666,6 @@ function App() {
     {/* Guided Tour */}
     <GuidedTour
       isActive={isWalkthroughOpen}
-      onComplete={() => setIsWalkthroughOpen(false)}
       onClose={() => setIsWalkthroughOpen(false)}
     />
     </>
