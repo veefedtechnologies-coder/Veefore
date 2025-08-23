@@ -6,6 +6,7 @@ interface OnboardingModalProps {
 
 export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   console.log('🔵 SIMPLE MODAL CALLED - isOpen:', isOpen)
+  console.log('🔵 SIMPLE MODAL PROPS:', { isOpen, onClose })
   
   if (!isOpen) {
     console.log('🔴 SIMPLE MODAL - returning null')
