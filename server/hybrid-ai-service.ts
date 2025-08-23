@@ -127,6 +127,42 @@ export class HybridAIService {
   }
 
   /**
+   * Gemini Streaming Response
+   */
+  async* generateGeminiStreamingResponse(userMessage: string): AsyncGenerator<string, void, unknown> {
+    try {
+      const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      
+      const prompt = `You are VeeGPT, an AI assistant specifically designed to help content creators and social media professionals. You specialize in:
+
+1. Content Strategy & Planning
+2. Social Media Marketing  
+3. Video Content Creation
+4. Brand Building
+5. Audience Engagement
+6. Content Optimization
+7. Analytics & Insights
+8. Platform-specific advice (Instagram, YouTube, TikTok, etc.)
+
+Always provide practical, actionable advice tailored to content creation and social media growth. Be conversational, helpful, and specific in your recommendations.
+
+User question: ${userMessage}`;
+
+      const result = await model.generateContentStream(prompt);
+      
+      for await (const chunk of result.stream) {
+        const text = chunk.text();
+        if (text) {
+          yield text;
+        }
+      }
+    } catch (error) {
+      console.error('Gemini streaming error:', error);
+      yield 'I apologize, but I encountered an error generating a response. Please try again.';
+    }
+  }
+
+  /**
    * OpenAI Streaming Response
    */
   async* generateOpenAIStreamingResponse(messages: ChatMessage[]): AsyncGenerator<string, void, unknown> {
@@ -400,13 +436,7 @@ Provide creative, actionable insights focused on content creation and social med
           }
         } else if (analysis.primaryProvider === 'gemini') {
           statusCallback?.('✨ Gemini creating...');
-          const response = await this.getGeminiResponse(userMessage);
-          
-          // Stream immediately without extra status  
-          const words = response.content.split(' ');
-          for (const word of words) {
-            yield word + ' ';
-          }
+          yield* this.generateGeminiStreamingResponse(userMessage);
         }
         return;
       }
