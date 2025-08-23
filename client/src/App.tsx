@@ -82,10 +82,12 @@ function App() {
           setIsOnboardingModalOpen(true)
         }
         
-        // Redirect away from auth pages to dashboard where modal will show
+        // FORCE redirect away from auth pages to dashboard where modal will show
         if (location === '/signin' || location === '/signup') {
-          console.log('Redirecting to dashboard for MANDATORY onboarding')
+          console.log('🚀 FORCE REDIRECTING to dashboard for MANDATORY onboarding')
+          console.log('🔀 Current location:', location, '-> Redirecting to /')
           setLocation('/')
+          return // Exit early to prevent rendering auth page
         }
       }
       
