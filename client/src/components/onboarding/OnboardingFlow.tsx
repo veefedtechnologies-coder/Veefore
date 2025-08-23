@@ -428,7 +428,7 @@ export default function OnboardingFlow({ open, onComplete }: OnboardingFlowProps
               <p className="text-sm text-gray-600 mt-1">Select the perfect plan for your social media needs</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {/* Free Plan */}
               <div 
                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
