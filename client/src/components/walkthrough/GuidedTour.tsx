@@ -172,17 +172,18 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
             break
         }
 
-        // Ensure tooltip stays within viewport
+        // Responsive viewport constraints
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
+        const padding = viewportWidth < 768 ? 16 : 20  // Responsive padding
         
-        if (left < 10) left = 10
-        if (left + (tooltipRect?.width || 0) > viewportWidth - 10) {
-          left = viewportWidth - (tooltipRect?.width || 0) - 10
+        if (left < padding) left = padding
+        if (left + (tooltipRect?.width || 0) > viewportWidth - padding) {
+          left = viewportWidth - (tooltipRect?.width || 0) - padding
         }
-        if (top < 10) top = 10
-        if (top + (tooltipRect?.height || 0) > viewportHeight - 10) {
-          top = viewportHeight - (tooltipRect?.height || 0) - 10
+        if (top < padding) top = padding
+        if (top + (tooltipRect?.height || 0) > viewportHeight - padding) {
+          top = viewportHeight - (tooltipRect?.height || 0) - padding
         }
 
         setTooltipPosition({ top, left })
@@ -226,17 +227,53 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     }
   }, [isActive])
 
+  // Responsive resize handling
+  useEffect(() => {
+    if (!isActive) return
+
+    const handleResize = () => {
+      // Force re-calculation of positions when window resizes
+      if (targetElement) {
+        const rect = targetElement.getBoundingClientRect()
+        // Trigger re-positioning
+        setTimeout(() => {
+          setTargetElement(targetElement)
+        }, 100)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleResize)
+    
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('orientationchange', handleResize)
+    }
+  }, [isActive, targetElement])
+
   if (!isActive) return null
 
   return (
     <>
-      {/* Overlay with spotlight effect - blocks all background interactions */}
+      {/* Responsive overlay with spotlight effect - blocks all background interactions */}
       <div 
         className="fixed inset-0 z-50"
         style={{
-          background: targetElement 
-            ? `radial-gradient(circle at ${targetElement.getBoundingClientRect().left + targetElement.getBoundingClientRect().width/2}px ${targetElement.getBoundingClientRect().top + targetElement.getBoundingClientRect().height/2}px, transparent 0px, transparent ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 60}px, rgba(0,0,0,0.4) ${Math.max(targetElement.getBoundingClientRect().width, targetElement.getBoundingClientRect().height) + 80}px)`
-            : 'rgba(0,0,0,0.3)',
+          background: targetElement ? (() => {
+            const rect = targetElement.getBoundingClientRect()
+            const centerX = rect.left + rect.width / 2
+            const centerY = rect.top + rect.height / 2
+            const viewportWidth = window.innerWidth
+            
+            // Responsive spotlight size based on screen size
+            const baseRadius = Math.max(rect.width, rect.height)
+            const spotlightRadius = viewportWidth < 768 
+              ? baseRadius + 40  // Smaller on mobile
+              : baseRadius + 60  // Larger on desktop
+            const fadeRadius = spotlightRadius + 20
+            
+            return `radial-gradient(circle at ${centerX}px ${centerY}px, transparent 0px, transparent ${spotlightRadius}px, rgba(0,0,0,0.4) ${fadeRadius}px)`
+          })() : 'rgba(0,0,0,0.3)',
           overscrollBehavior: 'contain'
         }}
         onWheel={(e) => e.preventDefault()}
@@ -245,28 +282,39 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
         onMouseDown={(e) => e.preventDefault()}
       />
 
-      {/* Highlight border around target element */}
-      {targetElement && (
-        <div
-          className="fixed z-50 pointer-events-none border-3 border-blue-400 rounded-lg shadow-lg"
-          style={{
-            top: targetElement.getBoundingClientRect().top - 6,
-            left: targetElement.getBoundingClientRect().left - 6,
-            width: targetElement.getBoundingClientRect().width + 12,
-            height: targetElement.getBoundingClientRect().height + 12,
-            boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 30px rgba(59, 130, 246, 0.4)',
-            animation: 'pulse 2s infinite'
-          }}
-        />
-      )}
+      {/* Responsive highlight border around target element */}
+      {targetElement && (() => {
+        const rect = targetElement.getBoundingClientRect()
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        
+        // Responsive padding based on screen size
+        const padding = viewportWidth < 768 ? 4 : 6
+        const shadowSize = viewportWidth < 768 ? 20 : 30
+        
+        return (
+          <div
+            className="fixed z-50 pointer-events-none border-2 md:border-3 border-blue-400 rounded-lg shadow-lg"
+            style={{
+              top: rect.top - padding,
+              left: rect.left - padding,
+              width: rect.width + (padding * 2),
+              height: rect.height + (padding * 2),
+              boxShadow: `0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 ${shadowSize}px rgba(59, 130, 246, 0.4)`,
+              animation: 'pulse 2s infinite'
+            }}
+          />
+        )
+      })()}
 
-      {/* Tooltip */}
+      {/* Responsive Tooltip */}
       <div
         ref={tooltipRef}
-        className="fixed z-50 bg-white rounded-2xl shadow-2xl p-6 max-w-sm border border-gray-200 pointer-events-auto"
+        className="fixed z-50 bg-white rounded-2xl shadow-2xl p-4 md:p-6 max-w-xs md:max-w-sm border border-gray-200 pointer-events-auto"
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
+          maxWidth: window.innerWidth < 768 ? '280px' : '384px',
           transform: tooltipPosition.top < 100 ? 'translateY(0)' : 'translateY(0)'
         }}
       >
