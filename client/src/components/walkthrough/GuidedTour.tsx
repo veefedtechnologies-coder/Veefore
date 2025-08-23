@@ -28,14 +28,14 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 'video-generator-nav',
-    target: '.sidebar-nav-item[data-nav="video-generator"]',
+    target: '[data-nav="video-generator"]',
     title: '🎬 AI Video Generator',
     description: 'Create professional videos with AI! Generate scripts, voiceovers, visuals, and complete videos from just a text prompt. Our most powerful feature.',
     position: 'right'
   },
   {
     id: 'automation-nav',
-    target: '.sidebar-nav-item[data-nav="automation"]',
+    target: '[data-nav="automation"]',
     title: '⚡ Smart Automation',
     description: 'Automate your social media interactions! Set up AI-powered DM responses, comment replies, keyword triggers, and engagement automation.',
     position: 'right'
@@ -49,21 +49,21 @@ const tourSteps: TourStep[] = [
   },
   {
     id: 'analytics-nav',
-    target: '.sidebar-nav-item[data-nav="analytics"]',
+    target: '[data-nav="analytics"]',
     title: '📊 Advanced Analytics',
     description: 'Deep insights powered by AI! Track performance across all platforms, get predictive analytics, and receive smart recommendations.',
     position: 'right'
   },
   {
     id: 'workspaces-nav',
-    target: '.sidebar-nav-item[data-nav="workspaces"]',
+    target: '[data-nav="workspaces"]',
     title: '👥 AI-Powered Workspaces',
     description: 'Collaborate with custom AI personalities! Each workspace can have its own AI assistant with unique personality and expertise.',
     position: 'right'
   },
   {
     id: 'integration-nav',
-    target: '.sidebar-nav-item[data-nav="integration"]',
+    target: '[data-nav="integration"]',
     title: '🔗 Platform Integration',
     description: 'Connect all your social platforms! Manage Instagram, YouTube, Twitter, LinkedIn, and more from one unified dashboard.',
     position: 'right'
@@ -89,19 +89,7 @@ export function GuidedTour({ isActive, onComplete, onClose }: GuidedTourProps) {
     if (!isActive) return
 
     const findAndHighlightElement = () => {
-      console.log(`🎯 TOUR: Looking for element with selector: "${currentStepData.target}"`)
-      
-      // Debug: log available elements
-      console.log('🔍 Available sidebar items:')
-      document.querySelectorAll('.sidebar-nav-item').forEach((el, i) => {
-        const navKey = el.getAttribute('data-nav')
-        console.log(`  ${i}: data-nav="${navKey}"`, el)
-      })
-      console.log('🔍 VeeGPT element:', document.querySelector('.veegpt-nav-item'))
-      console.log('🔍 Create button:', document.querySelector('[data-testid="create-dropdown-trigger"]'))
-      
       const element = document.querySelector(currentStepData.target) as HTMLElement
-      console.log(`${element ? '✅' : '❌'} Found element:`, element)
       
       if (element) {
         setTargetElement(element)
