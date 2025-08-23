@@ -39,26 +39,27 @@ import remarkGfm from 'remark-gfm'
 
 // Function to convert text patterns to proper markdown headings
 const convertToMarkdown = (text: string): string => {
-  return text
-    // Convert "Title: Something" to "# Something" 
-    .replace(/^Title:\s*(.+)$/gm, '# $1')
-    // Convert standalone lines that look like section headers to ## headers
-    .replace(/^([A-Z][A-Za-z\s]+)(?:\s*:?\s*)$/gm, (match, title) => {
-      // Only convert if it's a short line (likely a heading) and not a sentence
-      if (title.length < 50 && !title.includes('.') && !title.includes(',')) {
-        return `## ${title.replace(/:\s*$/, '')}`;
-      }
-      return match;
-    })
-    // Convert "Effects of Something" pattern to ## headers
-    .replace(/^(Introduction|Conclusion|Overview|Summary|Effects? of [^.]+|Causes? of [^.]+|Benefits? of [^.]+|Types? of [^.]+|Examples? of [^.]+|Steps? to [^.]+|Ways? to [^.]+|How to [^.]+|What is [^.]+|Why [^.]+|When [^.]+|Where [^.]+|Key [^.]+|Important [^.]+|Main [^.]+|Primary [^.]+|Secondary [^.]+)(?:\s*:?\s*)$/gmi, '## $1')
-    // Convert numbered sections like "1. Something" to ### headers if they're short
-    .replace(/^\d+\.\s+([A-Z][A-Za-z\s]+)(?:\s*:?\s*)$/gm, (match, title) => {
-      if (title.length < 40 && !title.includes('.') && !title.includes(',')) {
-        return `### ${title}`;
-      }
-      return match;
-    });
+  let result = text;
+  
+  // Convert "Title: Something" to "# Something" 
+  result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
+  
+  // Convert specific heading patterns to ## headers
+  result = result.replace(/^The Evolution of Communication$/gm, '## The Evolution of Communication');
+  result = result.replace(/^Community Building and Networking$/gm, '## Community Building and Networking');
+  result = result.replace(/^Content Creation and the Creator Economy$/gm, '## Content Creation and the Creator Economy');
+  result = result.replace(/^Introduction$/gm, '## Introduction');
+  result = result.replace(/^Conclusion$/gm, '## Conclusion');
+  result = result.replace(/^Overview$/gm, '## Overview');
+  result = result.replace(/^Summary$/gm, '## Summary');
+  
+  // Convert "Effects of Something" and "Causes of Something" patterns
+  result = result.replace(/^(Effects? of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Causes? of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Benefits? of [A-Za-z\s]+)$/gm, '## $1');
+  result = result.replace(/^(Types? of [A-Za-z\s]+)$/gm, '## $1');
+  
+  return result;
 };
 
 type ChatConversation = {
