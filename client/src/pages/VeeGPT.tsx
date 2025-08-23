@@ -162,6 +162,7 @@ export default function VeeGPT() {
   const [hasUserStartedNewChat, setHasUserStartedNewChat] = useState(false)
   // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
+  const [aiStatus, setAiStatus] = useState<string | null>(null)
   const isGeneratingRef = useRef(false)
   const streamResolveRef = useRef<((value: any) => void) | null>(null)
   // WebSocket for real-time streaming
@@ -555,6 +556,9 @@ export default function VeeGPT() {
         break
 
       case 'aiMessageStart':
+        // Clear AI status when streaming starts
+        setAiStatus(null)
+        
         // Initialize streaming content for this message
         if (data.messageId) {
           console.log('VeeGPT: Starting AI message stream for ID:', data.messageId)
@@ -789,6 +793,20 @@ export default function VeeGPT() {
       textareaRef.current.value = ''
     }
     
+    // Add random AI status messages like Perplexity
+    const statusMessages = [
+      "Understanding your request...",
+      "Analyzing content...", 
+      "Processing information...",
+      "Thinking...",
+      "Gathering insights...",
+      "Reviewing context...",
+      "Formulating response...",
+      "Preparing answer..."
+    ]
+    const randomStatus = statusMessages[Math.floor(Math.random() * statusMessages.length)]
+    setAiStatus(randomStatus)
+
     try {
       if (!currentConversationId) {
         // Create new conversation
@@ -803,6 +821,8 @@ export default function VeeGPT() {
         })
       }
     } catch (error) {
+      // Clear status on error
+      setAiStatus(null)
       console.error('VeeGPT: Error sending message:', error)
       // Restore input text if there was an error
       setInputText(messageContent)
@@ -1739,6 +1759,29 @@ export default function VeeGPT() {
                 </div>
               </div>
             ))}
+            
+            {/* AI Status Indicator - shows when AI is processing before streaming */}
+            {aiStatus && (
+              <div className="flex flex-col space-y-2 items-start">
+                <div className="max-w-4xl w-full">
+                  <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
+                    <Bot className="w-3 h-3 mr-1" />
+                    VeeGPT
+                  </div>
+                  <div className="bg-transparent px-4 py-3 rounded-2xl">
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                      <span className="text-sm font-medium text-blue-600">{aiStatus}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
         </div>
