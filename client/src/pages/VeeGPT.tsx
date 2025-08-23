@@ -1562,7 +1562,11 @@ export default function VeeGPT() {
                 key={message.id}
                 className="flex flex-col space-y-2"
               >
-                <div className="w-full" style={{
+                <div className={`${
+                  message.role === 'user' 
+                    ? 'max-w-sm w-fit' 
+                    : 'max-w-4xl w-full'
+                }`} style={{
                   minWidth: 0,
                   overflow: 'hidden'
                 }}>
@@ -1580,7 +1584,7 @@ export default function VeeGPT() {
                   )}
                   <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
-                      ? 'bg-gray-200 text-gray-900'
+                      ? 'bg-gray-200 text-gray-900 inline-block'
                       : 'bg-transparent text-gray-900'
                   }`} style={{
                     wordWrap: 'break-word',
