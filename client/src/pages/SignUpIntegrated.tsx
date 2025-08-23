@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -274,7 +273,10 @@ const SignUpIntegrated = ({ onNavigate }: SignUpIntegratedProps) => {
         await signUpWithEmail(formData.email, formData.password)
         console.log('🔥 Firebase signup successful')
         
-        // Step 2: Send verification email with user's name
+        // Step 2: Wait a moment for Firebase auth state to be established
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Step 3: Send verification email with user's name
         sendVerificationMutation.mutate(formData.email)
         
         toast({
