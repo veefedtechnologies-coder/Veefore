@@ -167,7 +167,7 @@ function App() {
         </div>
       </Route>
 
-      {/* Root route - Landing for unauthenticated, Dashboard for authenticated & onboarded, Signup for authenticated but not onboarded */}
+      {/* Root route - Landing for unauthenticated, Dashboard for authenticated users (modal handles onboarding) */}
       <Route path="/">
         {!user && !hasFirebaseAuth ? (
           <div className="min-h-screen">
@@ -175,11 +175,7 @@ function App() {
           </div>
         ) : !user && hasFirebaseAuth ? (
           <LoadingSpinner />
-        ) : userData && !userData.isOnboarded ? (
-          <div className="min-h-screen">
-            <SignUpIntegrated onNavigate={(page: string) => setLocation(`/${page}`)} />
-          </div>
-        ) : (
+        ) : user && userData ? (
           <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white">
@@ -235,6 +231,8 @@ function App() {
               </main>
             </div>
           </div>
+        ) : (
+          <LoadingSpinner />
         )}
       </Route>
 
