@@ -9116,6 +9116,51 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Link Firebase UID to existing verified user
+  app.post('/api/auth/link-firebase', async (req: any, res: Response) => {
+    try {
+      const { email, firebaseUid, displayName } = req.body;
+
+      if (!email || !firebaseUid) {
+        return res.status(400).json({ message: 'Email and Firebase UID are required' });
+      }
+
+      console.log(`[FIREBASE LINKING] Linking Firebase UID ${firebaseUid} to user ${email}`);
+
+      // Find the verified user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+
+      if (!user.isEmailVerified) {
+        return res.status(400).json({ message: 'Email not verified' });
+      }
+
+      // Update user with Firebase UID and display name
+      const updatedUser = await storage.updateUser(user.id, {
+        firebaseUid: firebaseUid,
+        displayName: displayName || user.displayName
+      });
+
+      console.log(`[FIREBASE LINKING] Successfully linked Firebase UID to user ${email}`);
+      res.json({ 
+        message: 'Firebase account linked successfully',
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          displayName: updatedUser.displayName,
+          isEmailVerified: true,
+          isOnboarded: updatedUser.isOnboarded
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[FIREBASE LINKING] Error linking Firebase account:', error);
+      res.status(500).json({ message: 'Error linking Firebase account: ' + error.message });
+    }
+  });
+
   // ===== AI CONTENT GENERATION ROUTES =====
   
   // AI Image Generator - Real DALL-E Integration with Authentic Captions
