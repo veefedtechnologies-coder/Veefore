@@ -45,15 +45,19 @@ const convertToMarkdown = (text: string): string => {
   result = result.replace(/^\*\*Title:\s*(.+)\*\*$/gm, '# $1');
   result = result.replace(/^Title:\s*(.+)$/gm, '# $1');
   
-  // Convert section headers ending with colon to ## headers (H2 - large)
-  result = result.replace(/^([A-Z][A-Za-z\s]+):\s*$/gm, '## $1');
-  
-  // Convert specific heading patterns to ## headers (catch variations)
+  // Convert section headers ending with colon to ## headers (H2 - large) 
   result = result.replace(/^(About Us):\s*$/gm, '## $1');
-  result = result.replace(/^(Position Overview):\s*$/gm, '## $1');
   result = result.replace(/^(Key Responsibilities):\s*$/gm, '## $1');
+  result = result.replace(/^(Position Overview):\s*$/gm, '## $1');
   result = result.replace(/^(Requirements):\s*$/gm, '## $1');
   result = result.replace(/^(Qualifications):\s*$/gm, '## $1');
+  result = result.replace(/^(Responsibilities):\s*$/gm, '## $1');
+  result = result.replace(/^(Overview):\s*$/gm, '## $1');
+  result = result.replace(/^(Summary):\s*$/gm, '## $1');
+  result = result.replace(/^(Introduction):\s*$/gm, '## $1');
+  result = result.replace(/^(Conclusion):\s*$/gm, '## $1');
+  // General pattern for any heading ending with colon
+  result = result.replace(/^([A-Z][A-Za-z\s]{2,}):\s*$/gm, '## $1');
   result = result.replace(/^(The Evolution of Communication.*)$/gm, '## $1');
   result = result.replace(/^(Community Building and Networking.*)$/gm, '## $1');
   result = result.replace(/^(Content Creation and.*)$/gm, '## $1');
