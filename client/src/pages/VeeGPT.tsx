@@ -801,9 +801,9 @@ export default function VeeGPT() {
   // Don't show welcome screen if we have optimistic messages (instant UI transition)
   if (!currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0) {
     return (
-      <div className="h-screen w-full bg-gray-50 flex relative overflow-hidden" style={{ minHeight: '100vh', display: 'flex' }}>
+      <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
         {/* Static Background - No Scroll Animations */}
-        <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 pointer-events-none z-0">
           {/* Static background elements - no scroll interaction */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
           
@@ -1232,9 +1232,9 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-screen w-full bg-gray-50 flex relative overflow-hidden" style={{ minHeight: '100vh', display: 'flex' }}>
+    <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
       {/* Static Background - No Scroll Animations */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-0">
         {/* Static background elements - no scroll interaction */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
         
