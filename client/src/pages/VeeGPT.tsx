@@ -31,7 +31,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { getAuth } from 'firebase/auth'
-import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
+// import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -853,8 +853,8 @@ export default function VeeGPT() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                    <img src={veeGPTLogo} alt="VeeFore" className="w-10 h-10 object-contain" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">V</span>
                   </div>
                 </div>
                 <button
@@ -1285,8 +1285,8 @@ export default function VeeGPT() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                    <img src={veeGPTLogo} alt="VeeFore" className="w-10 h-10 object-contain" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">V</span>
                   </div>
                 </div>
                 <button
@@ -1600,16 +1600,16 @@ export default function VeeGPT() {
                             <ReactMarkdown 
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                h1: ({children}) => <h1 className="text-2xl font-bold mb-4 text-gray-900">{children}</h1>,
-                                h2: ({children}) => <h2 className="text-xl font-bold mb-3 text-gray-900">{children}</h2>,
-                                h3: ({children}) => <h3 className="text-lg font-bold mb-2 text-gray-900">{children}</h3>,
-                                p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
-                                strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
-                                ul: ({children}) => <ul className="mb-3 ml-6 space-y-1 list-disc">{children}</ul>,
-                                ol: ({children}) => <ol className="mb-3 ml-6 space-y-1 list-decimal">{children}</ol>,
-                                li: ({children}) => <li className="leading-relaxed">{children}</li>,
-                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
-                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3">{children}</pre>
+                                h1: ({children}) => <h1 className="text-5xl font-black mb-6 text-gray-900 leading-tight">{children}</h1>,
+                                h2: ({children}) => <h2 className="text-3xl font-black mb-4 text-gray-900 leading-tight">{children}</h2>,
+                                h3: ({children}) => <h3 className="text-2xl font-black mb-3 text-gray-900 leading-tight">{children}</h3>,
+                                p: ({children}) => <p className="text-base mb-3 leading-relaxed font-semibold text-gray-900">{children}</p>,
+                                strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                                ul: ({children}) => <ul className="text-base mb-3 ml-6 space-y-1 list-disc font-semibold">{children}</ul>,
+                                ol: ({children}) => <ol className="text-base mb-3 ml-6 space-y-1 list-decimal font-semibold">{children}</ol>,
+                                li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
+                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono font-semibold">{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                               }}
                             >
                               {streamingContent[message.id] || ''}
@@ -1622,16 +1622,16 @@ export default function VeeGPT() {
                           <ReactMarkdown 
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              h1: ({children}) => <h1 className="text-2xl font-bold mb-4 text-gray-900">{children}</h1>,
-                              h2: ({children}) => <h2 className="text-xl font-bold mb-3 text-gray-900">{children}</h2>,
-                              h3: ({children}) => <h3 className="text-lg font-bold mb-2 text-gray-900">{children}</h3>,
-                              p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
-                              strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
-                              ul: ({children}) => <ul className="mb-3 ml-4 space-y-1">{children}</ul>,
-                              ol: ({children}) => <ol className="mb-3 ml-4 space-y-1 list-decimal">{children}</ol>,
-                              li: ({children}) => <li className="leading-relaxed">{children}</li>,
-                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
-                              pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3">{children}</pre>
+                              h1: ({children}) => <h1 className="text-5xl font-black mb-6 text-gray-900 leading-tight">{children}</h1>,
+                              h2: ({children}) => <h2 className="text-3xl font-black mb-4 text-gray-900 leading-tight">{children}</h2>,
+                              h3: ({children}) => <h3 className="text-2xl font-black mb-3 text-gray-900 leading-tight">{children}</h3>,
+                              p: ({children}) => <p className="text-base mb-3 leading-relaxed font-semibold text-gray-900">{children}</p>,
+                              strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                              ul: ({children}) => <ul className="text-base mb-3 ml-6 space-y-1 list-disc font-semibold">{children}</ul>,
+                              ol: ({children}) => <ol className="text-base mb-3 ml-6 space-y-1 list-decimal font-semibold">{children}</ol>,
+                              li: ({children}) => <li className="leading-relaxed font-semibold text-gray-900">{children}</li>,
+                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono font-semibold">{children}</code>,
+                              pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
                             }}
                           >
                             {message.content}
@@ -1653,7 +1653,7 @@ export default function VeeGPT() {
                           lineBreak: 'anywhere'
                         }}
                       >
-                        {message.content}
+                        <div className="font-semibold text-gray-900">{message.content}</div>
                       </div>
                     )}
                   </div>
