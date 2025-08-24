@@ -71,11 +71,12 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - ULTRA-SAFE rate limit protection
+  // Polling status query - PRODUCTION-SAFE rate limit protection
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 5000, // 5 seconds for polling status updates
+    refetchInterval: 5 * 60 * 1000, // 5 minutes - SAFE for production
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 

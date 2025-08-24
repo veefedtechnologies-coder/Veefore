@@ -625,7 +625,7 @@ const VideoGenerator: React.FC = () => {
   const { data: videoJobsData, isLoading: jobsLoading } = useQuery({
     queryKey: ['/api/video/jobs'],
     queryFn: () => apiRequest('/api/video/jobs'),
-    refetchInterval: 5000 // Refetch every 5 seconds when generating
+    refetchInterval: 30 * 1000 // Refetch every 30 seconds - PRODUCTION-SAFE
   })
 
   // Ensure videoJobs is always an array
