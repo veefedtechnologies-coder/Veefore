@@ -113,14 +113,20 @@ export class InstagramCommentWebhookHandler {
   /**
    * Process Instagram comment event and send dynamic DM
    */
-  private async processCommentEvent(pageId: string, commentData: any): Promise<void> {
+  private async processCommentEvent(instagramAccountId: string, commentData: any): Promise<void> {
     try {
       console.log('[INSTAGRAM WEBHOOK] Processing comment from user:', commentData.from.id);
 
-      // Find the workspace associated with this Instagram page
-      const socialAccount = await this.storage.getSocialAccountByPageId(pageId);
+      // Find the workspace associated with this Instagram account ID
+      let socialAccount = await this.storage.getSocialAccountByPageId(instagramAccountId);
+      
+      // If not found by pageId, try by accountId (Instagram Account ID)
       if (!socialAccount) {
-        console.log('[INSTAGRAM WEBHOOK] No social account found for page ID:', pageId);
+        socialAccount = await this.storage.getSocialAccountByAccountId(instagramAccountId);
+      }
+      
+      if (!socialAccount) {
+        console.log('[INSTAGRAM WEBHOOK] No social account found for Instagram account ID:', instagramAccountId);
         return;
       }
 
@@ -139,8 +145,9 @@ export class InstagramCommentWebhookHandler {
         buttonUrl: dmTemplate.buttonUrl
       });
 
-      // Convert Instagram User ID to PSID
-      const psid = await this.convertToPSID(commentData.from.id, pageId, socialAccount);
+      // Convert Instagram User ID to PSID (use pageId from account or fallback to accountId)
+      const pageIdToUse = socialAccount.pageId || socialAccount.accountId || instagramAccountId;
+      const psid = await this.convertToPSID(commentData.from.id, pageIdToUse, socialAccount);
       if (!psid) {
         console.log('[INSTAGRAM WEBHOOK] Failed to convert Instagram User ID to PSID');
         return;
