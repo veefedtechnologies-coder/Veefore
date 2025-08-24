@@ -12,6 +12,7 @@ import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
 import { InstagramAutomation } from "./instagram-automation";
 import { InstagramWebhookHandler } from "./instagram-webhook";
+import { InstagramSmartPolling } from "./instagram-smart-polling";
 import { InstagramCommentWebhookHandler } from "./instagram-comment-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
@@ -72,6 +73,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const instagramAutomation = new InstagramAutomation(storage);
   const webhookHandler = new InstagramWebhookHandler(storage);
   const commentWebhookHandler = new InstagramCommentWebhookHandler(storage);
+  const smartPolling = new InstagramSmartPolling(storage);
   const creditService = new CreditService();
   const enhancedDMService = new EnhancedAutoDMService(storage as any);
   const dashboardCache = new DashboardCache(storage);
@@ -2802,15 +2804,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Force real-time Instagram sync endpoint
+  // Force real-time Instagram sync endpoint - enhanced with smart polling
   app.post("/api/instagram/force-sync", requireAuth, async (req: any, res: any) => {
     try {
       console.log('[FORCE SYNC] Starting real-time Instagram data sync...');
       
-      // Get workspaceId from request body or user's current workspace
-      const workspaceId = req.body.workspaceId || req.user.currentWorkspaceId;
+      // Get workspaceId from request body or user's default workspace
+      const workspaceId = req.body.workspaceId || (await storage.getDefaultWorkspace(req.user.id))?.id;
       console.log('[FORCE SYNC] Workspace ID:', workspaceId);
-      console.log('[FORCE SYNC] Request body:', req.body);
 
       // Get the Instagram account for this workspace
       const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
@@ -2821,40 +2822,61 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
 
       console.log('[FORCE SYNC] Found Instagram account:', instagramAccount.username);
-      console.log('[FORCE SYNC] Access token available:', !!instagramAccount.accessToken);
-
-      // Direct Instagram Business API call to get current data
-      const apiUrl = `https://graph.instagram.com/me?fields=account_type,followers_count,media_count&access_token=${instagramAccount.accessToken}`;
       
-      console.log('[FORCE SYNC] Making direct Instagram API call...');
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      
-      if (response.ok && data.followers_count !== undefined) {
-        console.log('[FORCE SYNC] Live Instagram data received:', data);
-        
-        // Clear cache and update database with fresh data
-        dashboardCache.clearCache();
-        
-        // Update the stored account data with current values
-        await storage.updateSocialAccount(instagramAccount.id, {
-          followersCount: data.followers_count,
-          mediaCount: data.media_count,
-          lastSyncAt: new Date(),
-          updatedAt: new Date()
-        });
+      // Notify smart polling about user activity
+      smartPolling.updateUserActivity(instagramAccount.accountId || instagramAccount.id);
 
-        console.log('[FORCE SYNC] Database updated with live follower count:', data.followers_count);
+      // Try smart polling first (respects rate limits)
+      const pollingSuccess = await smartPolling.forcePoll(instagramAccount.accountId || instagramAccount.id);
+      
+      if (pollingSuccess) {
+        console.log('[FORCE SYNC] ✅ Successfully used smart polling for immediate sync');
         
+        // Get updated data from storage
+        const updatedAccount = await storage.getSocialAccount(instagramAccount.id);
         res.json({ 
           success: true, 
-          followers: data.followers_count,
-          mediaCount: data.media_count,
-          message: "Real-time Instagram data synced successfully" 
+          followers: updatedAccount.followersCount,
+          mediaCount: updatedAccount.mediaCount,
+          message: "Real-time Instagram data synced via smart polling",
+          method: "smart_polling"
         });
       } else {
-        console.error('[FORCE SYNC] Instagram API error:', data);
-        res.status(400).json({ error: data.error?.message || "Failed to fetch Instagram data" });
+        console.log('[FORCE SYNC] ⚠️ Smart polling rate limited, falling back to direct API call');
+        
+        // Fallback to direct API call (bypass rate limits for manual requests)
+        const apiUrl = `https://graph.instagram.com/me?fields=account_type,followers_count,media_count&access_token=${instagramAccount.accessToken}`;
+        
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (response.ok && data.followers_count !== undefined) {
+          console.log('[FORCE SYNC] Live Instagram data received via direct API:', data);
+          
+          // Clear cache and update database with fresh data
+          dashboardCache.clearCache();
+          
+          // Update the stored account data with current values
+          await storage.updateSocialAccount(instagramAccount.id, {
+            followersCount: data.followers_count,
+            mediaCount: data.media_count,
+            lastSyncAt: new Date(),
+            updatedAt: new Date()
+          });
+
+          console.log('[FORCE SYNC] Database updated with live follower count:', data.followers_count);
+          
+          res.json({ 
+            success: true, 
+            followers: data.followers_count,
+            mediaCount: data.media_count,
+            message: "Real-time Instagram data synced via direct API",
+            method: "direct_api"
+          });
+        } else {
+          console.error('[FORCE SYNC] Instagram API error:', data);
+          res.status(400).json({ error: data.error?.message || "Failed to fetch Instagram data" });
+        }
       }
       
     } catch (error: any) {
