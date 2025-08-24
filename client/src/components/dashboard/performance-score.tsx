@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight, Info, Clock, Target, BarChart3 } from 'lucide-react'
+import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
@@ -20,7 +20,7 @@ export function PerformanceScore() {
   }, [selectedPeriod])
 
   // Generate unique data stories based on actual performance
-  const generateDataStory = (period: 'day' | 'week' | 'month', currentData: any) => {
+  const generateDataStory = (currentData: any) => {
     const followerCount = currentData?.followers || 4
     const engagement = currentData?.engagement || 567
     const reach = currentData?.reach || 135
@@ -323,91 +323,61 @@ export function PerformanceScore() {
       </CardHeader>
 
       {/* Interactive Data Story - Unique storytelling experience */}
-      {showDataStory && (
-        <div 
-          key={storyAnimation}
-          className="mx-6 mb-4 relative overflow-hidden rounded-3xl transform-gpu animate-in zoom-in-95 duration-700 shadow-2xl"
-          data-testid="data-story"
-        >
-          <div className={`${generateDataStory(selectedPeriod, {
-            followers: totalFollowers,
-            engagement: avgEngagement, 
-            reach: totalReach,
-            posts: totalPosts
-          }).color} p-6 relative`}>
-            {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-2 right-2 text-4xl animate-bounce">
-                {generateDataStory(selectedPeriod, {
-                  followers: totalFollowers,
-                  engagement: avgEngagement,
-                  reach: totalReach, 
-                  posts: totalPosts
-                }).emoji}
-              </div>
-              <div className="absolute bottom-2 left-2 w-16 h-16 rounded-full bg-white/20 animate-pulse"></div>
-              <div className="absolute top-1/2 left-1/3 w-8 h-8 rounded-full bg-white/10 animate-ping"></div>
-            </div>
-
-            {/* Main story content */}
-            <div className={`relative z-10 ${generateDataStory(selectedPeriod, {
-              followers: totalFollowers,
-              engagement: avgEngagement,
-              reach: totalReach,
-              posts: totalPosts  
-            }).textColor}`}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">
-                    {generateDataStory(selectedPeriod, {
-                      followers: totalFollowers,
-                      engagement: avgEngagement,
-                      reach: totalReach,
-                      posts: totalPosts
-                    }).emoji}
-                  </span>
-                  <h3 className="text-lg font-bold tracking-wide">
-                    {generateDataStory(selectedPeriod, {
-                      followers: totalFollowers,
-                      engagement: avgEngagement,
-                      reach: totalReach,
-                      posts: totalPosts
-                    }).title}
-                  </h3>
+      {showDataStory && (() => {
+        const currentStory = generateDataStory({
+          followers: totalFollowers,
+          engagement: avgEngagement, 
+          reach: totalReach,
+          posts: totalPosts
+        })
+        
+        return (
+          <div 
+            key={storyAnimation}
+            className="mx-6 mb-4 relative overflow-hidden rounded-3xl transform-gpu animate-in zoom-in-95 duration-700 shadow-2xl"
+            data-testid="data-story"
+          >
+            <div className={`${currentStory.color} p-6 relative`}>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-2 right-2 text-4xl animate-bounce">
+                  {currentStory.emoji}
                 </div>
-                <button
-                  onClick={() => setShowDataStory(false)}
-                  className="text-white/70 hover:text-white transition-colors p-1 rounded-full hover:bg-white/20"
-                >
-                  ✕
-                </button>
+                <div className="absolute bottom-2 left-2 w-16 h-16 rounded-full bg-white/20 animate-pulse"></div>
+                <div className="absolute top-1/2 left-1/3 w-8 h-8 rounded-full bg-white/10 animate-ping"></div>
               </div>
-              
-              <div className="space-y-3">
-                <p className="text-sm font-medium leading-relaxed animate-in slide-in-from-left duration-500 delay-200">
-                  {generateDataStory(selectedPeriod, {
-                    followers: totalFollowers,
-                    engagement: avgEngagement,
-                    reach: totalReach,
-                    posts: totalPosts
-                  }).story}
-                </p>
+
+              {/* Main story content */}
+              <div className={`relative z-10 ${currentStory.textColor}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{currentStory.emoji}</span>
+                    <h3 className="text-lg font-bold tracking-wide">{currentStory.title}</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowDataStory(false)}
+                    className="text-white/70 hover:text-white transition-colors p-1 rounded-full hover:bg-white/20"
+                  >
+                    ✕
+                  </button>
+                </div>
                 
-                <div className="bg-white/20 rounded-xl p-3 animate-in slide-in-from-left duration-500 delay-400">
-                  <p className="text-xs font-semibold opacity-90">
-                    💡 {generateDataStory(selectedPeriod, {
-                      followers: totalFollowers,
-                      engagement: avgEngagement,
-                      reach: totalReach,
-                      posts: totalPosts
-                    }).insight}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium leading-relaxed animate-in slide-in-from-left duration-500 delay-200">
+                    {currentStory.story}
                   </p>
+                  
+                  <div className="bg-white/20 rounded-xl p-3 animate-in slide-in-from-left duration-500 delay-400">
+                    <p className="text-xs font-semibold opacity-90">
+                      💡 {currentStory.insight}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       <CardContent className="space-y-8">
         {/* Connected Platforms Header */}
@@ -450,7 +420,7 @@ export function PerformanceScore() {
                       <ArrowUpRight className="w-3 h-3 mr-1" /> : 
                       <ArrowDownRight className="w-3 h-3 mr-1" />
                     }
-                    <span>{growthPercentages.followers.value} ({growthPercentages.followers.percentage})</span>
+                    <span>{growthPercentages.followers.value}</span>
                   </div>
                 </div>
               </div>
