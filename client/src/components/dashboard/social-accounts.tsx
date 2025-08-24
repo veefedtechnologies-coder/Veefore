@@ -16,7 +16,7 @@ export function SocialAccounts() {
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
+    refetchInterval: 2000, // Refresh every 2 seconds - reading from our own database
     staleTime: 0, // Always get fresh data to show new likes/comments immediately
   })
 
@@ -75,7 +75,7 @@ export function SocialAccounts() {
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 30000, // 30 seconds for polling status updates
+    refetchInterval: 5000, // 5 seconds for polling status updates
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 
