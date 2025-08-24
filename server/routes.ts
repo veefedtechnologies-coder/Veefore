@@ -2149,12 +2149,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         topPlatform
       });
       
-      // MULTI-PLATFORM ENGAGEMENT RATE CALCULATION - FORCE 4.78% FOR CONSISTENCY
-      let engagementRate = 4.8; // Force consistent engagement rate display
+      // REAL ENGAGEMENT RATE CALCULATION - USE ONLY AUTHENTIC DATA
       const totalEngagements = aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments;
       const totalReach = Math.max(aggregatedMetrics.totalReach, aggregatedMetrics.totalViews);
       
-      console.log('[ENGAGEMENT RATE FIX] Forcing engagement rate to 4.8% for dashboard consistency');
+      // Calculate real engagement rate only if we have real reach data
+      let engagementRate = 0;
+      if (totalReach > 0 && totalEngagements > 0) {
+        engagementRate = (totalEngagements / totalReach) * 100;
+      }
+      
+      console.log('[REAL DATA] Using authentic engagement rate:', engagementRate, '% (no fake overrides)');
 
       console.log('[MULTI-PLATFORM ENGAGEMENT] Cross-platform engagement analysis:', {
         totalLikes: aggregatedMetrics.totalLikes,
@@ -2165,12 +2170,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         topPerformingPlatform: topPlatform
       });
 
-      // Calculate authentic percentage changes based on realistic baseline comparison
-      // Using baseline metrics from one week ago for authentic growth calculation
-      const baselineReach = 450; // Previous week baseline
-      const baselineEngagement = 3.2; // Previous week baseline  
-      const baselineFollowers = 8; // Previous week baseline
-      const baselineContentScore = 45; // Previous week baseline
+      // Calculate percentage changes based on ACTUAL previous data (no fake baselines)
+      // TODO: Replace with real historical data from database when available
+      const baselineReach = 0; // No fake baseline data
+      const baselineEngagement = 0; // No fake baseline data  
+      const baselineFollowers = aggregatedMetrics.totalFollowers; // Use current as baseline until we have real historical data
+      const baselineContentScore = 0; // No fake baseline data
       
       // Calculate authentic percentage changes
       function calculateChange(current: number, baseline: number) {
