@@ -228,8 +228,19 @@ export function PerformanceScore() {
               <div className="relative z-10">
                 <div className="text-2xl font-bold text-blue-600 mb-1">{formatNumber(totalFollowers)}</div>
                 <div className="text-xs text-gray-600 font-medium mb-2">Total Followers</div>
-                <div className="w-full bg-white/60 rounded-full h-1.5">
-                  <div className="bg-blue-500 h-1.5 rounded-full w-3/4 transition-all duration-1000"></div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-full bg-white/60 rounded-full h-1.5 mr-2">
+                    <div className="bg-blue-500 h-1.5 rounded-full w-3/4 transition-all duration-1000"></div>
+                  </div>
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.followers.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.followers.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.followers.value}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -242,8 +253,19 @@ export function PerformanceScore() {
               <div className="relative z-10">
                 <div className="text-2xl font-bold text-green-600 mb-1">{avgEngagement.toFixed(1)}%</div>
                 <div className="text-xs text-gray-600 font-medium mb-2">Avg Engagement</div>
-                <div className="w-full bg-white/60 rounded-full h-1.5">
-                  <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-full bg-white/60 rounded-full h-1.5 mr-2">
+                    <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>
+                  </div>
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.engagement.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.engagement.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.engagement.value}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -256,8 +278,19 @@ export function PerformanceScore() {
               <div className="relative z-10">
                 <div className="text-2xl font-bold text-purple-600 mb-1">{formatNumber(totalReach)}</div>
                 <div className="text-xs text-gray-600 font-medium mb-2">Total Reach</div>
-                <div className="w-full bg-white/60 rounded-full h-1.5">
-                  <div className="bg-purple-500 h-1.5 rounded-full w-2/3 transition-all duration-1000"></div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-full bg-white/60 rounded-full h-1.5 mr-2">
+                    <div className="bg-purple-500 h-1.5 rounded-full w-2/3 transition-all duration-1000"></div>
+                  </div>
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.reach.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.reach.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.reach.value}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -269,9 +302,24 @@ export function PerformanceScore() {
               </div>
               <div className="relative z-10">
                 <div className="text-2xl font-bold text-orange-600 mb-1">{totalPosts}</div>
-                <div className="text-xs text-gray-600 font-medium mb-2">Total Posts</div>
-                <div className="w-full bg-white/60 rounded-full h-1.5">
-                  <div className="bg-orange-500 h-1.5 rounded-full w-5/6 transition-all duration-1000"></div>
+                <div className="text-xs text-gray-600 font-medium mb-2">
+                  {selectedPeriod === 'day' ? 'Posts Today' : 
+                   selectedPeriod === 'week' ? 'Posts This Week' : 
+                   'Posts This Month'}
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-full bg-white/60 rounded-full h-1.5 mr-2">
+                    <div className="bg-orange-500 h-1.5 rounded-full w-5/6 transition-all duration-1000"></div>
+                  </div>
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.posts.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.posts.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.posts.value}</span>
+                  </div>
                 </div>
               </div>
             </div>
