@@ -7221,6 +7221,42 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     await commentWebhookHandler.testWebhookSystem(req, res);
   });
 
+  // Force Instagram analytics sync endpoint
+  app.post('/api/instagram/force-analytics-sync', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const workspace = await storage.getDefaultWorkspace(user.id);
+      if (!workspace) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+
+      // Get Instagram accounts for this workspace
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      const instagramAccounts = socialAccounts.filter(acc => acc.platform === 'instagram' && acc.accessToken);
+
+      for (const account of instagramAccounts) {
+        console.log(`[FORCE SYNC] Syncing Instagram analytics for @${account.username}`);
+        
+        // Force refresh Instagram data using the smart polling system
+        const instagramSyncService = new (require('./instagram-sync-service').InstagramSyncService)(storage);
+        await instagramSyncService.syncInstagramAccount({
+          accountId: account.accountId,
+          accessToken: account.accessToken,
+          username: account.username,
+          workspaceId: workspace.id,
+          id: account.id
+        });
+
+        console.log(`[FORCE SYNC] ✅ Completed sync for @${account.username}`);
+      }
+
+      res.json({ success: true, message: `Synced ${instagramAccounts.length} Instagram account(s)` });
+    } catch (error: any) {
+      console.error('[FORCE SYNC] Error:', error);
+      res.status(500).json({ error: 'Failed to sync Instagram analytics' });
+    }
+  });
+
   // DM Template Management Routes
   app.post('/api/dm-templates', requireAuth, async (req: any, res: Response) => {
     try {
