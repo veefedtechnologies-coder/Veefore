@@ -140,7 +140,7 @@ export class InstagramCommentWebhookHandler {
       });
 
       // Convert Instagram User ID to PSID
-      const psid = await this.convertToPSID(commentData.from.id, pageId);
+      const psid = await this.convertToPSID(commentData.from.id, pageId, socialAccount);
       if (!psid) {
         console.log('[INSTAGRAM WEBHOOK] Failed to convert Instagram User ID to PSID');
         return;
@@ -153,7 +153,8 @@ export class InstagramCommentWebhookHandler {
         psid,
         dmTemplate.messageText,
         dmTemplate.buttonText,
-        dmTemplate.buttonUrl
+        dmTemplate.buttonUrl,
+        socialAccount
       );
 
       console.log('[INSTAGRAM WEBHOOK] Dynamic DM sent successfully');
@@ -209,11 +210,19 @@ export class InstagramCommentWebhookHandler {
   /**
    * Convert Instagram User ID to PSID using Graph API
    */
-  private async convertToPSID(instagramUserId: string, pageId: string): Promise<string | null> {
+  private async convertToPSID(instagramUserId: string, pageId: string, socialAccount?: any): Promise<string | null> {
     try {
-      const pageAccessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      // Use the access token from the social account instead of environment variable
+      let pageAccessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      
+      // If no environment token, use the Instagram account's access token
+      if (!pageAccessToken && socialAccount?.accessToken) {
+        pageAccessToken = socialAccount.accessToken;
+        console.log('[INSTAGRAM WEBHOOK] Using Instagram account access token for API calls');
+      }
+      
       if (!pageAccessToken) {
-        throw new Error('PAGE_ACCESS_TOKEN not configured');
+        throw new Error('No access token available - neither PAGE_ACCESS_TOKEN nor Instagram account token found');
       }
 
       const response = await fetch(
@@ -259,12 +268,21 @@ export class InstagramCommentWebhookHandler {
     psid: string,
     messageText: string,
     buttonText: string,
-    buttonUrl: string
+    buttonUrl: string,
+    socialAccount?: any
   ): Promise<void> {
     try {
-      const pageAccessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      // Use the access token from the social account instead of environment variable
+      let pageAccessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      
+      // If no environment token, use the Instagram account's access token
+      if (!pageAccessToken && socialAccount?.accessToken) {
+        pageAccessToken = socialAccount.accessToken;
+        console.log('[INSTAGRAM WEBHOOK] Using Instagram account access token for sending DM');
+      }
+      
       if (!pageAccessToken) {
-        throw new Error('PAGE_ACCESS_TOKEN not configured');
+        throw new Error('No access token available for sending DM - neither PAGE_ACCESS_TOKEN nor Instagram account token found');
       }
 
       const messagePayload = {
