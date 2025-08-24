@@ -12,10 +12,11 @@ export class InstagramOAuthService {
   }
 
   getAuthUrl(workspaceId: string): string {
-    const scopes = 'user_profile,user_media';
+    // Use Instagram Business API scopes for messaging capabilities
+    const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights';
     const state = Buffer.from(JSON.stringify({ workspaceId })).toString('base64');
     
-    return `https://api.instagram.com/oauth/authorize?client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+    return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
   }
 
   async exchangeCodeForToken(code: string, workspaceId: string): Promise<any> {
@@ -41,16 +42,12 @@ export class InstagramOAuthService {
 
       const tokenData = await tokenResponse.json();
       
-      // Get long-lived access token
-      const longLivedResponse = await fetch(
-        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${this.appSecret}&access_token=${tokenData.access_token}`
-      );
-
-      if (!longLivedResponse.ok) {
-        throw new Error(`Long-lived token exchange failed: ${longLivedResponse.status}`);
-      }
-
-      const longLivedData = await longLivedResponse.json();
+      // For Business API, tokens are already long-lived, no need for exchange
+      console.log('[INSTAGRAM OAUTH] Got Business API token, no exchange needed');
+      const longLivedData = {
+        access_token: tokenData.access_token,
+        expires_in: 5183944 // Business tokens last ~60 days
+      };
 
       // Fetch user profile data
       const userProfile = await this.fetchUserProfile(longLivedData.access_token);
