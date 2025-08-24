@@ -596,11 +596,11 @@ export default function VeeGPT() {
             clearTimeout(statusTimeoutRef.current)
           }
           
-          // Auto-clear status after 2 seconds max to prevent lingering
+          // Auto-clear status after shorter time to keep it responsive
           statusTimeoutRef.current = setTimeout(() => {
             console.log('VeeGPT: STATUS AUTO-TIMEOUT - clearing status')
             setAiStatus(null)
-          }, 2000)
+          }, 3000)
         } else {
           console.log('VeeGPT: STATUS UPDATE IGNORED (content streaming):', data.content || data.status)
         }
@@ -670,8 +670,11 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current
         })
         
-        // IMMEDIATELY clear status and set streaming flag when ANY chunk arrives
-        setAiStatus(null)
+        // Clear status after first chunk (keep it visible briefly for immediate feedback)
+        if (!isContentStreaming) {
+          // Give user a moment to see the status before clearing
+          setTimeout(() => setAiStatus(null), 800) // Show status for 800ms
+        }
         setIsContentStreaming(true)
         
         // Clear status timeout since content is now streaming
