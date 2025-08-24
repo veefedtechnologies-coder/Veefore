@@ -670,11 +670,8 @@ export default function VeeGPT() {
           isGeneratingRef: isGeneratingRef.current
         })
         
-        // Clear status after first chunk (keep it visible briefly for immediate feedback)
-        if (!isContentStreaming) {
-          // Give user a moment to see the status before clearing
-          setTimeout(() => setAiStatus(null), 800) // Show status for 800ms
-        }
+        // Clear status IMMEDIATELY when streaming starts
+        setAiStatus(null)
         setIsContentStreaming(true)
         
         // Clear status timeout since content is now streaming
