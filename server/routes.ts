@@ -3610,10 +3610,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const longLivedToken = await longLivedResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Long-lived token obtained, expires in ${longLivedToken.expires_in} seconds`);
       
-      // Get user profile using Instagram Business API
-      console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
+      // Get user profile using Instagram Business API with complete data
+      console.log(`[INSTAGRAM CALLBACK] Fetching user profile with analytics...`);
       const profileResponse = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${longLivedToken.access_token}`
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,followers_count,follows_count,profile_picture_url,website,biography&access_token=${longLivedToken.access_token}`
       );
 
       if (!profileResponse.ok) {
@@ -3636,7 +3636,16 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         accessToken: longLivedToken.access_token,
         refreshToken: null,
         expiresAt: expiresAt,
-        isActive: true
+        isActive: true,
+        followersCount: profile.followers_count || 0,
+        followingCount: profile.follows_count || 0,
+        mediaCount: profile.media_count || 0,
+        accountType: profile.account_type || 'PERSONAL',
+        isBusinessAccount: profile.account_type === 'BUSINESS',
+        isVerified: false,
+        profilePicture: profile.profile_picture_url || null,
+        bio: profile.biography || null,
+        website: profile.website || null
       };
 
       console.log(`[INSTAGRAM CALLBACK] Saving social account for workspace ${workspaceId}...`);
