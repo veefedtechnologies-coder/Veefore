@@ -13783,6 +13783,26 @@ Create a detailed growth strategy in JSON format:
         conversationId: convId
       });
 
+      // Send immediate real AI analysis status BEFORE starting generation
+      const { HybridAIService } = await import('./hybrid-ai-service');
+      const hybridAIService = new HybridAIService();
+      const quickAnalysis = hybridAIService.analyzeQuestion(content.trim());
+      
+      // Send immediate real status based on actual AI analysis
+      const immediateStatus = quickAnalysis.primaryProvider === 'openai' ? 
+        'Analyzing question complexity and routing to GPT-4o for optimal results...' :
+        quickAnalysis.primaryProvider === 'perplexity' ?
+        'Analyzing trends and routing to Perplexity for real-time research...' :
+        'Analyzing creative requirements and routing to Gemini for innovative insights...';
+        
+      // Broadcast immediate status via WebSocket
+      (global as any).broadcastToConversation(convId, {
+        type: 'status',
+        content: immediateStatus,
+        conversationId: convId,
+        timestamp: Date.now()
+      });
+
       // Start AI response generation immediately in background using WebSocket
       setImmediate(async () => {
         try {
@@ -14039,6 +14059,24 @@ Create a detailed growth strategy in JSON format:
         conversation, 
         userMessage,
         streaming: true
+      });
+
+      // Send immediate real AI analysis status BEFORE starting generation
+      const quickAnalysis = hybridAI.analyzeQuestion(content.trim());
+      
+      // Send immediate real status based on actual AI analysis
+      const immediateStatus = quickAnalysis.primaryProvider === 'openai' ? 
+        'Analyzing question complexity and routing to GPT-4o for optimal results...' :
+        quickAnalysis.primaryProvider === 'perplexity' ?
+        'Analyzing trends and routing to Perplexity for real-time research...' :
+        'Analyzing creative requirements and routing to Gemini for innovative insights...';
+        
+      // Broadcast immediate status via WebSocket
+      (global as any).broadcastToConversation(conversation.id, {
+        type: 'status',
+        content: immediateStatus,
+        conversationId: conversation.id,
+        timestamp: Date.now()
       });
 
       // Start AI response generation immediately with status buffering
