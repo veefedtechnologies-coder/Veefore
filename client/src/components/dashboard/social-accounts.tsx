@@ -87,17 +87,19 @@ export function SocialAccounts() {
 
   const [selectedAccount, setSelectedAccount] = useState(connectedAccounts[0]?.platform || 'instagram')
 
-  // Auto-start polling when component mounts and Instagram account exists
+  // PRODUCTION-SAFE: Only start polling once on initial load, not on every update
+  const [hasStartedPolling, setHasStartedPolling] = React.useState(false)
   React.useEffect(() => {
     const instagramAccount = connectedAccounts.find((acc: any) => acc.platform === 'instagram')
-    if (instagramAccount && !startPollingMutation.isPending) {
-      // Small delay to ensure account is fully loaded
+    if (instagramAccount && !startPollingMutation.isPending && !hasStartedPolling) {
+      setHasStartedPolling(true)
+      // Start polling only once when Instagram account is first detected
       const timer = setTimeout(() => {
         startPollingMutation.mutate()
-      }, 2000)
+      }, 5000) // Longer delay to prevent rapid triggering
       return () => clearTimeout(timer)
     }
-  }, [connectedAccounts, startPollingMutation.isPending])
+  }, [connectedAccounts, startPollingMutation.isPending, hasStartedPolling])
 
   if (isLoading) {
     return (
