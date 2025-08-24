@@ -1,9 +1,8 @@
-import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Info, TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye } from 'lucide-react'
+import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye } from 'lucide-react'
 
 export function PerformanceScore() {
   // Fetch real dashboard analytics data
@@ -57,17 +56,17 @@ export function PerformanceScore() {
            account.platform === 'twitter' ? 'from-blue-400 to-blue-600' : 
            account.platform === 'linkedin' ? 'from-blue-700 to-blue-900' : 'from-blue-600 to-blue-700',
     followers: account.followersCount || account.followers || 0,
-    engagement: account.engagementRate ? `${account.engagementRate.toFixed(1)}%` : '0%'
-    reach: account.totalReach || 0
+    engagement: account.engagementRate ? `${account.engagementRate.toFixed(1)}%` : '0%',
+    reach: account.totalReach || 0,
     posts: account.mediaCount || account.posts || 0,
     username: account.username
   })) || []
 
   // Calculate total metrics from real data
-  const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum, platform) => sum + platform.followers, 0)
-  const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum, platform) => sum + platform.reach, 0)
+  const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
+  const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.reach, 0)
   const avgEngagement = analytics?.engagementRate || 0
-  const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum, platform) => sum + platform.posts, 0)
+  const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
 
   // Format numbers for display
   const formatNumber = (num: number) => {
@@ -95,7 +94,7 @@ export function PerformanceScore() {
           <div className="flex items-center space-x-4">
             <h3 className="text-lg font-bold text-gray-900">Connected Platforms</h3>
             <div className="flex items-center space-x-2">
-              {connectedPlatforms.map((platform, idx) => (
+              {connectedPlatforms.map((platform: any) => (
                 <div key={platform.name} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm">
                   {platform.logo}
                 </div>
@@ -180,7 +179,7 @@ export function PerformanceScore() {
             connectedPlatforms.length === 5 ? 'grid-cols-2 lg:grid-cols-5' :
             'grid-cols-2 lg:grid-cols-6'
           }`}>
-            {connectedPlatforms.map((platform) => (
+            {connectedPlatforms.map((platform: any) => (
               <div key={platform.name} className="bg-gray-50 rounded-xl p-4 text-center hover:bg-gray-100 transition-colors duration-200">
                 <div className="w-10 h-10 rounded-full bg-white mx-auto mb-3 flex items-center justify-center text-lg shadow-sm">
                   {platform.logo}
