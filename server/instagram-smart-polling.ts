@@ -322,7 +322,18 @@ export class InstagramSmartPolling {
         acc.platform === 'instagram' && 
         (acc.accountId === config.accountId || acc.id === config.accountId)
       );
-      const isBusinessAccount = account?.isBusinessAccount || account?.accountType === 'BUSINESS' || account?.accountType === 'CREATOR';
+      // Debug current account type values
+      console.log(`[SMART POLLING] Account @${config.username} debug:`, {
+        isBusinessAccount: account?.isBusinessAccount,
+        accountType: account?.accountType,
+        hasAccessToken: !!config.accessToken
+      });
+      
+      const isBusinessAccount = account?.isBusinessAccount || 
+                               account?.accountType === 'BUSINESS' || 
+                               account?.accountType === 'CREATOR' ||
+                               account?.accountType === 'business' ||
+                               account?.accountType === 'creator';
       
       console.log(`[SMART POLLING] Account @${config.username} - Business account: ${isBusinessAccount}`);
       
@@ -432,9 +443,45 @@ export class InstagramSmartPolling {
                 reachCount++;
                 console.log(`[SMART POLLING] ✅ Real reach for post ${media.id}: ${reach}`);
               }
+            } else {
+              console.log(`[SMART POLLING] Insights failed for ${media.id}: ${insightsResponse.status}`);
             }
           } catch (error) {
-            console.log(`[SMART POLLING] Could not fetch reach for post ${media.id}`);
+            console.log(`[SMART POLLING] Could not fetch reach for post ${media.id}:`, error.message);
+          }
+        }
+      } else {
+        // Even if not detected as business, try ONE Business API call to test if we actually have access
+        console.log('[SMART POLLING] 🧪 Testing Business API access even though account not detected as business...');
+        if (mediaList.length > 0) {
+          try {
+            const testMedia = mediaList[0];
+            const testResponse = await fetch(`https://graph.instagram.com/${testMedia.id}/insights?metric=reach&access_token=${accessToken}`);
+            if (testResponse.ok) {
+              const insights = await testResponse.json();
+              const reach = insights.data?.[0]?.values?.[0]?.value || 0;
+              console.log(`[SMART POLLING] 🎉 SURPRISE! We DO have Business API access! Reach: ${reach}`);
+              // If Business API works, treat as business account and fetch more data
+              for (const media of mediaList.slice(0, 5)) {
+                try {
+                  const insightsResponse = await fetch(`https://graph.instagram.com/${media.id}/insights?metric=reach&access_token=${accessToken}`);
+                  if (insightsResponse.ok) {
+                    const insights = await insightsResponse.json();
+                    const reach = insights.data?.[0]?.values?.[0]?.value || 0;
+                    if (reach > 0) {
+                      totalReach += reach;
+                      reachCount++;
+                    }
+                  }
+                } catch (error) {
+                  // Continue if some posts fail
+                }
+              }
+            } else {
+              console.log(`[SMART POLLING] Business API test failed: ${testResponse.status} - confirmed personal account`);
+            }
+          } catch (error) {
+            console.log(`[SMART POLLING] Business API test error: ${error.message}`);
           }
         }
       }
