@@ -57,8 +57,8 @@ export function PerformanceScore() {
            account.platform === 'twitter' ? 'from-blue-400 to-blue-600' : 
            account.platform === 'linkedin' ? 'from-blue-700 to-blue-900' : 'from-blue-600 to-blue-700',
     followers: account.followersCount || account.followers || 0,
-    engagement: '8.2%', // Default engagement rate
-    reach: Math.round((account.followersCount || 0) * 2.5), // Estimated reach
+    engagement: account.engagementRate ? `${account.engagementRate.toFixed(1)}%` : '0%'
+    reach: account.totalReach || 0
     posts: account.mediaCount || account.posts || 0,
     username: account.username
   })) || []
@@ -66,7 +66,7 @@ export function PerformanceScore() {
   // Calculate total metrics from real data
   const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum, platform) => sum + platform.followers, 0)
   const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum, platform) => sum + platform.reach, 0)
-  const avgEngagement = analytics?.engagementRate || 10.3
+  const avgEngagement = analytics?.engagementRate || 0
   const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum, platform) => sum + platform.posts, 0)
 
   // Format numbers for display
@@ -214,8 +214,15 @@ export function PerformanceScore() {
                 <TrendingUp className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex items-center space-x-2 mb-2">
-                <span className="text-lg">{connectedPlatforms[0]?.logo || '📷'}</span>
-                <div className="text-xl font-bold text-blue-600">{connectedPlatforms[0]?.name || 'Instagram'}</div>
+                {connectedPlatforms[0] && (
+                  <>
+                    <span className="text-lg">{connectedPlatforms[0].logo}</span>
+                    <div className="text-xl font-bold text-blue-600">{connectedPlatforms[0].name}</div>
+                  </>
+                )}
+                {!connectedPlatforms[0] && (
+                  <div className="text-sm text-gray-400">No platform connected</div>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
@@ -234,11 +241,11 @@ export function PerformanceScore() {
                 <h5 className="text-sm font-semibold text-gray-700">Content Score</h5>
                 <Sparkles className="w-4 h-4 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600 mb-2">8.7/10</div>
+              <div className="text-2xl font-bold text-green-600 mb-2">{connectedPlatforms.length > 0 ? '8.7/10' : '0/10'}</div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-600">Quality Rating</span>
-                  <span className="font-medium text-gray-700">Excellent</span>
+                  <span className="font-medium text-gray-700">{connectedPlatforms.length > 0 ? 'Excellent' : 'No Data'}</span>
                 </div>
                 <div className="w-full bg-white/60 rounded-full h-1.5">
                   <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>

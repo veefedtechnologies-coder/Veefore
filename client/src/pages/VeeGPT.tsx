@@ -11,7 +11,6 @@ import {
   Edit3,
   Calendar,
   ChevronDown,
-  MessageSquare,
   User,
   Paperclip,
   Edit,
