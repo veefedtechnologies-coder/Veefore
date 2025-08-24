@@ -397,7 +397,7 @@ export class InstagramSmartPolling {
         return { avgLikes: 0, avgComments: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalReach: 0, avgEngagement: 0 };
       }
       
-      // Calculate engagement metrics
+      // Calculate ONLY real engagement metrics from actual Instagram data
       const totalLikes = mediaList.reduce((sum: number, media: any) => sum + (media.like_count || 0), 0);
       const totalComments = mediaList.reduce((sum: number, media: any) => sum + (media.comments_count || 0), 0);
       
@@ -405,18 +405,17 @@ export class InstagramSmartPolling {
       const avgComments = Math.round(totalComments / mediaList.length);
       const avgEngagement = avgLikes + avgComments;
       
-      // Basic reach estimation (we'll use followers for now)
-      const avgReach = 100; // Conservative estimate
-      const engagementRate = avgReach > 0 ? Math.round((avgEngagement / avgReach) * 10000) : 0;
+      // ONLY use real data - no fake estimates
+      console.log(`[SMART POLLING] ✅ Real engagement data: ${totalLikes} likes, ${totalComments} comments across ${mediaList.length} posts`);
       
       return {
         avgLikes,
         avgComments,
-        avgReach,
-        engagementRate,
+        avgReach: 0, // Not available via Instagram Basic API - show 0 instead of fake data
+        engagementRate: 0, // Can't calculate without real reach data
         totalLikes,
         totalComments,
-        totalReach: avgReach * mediaList.length,
+        totalReach: 0, // Not available
         avgEngagement
       };
     } catch (error) {
