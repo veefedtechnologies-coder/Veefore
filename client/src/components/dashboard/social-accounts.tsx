@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useLocation } from 'wouter'
-import { apiRequest } from '@/lib/queryClient'
+import { apiRequest, queryClient } from '@/lib/queryClient'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
 
 export function SocialAccounts() {
   const [, setLocation] = useLocation()
+  const { toast } = useToast()
   
   // Fetch real social accounts data - webhook-based updates
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
@@ -16,6 +18,27 @@ export function SocialAccounts() {
     queryFn: () => apiRequest('/api/social-accounts'),
     // Removed polling - using webhooks for real-time updates
     staleTime: 0, // Always fetch latest data when needed
+  })
+
+  // Manual sync mutation for Instagram data
+  const syncMutation = useMutation({
+    mutationFn: () => apiRequest('/api/instagram/force-sync', { method: 'POST' }),
+    onSuccess: (data) => {
+      toast({
+        title: "✅ Instagram data synced",
+        description: `Updated to ${data.followers} followers`,
+      })
+      // Invalidate relevant queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+    },
+    onError: (error: any) => {
+      toast({
+        title: "❌ Sync failed", 
+        description: error.message || "Failed to sync Instagram data",
+        variant: "destructive"
+      })
+    }
   })
 
 
@@ -120,9 +143,22 @@ export function SocialAccounts() {
               <h3 className="text-xl font-bold text-gray-900">Social accounts</h3>
               <p className="text-sm text-gray-600 mt-1">Manage your connected platforms</p>
             </div>
-            <Button variant="outline" size="sm" className="text-slate-600 border-slate-200 hover:bg-slate-50">
-              See all accounts
-            </Button>
+            <div className="flex space-x-2">
+              {/* Manual sync button for Instagram */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => syncMutation.mutate()}
+                disabled={syncMutation.isPending}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <RefreshCw className={`w-4 h-4 mr-1 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+                {syncMutation.isPending ? 'Syncing...' : 'Sync Data'}
+              </Button>
+              <Button variant="outline" size="sm" className="text-slate-600 border-slate-200 hover:bg-slate-50">
+                See all accounts
+              </Button>
+            </div>
           </div>
 
           {/* Account Selector */}
