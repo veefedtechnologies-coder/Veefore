@@ -62,28 +62,28 @@ export function PerformanceScore() {
     return stories[period]
   }
   
-  // Fetch real dashboard analytics data - webhook-based updates
+  // Fetch real dashboard analytics data - PRODUCTION-SAFE
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
     queryFn: () => apiRequest('/api/dashboard/analytics'),
-    refetchInterval: 2000, // Refresh every 2 seconds - reading from our own database
-    staleTime: 0, // Always fetch latest data when needed
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
-  // Fetch real social accounts data - webhook-based updates
+  // Fetch real social accounts data - PRODUCTION-SAFE
   const { data: socialAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 2000, // Refresh every 2 seconds - reading from our own database
-    staleTime: 0, // Always fetch latest data when needed
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
-  // Fetch historical analytics data for trend comparisons
+  // Fetch historical analytics data for trend comparisons - PRODUCTION-SAFE
   const { data: historicalData } = useQuery({
     queryKey: ['/api/analytics/historical', selectedPeriod],
     queryFn: () => apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}`),
-    refetchInterval: 5000, // Refresh every 5 seconds
-    staleTime: 0,
+    refetchInterval: 10 * 60 * 1000, // Refresh every 10 minutes - SAFE for production
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 
   // Calculate REAL growth data using historical records

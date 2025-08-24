@@ -12,12 +12,12 @@ export function SocialAccounts() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   
-  // Fetch social accounts data - ULTRA-SAFE rate limit protection
+  // Fetch social accounts data - PRODUCTION-SAFE rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 2000, // Refresh every 2 seconds - reading from our own database
-    staleTime: 0, // Always get fresh data to show new likes/comments immediately
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes to prevent excessive calls
   })
 
   // Manual sync mutation for Instagram data - IMMEDIATE mode

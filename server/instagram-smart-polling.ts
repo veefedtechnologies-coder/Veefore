@@ -32,13 +32,13 @@ export class InstagramSmartPolling {
   private readonly MAX_REQUESTS_PER_HOUR = 200;
   private readonly HOUR_IN_MS = 60 * 60 * 1000;
   
-  // ULTRA-SECURE polling intervals - BULLETPROOF rate limit protection
+  // PRODUCTION-SAFE polling intervals - PRIORITIZE AUTOMATION OVER ANALYTICS
   private readonly INTERVALS = {
-    ACTIVE_USER: 60 * 1000,      // 1 minute when user is active (ULTRA-SAFE)
-    NORMAL: 3 * 60 * 1000,       // 3 minutes normal (VERY CONSERVATIVE)
-    REDUCED: 5 * 60 * 1000,      // 5 minutes when no changes
-    MINIMAL: 10 * 60 * 1000,     // 10 minutes when inactive
-    NIGHT: 15 * 60 * 1000        // 15 minutes during night hours
+    ACTIVE_USER: 10 * 60 * 1000,   // 10 minutes when user is active (SAFE)
+    NORMAL: 15 * 60 * 1000,       // 15 minutes normal (VERY CONSERVATIVE)
+    REDUCED: 30 * 60 * 1000,      // 30 minutes when no changes
+    MINIMAL: 60 * 60 * 1000,      // 1 hour when inactive
+    NIGHT: 120 * 60 * 1000        // 2 hours during night hours
   };
 
   constructor(storage: IStorage) {
@@ -172,15 +172,15 @@ export class InstagramSmartPolling {
       tracker.windowStart = now;
     }
 
-    // Check per-account limit (25% of total to be safe with multiple accounts)
-    const maxPerAccount = Math.floor(this.MAX_REQUESTS_PER_HOUR / 4); // 50 requests max per account
+    // Check per-account limit (10% of total to reserve quota for automation)
+    const maxPerAccount = Math.floor(this.MAX_REQUESTS_PER_HOUR / 10); // 20 requests max per account for analytics
     if (tracker.requestCount >= maxPerAccount) {
       console.log(`[SMART POLLING] 🚫 Account rate limit reached for ${accountId}: ${tracker.requestCount}/${maxPerAccount}`);
       return false;
     }
 
-    // Layer 3: Minimum gap enforcement (doubled for safety: 36 seconds)
-    const minGap = (this.HOUR_IN_MS / this.MAX_REQUESTS_PER_HOUR) * 2; // 36 seconds minimum
+    // Layer 3: Minimum gap enforcement (10x safety: 3 minutes minimum)
+    const minGap = (this.HOUR_IN_MS / this.MAX_REQUESTS_PER_HOUR) * 10; // 3 minutes minimum between requests
     if (now - tracker.lastRequest < minGap) {
       console.log(`[SMART POLLING] ⏱️ Too soon for ${accountId}, waiting ${Math.ceil((minGap - (now - tracker.lastRequest)) / 1000)}s`);
       return false;
