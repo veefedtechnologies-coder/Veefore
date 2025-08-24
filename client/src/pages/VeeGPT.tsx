@@ -1027,13 +1027,50 @@ export default function VeeGPT() {
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
           <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
-            {/* Top Logo/Brand with Toggle */}
+            {/* User Profile Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <img src="/veefore-logo.png" alt="VeeFore" className="w-10 h-10" />
-                  <span className="text-lg font-bold text-gray-900 -ml-1">eeGPT</span>
-                </div>
+                {!sidebarCollapsed ? (
+                  <div className="flex items-center space-x-3">
+                    {/* User Avatar */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                      {userData?.avatar ? (
+                        <img 
+                          src={userData.avatar} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-white text-lg font-bold">
+                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-lg font-bold text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {userData?.plan || 'Free'} Plan
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                    {userData?.avatar ? (
+                      <img 
+                        src={userData.avatar} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="text-white text-lg font-bold">
+                        {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
@@ -1045,37 +1082,6 @@ export default function VeeGPT() {
                   )}
                 </button>
               </div>
-              
-              {/* User Profile Information */}
-              {!sidebarCollapsed && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    {/* User Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                      {userData?.avatar ? (
-                        <img 
-                          src={userData.avatar} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <span className="text-white text-sm font-bold">
-                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                      )}
-                    </div>
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {userData?.plan || 'Free'} Plan
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Navigation Menu */}
@@ -1489,13 +1495,50 @@ export default function VeeGPT() {
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
           <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
-            {/* Top Logo/Brand with Toggle */}
+            {/* User Profile Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <img src="/veefore-logo.png" alt="VeeFore" className="w-10 h-10" />
-                  <span className="text-lg font-bold text-gray-900 -ml-1">eeGPT</span>
-                </div>
+                {!sidebarCollapsed ? (
+                  <div className="flex items-center space-x-3">
+                    {/* User Avatar */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                      {userData?.avatar ? (
+                        <img 
+                          src={userData.avatar} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-white text-lg font-bold">
+                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-lg font-bold text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {userData?.plan || 'Free'} Plan
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                    {userData?.avatar ? (
+                      <img 
+                        src={userData.avatar} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="text-white text-lg font-bold">
+                        {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
@@ -1507,37 +1550,6 @@ export default function VeeGPT() {
                   )}
                 </button>
               </div>
-              
-              {/* User Profile Information */}
-              {!sidebarCollapsed && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    {/* User Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                      {userData?.avatar ? (
-                        <img 
-                          src={userData.avatar} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <span className="text-white text-sm font-bold">
-                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                      )}
-                    </div>
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {userData?.plan || 'Free'} Plan
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Navigation Menu */}
