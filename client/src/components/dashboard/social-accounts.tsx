@@ -18,16 +18,11 @@ export function SocialAccounts() {
     staleTime: 5000, // Consider data stale after 5 seconds
   })
 
-  // Debug logging
-  console.log('Social Accounts - Raw data:', socialAccounts)
 
-  // Filter for connected accounts with real data - improved logic
+  // Filter for connected accounts with real data
   const connectedAccounts = socialAccounts?.filter((account: any) => {
-    console.log('Social Accounts - Filtering account:', account.username, 'followers:', account.followersCount, 'isConnected:', account.isConnected, 'hasToken:', !!account.accessToken)
     return account.isConnected || account.followersCount > 0 || account.accessToken
   }) || []
-  
-  console.log('Social Accounts - Connected accounts:', connectedAccounts.length)
 
   const [selectedAccount, setSelectedAccount] = useState(connectedAccounts[0]?.platform || 'instagram')
 
@@ -58,15 +53,25 @@ export function SocialAccounts() {
     return num?.toString() || '0'
   }
 
-  // Calculate engagement rate
+  // Calculate real engagement rate from authentic data
   const calculateEngagement = (account: any) => {
     if (!account.followersCount || account.followersCount === 0) return '0.0'
-    // Simple engagement calculation based on typical social media rates
-    const baseEngagement = account.platform === 'instagram' ? 4.2 : 
-                          account.platform === 'facebook' ? 0.25 : 
-                          account.platform === 'twitter' ? 0.5 : 
-                          account.platform === 'youtube' ? 2.8 : 1.5
-    return baseEngagement.toFixed(1)
+    
+    // Use real engagement data if available
+    if (account.avgEngagement) {
+      // Normalize extremely high engagement rates (typical for small accounts)
+      const normalizedRate = account.avgEngagement > 100 ? 
+        Math.min(account.avgEngagement / 10, 15) : // Cap at 15% for display
+        account.avgEngagement
+      return normalizedRate.toFixed(1)
+    }
+    
+    // Fallback calculation using real metrics
+    const totalEngagement = (account.totalLikes || 0) + (account.totalComments || 0)
+    const avgEngagementPerPost = account.mediaCount ? totalEngagement / account.mediaCount : 0
+    const engagementRate = account.followersCount ? (avgEngagementPerPost / account.followersCount) * 100 : 0
+    
+    return Math.min(engagementRate, 15).toFixed(1) // Cap at 15% for realistic display
   }
 
   // Get platform icon
@@ -175,14 +180,19 @@ export function SocialAccounts() {
                         active
                       </Badge>
                       <span className="text-sm text-gray-500">
-                        Last post: {currentAccount.lastSync ? new Date(currentAccount.lastSync).toLocaleDateString() : '2 hours ago'}
+                        Last sync: {currentAccount.lastSyncAt ? 
+                          new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
+                            Math.round((new Date(currentAccount.lastSyncAt).getTime() - Date.now()) / (1000 * 60)), 'minute'
+                          ) :
+                          currentAccount.lastSync ? new Date(currentAccount.lastSync).toLocaleDateString() : 'Never'
+                        }
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-green-600 font-medium">+12%</div>
-                  <div className="text-xs text-gray-500">Growth</div>
+                  <div className="text-sm text-blue-600 font-medium">{currentAccount.mediaCount || 0}</div>
+                  <div className="text-xs text-gray-500">Total Posts</div>
                 </div>
               </div>
 
@@ -217,17 +227,18 @@ export function SocialAccounts() {
                 </div>
               </div>
 
-              {/* Monthly Engagement Goal */}
+              {/* Real Engagement Metrics */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-gray-900">Monthly engagement goal</h4>
-                  <span className="text-sm font-medium text-blue-600">67%</span>
+                  <h4 className="font-semibold text-gray-900">Account Reach</h4>
+                  <span className="text-sm font-medium text-blue-600">{currentAccount.totalReach || 0}</span>
                 </div>
+                <div className="text-xs text-gray-600 mb-2">Total accounts reached: {currentAccount.totalLikes || 0} likes • {currentAccount.totalComments || 0} comments</div>
                 <div className="w-full bg-white rounded-full h-3 overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-1000" style={{ width: '67%' }}></div>
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentAccount.totalReach || 0) / 500 * 100, 100)}%` }}></div>
                 </div>
                 <div className="text-xs text-gray-600 mt-2">
-                  Target: 5% average engagement rate
+                  Performance: {currentAccount.avgComments || 0} avg comments per post
                 </div>
               </div>
 
