@@ -1026,99 +1026,57 @@ export default function VeeGPT() {
         <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
-            {/* User Profile Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                {!sidebarCollapsed ? (
-                  <div className="flex items-center space-x-3">
-                    {/* User Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                      {userData?.avatar ? (
-                        <img 
-                          src={userData.avatar} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <span className="text-white text-lg font-bold">
-                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                      )}
-                    </div>
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-lg font-bold text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {userData?.plan || 'Free'} Plan
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                    {userData?.avatar ? (
-                      <img 
-                        src={userData.avatar} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <span className="text-white text-lg font-bold">
-                        {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <button
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
-                >
-                  {sidebarCollapsed ? (
-                    <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-                  ) : (
-                    <ChevronLeft className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-                  )}
-                </button>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}>
+            {/* Top Header with Logo */}
+            <div className="p-3 flex items-center justify-between">
+              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
               </div>
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4 text-gray-500" />
+                )}
+              </button>
             </div>
 
             {/* Navigation Menu */}
-            <div className="p-4 space-y-2">
+            <div className="px-3 pb-3 space-y-1">
               <button
                 onClick={startNewChat}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-all duration-200 shadow-sm group"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "New chat" : ""}
               >
                 <Edit className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>New Chat</span>}
+                {!sidebarCollapsed && <span>New chat</span>}
               </button>
               
               <button 
                 onClick={() => setShowSearchInput(!showSearchInput)}
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Search chats" : ""}
               >
                 <Search className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>Search Chats</span>}
+                {!sidebarCollapsed && <span>Search chats</span>}
               </button>
               
-              <div className="h-px bg-gray-200 my-3"></div>
-              
               <button 
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Content Assistant" : ""}
               >
-                <Zap className="w-4 h-4 flex-shrink-0 text-amber-500" />
+                <Zap className="w-4 h-4 flex-shrink-0" />
                 {!sidebarCollapsed && <span>Content Assistant</span>}
               </button>
               
               <button 
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Analytics" : ""}
               >
-                <BarChart3 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
+                <BarChart3 className="w-4 h-4 flex-shrink-0" />
                 {!sidebarCollapsed && <span>Analytics</span>}
               </button>
             </div>
@@ -1141,8 +1099,8 @@ export default function VeeGPT() {
             <div className="flex-1 overflow-y-auto">
               <div className="px-3">
                 {!sidebarCollapsed && (
-                  <div className="text-xs font-semibold text-gray-500 mb-4 px-2 uppercase tracking-wider">
-                    Recent Chats
+                  <div className="text-sm font-medium text-gray-500 mb-3 px-2">
+                    Chats
                   </div>
                 )}
                 <div className="space-y-2">
@@ -1276,14 +1234,28 @@ export default function VeeGPT() {
             {/* Bottom User Section */}
             <div className="p-3 border-t border-gray-200">
               <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                <div className="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  {userData?.avatar ? (
+                    <img 
+                      src={userData.avatar} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span className="text-white text-xs font-bold">
+                      {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  )}
                 </div>
                 {!sidebarCollapsed && (
                   <>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">Arpit Choudhary</div>
-                      <div className="text-xs text-gray-500">Business Plan</div>
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {userData?.plan || 'Free'}
+                      </div>
                     </div>
                     <MoreHorizontal className="w-4 h-4 text-gray-400" />
                   </>
@@ -1494,99 +1466,57 @@ export default function VeeGPT() {
       <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-72'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm`}>
-            {/* User Profile Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                {!sidebarCollapsed ? (
-                  <div className="flex items-center space-x-3">
-                    {/* User Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                      {userData?.avatar ? (
-                        <img 
-                          src={userData.avatar} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <span className="text-white text-lg font-bold">
-                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                      )}
-                    </div>
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-lg font-bold text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {userData?.plan || 'Free'} Plan
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                    {userData?.avatar ? (
-                      <img 
-                        src={userData.avatar} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <span className="text-white text-lg font-bold">
-                        {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <button
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
-                >
-                  {sidebarCollapsed ? (
-                    <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-                  ) : (
-                    <ChevronLeft className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-                  )}
-                </button>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}>
+            {/* Top Header with Logo */}
+            <div className="p-3 flex items-center justify-between">
+              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
               </div>
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4 text-gray-500" />
+                )}
+              </button>
             </div>
 
             {/* Navigation Menu */}
-            <div className="p-4 space-y-2">
+            <div className="px-3 pb-3 space-y-1">
               <button
                 onClick={startNewChat}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-all duration-200 shadow-sm group"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "New chat" : ""}
               >
                 <Edit className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>New Chat</span>}
+                {!sidebarCollapsed && <span>New chat</span>}
               </button>
               
               <button 
                 onClick={() => setShowSearchInput(!showSearchInput)}
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Search chats" : ""}
               >
                 <Search className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>Search Chats</span>}
+                {!sidebarCollapsed && <span>Search chats</span>}
               </button>
               
-              <div className="h-px bg-gray-200 my-3"></div>
-              
               <button 
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Content Assistant" : ""}
               >
-                <Zap className="w-4 h-4 flex-shrink-0 text-amber-500" />
+                <Zap className="w-4 h-4 flex-shrink-0" />
                 {!sidebarCollapsed && <span>Content Assistant</span>}
               </button>
               
               <button 
-                className="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title={sidebarCollapsed ? "Analytics" : ""}
               >
-                <BarChart3 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
+                <BarChart3 className="w-4 h-4 flex-shrink-0" />
                 {!sidebarCollapsed && <span>Analytics</span>}
               </button>
             </div>
@@ -1609,8 +1539,8 @@ export default function VeeGPT() {
             <div className="flex-1 overflow-y-auto">
               <div className="px-4">
                 {!sidebarCollapsed && (
-                  <div className="text-xs font-semibold text-slate-400 mb-4 px-2 uppercase tracking-wider">
-                    Recent Chats
+                  <div className="text-sm font-medium text-gray-500 mb-3 px-2">
+                    Chats
                   </div>
                 )}
                 <div className="space-y-1">
@@ -1764,6 +1694,38 @@ export default function VeeGPT() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Bottom User Section */}
+            <div className="p-3 border-t border-gray-200">
+              <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  {userData?.avatar ? (
+                    <img 
+                      src={userData.avatar} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span className="text-white text-xs font-bold">
+                      {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  )}
+                </div>
+                {!sidebarCollapsed && (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {userData?.plan || 'Free'}
+                      </div>
+                    </div>
+                    <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                  </>
+                )}
               </div>
             </div>
           </div>
