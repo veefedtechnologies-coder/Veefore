@@ -192,15 +192,22 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           />
         </div>
         
-        {/* Branded eeGPT Label */}
-        <span className={cn(
-          "text-sm font-bold transition-all duration-500 tracking-wide -ml-1",
+        {/* AI Neural Network Text */}
+        <div className={cn(
+          "relative text-sm font-bold transition-all duration-500 tracking-wide -ml-1",
           activeView === 'veegpt' 
-            ? "text-blue-600 font-extrabold text-base animate-pulse" 
-            : "text-gray-700 group-hover:text-blue-600 group-hover:font-extrabold group-hover:scale-105"
+            ? "text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-clip-text animate-gradient-x font-extrabold text-base" 
+            : "text-gray-700 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:via-purple-500 group-hover:to-cyan-500 group-hover:bg-clip-text group-hover:font-extrabold group-hover:scale-105"
         )}>
           eeGPT
-        </span>
+          {/* Neural connection dots */}
+          {activeView === 'veegpt' && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-ping"></div>
+          )}
+          {activeView === 'veegpt' && (
+            <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+          )}
+        </div>
         
         {/* Active indicator with enhanced animation */}
         {activeView === 'veegpt' && (

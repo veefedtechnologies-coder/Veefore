@@ -920,6 +920,35 @@ div[contenteditable="true"].transparent-input {
   max-width: 100% !important;
 }
 
+/* Custom AI-themed header animations */
+@keyframes gradient-x {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+@keyframes scan-right {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 3s ease-in-out infinite;
+}
+
+.animate-scan-right {
+  animation: scan-right 2s linear infinite;
+}
+
 /* Modern Dropdown Animations */
 @keyframes dropdown-enter {
   from {
