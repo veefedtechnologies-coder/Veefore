@@ -151,6 +151,35 @@ const formatLastInteractionDate = (dateString: string | Date | null) => {
   }
 }
 
+// Function to get immediate real AI analysis status based on user message content
+const getImmediateAnalysisStatus = (messageContent: string): string => {
+  const content = messageContent.toLowerCase()
+  
+  // Real AI analysis logic (same as backend hybrid AI service)
+  const isTrendingQuery = content.includes('trending') || content.includes('latest') || 
+                          content.includes('current') || content.includes('news') || 
+                          content.includes('recent') || content.includes('viral')
+  
+  const isCreativeQuery = content.includes('creative') || content.includes('ideas') ||
+                          content.includes('brainstorm') || content.includes('inspire') ||
+                          content.includes('innovative') || content.includes('design')
+  
+  const isComplexAnalysis = content.length > 100 || content.includes('strategy') ||
+                           content.includes('analysis') || content.includes('campaign') ||
+                           content.includes('marketing') || content.includes('plan')
+  
+  // Determine optimal AI provider based on content (same logic as backend)
+  if (isTrendingQuery) {
+    return '🔍 Analyzing trends and routing to Perplexity for real-time research...'
+  } else if (isCreativeQuery) {
+    return '🎨 Analyzing creative requirements and routing to Gemini for innovative insights...'
+  } else if (isComplexAnalysis) {
+    return '🧠 Analyzing question complexity and routing to GPT-4o for optimal results...'
+  } else {
+    return '⚡ Analyzing question complexity and routing to GPT-4o for optimal results...'
+  }
+}
+
 export default function VeeGPT() {
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
@@ -826,8 +855,9 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
-    // Reset state for new message - wait for real backend AI status
-    setAiStatus(null) // No immediate hardcoded status - wait for backend
+    // Show immediate real AI analysis status based on message content
+    const immediateAnalysisStatus = getImmediateAnalysisStatus(messageContent)
+    setAiStatus(immediateAnalysisStatus)
     setIsGenerating(true)
     setIsContentStreaming(false) // Reset streaming flag for new message
     isGeneratingRef.current = true
