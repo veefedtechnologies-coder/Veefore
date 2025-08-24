@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useLocation } from 'wouter'
 import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -7,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube } from 'lucide-react'
 
 export function SocialAccounts() {
+  const [, setLocation] = useLocation()
+  
   // Fetch real social accounts data
   const { data: socialAccounts, isLoading } = useQuery({
     queryKey: ['/api/social-accounts'],
@@ -240,7 +243,10 @@ export function SocialAccounts() {
         {connectedAccounts.length === 0 && (
           <div className="p-6 text-center">
             <p className="text-gray-500 mb-4">No connected social accounts found.</p>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button 
+              onClick={() => setLocation('/integration')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               Connect Account
             </Button>
           </div>
