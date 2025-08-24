@@ -135,8 +135,8 @@ class ViralContentService {
       }
 
       return this.getFallbackTrends(userPreferences);
-    } catch (error) {
-      console.error('[VIRAL CONTENT] Perplexity API error:', error);
+    } catch (error: any) {
+      console.error('[VIRAL CONTENT] Perplexity API error:', error?.message?.substring(0, 200) || 'Unknown error');
       return this.getFallbackTrends(userPreferences);
     }
   }

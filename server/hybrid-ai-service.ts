@@ -251,8 +251,21 @@ Always provide practical, actionable advice tailored to content creation and soc
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[PERPLEXITY] API error response:', errorText);
-        throw new Error(`API Error: ${response.status} - ${response.statusText} - ${errorText}`);
+        console.error('[PERPLEXITY] API error response:', errorText.substring(0, 200) + '...');
+        
+        // Provide clean error handling without exposing HTML error pages
+        if (response.status === 401) {
+          console.error('[PERPLEXITY] Authentication failed - API key may be invalid or expired');
+          throw new Error('External research data temporarily unavailable due to authentication issues.');
+        } else if (response.status === 429) {
+          console.error('[PERPLEXITY] Rate limit exceeded');
+          throw new Error('External research data temporarily unavailable due to rate limiting.');
+        } else if (response.status >= 500) {
+          console.error('[PERPLEXITY] Server error');
+          throw new Error('External research service temporarily unavailable.');
+        } else {
+          throw new Error('Unable to access current research data at the moment.');
+        }
       }
 
       const data = await response.json() as any;

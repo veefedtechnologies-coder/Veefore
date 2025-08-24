@@ -180,7 +180,13 @@ export class AuthenticTrendAnalyzer {
       } else {
         console.error(`[AUTHENTIC TRENDS] Perplexity API error: ${response.status} ${response.statusText}`);
         const errorText = await response.text();
-        console.error(`[AUTHENTIC TRENDS] Perplexity error details:`, errorText);
+        console.error(`[AUTHENTIC TRENDS] Perplexity error details:`, errorText.substring(0, 200) + '...');
+        
+        if (response.status === 401) {
+          console.error('[AUTHENTIC TRENDS] Authentication failed - API key may be invalid');
+        } else if (response.status === 429) {
+          console.error('[AUTHENTIC TRENDS] Rate limit exceeded');
+        }
       }
     } catch (error) {
       console.error('[AUTHENTIC TRENDS] Perplexity API error:', error);
