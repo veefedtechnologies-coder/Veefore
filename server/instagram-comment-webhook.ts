@@ -271,21 +271,27 @@ export class InstagramCommentWebhookHandler {
     socialAccount?: any
   ): Promise<void> {
     try {
-      // Try multiple token sources for Instagram messaging
+      // Try multiple token sources for Instagram messaging - prioritize fresh account token
       let accessToken;
       
-      // First try environment variables (these usually work)
-      accessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      // FIRST try the fresh stored account token (after reconnection)
+      if (socialAccount?.accessToken) {
+        accessToken = socialAccount.accessToken;
+        console.log('[INSTAGRAM WEBHOOK] Using fresh Instagram account access token from reconnection');
+        console.log('[INSTAGRAM WEBHOOK] Token format check - starts with:', socialAccount.accessToken?.substring(0, 15) + '...');
+        console.log('[INSTAGRAM WEBHOOK] Token length:', socialAccount.accessToken?.length);
+      }
+      
+      // Fallback to environment variables only if account token not available
+      if (!accessToken) {
+        accessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+        console.log('[INSTAGRAM WEBHOOK] Using environment PAGE_ACCESS_TOKEN as fallback');
+      }
       
       if (!accessToken) {
         // Try Instagram app secret environment variables  
         accessToken = process.env.INSTAGRAM_APP_SECRET || process.env.INSTAGRAM_ACCESS_TOKEN;
-      }
-      
-      if (!accessToken && socialAccount?.accessToken) {
-        // Last resort - stored account token (might be expired)
-        accessToken = socialAccount.accessToken;
-        console.log('[INSTAGRAM WEBHOOK] Using stored Instagram account access token');
+        console.log('[INSTAGRAM WEBHOOK] Using environment app credentials as fallback');
       }
       
       console.log('[INSTAGRAM WEBHOOK] Access token status:', accessToken ? 'Found' : 'Missing');
