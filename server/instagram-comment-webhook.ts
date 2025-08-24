@@ -326,7 +326,7 @@ export class InstagramCommentWebhookHandler {
         }
       };
 
-      const response = await fetch(`https://graph.instagram.com/v18.0/${socialAccount.accountId}/messages`, {
+      const response = await fetch(`https://graph.facebook.com/v20.0/me/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -392,7 +392,7 @@ export class InstagramCommentWebhookHandler {
           message: { text: `${messageText}\n\n🔗 Check out: https://veeforeai.com/products` }
         };
 
-        const response = await fetch(`https://graph.instagram.com/v18.0/me/messages`, {
+        const response = await fetch(`https://graph.facebook.com/v20.0/me/messages`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -464,7 +464,7 @@ export class InstagramCommentWebhookHandler {
       console.log('[INSTAGRAM WEBHOOK] Sending message payload:', JSON.stringify(messagePayload, null, 2));
 
       const response = await fetch(
-        `https://graph.instagram.com/v18.0/me/messages?access_token=${pageAccessToken}`,
+        `https://graph.facebook.com/v20.0/me/messages?access_token=${pageAccessToken}`,
         {
           method: 'POST',
           headers: {
