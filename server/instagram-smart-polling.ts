@@ -525,7 +525,7 @@ export class InstagramSmartPolling {
   }
 
   /**
-   * Update account data in storage
+   * Update account data in storage and save daily analytics snapshot
    */
   private async updateAccountData(config: PollingConfig, updates: any): Promise<void> {
     try {
@@ -538,9 +538,66 @@ export class InstagramSmartPolling {
 
       if (account) {
         await this.storage.updateSocialAccount(account.id, updates);
+        
+        // 📊 SAVE DAILY ANALYTICS SNAPSHOT - Building Real Historical Data!
+        await this.recordDailyAnalytics(config, updates);
       }
     } catch (error) {
       console.error('[SMART POLLING] Failed to update account data:', error);
+    }
+  }
+
+  /**
+   * Record daily analytics snapshot for historical data tracking
+   */
+  private async recordDailyAnalytics(config: PollingConfig, metrics: any): Promise<void> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of day
+      
+      // Check if we already have an analytics record for today
+      const existingAnalytics = await this.storage.getAnalyticsByWorkspace(
+        config.workspaceId, 
+        'instagram', 
+        1 // Last 1 day
+      );
+      
+      const todayRecord = existingAnalytics.find((record: any) => {
+        const recordDate = new Date(record.date);
+        recordDate.setHours(0, 0, 0, 0);
+        return recordDate.getTime() === today.getTime();
+      });
+      
+      if (!todayRecord) {
+        // Create new daily analytics record
+        await this.storage.createAnalytics({
+          workspaceId: config.workspaceId,
+          platform: 'instagram',
+          date: today,
+          followers: metrics.followersCount || 0,
+          engagement: metrics.engagementRate || 0,
+          reach: metrics.totalReach || 0,
+          likes: metrics.totalLikes || 0,
+          comments: metrics.totalComments || 0,
+          shares: 0, // Not available in Instagram Basic API
+          views: 0, // Not available in Instagram Basic API
+          metrics: {
+            posts: metrics.mediaCount || 0,
+            avgLikes: metrics.avgLikes || 0,
+            avgComments: metrics.avgComments || 0,
+            avgReach: metrics.avgReach || 0,
+            avgEngagement: metrics.avgEngagement || 0,
+            username: config.username,
+            accountId: config.accountId
+          }
+        });
+        
+        console.log(`[DAILY ANALYTICS] 📊 Saved daily snapshot for @${config.username} - ${metrics.followersCount} followers, ${metrics.engagementRate}% engagement`);
+      } else {
+        console.log(`[DAILY ANALYTICS] 📅 Today's record already exists for @${config.username}`);
+      }
+    } catch (error) {
+      console.error('[DAILY ANALYTICS] Failed to record daily analytics:', error);
     }
   }
 
