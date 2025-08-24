@@ -1128,7 +1128,6 @@ export default function VeeGPT() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
-                            <MessageSquare className="w-4 h-4 flex-shrink-0" />
                             {!sidebarCollapsed && (
                               <div className="truncate text-base font-medium">
                                 {renamingChatId === conversation.id ? (
@@ -1569,11 +1568,6 @@ export default function VeeGPT() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
-                            <MessageSquare className={`w-4 h-4 flex-shrink-0 ${
-                              currentConversationId === conversation.id
-                                ? 'text-blue-600'
-                                : 'text-gray-400 group-hover:text-gray-600'
-                            }`} />
                             {!sidebarCollapsed && (
                               <div className="flex-1 min-w-0">
                                 <div className="truncate text-sm font-medium">
