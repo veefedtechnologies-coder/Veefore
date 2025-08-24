@@ -3569,20 +3569,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
-      // Exchange authorization code for access token using Instagram Business API
-      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token...`);
-      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: process.env.INSTAGRAM_APP_ID!,
-          client_secret: process.env.INSTAGRAM_APP_SECRET!,
-          grant_type: 'authorization_code',
-          redirect_uri: redirectUri,
-          code: code as string,
-        }),
+      // Exchange authorization code for access token using Facebook Graph API (Instagram Business API)
+      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token via Facebook Graph API...`);
+      const tokenResponse = await fetch(`https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&code=${code}`, {
+        method: 'GET'
       });
 
       if (!tokenResponse.ok) {
