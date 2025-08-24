@@ -76,6 +76,44 @@ export function PerformanceScore() {
   const avgEngagement = analytics?.engagementRate || 0
   const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
 
+  // Calculate real content score based on performance metrics
+  const calculateContentScore = () => {
+    if (connectedPlatforms.length === 0) return { score: 0, rating: 'No Data' }
+    
+    let score = 0
+    
+    // Engagement Rate Score (40% weight) - 566.7% is exceptional
+    const engagementScore = Math.min(avgEngagement / 10, 10) // Cap at 10, since 100%+ engagement is max score
+    score += engagementScore * 0.4
+    
+    // Post Activity Score (30% weight) - Based on total posts
+    const activityScore = Math.min(totalPosts / 10, 10) // 10+ posts = full score
+    score += activityScore * 0.3
+    
+    // Reach Efficiency Score (20% weight) - Reach vs Followers ratio
+    const reachEfficiency = totalFollowers > 0 ? Math.min((totalReach / totalFollowers) / 5, 10) : 0
+    score += reachEfficiency * 0.2
+    
+    // Platform Consistency Score (10% weight) - Multiple platforms bonus
+    const consistencyScore = Math.min(connectedPlatforms.length * 2.5, 10)
+    score += consistencyScore * 0.1
+    
+    // Round to 1 decimal place
+    const finalScore = Math.min(score, 10)
+    
+    // Determine rating based on score
+    let rating = 'Poor'
+    if (finalScore >= 9) rating = 'Exceptional'
+    else if (finalScore >= 7.5) rating = 'Excellent'  
+    else if (finalScore >= 6) rating = 'Very Good'
+    else if (finalScore >= 4.5) rating = 'Good'
+    else if (finalScore >= 3) rating = 'Fair'
+    
+    return { score: finalScore, rating }
+  }
+  
+  const contentScore = calculateContentScore()
+
   // Format numbers for display
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
@@ -287,14 +325,17 @@ export function PerformanceScore() {
                 <h5 className="text-sm font-semibold text-gray-700">Content Score</h5>
                 <Sparkles className="w-4 h-4 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600 mb-2">{connectedPlatforms.length > 0 ? '8.7/10' : '0/10'}</div>
+              <div className="text-2xl font-bold text-green-600 mb-2">{contentScore.score.toFixed(1)}/10</div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-600">Quality Rating</span>
-                  <span className="font-medium text-gray-700">{connectedPlatforms.length > 0 ? 'Excellent' : 'No Data'}</span>
+                  <span className="font-medium text-gray-700">{contentScore.rating}</span>
                 </div>
                 <div className="w-full bg-white/60 rounded-full h-1.5">
-                  <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>
+                  <div 
+                    className="bg-green-500 h-1.5 rounded-full transition-all duration-1000" 
+                    style={{ width: `${(contentScore.score / 10) * 100}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
