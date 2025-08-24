@@ -1743,7 +1743,7 @@ export default function VeeGPT() {
                   )}
                   {message.role === 'assistant' && (
                     <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                      <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4 mr-1" />
+                      <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4" />
                       {isGenerating ? "eegpt is Working..." : "eegpt 🚀 Mission Accomplished!"}
                     </div>
                   )}
@@ -1855,7 +1855,7 @@ export default function VeeGPT() {
               <div className="flex flex-col space-y-2 items-start">
                 <div className="max-w-4xl w-full">
                   <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                    <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4 mr-1" />
+                    <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4" />
                     {isGenerating ? "eegpt is Working..." : "eegpt 🚀 Mission Accomplished!"}
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
