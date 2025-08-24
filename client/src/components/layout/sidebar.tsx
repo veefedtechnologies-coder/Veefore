@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Home, Calendar, BarChart3, MessageSquare, Settings, Globe, LogOut, Users, Link, Plus, Zap, Video, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CreateDropdown } from './create-dropdown'
-import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
 import { logout } from '@/lib/auth'
 import { useToast } from '@/hooks/use-toast'
 import { useLocation } from 'wouter'
@@ -171,10 +170,10 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
             <div className="absolute w-2 h-0.5 bg-cyan-500 animate-geometric-float-4 opacity-40"></div>
           </div>
           
-          {/* Logo with morphing effects */}
+          {/* VeeFore Logo with morphing effects */}
           <img 
-            src={veeGPTLogo} 
-            alt="VeeGPT" 
+            src="/veefore-logo.png" 
+            alt="VeeFore" 
             className={cn(
               "w-10 h-10 transition-all duration-500 filter drop-shadow-lg relative z-10",
               activeView === 'veegpt' 
@@ -193,14 +192,14 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           />
         </div>
         
-        {/* VeeGPT Label */}
+        {/* Branded eeGPT Label */}
         <span className={cn(
-          "text-sm font-bold transition-all duration-500 tracking-wide",
+          "text-sm font-bold transition-all duration-500 tracking-wide -ml-1",
           activeView === 'veegpt' 
             ? "text-blue-600 font-extrabold text-base animate-pulse" 
             : "text-gray-700 group-hover:text-blue-600 group-hover:font-extrabold group-hover:scale-105"
         )}>
-          VeeGPT
+          eeGPT
         </span>
         
         {/* Active indicator with enhanced animation */}

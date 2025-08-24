@@ -1028,10 +1028,9 @@ export default function VeeGPT() {
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">V</span>
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <img src="/veefore-logo.png" alt="VeeFore" className="w-10 h-10" />
+                  <span className="text-lg font-bold text-gray-900 -ml-1">eeGPT</span>
                 </div>
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -1460,10 +1459,9 @@ export default function VeeGPT() {
             {/* Top Logo/Brand with Toggle */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">V</span>
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <img src="/veefore-logo.png" alt="VeeFore" className="w-10 h-10" />
+                  <span className="text-lg font-bold text-gray-900 -ml-1">eeGPT</span>
                 </div>
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -1701,7 +1699,10 @@ export default function VeeGPT() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <h1 className="text-lg font-semibold text-gray-900">VeeGPT</h1>
+                <div className="flex items-center">
+                  <img src="/veefore-logo.png" alt="VeeFore" className="w-6 h-6" />
+                  <h1 className="text-lg font-semibold text-gray-900 ml-1">eeGPT</h1>
+                </div>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </div>
             </div>
