@@ -168,10 +168,36 @@ export class InstagramCommentWebhookHandler {
    */
   private async getDmTemplate(workspaceId: string): Promise<DmTemplate | null> {
     try {
-      const template = await this.DmTemplateModel.findOne({
+      console.log('[DM TEMPLATE DEBUG] Looking for template in workspace:', workspaceId);
+      
+      // Try the DmTemplateModel first
+      let template = await this.DmTemplateModel.findOne({
         workspaceId: workspaceId,
         isActive: true
       }).sort({ createdAt: -1 }); // Get latest active template
+      
+      // If not found, try direct MongoDB connection with collection name
+      if (!template) {
+        console.log('[DM TEMPLATE DEBUG] Not found via DmTemplateModel, trying direct collection access...');
+        const db = this.DmTemplateModel.db;
+        const collection = db.collection('dmtemplates');
+        template = await collection.findOne({
+          workspaceId: workspaceId,
+          isActive: true
+        });
+        console.log('[DM TEMPLATE DEBUG] Direct collection result:', template ? 'Found' : 'Not found');
+      }
+
+      if (template) {
+        console.log('[DM TEMPLATE DEBUG] Found template:', {
+          messageText: template.messageText?.substring(0, 50) + '...',
+          buttonText: template.buttonText,
+          buttonUrl: template.buttonUrl,
+          isActive: template.isActive
+        });
+      } else {
+        console.log('[DM TEMPLATE DEBUG] No active template found for workspace:', workspaceId);
+      }
 
       return template;
     } catch (error) {
