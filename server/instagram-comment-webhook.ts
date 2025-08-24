@@ -145,11 +145,19 @@ export class InstagramCommentWebhookHandler {
         buttonUrl: dmTemplate.buttonUrl
       });
 
-      // Send Instagram direct message without PSID conversion
-      console.log('[INSTAGRAM WEBHOOK] Sending DM directly to Instagram user:', commentData.from.id);
-      
-      await this.sendInstagramDirectMessage(
-        commentData.from.id,
+      // Convert Instagram User ID to PSID (use pageId from account or fallback to accountId)
+      const pageIdToUse = socialAccount.pageId || socialAccount.accountId || instagramAccountId;
+      const psid = await this.convertToPSID(commentData.from.id, pageIdToUse, socialAccount);
+      if (!psid) {
+        console.log('[INSTAGRAM WEBHOOK] Failed to convert Instagram User ID to PSID');
+        return;
+      }
+
+      console.log('[INSTAGRAM WEBHOOK] Converted to PSID:', psid);
+
+      // Send dynamic button-style DM
+      await this.sendDynamicMessage(
+        psid,
         dmTemplate.messageText,
         dmTemplate.buttonText,
         dmTemplate.buttonUrl,
@@ -261,161 +269,7 @@ export class InstagramCommentWebhookHandler {
   }
 
   /**
-   * Send Instagram direct message with button using Instagram API
-   */
-  private async sendInstagramDirectMessage(
-    instagramUserId: string,
-    messageText: string,
-    buttonText: string,
-    buttonUrl: string,
-    socialAccount?: any
-  ): Promise<void> {
-    try {
-      // Try multiple token sources for Instagram messaging - prioritize fresh account token
-      let accessToken;
-      
-      // FIRST try the fresh stored account token (after reconnection)
-      if (socialAccount?.accessToken) {
-        accessToken = socialAccount.accessToken;
-        console.log('[INSTAGRAM WEBHOOK] Using fresh Instagram account access token from reconnection');
-        console.log('[INSTAGRAM WEBHOOK] Token format check - starts with:', socialAccount.accessToken?.substring(0, 15) + '...');
-        console.log('[INSTAGRAM WEBHOOK] Token length:', socialAccount.accessToken?.length);
-      }
-      
-      // Fallback to environment variables only if account token not available
-      if (!accessToken) {
-        accessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
-        console.log('[INSTAGRAM WEBHOOK] Using environment PAGE_ACCESS_TOKEN as fallback');
-      }
-      
-      if (!accessToken) {
-        // Try Instagram app secret environment variables  
-        accessToken = process.env.INSTAGRAM_APP_SECRET || process.env.INSTAGRAM_ACCESS_TOKEN;
-        console.log('[INSTAGRAM WEBHOOK] Using environment app credentials as fallback');
-      }
-      
-      console.log('[INSTAGRAM WEBHOOK] Access token status:', accessToken ? 'Found' : 'Missing');
-      
-      if (!accessToken) {
-        console.log('[INSTAGRAM WEBHOOK] No access token found - trying simple text message approach');
-        // Send a simple text message instead of template
-        return await this.sendSimpleInstagramMessage(instagramUserId, messageText, socialAccount);
-      }
-
-      // Instagram Generic Template message with button
-      const messageData = {
-        recipient: {
-          id: instagramUserId
-        },
-        message: {
-          attachment: {
-            type: "template",
-            payload: {
-              template_type: "generic",
-              elements: [{
-                title: "VeeFore AI",
-                subtitle: messageText,
-                buttons: [{
-                  type: "web_url",
-                  url: buttonUrl,
-                  title: buttonText
-                }]
-              }]
-            }
-          }
-        }
-      };
-
-      const response = await fetch(`https://graph.facebook.com/v20.0/me/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(messageData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('[INSTAGRAM WEBHOOK] Instagram DM API error:', errorData);
-        
-        // If token is invalid, try fallback approach
-        if (errorData.error?.code === 190) {
-          console.log('[INSTAGRAM WEBHOOK] Invalid token detected - trying fallback approach');
-          return await this.sendSimpleInstagramMessage(instagramUserId, messageText, socialAccount);
-        }
-        
-        throw new Error(`Instagram messaging failed: ${response.status} - ${JSON.stringify(errorData)}`);
-      }
-
-      const result = await response.json();
-      console.log('[INSTAGRAM WEBHOOK] Instagram DM sent successfully:', result);
-
-    } catch (error) {
-      console.error('[INSTAGRAM WEBHOOK] Error sending Instagram DM:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Send simple text message to Instagram user (fallback method)
-   */
-  private async sendSimpleInstagramMessage(
-    instagramUserId: string,
-    messageText: string,
-    socialAccount?: any
-  ): Promise<void> {
-    try {
-      console.log('[INSTAGRAM WEBHOOK] Attempting simple Instagram messaging approach');
-      
-      // Use your Instagram app credentials from environment
-      const appId = process.env.INSTAGRAM_APP_ID;
-      const appSecret = process.env.INSTAGRAM_APP_SECRET;
-      
-      if (!appId || !appSecret) {
-        console.log('[INSTAGRAM WEBHOOK] Instagram app credentials not available - automation will reply to comment instead');
-        return;
-      }
-
-      // Generate app access token
-      const tokenResponse = await fetch(
-        `https://graph.facebook.com/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&grant_type=client_credentials`
-      );
-
-      if (tokenResponse.ok) {
-        const tokenData = await tokenResponse.json();
-        const appAccessToken = tokenData.access_token;
-
-        // Simple text message
-        const messageData = {
-          recipient: { id: instagramUserId },
-          message: { text: `${messageText}\n\n🔗 Check out: https://veeforeai.com/products` }
-        };
-
-        const response = await fetch(`https://graph.facebook.com/v20.0/me/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${appAccessToken}`
-          },
-          body: JSON.stringify(messageData)
-        });
-
-        if (response.ok) {
-          console.log('[INSTAGRAM WEBHOOK] Simple Instagram message sent successfully');
-        } else {
-          const errorData = await response.json();
-          console.log('[INSTAGRAM WEBHOOK] Simple message failed:', errorData);
-        }
-      }
-
-    } catch (error) {
-      console.error('[INSTAGRAM WEBHOOK] Simple messaging error:', error);
-    }
-  }
-
-  /**
-   * Send dynamic button-style message using Messenger Send API (DEPRECATED - kept for fallback)
+   * Send dynamic button-style message using Messenger Send API
    */
   private async sendDynamicMessage(
     psid: string,
