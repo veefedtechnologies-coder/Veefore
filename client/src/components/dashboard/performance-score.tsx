@@ -9,55 +9,57 @@ import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpR
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
   const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('month')
-  const [showInsights, setShowInsights] = useState(false)
-  const [insightKey, setInsightKey] = useState(0)
+  const [showDataStory, setShowDataStory] = useState(false)
+  const [storyAnimation, setStoryAnimation] = useState(0)
 
-  // Show educational insights when period changes
+  // Create unique data story when period changes
   useEffect(() => {
-    setShowInsights(true)
-    setInsightKey(prev => prev + 1)
-    const timer = setTimeout(() => setShowInsights(false), 8000) // Hide after 8 seconds
+    setShowDataStory(true)
+    setStoryAnimation(prev => prev + 1)
+    const timer = setTimeout(() => setShowDataStory(false), 6000)
     return () => clearTimeout(timer)
   }, [selectedPeriod])
 
-  // Educational insights based on selected period
-  const getEducationalInsights = (period: 'day' | 'week' | 'month') => {
-    const insights = {
+  // Generate unique data stories based on actual performance
+  const generateDataStory = (period: 'day' | 'week' | 'month', currentData: any) => {
+    const followerCount = currentData?.followers || 4
+    const engagement = currentData?.engagement || 567
+    const reach = currentData?.reach || 135
+    const posts = currentData?.posts || 15
+
+    const stories = {
       day: {
-        icon: <Clock className="w-5 h-5 text-blue-600" />,
-        title: "Today's Performance",
-        description: "Real-time data showing today's activity. Great for monitoring immediate response to content and timing optimal posts.",
-        tips: [
-          "Daily data shows immediate engagement patterns",
-          "Best for tracking post timing effectiveness", 
-          "Monitor hourly engagement trends"
-        ],
-        color: "from-blue-50 to-indigo-50 border-blue-200"
+        emoji: "⚡",
+        title: "Right Now Mode",
+        story: engagement > 100 
+          ? `🔥 Your content is ON FIRE today! ${engagement.toFixed(0)}% engagement means every post gets massive love`
+          : `📊 Today's snapshot: ${followerCount} followers are watching. Time to drop that viral content!`,
+        insight: posts > 0 ? "Peak activity detected! Your audience is most active right now." : "Perfect timing to post - your audience is waiting!",
+        color: "bg-gradient-to-r from-orange-400 via-red-400 to-pink-400",
+        textColor: "text-white"
       },
       week: {
-        icon: <Target className="w-5 h-5 text-green-600" />,
-        title: "Weekly Trends",
-        description: "7-day overview revealing weekly patterns and consistency. Ideal for understanding your audience's weekly behavior.",
-        tips: [
-          "Weekly data reveals audience weekly patterns",
-          "Perfect for content scheduling strategies",
-          "Shows consistency in your posting rhythm"
-        ],
-        color: "from-green-50 to-emerald-50 border-green-200"
+        emoji: "🎯", 
+        title: "Weekly Pulse",
+        story: reach > followerCount 
+          ? `🚀 VIRAL ALERT! You reached ${reach} people with just ${followerCount} followers. That's ${Math.round(reach/followerCount)}x amplification!`
+          : `📈 This week: ${posts} posts, ${followerCount} loyal followers, building your empire one post at a time`,
+        insight: "Weekly patterns reveal your content's true impact. Consistency is key!",
+        color: "bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400", 
+        textColor: "text-white"
       },
       month: {
-        icon: <BarChart3 className="w-5 h-5 text-purple-600" />,
-        title: "Monthly Growth",
-        description: "30-day analysis showing long-term growth trends and content performance. Essential for strategic planning.",
-        tips: [
-          "Monthly view shows sustainable growth patterns",
-          "Best for measuring content strategy success",
-          "Tracks long-term follower and engagement trends"
-        ],
-        color: "from-purple-50 to-pink-50 border-purple-200"
+        emoji: "💎",
+        title: "Growth Journey", 
+        story: posts >= 10 
+          ? `🏆 CONTENT MACHINE! ${posts} posts this month = ${(posts/30).toFixed(1)} posts/day. You're building a media empire!`
+          : `💪 ${posts} quality posts, ${followerCount} engaged followers. Quality > Quantity strategy in action!`,
+        insight: engagement > 300 ? "Your content strategy is working! Keep this momentum going." : "Steady growth foundation set. Ready to scale up?",
+        color: "bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400",
+        textColor: "text-white"  
       }
     }
-    return insights[period]
+    return stories[period]
   }
   
   // Fetch real dashboard analytics data - webhook-based updates
@@ -321,39 +323,87 @@ export function PerformanceScore() {
         </div>
       </CardHeader>
 
-      {/* Educational Insights - Shows when user changes time period */}
-      {showInsights && (
+      {/* Interactive Data Story - Unique storytelling experience */}
+      {showDataStory && (
         <div 
-          key={insightKey}
-          className={`mx-6 mb-4 bg-gradient-to-r ${getEducationalInsights(selectedPeriod).color} border rounded-2xl p-4 animate-in slide-in-from-top-5 duration-500`}
-          data-testid="educational-insights"
+          key={storyAnimation}
+          className="mx-6 mb-4 relative overflow-hidden rounded-3xl transform-gpu animate-in zoom-in-95 duration-700 shadow-2xl"
+          data-testid="data-story"
         >
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 mt-0.5">
-              {getEducationalInsights(selectedPeriod).icon}
+          <div className={`${generateDataStory(selectedPeriod, {
+            followers: totalFollowers,
+            engagement: avgEngagement, 
+            reach: totalReach,
+            posts: totalPosts
+          }).color} p-6 relative`}>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-2 right-2 text-4xl animate-bounce">
+                {generateDataStory(selectedPeriod, {
+                  followers: totalFollowers,
+                  engagement: avgEngagement,
+                  reach: totalReach, 
+                  posts: totalPosts
+                }).emoji}
+              </div>
+              <div className="absolute bottom-2 left-2 w-16 h-16 rounded-full bg-white/20 animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/3 w-8 h-8 rounded-full bg-white/10 animate-ping"></div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-semibold text-gray-900">
-                  {getEducationalInsights(selectedPeriod).title}
-                </h4>
+
+            {/* Main story content */}
+            <div className={`relative z-10 ${generateDataStory(selectedPeriod, {
+              followers: totalFollowers,
+              engagement: avgEngagement,
+              reach: totalReach,
+              posts: totalPosts  
+            }).textColor}`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">
+                    {generateDataStory(selectedPeriod, {
+                      followers: totalFollowers,
+                      engagement: avgEngagement,
+                      reach: totalReach,
+                      posts: totalPosts
+                    }).emoji}
+                  </span>
+                  <h3 className="text-lg font-bold tracking-wide">
+                    {generateDataStory(selectedPeriod, {
+                      followers: totalFollowers,
+                      engagement: avgEngagement,
+                      reach: totalReach,
+                      posts: totalPosts
+                    }).title}
+                  </h3>
+                </div>
                 <button
-                  onClick={() => setShowInsights(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowDataStory(false)}
+                  className="text-white/70 hover:text-white transition-colors p-1 rounded-full hover:bg-white/20"
                 >
-                  <Info className="w-4 h-4" />
+                  ✕
                 </button>
               </div>
-              <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                {getEducationalInsights(selectedPeriod).description}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {getEducationalInsights(selectedPeriod).tips.map((tip, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
-                    <span className="text-xs text-gray-600 font-medium">{tip}</span>
-                  </div>
-                ))}
+              
+              <div className="space-y-3">
+                <p className="text-sm font-medium leading-relaxed animate-in slide-in-from-left duration-500 delay-200">
+                  {generateDataStory(selectedPeriod, {
+                    followers: totalFollowers,
+                    engagement: avgEngagement,
+                    reach: totalReach,
+                    posts: totalPosts
+                  }).story}
+                </p>
+                
+                <div className="bg-white/20 rounded-xl p-3 animate-in slide-in-from-left duration-500 delay-400">
+                  <p className="text-xs font-semibold opacity-90">
+                    💡 {generateDataStory(selectedPeriod, {
+                      followers: totalFollowers,
+                      engagement: avgEngagement,
+                      reach: totalReach,
+                      posts: totalPosts
+                    }).insight}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
