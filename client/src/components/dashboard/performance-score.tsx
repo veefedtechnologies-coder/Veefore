@@ -323,7 +323,18 @@ export function PerformanceScore() {
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <h5 className="text-sm font-semibold text-gray-700">Content Score</h5>
-                <Sparkles className="w-4 h-4 text-green-600" />
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.contentScore.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.contentScore.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.contentScore.value}</span>
+                  </div>
+                  <Sparkles className="w-4 h-4 text-green-600" />
+                </div>
               </div>
               <div className="text-2xl font-bold text-green-600 mb-2">{contentScore.score.toFixed(1)}/10</div>
               <div className="space-y-2">
@@ -337,6 +348,11 @@ export function PerformanceScore() {
                     style={{ width: `${(contentScore.score / 10) * 100}%` }}
                   ></div>
                 </div>
+                <div className="mt-2 pt-2 border-t border-green-200">
+                  <div className="text-xs text-gray-600">
+                    Performance over {selectedPeriod === 'day' ? 'today' : selectedPeriod === 'week' ? 'this week' : 'this month'}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -344,16 +360,38 @@ export function PerformanceScore() {
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <h5 className="text-sm font-semibold text-gray-700">Post Frequency</h5>
-                <MessageCircle className="w-4 h-4 text-purple-600" />
+                <div className="flex items-center space-x-2">
+                  <div className={`flex items-center text-xs font-semibold ${
+                    growthData.posts.isPositive ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {growthData.posts.isPositive ? 
+                      <ArrowUpRight className="w-3 h-3 mr-1" /> : 
+                      <ArrowDownRight className="w-3 h-3 mr-1" />
+                    }
+                    <span>{growthData.posts.value}</span>
+                  </div>
+                  <MessageCircle className="w-4 h-4 text-purple-600" />
+                </div>
               </div>
               <div className="text-2xl font-bold text-purple-600 mb-2">{totalPosts}</div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-600">Total Posts</span>
-                  <span className="font-medium text-gray-700">All Time</span>
+                  <span className="text-gray-600">
+                    {selectedPeriod === 'day' ? 'Posts Today' : 
+                     selectedPeriod === 'week' ? 'Posts This Week' : 
+                     'Posts This Month'}
+                  </span>
+                  <span className="font-medium text-gray-700">
+                    {selectedPeriod === 'day' ? 'Daily' : selectedPeriod === 'week' ? 'Weekly' : 'Monthly'}
+                  </span>
                 </div>
                 <div className="w-full bg-white/60 rounded-full h-1.5">
                   <div className="bg-purple-500 h-1.5 rounded-full w-3/4 transition-all duration-1000"></div>
+                </div>
+                <div className="mt-2 pt-2 border-t border-purple-200">
+                  <div className="text-xs text-gray-600">
+                    Activity trends for {selectedPeriod === 'day' ? 'today' : selectedPeriod === 'week' ? 'this week' : 'this month'}
+                  </div>
                 </div>
               </div>
             </div>
