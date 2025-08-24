@@ -73,7 +73,7 @@ export function PerformanceScore() {
   // Calculate total metrics from real data
   const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
   const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.reach, 0)
-  const avgEngagement = analytics?.engagementRate || (connectedPlatforms.length > 0 ? connectedPlatforms[0].followers > 0 ? parseFloat(connectedPlatforms[0].engagement) || 0 : 0 : 0)
+  const avgEngagement = connectedPlatforms.length > 0 ? parseFloat(connectedPlatforms[0].engagement) || 0 : 0
   const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
 
   // Calculate real content score based on performance metrics
