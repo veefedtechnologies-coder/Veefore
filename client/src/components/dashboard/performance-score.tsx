@@ -12,7 +12,7 @@ export function PerformanceScore() {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
     queryFn: () => apiRequest('/api/dashboard/analytics'),
-    // Removed polling - using webhooks for real-time updates
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
     staleTime: 0, // Always fetch latest data when needed
   })
 
@@ -20,7 +20,7 @@ export function PerformanceScore() {
   const { data: socialAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    // Removed polling - using webhooks for real-time updates
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
     staleTime: 0, // Always fetch latest data when needed
   })
 
@@ -64,7 +64,7 @@ export function PerformanceScore() {
            account.platform === 'twitter' ? 'from-blue-400 to-blue-600' : 
            account.platform === 'linkedin' ? 'from-blue-700 to-blue-900' : 'from-blue-600 to-blue-700',
     followers: account.followersCount || account.followers || 0,
-    engagement: account.engagementRate ? `${account.engagementRate.toFixed(1)}%` : '0%',
+    engagement: account.avgEngagement ? `${account.avgEngagement.toFixed(1)}%` : '0%',
     reach: account.totalReach || 0,
     posts: account.mediaCount || account.posts || 0,
     username: account.username
@@ -73,7 +73,7 @@ export function PerformanceScore() {
   // Calculate total metrics from real data
   const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
   const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.reach, 0)
-  const avgEngagement = analytics?.engagementRate || 0
+  const avgEngagement = analytics?.engagementRate || (connectedPlatforms.length > 0 ? connectedPlatforms[0].followers > 0 ? parseFloat(connectedPlatforms[0].engagement) || 0 : 0 : 0)
   const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
 
   // Calculate real content score based on performance metrics
