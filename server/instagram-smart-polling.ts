@@ -316,8 +316,18 @@ export class InstagramSmartPolling {
       const newFollowerCount = data.followers_count;
       const mediaCount = data.media_count;
       
+      // Check if this is a business account to determine if we can fetch reach data
+      const accounts = await this.storage.getSocialAccountsByWorkspace(config.workspaceId);
+      const account = accounts.find((acc: any) => 
+        acc.platform === 'instagram' && 
+        (acc.accountId === config.accountId || acc.id === config.accountId)
+      );
+      const isBusinessAccount = account?.isBusinessAccount || account?.accountType === 'BUSINESS' || account?.accountType === 'CREATOR';
+      
+      console.log(`[SMART POLLING] Account @${config.username} - Business account: ${isBusinessAccount}`);
+      
       // Fetch comprehensive engagement metrics
-      const engagementMetrics = await this.fetchEngagementMetrics(config.accessToken);
+      const engagementMetrics = await this.fetchEngagementMetrics(config.accessToken, isBusinessAccount);
 
       // Check if ANY data changed (not just followers)
       const hasChanges = newFollowerCount !== config.lastFollowerCount || 
@@ -379,9 +389,9 @@ export class InstagramSmartPolling {
   }
 
   /**
-   * Fetch comprehensive engagement metrics from Instagram
+   * Fetch comprehensive engagement metrics from Instagram using Business API when available
    */
-  private async fetchEngagementMetrics(accessToken: string): Promise<any> {
+  private async fetchEngagementMetrics(accessToken: string, isBusinessAccount: boolean = false): Promise<any> {
     try {
       // Fetch recent media posts
       const mediaResponse = await fetch(`https://graph.instagram.com/me/media?fields=id,like_count,comments_count&limit=25&access_token=${accessToken}`);
@@ -397,7 +407,7 @@ export class InstagramSmartPolling {
         return { avgLikes: 0, avgComments: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalReach: 0, avgEngagement: 0 };
       }
       
-      // Calculate ONLY real engagement metrics from actual Instagram data
+      // Calculate basic engagement metrics
       const totalLikes = mediaList.reduce((sum: number, media: any) => sum + (media.like_count || 0), 0);
       const totalComments = mediaList.reduce((sum: number, media: any) => sum + (media.comments_count || 0), 0);
       
@@ -405,17 +415,47 @@ export class InstagramSmartPolling {
       const avgComments = Math.round(totalComments / mediaList.length);
       const avgEngagement = avgLikes + avgComments;
       
-      // ONLY use real data - no fake estimates
+      // Try to fetch REAL reach data using Business API insights
+      let totalReach = 0;
+      let reachCount = 0;
+      
+      if (isBusinessAccount) {
+        console.log('[SMART POLLING] 🔥 Business account detected - fetching REAL reach data from Instagram Business API');
+        for (const media of mediaList.slice(0, 5)) { // Sample first 5 posts to avoid rate limits
+          try {
+            const insightsResponse = await fetch(`https://graph.instagram.com/${media.id}/insights?metric=reach&access_token=${accessToken}`);
+            if (insightsResponse.ok) {
+              const insights = await insightsResponse.json();
+              const reach = insights.data?.[0]?.values?.[0]?.value || 0;
+              if (reach > 0) {
+                totalReach += reach;
+                reachCount++;
+                console.log(`[SMART POLLING] ✅ Real reach for post ${media.id}: ${reach}`);
+              }
+            }
+          } catch (error) {
+            console.log(`[SMART POLLING] Could not fetch reach for post ${media.id}`);
+          }
+        }
+      }
+      
+      const avgReach = reachCount > 0 ? Math.round(totalReach / reachCount) : 0;
+      const totalReachEstimate = avgReach * mediaList.length;
+      const engagementRate = avgReach > 0 ? Math.round((avgEngagement / avgReach) * 100) : 0;
+      
       console.log(`[SMART POLLING] ✅ Real engagement data: ${totalLikes} likes, ${totalComments} comments across ${mediaList.length} posts`);
+      if (isBusinessAccount && reachCount > 0) {
+        console.log(`[SMART POLLING] ✅ Real reach data: ${totalReach} total reach from ${reachCount} posts, avg: ${avgReach}`);
+      }
       
       return {
         avgLikes,
         avgComments,
-        avgReach: 0, // Not available via Instagram Basic API - show 0 instead of fake data
-        engagementRate: 0, // Can't calculate without real reach data
+        avgReach,
+        engagementRate,
         totalLikes,
         totalComments,
-        totalReach: 0, // Not available
+        totalReach: totalReachEstimate,
         avgEngagement
       };
     } catch (error) {
