@@ -13819,11 +13819,14 @@ Create a detailed growth strategy in JSON format:
           // Status callback for real-time AI processing updates
           const statusCallback = (status: string) => {
             console.log(`[HYBRID AI STATUS] ${status}`);
-            (global as any).broadcastToConversation(convId, {
-              type: 'status',
-              status: status,
-              conversationId: convId,
-              messageId: aiMessage.id
+            // Send status immediately without delays
+            setImmediate(() => {
+              (global as any).broadcastToConversation(convId, {
+                type: 'status',
+                status: status,
+                conversationId: convId,
+                messageId: aiMessage.id
+              });
             });
           };
           
@@ -14068,11 +14071,14 @@ Create a detailed growth strategy in JSON format:
           // Status callback to broadcast status updates via WebSocket
           const statusCallback = (status: string) => {
             console.log(`[HYBRID AI STATUS] ${status}`);
-            (global as any).broadcastToConversation(conversation.id, {
-              type: 'status',
-              content: status,
-              messageId: aiMessage.id,
-              timestamp: Date.now()
+            // Send status immediately without delays
+            setImmediate(() => {
+              (global as any).broadcastToConversation(conversation.id, {
+                type: 'status',
+                content: status,
+                messageId: aiMessage.id,
+                timestamp: Date.now()
+              });
             });
           };
           

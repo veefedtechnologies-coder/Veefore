@@ -410,8 +410,10 @@ Provide creative, actionable insights focused on content creation and social med
     try {
       const userMessage = messages[messages.length - 1]?.content || '';
       
-      // Analyze the question to determine strategy
+      // Send immediate status callback - no delays
       statusCallback?.('🔍 Analyzing question complexity and optimal AI routing...');
+      
+      // Analyze the question to determine strategy (fast analysis)
       const analysis = this.analyzeQuestion(userMessage);
       
       console.log(`[HYBRID AI] Analysis:`, analysis);
