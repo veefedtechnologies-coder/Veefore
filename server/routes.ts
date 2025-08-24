@@ -3519,8 +3519,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      // Instagram Business API OAuth via Facebook Graph API - proper business scopes for real engagement data
-      const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=instagram_basic%2Cinstagram_manage_messages%2Cinstagram_manage_comments%2Cinstagram_content_publish%2Cpages_show_list%2Cpages_read_engagement&state=${state}`;
+      // Instagram Graph API OAuth via Facebook (required for Business messaging permissions)
+      const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=instagram_basic,pages_show_list,pages_messaging,instagram_manage_messages,manage_pages&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {
@@ -3569,18 +3569,26 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
-      // Exchange authorization code for access token using Facebook Graph API (Instagram Business API)
+      // Exchange authorization code for access token using Facebook Graph API (required for Business API messaging)
       console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token via Facebook Graph API...`);
-      const tokenResponse = await fetch(`https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&code=${code}`, {
-        method: 'GET'
+      const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.INSTAGRAM_APP_ID!,
+          client_secret: process.env.INSTAGRAM_APP_SECRET!,
+          grant_type: 'authorization_code',
+          redirect_uri: redirectUri,
+          code: code as string,
+        }),
       });
 
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
-        console.error(`[INSTAGRAM CALLBACK] Token exchange failed - Status: ${tokenResponse.status}`);
-        console.error(`[INSTAGRAM CALLBACK] Token exchange error response:`, errorText);
-        console.error(`[INSTAGRAM CALLBACK] Request URL was: https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&code=${code}`);
-        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`);
+        console.error(`[INSTAGRAM CALLBACK] Token exchange failed:`, errorText);
+        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
       }
 
       const tokenData = await tokenResponse.json();
