@@ -1468,77 +1468,78 @@ export default function VeeGPT() {
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
           <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
-            {/* Top Header with Logo */}
-            <div className="p-3 flex items-center justify-between">
-              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
-              </div>
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronLeft className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
-            </div>
-
-            {/* Navigation Menu */}
-            <div className="px-3 pb-6 space-y-1">
-              <button
-                onClick={startNewChat}
-                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                title={sidebarCollapsed ? "New chat" : ""}
-              >
-                <Edit className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>New chat</span>}
-              </button>
-              
-              <button 
-                onClick={() => setShowSearchInput(!showSearchInput)}
-                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title={sidebarCollapsed ? "Search chats" : ""}
-              >
-                <Search className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>Search chats</span>}
-              </button>
-              
-              <button 
-                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title={sidebarCollapsed ? "Content Assistant" : ""}
-              >
-                <Zap className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>Content Assistant</span>}
-              </button>
-              
-              <button 
-                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title={sidebarCollapsed ? "Analytics" : ""}
-              >
-                <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                {!sidebarCollapsed && <span>Analytics</span>}
-              </button>
-            </div>
-
-            {/* Search Input */}
-            {showSearchInput && !sidebarCollapsed && (
-              <div className="px-4 pb-4">
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                />
-              </div>
-            )}
-
-            {/* Conversations Section */}
+            {/* Scrollable Content Area - Everything scrolls except user profile */}
             <div className="flex-1 overflow-y-auto">
-              <div className="px-4">
+              {/* Top Header with Logo */}
+              <div className="p-3 flex items-center justify-between">
+                <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                  <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
+                </div>
+                <button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                >
+                  {sidebarCollapsed ? (
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronLeft className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+
+              {/* Navigation Menu */}
+              <div className="px-3 pb-6 space-y-1">
+                <button
+                  onClick={startNewChat}
+                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={sidebarCollapsed ? "New chat" : ""}
+                >
+                  <Edit className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>New chat</span>}
+                </button>
+                
+                <button 
+                  onClick={() => setShowSearchInput(!showSearchInput)}
+                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={sidebarCollapsed ? "Search chats" : ""}
+                >
+                  <Search className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Search chats</span>}
+                </button>
+                
+                <button 
+                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={sidebarCollapsed ? "Content Assistant" : ""}
+                >
+                  <Zap className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Content Assistant</span>}
+                </button>
+                
+                <button 
+                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={sidebarCollapsed ? "Analytics" : ""}
+                >
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Analytics</span>}
+                </button>
+              </div>
+
+              {/* Search Input */}
+              {showSearchInput && !sidebarCollapsed && (
+                <div className="px-3 pb-4">
+                  <input
+                    type="text"
+                    placeholder="Search conversations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
+                  />
+                </div>
+              )}
+
+              {/* Conversations Section */}
+              <div className="px-3">
                 {!sidebarCollapsed && (
                   <div className="text-sm font-medium text-gray-500 mb-3 px-2">
                     Chats
