@@ -412,12 +412,6 @@ export class AuthenticTrendAnalyzer {
     ];
   }
 
-  async refreshTrends(category: string = 'all'): Promise<void> {
-    console.log(`[AUTHENTIC TRENDS] Force refreshing trends for category: ${category}`);
-    const cacheKey = `trends_${category}`;
-    this.trendCache.delete(cacheKey);
-    await this.getAuthenticTrendingData(category);
-  }
 
   private shuffleArray(array: any[]): any[] {
     const shuffled = [...array];

@@ -1,6 +1,15 @@
 import axios from 'axios';
 import { trendingScraper } from './trending-scraper';
-import { ContentRecommendation } from '@shared/schema';
+
+interface ContentRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  platforms: string[];
+  engagement?: number;
+  difficulty?: string;
+}
 
 interface PerplexityResponse {
   choices: {
