@@ -598,23 +598,24 @@ export class InstagramAutomation {
    * Start automation monitoring service
    */
   async startAutomationService(): Promise<void> {
-    console.log('[AUTOMATION] Starting Instagram automation service');
+    console.log('[AUTOMATION] Instagram automation service configured for webhook-triggered execution');
     
-    // Run automation checks every 5 minutes
-    setInterval(async () => {
-      try {
-        // Get all workspaces with active automation rules
-        const workspaces = await this.storage.getAllWorkspaces?.();
-        
-        if (workspaces) {
-          for (const workspace of workspaces) {
-            await this.processMentions(workspace.id.toString());
-            await this.processNewFollowers(workspace.id.toString());
-          }
-        }
-      } catch (error) {
-        console.log('[AUTOMATION] Service error:', error);
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    // Automation checks disabled - webhooks trigger automation when needed
+    console.log('[AUTOMATION] ❌ Polling disabled - automation runs via webhook events');
+    // setInterval(async () => {
+    //   try {
+    //     // Get all workspaces with active automation rules
+    //     const workspaces = await this.storage.getAllWorkspaces?.();
+    //     
+    //     if (workspaces) {
+    //       for (const workspace of workspaces) {
+    //         await this.processMentions(workspace.id.toString());
+    //         await this.processNewFollowers(workspace.id.toString());
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.log('[AUTOMATION] Service error:', error);
+    //   }
+    // }, 5 * 60 * 1000); // 5 minutes
   }
 }

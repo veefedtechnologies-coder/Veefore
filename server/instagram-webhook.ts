@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { IStorage } from './storage';
 import { InstagramAutomation } from './instagram-automation';
+import { InstagramSyncService } from './instagram-sync-service';
+import { DashboardCache } from './dashboard-cache';
 
 interface WebhookEntry {
   id: string;
@@ -49,12 +51,16 @@ interface WebhookPayload {
 export class InstagramWebhookHandler {
   private storage: IStorage;
   private automation: InstagramAutomation;
+  private syncService: InstagramSyncService;
+  private dashboardCache: DashboardCache;
   private appSecret: string;
   private processedMessages: Set<string>;
 
   constructor(storage: IStorage) {
     this.storage = storage;
     this.automation = new InstagramAutomation(storage);
+    this.syncService = new InstagramSyncService(storage);
+    this.dashboardCache = new DashboardCache(storage);
     this.appSecret = process.env.INSTAGRAM_APP_SECRET || '';
     this.processedMessages = new Set<string>();
   }
@@ -185,8 +191,84 @@ export class InstagramWebhookHandler {
           await this.processDirectMessage(message, socialAccount);
         }
       }
+
+      // Trigger data sync for relevant events
+      await this.triggerDataSyncFromWebhook(entry, socialAccount);
     } catch (error) {
       console.error('[WEBHOOK] Error processing entry:', error);
+    }
+  }
+
+  /**
+   * Trigger data synchronization when webhook events indicate data changes
+   */
+  private async triggerDataSyncFromWebhook(entry: WebhookEntry, socialAccount?: any): Promise<void> {
+    try {
+      console.log('[WEBHOOK] Analyzing entry for data sync triggers:', entry.id);
+      
+      // Determine if this event should trigger a data sync
+      let shouldSync = false;
+      const syncReasons: string[] = [];
+
+      if (entry.changes) {
+        for (const change of entry.changes) {
+          // Sync on comments (affects engagement metrics)
+          if (change.field === 'comments') {
+            shouldSync = true;
+            syncReasons.push('new comment received');
+          }
+          
+          // Sync on media changes (new posts, media updates)
+          if (change.field === 'media' || change.field === 'feed') {
+            shouldSync = true;
+            syncReasons.push('media content updated');
+          }
+          
+          // Sync on story events (story insights)
+          if (change.field === 'story_insights') {
+            shouldSync = true;
+            syncReasons.push('story insights updated');
+          }
+        }
+      }
+
+      // Sync on messaging events (DM activity can affect profile views)
+      if (entry.messaging && entry.messaging.length > 0) {
+        shouldSync = true;
+        syncReasons.push('direct message activity');
+      }
+
+      if (shouldSync) {
+        console.log(`[WEBHOOK] ✅ Triggering data sync - reasons: ${syncReasons.join(', ')}`);
+        
+        // Use the social account if provided, otherwise find it
+        let relevantAccount = socialAccount;
+        if (!relevantAccount) {
+          const accounts = await this.storage.getSocialAccountsByWorkspace('');
+          relevantAccount = accounts.find((acc: any) => 
+            acc.platform === 'instagram' && 
+            (acc.accountId === entry.id || acc.pageId === entry.id)
+          );
+        }
+
+        if (relevantAccount) {
+          console.log(`[WEBHOOK] 🔄 Syncing data for account: @${relevantAccount.username}`);
+          
+          // Trigger sync for this specific account
+          await this.syncService.syncInstagramAccount(relevantAccount.workspaceId, relevantAccount.id);
+          
+          // Clear dashboard cache to force fresh data on next request
+          await this.dashboardCache.clearCache(relevantAccount.workspaceId);
+          
+          console.log(`[WEBHOOK] ✓ Data sync completed for @${relevantAccount.username}`);
+        } else {
+          console.log('[WEBHOOK] ⚠️ No matching social account found for webhook entry');
+        }
+      } else {
+        console.log('[WEBHOOK] ℹ️ No data sync needed for this event type');
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] ❌ Error triggering data sync:', error);
     }
   }
 

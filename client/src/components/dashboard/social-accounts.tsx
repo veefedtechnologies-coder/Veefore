@@ -10,12 +10,12 @@ import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Hea
 export function SocialAccounts() {
   const [, setLocation] = useLocation()
   
-  // Fetch real social accounts data
+  // Fetch real social accounts data - webhook-based updates
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 5000, // Consider data stale after 5 seconds
+    // Removed polling - using webhooks for real-time updates
+    staleTime: 0, // Always fetch latest data when needed
   })
 
 

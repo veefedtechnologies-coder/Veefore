@@ -18,15 +18,14 @@ class AutoSyncService {
   }
 
   start() {
-    console.log('[AUTO SYNC] Starting automatic Instagram data synchronization service');
+    console.log('[AUTO SYNC] ❌ AUTO-SYNC DISABLED - Using webhook-based real-time updates instead');
+    console.log('[AUTO SYNC] Webhooks provide efficient data syncing only when Instagram sends notifications');
     
-    // Initial sync
-    this.performAutoSync();
-    
-    // Set up periodic sync
-    this.syncInterval = setInterval(() => {
-      this.performAutoSync();
-    }, this.SYNC_INTERVAL_MS);
+    // Do not start interval-based syncing - webhooks handle real-time updates
+    // this.performAutoSync();
+    // this.syncInterval = setInterval(() => {
+    //   this.performAutoSync();
+    // }, this.SYNC_INTERVAL_MS);
   }
 
   stop() {

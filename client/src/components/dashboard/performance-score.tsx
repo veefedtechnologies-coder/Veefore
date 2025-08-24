@@ -8,20 +8,20 @@ import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye } from 'l
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
   
-  // Fetch real dashboard analytics data
+  // Fetch real dashboard analytics data - webhook-based updates
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
     queryFn: () => apiRequest('/api/dashboard/analytics'),
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 5000, // Consider data stale after 5 seconds
+    // Removed polling - using webhooks for real-time updates
+    staleTime: 0, // Always fetch latest data when needed
   })
 
-  // Fetch real social accounts data  
+  // Fetch real social accounts data - webhook-based updates
   const { data: socialAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 30000,
-    staleTime: 5000, // Consider data stale after 5 seconds
+    // Removed polling - using webhooks for real-time updates
+    staleTime: 0, // Always fetch latest data when needed
   })
 
 

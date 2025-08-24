@@ -170,14 +170,15 @@ export class InstagramSyncService {
   }
 
   async schedulePeriodicSync(workspaceId: string, accessToken: string): Promise<void> {
-    // Sync data every 15 minutes for real-time updates
-    setInterval(async () => {
-      try {
-        await this.syncInstagramData(workspaceId, accessToken);
-        console.log('[INSTAGRAM SYNC] Periodic sync completed for workspace:', workspaceId);
-      } catch (error) {
-        console.error('[INSTAGRAM SYNC] Periodic sync failed:', error);
-      }
-    }, 15 * 60 * 1000); // 15 minutes
+    // Periodic sync disabled - using webhooks for real-time updates
+    console.log('[INSTAGRAM SYNC] ❌ Periodic sync disabled - webhooks handle real-time updates');
+    // setInterval(async () => {
+    //   try {
+    //     await this.syncInstagramData(workspaceId, accessToken);
+    //     console.log('[INSTAGRAM SYNC] Periodic sync completed for workspace:', workspaceId);
+    //   } catch (error) {
+    //     console.error('[INSTAGRAM SYNC] Periodic sync failed:', error);
+    //   }
+    // }, 15 * 60 * 1000); // 15 minutes
   }
 }
