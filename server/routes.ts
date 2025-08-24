@@ -7207,10 +7207,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Instagram Webhook Routes
+  // Instagram Webhook Routes - Updated for v18.0 API
   app.get('/webhook/instagram', async (req, res) => {
     console.log('[WEBHOOK] Instagram webhook verification request');
     await webhookHandler.handleVerification(req, res);
+  });
+
+  app.post('/webhook/instagram', async (req, res) => {
+    console.log('[INSTAGRAM WEBHOOK] Received webhook event for comment-to-DM automation');
+    await webhookHandler.handleWebhookEvent(req, res);
   });
 
   // Instagram Comment Webhook Routes for DM Automation

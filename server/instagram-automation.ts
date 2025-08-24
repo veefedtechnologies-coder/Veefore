@@ -196,8 +196,14 @@ export class InstagramAutomation {
         };
       }
       
+      // Get the Instagram account ID for proper API endpoint
+      const accountId = await this.getInstagramAccountId(accessToken);
+      if (!accountId) {
+        throw new Error('Could not retrieve Instagram account ID');
+      }
+
       const response = await fetch(
-        `https://graph.instagram.com/v22.0/me/messages`,
+        `https://graph.instagram.com/v18.0/${accountId}/messages`,
         {
           method: 'POST',
           headers: {
@@ -312,6 +318,28 @@ export class InstagramAutomation {
         dmSuccess: false,
         errors: [`Automation failed: ${error.message}`]
       };
+    }
+  }
+
+  /**
+   * Get Instagram account ID for API calls
+   */
+  private async getInstagramAccountId(accessToken: string): Promise<string | null> {
+    try {
+      const response = await fetch(
+        `https://graph.instagram.com/v18.0/me?fields=id&access_token=${accessToken}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.id;
+      } else {
+        console.error('[AUTOMATION] Failed to get Instagram account ID:', response.statusText);
+        return null;
+      }
+    } catch (error) {
+      console.error('[AUTOMATION] Error getting Instagram account ID:', error);
+      return null;
     }
   }
 
