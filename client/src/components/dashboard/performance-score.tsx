@@ -16,8 +16,7 @@ export function PerformanceScore() {
   useEffect(() => {
     setShowDataStory(true)
     setStoryAnimation(prev => prev + 1)
-    const timer = setTimeout(() => setShowDataStory(false), 6000)
-    return () => clearTimeout(timer)
+    // No auto-close timer - only closes when user clicks X
   }, [selectedPeriod])
 
   // Generate unique data stories based on actual performance
