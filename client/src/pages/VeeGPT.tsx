@@ -1703,9 +1703,7 @@ export default function VeeGPT() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {isGenerating ? "VeeGPT is Working..." : "VeeGPT"}
-                </h1>
+                <h1 className="text-lg font-semibold text-gray-900">VeeGPT</h1>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </div>
             </div>
