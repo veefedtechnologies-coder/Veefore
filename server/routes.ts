@@ -3571,7 +3571,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       // Exchange authorization code for access token using Instagram Business API
       console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token...`);
-      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
+      const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

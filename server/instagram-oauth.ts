@@ -21,8 +21,8 @@ export class InstagramOAuthService {
 
   async exchangeCodeForToken(code: string, workspaceId: string): Promise<any> {
     try {
-      // Exchange authorization code for access token
-      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
+      // Exchange authorization code for access token using Business API
+      const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
