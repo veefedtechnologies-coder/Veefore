@@ -12,25 +12,27 @@ export function SocialAccounts() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   
-  // Fetch real social accounts data - webhook-based updates
+  // Fetch real social accounts data - Ultra-responsive updates
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    // Removed polling - using webhooks for real-time updates
+    refetchInterval: 5000, // Refresh every 5 seconds for immediate data changes
     staleTime: 0, // Always fetch latest data when needed
   })
 
-  // Manual sync mutation for Instagram data
+  // Manual sync mutation for Instagram data - IMMEDIATE mode
   const syncMutation = useMutation({
     mutationFn: () => apiRequest('/api/instagram/force-sync', { method: 'POST' }),
     onSuccess: (data) => {
-      toast({
-        title: "✅ Instagram data synced",
-        description: `Updated to ${data.followers} followers via ${data.method === 'smart_polling' ? 'smart polling' : 'direct API'}`,
-      })
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+      // Immediately trigger a refresh of all data
+      refetchAccounts()
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
+      
+      toast({
+        title: "🚀 Instant sync complete!",
+        description: `Updated to ${data.followers} followers immediately via ${data.method === 'smart_polling' ? 'smart polling' : 'direct API'}`,
+      })
     },
     onError: (error: any) => {
       toast({
@@ -40,6 +42,20 @@ export function SocialAccounts() {
       })
     }
   })
+
+  // Auto-refresh when user returns to page for immediate fresh data
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // User returned to page - immediately refresh data
+        refetchAccounts()
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   // Auto-start polling mutation
   const startPollingMutation = useMutation({
@@ -55,11 +71,11 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query (will be defined after connectedAccounts is declared)
+  // Polling status query - Much more responsive for immediate updates
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 30000, // Check status every 30 seconds
+    refetchInterval: 3000, // Check status every 3 seconds for immediate updates
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 
@@ -185,17 +201,22 @@ export function SocialAccounts() {
                 </div>
               )}
               
-              {/* Manual sync button for Instagram */}
+              {/* IMMEDIATE sync button for Instagram */}
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => syncMutation.mutate()}
+                onClick={() => {
+                  // Trigger immediate sync
+                  syncMutation.mutate()
+                  // Also immediately refresh the UI data
+                  refetchAccounts()
+                }}
                 disabled={syncMutation.isPending}
-                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                title="Get latest follower count immediately"
+                className="text-blue-600 border-blue-200 hover:bg-blue-50 font-medium"
+                title="Get latest follower count INSTANTLY - no delays!"
               >
                 <RefreshCw className={`w-4 h-4 mr-1 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-                {syncMutation.isPending ? 'Syncing...' : 'Sync Now'}
+                {syncMutation.isPending ? 'Getting fresh data...' : '🚀 Instant Sync'}
               </Button>
               
               <Button variant="outline" size="sm" className="text-slate-600 border-slate-200 hover:bg-slate-50">

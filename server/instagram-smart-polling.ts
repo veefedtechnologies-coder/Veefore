@@ -29,13 +29,13 @@ export class InstagramSmartPolling {
   private readonly MAX_REQUESTS_PER_HOUR = 200;
   private readonly HOUR_IN_MS = 60 * 60 * 1000;
   
-  // Adaptive polling intervals (in milliseconds) - optimized for real-time updates
+  // Adaptive polling intervals (in milliseconds) - ULTRA-RESPONSIVE for immediate updates
   private readonly INTERVALS = {
-    ACTIVE_USER: 15 * 1000,      // 15 seconds when user is active (faster updates)
-    NORMAL: 45 * 1000,           // 45 seconds normal (more frequent)
-    REDUCED: 2 * 60 * 1000,      // 2 minutes when no changes
-    MINIMAL: 5 * 60 * 1000,      // 5 minutes when inactive
-    NIGHT: 10 * 60 * 1000        // 10 minutes during night hours (still responsive)
+    ACTIVE_USER: 3 * 1000,       // 3 seconds when user is active (IMMEDIATE updates)
+    NORMAL: 10 * 1000,           // 10 seconds normal (very fast)
+    REDUCED: 30 * 1000,          // 30 seconds when no changes (still responsive)
+    MINIMAL: 1 * 60 * 1000,      // 1 minute when inactive (much faster)
+    NIGHT: 2 * 60 * 1000         // 2 minutes during night hours (still responsive)
   };
 
   constructor(storage: IStorage) {
