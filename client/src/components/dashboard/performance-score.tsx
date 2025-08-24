@@ -257,15 +257,18 @@ export function PerformanceScore() {
     const totalFollowersBase = totalFollowers || 0
     const totalReachBase = totalReach || 0
     const totalPostsBase = totalPosts || 0
-    const avgEngagementBase = avgEngagement || 0
+    
+    // Calculate proper engagement rate from analytics data
+    const realEngagementRate = analytics?.engagementRate || 0
+    const avgEngagementBase = realEngagementRate > 0 ? realEngagementRate : avgEngagement || 0
 
     // Show REAL current data
     const periodData = {
-      reach: totalReachBase,           // Real Instagram reach: 135
+      reach: totalReachBase,           // Real Instagram reach: 27
       posts: totalPostsBase,           // Real Instagram posts: 15
-      engagement: avgEngagementBase,   // Real Instagram engagement: 567%
+      engagement: avgEngagementBase,   // Real Instagram engagement rate from backend
       followerGains: 0,                // Will calculate from historical data
-      followerTotal: totalFollowersBase // Real Instagram followers: 4
+      followerTotal: totalFollowersBase // Real Instagram followers: 3
     }
 
     // Calculate REAL growth percentages using historical data when available
