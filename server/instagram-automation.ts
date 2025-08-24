@@ -84,7 +84,7 @@ export class InstagramAutomation {
       console.log(`[AUTOMATION] Sending reply to comment ${commentId}: "${message}"`);
       
       const response = await fetch(
-        `https://graph.instagram.com/v22.0/${commentId}/replies`,
+        `https://graph.instagram.com/v23.0/${commentId}/replies`,
         {
           method: 'POST',
           headers: {
@@ -203,7 +203,7 @@ export class InstagramAutomation {
       }
 
       const response = await fetch(
-        `https://graph.instagram.com/v18.0/${accountId}/messages`,
+        `https://graph.instagram.com/v23.0/${accountId}/messages`,
         {
           method: 'POST',
           headers: {
@@ -327,7 +327,7 @@ export class InstagramAutomation {
   private async getInstagramAccountId(accessToken: string): Promise<string | null> {
     try {
       const response = await fetch(
-        `https://graph.instagram.com/v18.0/me?fields=id&access_token=${accessToken}`
+        `https://graph.instagram.com/v23.0/me?fields=id&access_token=${accessToken}`
       );
 
       if (response.ok) {
@@ -365,7 +365,7 @@ export class InstagramAutomation {
 
       // Fetch recent mentions
       const mentionsResponse = await fetch(
-        `https://graph.instagram.com/v22.0/${instagramAccount.accountId}/tagged?fields=id,caption,comments_count,like_count,media_type,timestamp&access_token=${instagramAccount.accessToken}`
+        `https://graph.instagram.com/v23.0/${instagramAccount.accountId}/tagged?fields=id,caption,comments_count,like_count,media_type,timestamp&access_token=${instagramAccount.accessToken}`
       );
 
       if (mentionsResponse.ok) {
@@ -402,7 +402,7 @@ export class InstagramAutomation {
 
       // Get recent followers (Instagram API limitation - this would need webhooks for real-time)
       const followersResponse = await fetch(
-        `https://graph.instagram.com/v22.0/${instagramAccount.accountId}?fields=followers_count&access_token=${instagramAccount.accessToken}`
+        `https://graph.instagram.com/v23.0/${instagramAccount.accountId}?fields=followers_count&access_token=${instagramAccount.accessToken}`
       );
 
       if (followersResponse.ok) {
