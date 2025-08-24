@@ -410,7 +410,8 @@ Provide creative, actionable insights focused on content creation and social med
     try {
       const userMessage = messages[messages.length - 1]?.content || '';
       
-      statusCallback?.('🧠 Analyzing question complexity and AI routing strategy...');
+      // Analyze the question to determine strategy
+      statusCallback?.('🔍 Analyzing question complexity and optimal AI routing...');
       const analysis = this.analyzeQuestion(userMessage);
       
       console.log(`[HYBRID AI] Analysis:`, analysis);
@@ -418,28 +419,33 @@ Provide creative, actionable insights focused on content creation and social med
       // Determine which AIs will be used and provide detailed status
       const aiProviders = [];
       if (analysis.primaryProvider === 'perplexity' || analysis.requiresTrending) {
-        aiProviders.push('Perplexity AI (Online Research & Trending Data)');
+        aiProviders.push('Perplexity AI (Real-time Research)');
       }
       if (analysis.primaryProvider === 'openai' || analysis.requiresDeepAnalysis || analysis.recommendedStrategy !== 'single') {
-        aiProviders.push('OpenAI GPT-4o (Strategic Analysis & Reasoning)');
+        aiProviders.push('GPT-4o (Strategic Analysis)');
       }
       if (analysis.primaryProvider === 'gemini' || userMessage.toLowerCase().includes('creative') || userMessage.toLowerCase().includes('ideas')) {
-        aiProviders.push('Google Gemini (Creative Insights & Content Generation)');
+        aiProviders.push('Gemini (Creative Generation)');
       }
       
       const aiCount = aiProviders.length;
-      const strategyDescription = analysis.recommendedStrategy === 'single' ? 'Single AI Strategy' : 
-                                 analysis.recommendedStrategy === 'hybrid' ? 'Hybrid Multi-AI Strategy' : 'Enhanced Multi-AI Strategy';
+      const strategyType = analysis.recommendedStrategy === 'single' ? 'Focused' : 
+                          analysis.recommendedStrategy === 'hybrid' ? 'Hybrid' : 'Enhanced Multi-AI';
       
-      statusCallback?.(`🎯 ${strategyDescription} | Using ${aiCount} AI${aiCount > 1 ? 's' : ''}: ${aiProviders.join(', ')} | Reason: ${analysis.reasoning}`);
+      // Show intelligent routing decision
+      if (aiCount === 1) {
+        statusCallback?.(`🎯 ${strategyType} Strategy: ${aiProviders[0]} selected for optimal results`);
+      } else {
+        statusCallback?.(`⚡ ${strategyType} Strategy: Coordinating ${aiCount} AIs for comprehensive analysis`);
+      }
       
       // Single AI strategy - stream directly
       if (analysis.recommendedStrategy === 'single') {
         if (analysis.primaryProvider === 'openai') {
-          statusCallback?.('🚀 OpenAI GPT-4o processing...');
+          statusCallback?.('🚀 OpenAI GPT-4o processing your request with advanced reasoning and comprehensive analysis...');
           yield* this.generateOpenAIStreamingResponse(messages);
         } else if (analysis.primaryProvider === 'perplexity') {
-          statusCallback?.('🔍 Perplexity AI researching...');
+          statusCallback?.('🔍 Perplexity AI connecting to internet for real-time research and trending data...');
           const response = await this.getPerplexityResponse(userMessage);
           
           // Stream immediately without extra status
@@ -448,7 +454,7 @@ Provide creative, actionable insights focused on content creation and social med
             yield word + ' ';
           }
         } else if (analysis.primaryProvider === 'gemini') {
-          statusCallback?.('✨ Gemini creating...');
+          statusCallback?.('✨ Google Gemini generating creative insights and innovative content ideas...');
           yield* this.generateGeminiStreamingResponse(userMessage);
         }
         return;
