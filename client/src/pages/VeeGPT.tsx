@@ -1047,7 +1047,7 @@ export default function VeeGPT() {
               </div>
 
               {/* Navigation Menu */}
-              <div className="px-3 pb-6 space-y-1">
+              <div className="px-3 pb-6 pt-4 space-y-1">
                 <button
                   onClick={startNewChat}
                   className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1487,7 +1487,7 @@ export default function VeeGPT() {
               </div>
 
               {/* Navigation Menu */}
-              <div className="px-3 pb-6 space-y-1">
+              <div className="px-3 pb-6 pt-4 space-y-1">
                 <button
                   onClick={startNewChat}
                   className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
