@@ -2165,9 +2165,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       if (aggregatedMetrics.totalFollowers > 0 && totalEngagements > 0 && aggregatedMetrics.totalPosts > 0) {
         // Standard calculation: Average engagement per post / followers * 100
         const avgEngagementPerPost = totalEngagements / aggregatedMetrics.totalPosts;
-        engagementRate = Math.min((avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100, 100); // Cap at 100%
-        console.log('[ENGAGEMENT] Calculated realistic rate:', engagementRate.toFixed(2), '%');
+        engagementRate = (avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100; // REAL rate, no cap
+        console.log('[ENGAGEMENT] Calculated REAL rate:', engagementRate.toFixed(2), '%');
         console.log('[ENGAGEMENT] Formula: (', avgEngagementPerPost.toFixed(1), '÷', aggregatedMetrics.totalFollowers, ') × 100');
+        console.log('[ENGAGEMENT] Your engagement is', engagementRate > 100 ? 'exceptional!' : 'normal');
       } else {
         // Fallback: No engagement data available
         engagementRate = 0;
