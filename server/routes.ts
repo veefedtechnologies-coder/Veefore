@@ -3569,9 +3569,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
       
-      // Exchange authorization code for access token using Facebook Graph API (required for Business API messaging)
-      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token via Facebook Graph API...`);
-      const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
+      // Exchange authorization code for access token using Instagram API (for Instagram OAuth flow)
+      console.log(`[INSTAGRAM CALLBACK] Exchanging authorization code for Instagram Business access token via Instagram API...`);
+      const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
