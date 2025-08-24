@@ -73,7 +73,7 @@ export function PerformanceScore() {
   // Calculate total metrics from real data
   const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
   const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.reach, 0)
-  const avgEngagement = connectedPlatforms.length > 0 && connectedPlatforms[0]?.engagement ? parseFloat(connectedPlatforms[0].engagement) || 0 : 0
+  const avgEngagement = analytics?.engagementRate || (connectedPlatforms.length > 0 ? parseFloat(connectedPlatforms[0]?.engagement || '0') || 0 : 0)
   const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
 
   // Calculate real content score based on performance metrics
@@ -311,7 +311,7 @@ export function PerformanceScore() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-600">Engagement Rate</span>
-                  <span className="font-medium text-gray-700">{avgEngagement.toFixed(1)}%</span>
+                  <span className="font-medium text-gray-700">{connectedPlatforms[0]?.engagement || '0%'}</span>
                 </div>
                 <div className="w-full bg-white/60 rounded-full h-1.5">
                   <div className="bg-blue-500 h-1.5 rounded-full w-5/6 transition-all duration-1000"></div>
