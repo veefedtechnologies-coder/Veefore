@@ -1,14 +1,64 @@
 import { useQuery } from '@tanstack/react-query'
 import { useLocation } from 'wouter'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight, Info, Clock, Target, BarChart3 } from 'lucide-react'
 
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
   const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('month')
+  const [showInsights, setShowInsights] = useState(false)
+  const [insightKey, setInsightKey] = useState(0)
+
+  // Show educational insights when period changes
+  useEffect(() => {
+    setShowInsights(true)
+    setInsightKey(prev => prev + 1)
+    const timer = setTimeout(() => setShowInsights(false), 8000) // Hide after 8 seconds
+    return () => clearTimeout(timer)
+  }, [selectedPeriod])
+
+  // Educational insights based on selected period
+  const getEducationalInsights = (period: 'day' | 'week' | 'month') => {
+    const insights = {
+      day: {
+        icon: <Clock className="w-5 h-5 text-blue-600" />,
+        title: "Today's Performance",
+        description: "Real-time data showing today's activity. Great for monitoring immediate response to content and timing optimal posts.",
+        tips: [
+          "Daily data shows immediate engagement patterns",
+          "Best for tracking post timing effectiveness", 
+          "Monitor hourly engagement trends"
+        ],
+        color: "from-blue-50 to-indigo-50 border-blue-200"
+      },
+      week: {
+        icon: <Target className="w-5 h-5 text-green-600" />,
+        title: "Weekly Trends",
+        description: "7-day overview revealing weekly patterns and consistency. Ideal for understanding your audience's weekly behavior.",
+        tips: [
+          "Weekly data reveals audience weekly patterns",
+          "Perfect for content scheduling strategies",
+          "Shows consistency in your posting rhythm"
+        ],
+        color: "from-green-50 to-emerald-50 border-green-200"
+      },
+      month: {
+        icon: <BarChart3 className="w-5 h-5 text-purple-600" />,
+        title: "Monthly Growth",
+        description: "30-day analysis showing long-term growth trends and content performance. Essential for strategic planning.",
+        tips: [
+          "Monthly view shows sustainable growth patterns",
+          "Best for measuring content strategy success",
+          "Tracks long-term follower and engagement trends"
+        ],
+        color: "from-purple-50 to-pink-50 border-purple-200"
+      }
+    }
+    return insights[period]
+  }
   
   // Fetch real dashboard analytics data - webhook-based updates
   const { data: analytics, isLoading } = useQuery({
@@ -270,6 +320,46 @@ export function PerformanceScore() {
           </Button>
         </div>
       </CardHeader>
+
+      {/* Educational Insights - Shows when user changes time period */}
+      {showInsights && (
+        <div 
+          key={insightKey}
+          className={`mx-6 mb-4 bg-gradient-to-r ${getEducationalInsights(selectedPeriod).color} border rounded-2xl p-4 animate-in slide-in-from-top-5 duration-500`}
+          data-testid="educational-insights"
+        >
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 mt-0.5">
+              {getEducationalInsights(selectedPeriod).icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-semibold text-gray-900">
+                  {getEducationalInsights(selectedPeriod).title}
+                </h4>
+                <button
+                  onClick={() => setShowInsights(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-xs text-gray-700 mb-3 leading-relaxed">
+                {getEducationalInsights(selectedPeriod).description}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                {getEducationalInsights(selectedPeriod).tips.map((tip, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
+                    <span className="text-xs text-gray-600 font-medium">{tip}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <CardContent className="space-y-8">
         {/* Connected Platforms Header */}
         <div className="flex items-center justify-between mb-6">
