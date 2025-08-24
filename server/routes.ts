@@ -13811,6 +13811,15 @@ Create a detailed growth strategy in JSON format:
     try {
       console.log('[NEW WEBHOOK] Instagram webhook received');
       
+      // Check if this is a comment event for DM automation
+      const webhookData = req.body;
+      if (webhookData?.entry?.[0]?.changes?.[0]?.field === 'comments') {
+        console.log('[NEW WEBHOOK] Comment event detected - routing to comment webhook handler');
+        await commentWebhookHandler.handleWebhookEvent(req, res);
+        return;
+      }
+      
+      // Handle other webhook events with the original processor
       await newWebhookProcessor.processWebhookEvent(req.body);
       res.json({ message: 'EVENT_RECEIVED' });
     } catch (error: any) {
