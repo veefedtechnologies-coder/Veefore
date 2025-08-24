@@ -289,27 +289,6 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           <span className="text-xs font-medium text-gray-600">Settings</span>
         </div>
         
-        <div 
-          className="flex flex-col items-center cursor-pointer py-2 hover:scale-105 transition-all duration-300"
-          onClick={() => setLocation('/profile')}
-        >
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center hover-lift shadow-lg mb-1 relative overflow-hidden">
-            {userData?.avatar ? (
-              <img 
-                src={userData.avatar} 
-                alt="Profile" 
-                className="w-full h-full object-cover rounded-xl"
-              />
-            ) : (
-              <span className="text-white font-bold text-sm">
-                {userData?.displayName ? userData.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) :
-                 userData?.email ? userData.email.split('@')[0].slice(0, 2).toUpperCase() : 
-                 'U'}
-              </span>
-            )}
-          </div>
-          <span className="text-xs font-medium text-gray-600">Profile</span>
-        </div>
         
         <div 
           className="flex flex-col items-center cursor-pointer py-2 hover:text-red-600 transition-colors duration-300"
