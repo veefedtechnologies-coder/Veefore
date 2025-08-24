@@ -1697,22 +1697,11 @@ export default function VeeGPT() {
         <div className="flex-1 flex flex-col bg-white relative">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
-            <div className="flex items-center space-x-3">
+            {/* Centered Logo + GPT */}
+            <div className="flex items-center justify-center w-full">
               <div className="flex items-center space-x-2">
-                {/* AI Brain Visualization */}
-                <div className="relative flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-600 to-cyan-500 rounded-full flex items-center justify-center relative overflow-hidden shadow-lg">
-                    <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4 brightness-200 relative z-10" />
-                    {/* Data flow animation */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-scan-right"></div>
-                  </div>
-                  {/* Neural text */}
-                  <h1 className="text-lg font-bold text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-purple-600 bg-clip-text ml-2 animate-gradient-x">
-                    eeGPT
-                  </h1>
-                  {/* Activity indicator */}
-                  <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full ml-2 animate-pulse"></div>
-                </div>
+                <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+                <span className="text-lg font-bold text-gray-900">eeGPT</span>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </div>
             </div>
