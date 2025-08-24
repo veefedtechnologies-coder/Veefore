@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
+import { Users, TrendingUp, MessageSquare, Eye, BarChart3, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
 
 export function SocialAccounts() {
   const [, setLocation] = useLocation()
