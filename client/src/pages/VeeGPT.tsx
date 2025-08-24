@@ -1232,8 +1232,8 @@ export default function VeeGPT() {
             </div>
 
             {/* Bottom User Section - Fixed */}
-            <div className="p-3 border-t border-gray-200">
-              <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+            <div className="p-2 border-t border-gray-200">
+              <div className="flex items-center space-x-3 px-2 py-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                   {userData?.avatar ? (
                     <img 
@@ -1694,8 +1694,8 @@ export default function VeeGPT() {
             </div>
 
             {/* Bottom User Section - Fixed */}
-            <div className="p-3 border-t border-gray-200">
-              <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
+            <div className="p-2 border-t border-gray-200">
+              <div className="flex items-center space-x-3 px-2 py-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                   {userData?.avatar ? (
                     <img 
