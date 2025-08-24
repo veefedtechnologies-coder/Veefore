@@ -34,6 +34,8 @@ import AutomationStepByStep from './pages/AutomationStepByStep'
 import VideoGeneratorAdvanced from './pages/VideoGeneratorAdvanced'
 import AdminPanel from './pages/AdminPanel'
 import AdminLogin from './pages/AdminLogin'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 
 function App() {
@@ -678,8 +680,27 @@ function App() {
               </div>
             </div>
           </Route>
+
+          {/* Privacy Policy Route - Public access */}
+          <Route path="/privacy-policy">
+            <PrivacyPolicy />
+          </Route>
+
+          {/* Terms of Service Route - Public access */}
+          <Route path="/terms-of-service">
+            <TermsOfService />
+          </Route>
         </>
       )}
+      
+      {/* Public routes for legal pages - accessible without authentication */}
+      <Route path="/privacy-policy">
+        <PrivacyPolicy />
+      </Route>
+
+      <Route path="/terms-of-service">
+        <TermsOfService />
+      </Route>
       
     </Switch>
 
