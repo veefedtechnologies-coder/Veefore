@@ -192,26 +192,6 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
           />
         </div>
         
-        {/* User Profile Information */}
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-3">
-            {/* User Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">
-                {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
-            </div>
-            {/* User Info */}
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900 truncate">
-                {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-              </div>
-              <div className="text-xs text-gray-500">
-                {userData?.plan || 'Free'} Plan
-              </div>
-            </div>
-          </div>
-        </div>
         
         {/* Active indicator with enhanced animation */}
         {activeView === 'veegpt' && (
