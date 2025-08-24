@@ -33,6 +33,7 @@ import { getAuth } from 'firebase/auth'
 // import veeGPTLogo from '@assets/output-onlinepngtools_1752443706727.png'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useUser } from '@/hooks/useUser'
 
 // Removed hardcoded intelligent status function - now using only real backend AI status
 
@@ -179,6 +180,7 @@ const getImmediateAnalysisStatus = (messageContent: string): string => {
 }
 
 export default function VeeGPT() {
+  const { userData } = useUser()
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
@@ -1043,6 +1045,37 @@ export default function VeeGPT() {
                   )}
                 </button>
               </div>
+              
+              {/* User Profile Information */}
+              {!sidebarCollapsed && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    {/* User Avatar */}
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                      {userData?.avatar ? (
+                        <img 
+                          src={userData.avatar} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-white text-sm font-bold">
+                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {userData?.plan || 'Free'} Plan
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Navigation Menu */}
@@ -1474,6 +1507,37 @@ export default function VeeGPT() {
                   )}
                 </button>
               </div>
+              
+              {/* User Profile Information */}
+              {!sidebarCollapsed && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    {/* User Avatar */}
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+                      {userData?.avatar ? (
+                        <img 
+                          src={userData.avatar} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-white text-sm font-bold">
+                          {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {userData?.plan || 'Free'} Plan
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Navigation Menu */}
