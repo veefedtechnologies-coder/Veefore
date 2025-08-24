@@ -672,7 +672,7 @@ export class InstagramWebhookHandler {
   }
 
   /**
-   * Send direct message via Instagram API
+   * Send direct message via Instagram API (legacy - kept for compatibility)
    */
   private async sendDirectMessage(
     accessToken: string,
@@ -713,6 +713,104 @@ export class InstagramWebhookHandler {
     } catch (error) {
       console.error(`[INSTAGRAM API] Error sending DM:`, error);
       return { success: false, error: String(error) };
+    }
+  }
+
+  /**
+   * Get active DM template for a workspace
+   */
+  async getActiveDmTemplate(workspaceId: string): Promise<{ messageText: string; buttonText: string; buttonUrl: string } | null> {
+    try {
+      const { MongoClient } = await import('mongodb');
+      const client = new MongoClient(process.env.MONGODB_URI!);
+      
+      try {
+        await client.connect();
+        const db = client.db('veeforedb');
+        const collection = db.collection('dmtemplates');
+        
+        // Find the most recent active template for this workspace
+        const template = await collection.findOne(
+          { workspaceId, isActive: true },
+          { sort: { createdAt: -1 } }
+        );
+        
+        if (template) {
+          console.log(`[WEBHOOK] Found DM template for workspace ${workspaceId}:`, {
+            messageText: template.messageText?.substring(0, 50) + '...',
+            buttonText: template.buttonText,
+            buttonUrl: template.buttonUrl
+          });
+          
+          return {
+            messageText: template.messageText,
+            buttonText: template.buttonText,
+            buttonUrl: template.buttonUrl
+          };
+        } else {
+          console.log(`[WEBHOOK] No active DM template found for workspace ${workspaceId}`);
+          return null;
+        }
+      } finally {
+        await client.close();
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error fetching DM template:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Create a new DM template for a workspace
+   */
+  async createDmTemplate(
+    userId: string,
+    workspaceId: string,
+    messageText: string,
+    buttonText: string,
+    buttonUrl: string
+  ): Promise<any> {
+    try {
+      const { MongoClient } = await import('mongodb');
+      const client = new MongoClient(process.env.MONGODB_URI!);
+      
+      try {
+        await client.connect();
+        const db = client.db('veeforedb');
+        const collection = db.collection('dmtemplates');
+        
+        // Deactivate any existing templates for this workspace
+        await collection.updateMany(
+          { workspaceId },
+          { $set: { isActive: false, updatedAt: new Date() } }
+        );
+        
+        // Create new template
+        const template = {
+          userId,
+          workspaceId,
+          messageText,
+          buttonText,
+          buttonUrl,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        const result = await collection.insertOne(template);
+        
+        console.log(`[WEBHOOK] Created new DM template for workspace ${workspaceId}:`, template);
+        
+        return {
+          ...template,
+          _id: result.insertedId.toString()
+        };
+      } finally {
+        await client.close();
+      }
+    } catch (error) {
+      console.error('[WEBHOOK] Error creating DM template:', error);
+      throw error;
     }
   }
 
@@ -860,32 +958,65 @@ export class InstagramWebhookHandler {
             // Mark comment as processed only after successful processing
             this.automation.markCommentProcessed(commentId);
             
-            // Step 2: Send DM (for comment-to-dm automation)
+            // Step 2: Send Professional DM (for comment-to-dm automation)
             if (rule.type === 'dm' || rule.type === 'comment_dm') {
-              console.log(`[WEBHOOK] Sending follow-up DM for comment-to-DM automation`);
+              console.log(`[WEBHOOK] Sending professional DM for comment-to-DM automation`);
               
-              // Generate DM message using dmResponses field for comment_dm type
-              let dmMessage;
-              if (rule.type === 'comment_dm' && rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
-                dmMessage = rule.action.dmResponses[0]; // Use first DM response
-              } else if (rule.responses && rule.responses.length > 1) {
-                dmMessage = rule.responses[1]; // Use second response as DM message
-              } else {
-                dmMessage = `Hi ${value.from.username}! Thanks for your comment. I've sent you more details here!`;
-              }
-              
-              // Send DM to the commenter
-              const dmResult = await this.sendDirectMessage(
-                socialAccount.accessToken,
-                value.from.id,
-                dmMessage,
-                socialAccount
-              );
-              
-              if (dmResult.success) {
-                console.log(`[WEBHOOK] ✓ Successfully sent follow-up DM for comment-to-DM automation`);
-              } else {
-                console.log(`[WEBHOOK] ✗ Failed to send follow-up DM: ${dmResult.error}`);
+              try {
+                // Retrieve professional DM template for this workspace
+                const dmTemplate = await this.getActiveDmTemplate(socialAccount.workspaceId);
+                
+                if (dmTemplate) {
+                  console.log(`[WEBHOOK] Using professional DM template: "${dmTemplate.messageText}" with button "${dmTemplate.buttonText}"`);
+                  
+                  // Use the new comment-to-DM automation with professional template
+                  const automationResult = await this.automation.sendCommentToDMAutomation(
+                    socialAccount.accessToken,
+                    commentId,
+                    commentResponse, // The comment reply we already sent
+                    value.from.id,   // Commenter's user ID
+                    socialAccount.workspaceId,
+                    rule.id,
+                    {
+                      messageText: dmTemplate.messageText,
+                      buttonText: dmTemplate.buttonText,
+                      buttonUrl: dmTemplate.buttonUrl
+                    }
+                  );
+                  
+                  if (automationResult.dmSuccess) {
+                    console.log(`[WEBHOOK] ✓ Professional DM sent successfully with template!`);
+                  } else {
+                    console.log(`[WEBHOOK] ✗ Professional DM failed: ${automationResult.errors?.join(', ')}`);
+                  }
+                } else {
+                  console.log(`[WEBHOOK] No DM template configured, using fallback DM`);
+                  
+                  // Fallback: Generate basic DM message
+                  let dmMessage;
+                  if (rule.type === 'comment_dm' && rule.action?.dmResponses && rule.action.dmResponses.length > 0) {
+                    dmMessage = rule.action.dmResponses[0];
+                  } else {
+                    dmMessage = `Hi ${value.from.username}! Thanks for your comment. Check your DMs for more details! 🎯`;
+                  }
+                  
+                  // Send basic DM without template
+                  const dmResult = await this.automation.sendAutomatedDM(
+                    socialAccount.accessToken,
+                    value.from.id,
+                    dmMessage,
+                    socialAccount.workspaceId,
+                    rule.id
+                  );
+                  
+                  if (dmResult.success) {
+                    console.log(`[WEBHOOK] ✓ Fallback DM sent successfully`);
+                  } else {
+                    console.log(`[WEBHOOK] ✗ Fallback DM failed: ${dmResult.error}`);
+                  }
+                }
+              } catch (error) {
+                console.error(`[WEBHOOK] Error in professional DM automation:`, error);
               }
             }
           } else {

@@ -134,22 +134,67 @@ export class InstagramAutomation {
       }
     } catch (error) {
       console.log(`[AUTOMATION] Comment exception:`, error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
   /**
-   * Send automated DM to a user
+   * Send automated DM to a user with professional template formatting
    */
   async sendAutomatedDM(
     accessToken: string,
     recipientId: string,
     message: string,
     workspaceId: string,
-    ruleId: string
+    ruleId: string,
+    template?: { messageText: string; buttonText: string; buttonUrl: string }
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      console.log(`[AUTOMATION] Sending DM to user ${recipientId}: "${message}"`);
+      console.log(`[AUTOMATION] Sending professional DM to user ${recipientId}`);
+      
+      // Create professional DM with template if provided
+      let dmPayload: any;
+      
+      if (template && template.buttonText && template.buttonUrl) {
+        // Professional template with timestamp, message, and button (like big companies)
+        const timestamp = this.formatProfessionalTimestamp();
+        const professionalMessage = `${timestamp}\n\n${template.messageText}`;
+        
+        console.log(`[AUTOMATION] Using professional template with button: "${template.buttonText}"`);
+        
+        // Instagram supports Generic Template for rich messages with buttons
+        dmPayload = {
+          recipient: { id: recipientId },
+          message: {
+            attachment: {
+              type: "template",
+              payload: {
+                template_type: "generic",
+                elements: [
+                  {
+                    title: professionalMessage,
+                    buttons: [
+                      {
+                        type: "web_url",
+                        url: template.buttonUrl,
+                        title: template.buttonText
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          access_token: accessToken
+        };
+      } else {
+        // Fallback to simple text message
+        dmPayload = {
+          recipient: { id: recipientId },
+          message: { text: message },
+          access_token: accessToken
+        };
+      }
       
       const response = await fetch(
         `https://graph.instagram.com/v22.0/me/messages`,
@@ -158,11 +203,7 @@ export class InstagramAutomation {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            recipient: { id: recipientId },
-            message: { text: message },
-            access_token: accessToken
-          })
+          body: JSON.stringify(dmPayload)
         }
       );
 
@@ -207,6 +248,74 @@ export class InstagramAutomation {
   }
 
   /**
+   * Format timestamp like professional companies (e.g., "JUL 15, 08:31 PM")
+   */
+  private formatProfessionalTimestamp(): string {
+    const now = new Date();
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                   'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    
+    const month = months[now.getMonth()];
+    const day = now.getDate();
+    const hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    
+    return `${month} ${day}, ${displayHours}:${minutes} ${ampm}`;
+  }
+
+  /**
+   * Send comment-to-DM automation (reply to comment + send professional DM)
+   */
+  async sendCommentToDMAutomation(
+    accessToken: string,
+    commentId: string,
+    commentReply: string,
+    commenterUserId: string,
+    workspaceId: string,
+    ruleId: string,
+    dmTemplate?: { messageText: string; buttonText: string; buttonUrl: string }
+  ): Promise<{ commentSuccess: boolean; dmSuccess: boolean; errors?: string[] }> {
+    try {
+      console.log(`[AUTOMATION] Starting comment-to-DM automation for comment ${commentId}`);
+      
+      const results = { commentSuccess: false, dmSuccess: false, errors: [] };
+      
+      // Step 1: Reply to the comment (like "Check your DMs!")
+      const commentResult = await this.sendAutomatedComment(
+        accessToken, commentId, commentReply, workspaceId, ruleId
+      );
+      
+      results.commentSuccess = commentResult.success;
+      if (!commentResult.success) {
+        results.errors.push(`Comment reply failed: ${commentResult.error}`);
+      }
+      
+      // Step 2: Send professional DM with template
+      const dmResult = await this.sendAutomatedDM(
+        accessToken, commenterUserId, '', workspaceId, ruleId, dmTemplate
+      );
+      
+      results.dmSuccess = dmResult.success;
+      if (!dmResult.success) {
+        results.errors.push(`DM failed: ${dmResult.error}`);
+      }
+      
+      console.log(`[AUTOMATION] Comment-to-DM automation completed - Comment: ${results.commentSuccess}, DM: ${results.dmSuccess}`);
+      
+      return results;
+    } catch (error) {
+      console.error(`[AUTOMATION] Comment-to-DM automation failed:`, error);
+      return {
+        commentSuccess: false,
+        dmSuccess: false,
+        errors: [`Automation failed: ${error.message}`]
+      };
+    }
+  }
+
+  /**
    * Process new mentions and trigger automation
    */
   async processMentions(workspaceId: string): Promise<void> {
@@ -242,7 +351,7 @@ export class InstagramAutomation {
         }
       }
     } catch (error) {
-      console.log(`[AUTOMATION] Error processing mentions:`, error);
+      console.log(`[AUTOMATION] Error processing mentions:`, error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -278,7 +387,7 @@ export class InstagramAutomation {
           console.log(`[AUTOMATION] Detected ${newFollowersCount} new followers`);
           
           // Update stored follower count
-          await this.storage.updateSocialAccount(instagramAccount.id, {
+          await this.storage.updateSocialAccount(instagramAccount.id as any, {
             followersCount: currentFollowers
           });
 
@@ -293,7 +402,7 @@ export class InstagramAutomation {
         }
       }
     } catch (error) {
-      console.log(`[AUTOMATION] Error processing new followers:`, error);
+      console.log(`[AUTOMATION] Error processing new followers:`, error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -339,7 +448,7 @@ export class InstagramAutomation {
         }
       }
     } catch (error) {
-      console.log(`[AUTOMATION] Error processing individual mention:`, error);
+      console.log(`[AUTOMATION] Error processing individual mention:`, error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -421,7 +530,7 @@ export class InstagramAutomation {
       }
       
       // Check if we have valid non-empty responses
-      const validResponses = responses.filter(r => r && r.trim() !== '');
+      const validResponses = responses.filter((r: any) => r && r.trim() !== '');
       if (validResponses.length > 0) {
         // Use pre-configured response
         const response = validResponses[Math.floor(Math.random() * validResponses.length)];
@@ -432,7 +541,7 @@ export class InstagramAutomation {
       // If no pre-configured response, return error - NO AI AUTOMATION
       console.log(`[AUTOMATION] No pre-configured response found, responses: ${JSON.stringify(responses)}`);
       console.log(`[AUTOMATION] ERROR: No valid pre-configured response available for this rule. AI automation is disabled.`);
-      return null;
+      return null as any;
       
     } catch (error) {
       console.error('[AI AUTOMATION] Response generation failed:', error);
