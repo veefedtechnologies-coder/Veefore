@@ -2157,22 +2157,21 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         topPlatform
       });
       
-      // REAL ENGAGEMENT RATE CALCULATION - USE ONLY AUTHENTIC DATA
+      // REALISTIC ENGAGEMENT RATE CALCULATION - Fix the inconsistency
       const totalEngagements = aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments;
-      const totalReach = Math.max(aggregatedMetrics.totalReach, aggregatedMetrics.totalViews);
       
-      // Calculate real engagement rate using available data
+      // Calculate realistic engagement rate using followers (industry standard)
       let engagementRate = 0;
-      if (totalReach > 0 && totalEngagements > 0) {
-        // Use reach if available (preferred)
-        engagementRate = (totalEngagements / totalReach) * 100;
-        console.log('[REAL DATA] Calculated engagement rate using reach:', engagementRate.toFixed(2), '%');
-      } else if (aggregatedMetrics.totalFollowers > 0 && totalEngagements > 0 && aggregatedMetrics.totalPosts > 0) {
-        // Fallback: Use followers and calculate per-post engagement rate
+      if (aggregatedMetrics.totalFollowers > 0 && totalEngagements > 0 && aggregatedMetrics.totalPosts > 0) {
+        // Standard calculation: Average engagement per post / followers * 100
         const avgEngagementPerPost = totalEngagements / aggregatedMetrics.totalPosts;
-        engagementRate = (avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100;
-        console.log('[REAL DATA] Calculated engagement rate using followers (per post):', engagementRate.toFixed(2), '%');
-        console.log('[REAL DATA] Details: avgEngagement/post =', avgEngagementPerPost.toFixed(1), ', followers =', aggregatedMetrics.totalFollowers);
+        engagementRate = Math.min((avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100, 100); // Cap at 100%
+        console.log('[ENGAGEMENT] Calculated realistic rate:', engagementRate.toFixed(2), '%');
+        console.log('[ENGAGEMENT] Formula: (', avgEngagementPerPost.toFixed(1), '÷', aggregatedMetrics.totalFollowers, ') × 100');
+      } else {
+        // Fallback: No engagement data available
+        engagementRate = 0;
+        console.log('[ENGAGEMENT] No engagement calculation possible - missing data');
       }
       
       console.log('[REAL DATA] Final engagement rate:', engagementRate.toFixed(2), '% (authentic calculation)');
@@ -2181,7 +2180,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         totalLikes: aggregatedMetrics.totalLikes,
         totalComments: aggregatedMetrics.totalComments,
         totalEngagements,
-        totalReach,
+        totalReach: aggregatedMetrics.totalReach,
         engagementRate,
         topPerformingPlatform: topPlatform
       });
@@ -2204,7 +2203,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         };
       }
       
-      const reachChange = calculateChange(totalReach, baselineReach);
+      const reachChange = calculateChange(aggregatedMetrics.totalReach, baselineReach);
       const engagementChange = calculateChange(engagementRate, baselineEngagement);
       const followersChange = calculateChange(aggregatedMetrics.totalFollowers, baselineFollowers);
       const contentScore = Math.round((aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments) / Math.max(aggregatedMetrics.totalPosts, 1) * 10);
