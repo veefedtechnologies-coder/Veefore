@@ -25,6 +25,7 @@ export function PerformanceScore() {
     const engagement = currentData?.engagement || 567
     const reach = currentData?.reach || 135
     const posts = currentData?.posts || 15
+    const period = currentData?.period || selectedPeriod
 
     const stories = {
       day: {
@@ -328,7 +329,8 @@ export function PerformanceScore() {
           followers: totalFollowers,
           engagement: avgEngagement, 
           reach: totalReach,
-          posts: totalPosts
+          posts: totalPosts,
+          period: selectedPeriod
         })
         
         return (
