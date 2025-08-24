@@ -26,7 +26,8 @@ import {
   Archive,
   Trash2,
   Square,
-  Edit2
+  Edit2,
+  Sparkles
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -1748,7 +1749,7 @@ export default function VeeGPT() {
                   )}
                   {message.role === 'assistant' && (
                     <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                      <Bot className="w-3 h-3 mr-1" />
+                      <Sparkles className="w-3 h-3 mr-1" />
                       VeeGPT
                     </div>
                   )}
