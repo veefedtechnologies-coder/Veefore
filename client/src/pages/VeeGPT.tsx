@@ -13,7 +13,6 @@ import {
   ChevronDown,
   MessageSquare,
   User,
-  Bot,
   Paperclip,
   Edit,
   Search,
@@ -54,21 +53,21 @@ const getIntelligentStatus = (question: string): string => {
   
   // Generate dynamic status based on analysis
   if (isMarketing && isStrategy) {
-    return isComplex ? '🎯 Analyzing marketing strategy complexity - preparing comprehensive multi-AI approach...' : '🎯 Processing marketing strategy request with strategic analysis...'
+    return isComplex ? 'Analyzing marketing strategy complexity - preparing comprehensive multi-AI approach...' : 'Processing marketing strategy request with strategic analysis...'
   } else if (isMarketing) {
-    return isSpecific ? '📈 Analyzing your specific marketing needs - coordinating specialized insights...' : '📈 Processing marketing request with campaign expertise...'
+    return isSpecific ? 'Analyzing your specific marketing needs - coordinating specialized insights...' : 'Processing marketing request with campaign expertise...'
   } else if (isCreative && isResearch) {
-    return '✨ Complex creative research detected - activating hybrid AI coordination...'
+    return 'Complex creative research detected - activating hybrid AI coordination...'
   } else if (isCreative) {
     return isComplex ? '✨ Analyzing creative complexity - preparing innovative multi-perspective approach...' : '✨ Processing creative request with innovative insights...'
   } else if (isResearch || isStrategy) {
     return '🔍 Analyzing strategic complexity - preparing comprehensive research and analysis...'
   } else if (isTechnical) {
-    return '⚙️ Processing technical request with advanced reasoning capabilities...'
+    return 'Processing technical request with advanced reasoning capabilities...'
   } else if (isComplex) {
-    return '🧠 Complex question detected - analyzing optimal AI coordination strategy...'
+    return 'Complex question detected - analyzing optimal AI coordination strategy...'
   } else {
-    return '🚀 Analyzing question and selecting optimal AI approach for best results...'
+    return 'Analyzing question and selecting optimal AI approach for best results...'
   }
 }
 
