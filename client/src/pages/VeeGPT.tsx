@@ -1760,9 +1760,6 @@ export default function VeeGPT() {
                               {convertToMarkdown(streamingContent[message.id] || '')}
                             </ReactMarkdown>
                           </div>
-                            {isGenerating && streamingContent[message.id] !== undefined && (
-                              <span className="animate-pulse text-blue-500 ml-1">▋</span>
-                            )}
                           </div>
                         ) : (
                           <div className="markdown-content">

@@ -344,10 +344,7 @@
   100% { transform: translateX(200%) skewX(-15deg); }
 }
 
-@keyframes typing-cursor {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
+/* Removed typing-cursor animation for natural AI responses */
 
 /* Premium Glass Morphism */
 .glass-premium {
