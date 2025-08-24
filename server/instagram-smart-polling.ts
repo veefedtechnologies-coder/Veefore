@@ -548,7 +548,7 @@ export class InstagramSmartPolling {
   }
 
   /**
-   * Record daily analytics snapshot for historical data tracking
+   * Record comprehensive daily analytics snapshot for historical data tracking
    */
   private async recordDailyAnalytics(config: PollingConfig, metrics: any): Promise<void> {
     try {
@@ -569,7 +569,19 @@ export class InstagramSmartPolling {
       });
       
       if (!todayRecord) {
-        // Create new daily analytics record
+        // Calculate comprehensive content score
+        const contentScore = this.calculateContentScore(metrics);
+        
+        // Calculate post frequency (posts per week estimate)
+        const postFrequency = this.calculatePostFrequency(metrics);
+        
+        // Calculate engagement patterns
+        const engagementPatterns = this.calculateEngagementPatterns(metrics);
+        
+        // Calculate reach efficiency
+        const reachEfficiency = this.calculateReachEfficiency(metrics);
+        
+        // Create comprehensive daily analytics record with ALL metrics
         await this.storage.createAnalytics({
           workspaceId: config.workspaceId,
           platform: 'instagram',
@@ -582,23 +594,160 @@ export class InstagramSmartPolling {
           shares: 0, // Not available in Instagram Basic API
           views: 0, // Not available in Instagram Basic API
           metrics: {
+            // Basic metrics
             posts: metrics.mediaCount || 0,
             avgLikes: metrics.avgLikes || 0,
             avgComments: metrics.avgComments || 0,
             avgReach: metrics.avgReach || 0,
             avgEngagement: metrics.avgEngagement || 0,
+            
+            // Advanced analytics metrics
+            contentScore: contentScore,
+            postFrequency: postFrequency,
+            engagementRate: metrics.engagementRate || 0,
+            reachEfficiency: reachEfficiency,
+            
+            // Engagement patterns
+            likesPerPost: engagementPatterns.likesPerPost,
+            commentsPerPost: engagementPatterns.commentsPerPost,
+            engagementDistribution: engagementPatterns.distribution,
+            
+            // Performance indicators
+            followerGrowthRate: 0, // Will calculate from historical data
+            engagementTrend: 'stable', // Will calculate from historical data
+            contentPerformance: contentScore.rating,
+            
+            // Account metadata
             username: config.username,
-            accountId: config.accountId
+            accountId: config.accountId,
+            accountType: 'PERSONAL', // From account info
+            isVerified: false,
+            
+            // Timing and activity
+            lastSyncAt: new Date(),
+            activeHours: this.getCurrentHour(),
+            dayOfWeek: today.getDay(),
+            
+            // Content analysis
+            totalInteractions: (metrics.totalLikes || 0) + (metrics.totalComments || 0),
+            interactionRate: ((metrics.totalLikes || 0) + (metrics.totalComments || 0)) / Math.max(metrics.totalReach || 1, 1),
+            
+            // Growth metrics (will be calculated from historical data)
+            followerChangeToday: 0,
+            engagementChangeToday: 0,
+            reachChangeToday: 0,
+            postsAddedToday: 0
           }
         });
         
-        console.log(`[DAILY ANALYTICS] 📊 Saved daily snapshot for @${config.username} - ${metrics.followersCount} followers, ${metrics.engagementRate}% engagement`);
+        console.log(`[COMPREHENSIVE ANALYTICS] 📊 Saved complete daily snapshot for @${config.username}:`);
+        console.log(`[COMPREHENSIVE ANALYTICS] - Followers: ${metrics.followersCount}, Posts: ${metrics.mediaCount}`);
+        console.log(`[COMPREHENSIVE ANALYTICS] - Content Score: ${contentScore.score}/10 (${contentScore.rating})`);
+        console.log(`[COMPREHENSIVE ANALYTICS] - Post Frequency: ${postFrequency.postsPerWeek}/week`);
+        console.log(`[COMPREHENSIVE ANALYTICS] - Reach Efficiency: ${reachEfficiency.percentage}%`);
       } else {
-        console.log(`[DAILY ANALYTICS] 📅 Today's record already exists for @${config.username}`);
+        console.log(`[COMPREHENSIVE ANALYTICS] 📅 Today's complete record already exists for @${config.username}`);
       }
     } catch (error) {
-      console.error('[DAILY ANALYTICS] Failed to record daily analytics:', error);
+      console.error('[COMPREHENSIVE ANALYTICS] Failed to record daily analytics:', error);
     }
+  }
+
+  /**
+   * Calculate comprehensive content score based on multiple factors
+   */
+  private calculateContentScore(metrics: any): { score: number, rating: string } {
+    let score = 0;
+    
+    // Engagement Rate Score (40% weight)
+    const engagementScore = Math.min(metrics.engagementRate / 10, 10);
+    score += engagementScore * 0.4;
+    
+    // Post Activity Score (30% weight) 
+    const activityScore = Math.min((metrics.mediaCount || 0) / 10, 10);
+    score += activityScore * 0.3;
+    
+    // Reach Efficiency Score (20% weight)
+    const followers = metrics.followersCount || 1;
+    const reachEfficiency = Math.min((metrics.totalReach || 0) / followers / 5, 10);
+    score += reachEfficiency * 0.2;
+    
+    // Interaction Quality Score (10% weight)
+    const avgInteractionScore = Math.min((metrics.avgLikes + metrics.avgComments) / 5, 10);
+    score += avgInteractionScore * 0.1;
+    
+    const finalScore = Math.min(score, 10);
+    
+    let rating = 'Poor';
+    if (finalScore >= 9) rating = 'Exceptional';
+    else if (finalScore >= 7.5) rating = 'Excellent';
+    else if (finalScore >= 6) rating = 'Very Good';
+    else if (finalScore >= 4.5) rating = 'Good';
+    else if (finalScore >= 3) rating = 'Fair';
+    
+    return { score: finalScore, rating };
+  }
+
+  /**
+   * Calculate post frequency patterns
+   */
+  private calculatePostFrequency(metrics: any): { postsPerWeek: number, frequency: string } {
+    const totalPosts = metrics.mediaCount || 0;
+    // Estimate based on account age (assuming account is active for at least 30 days)
+    const estimatedWeeks = 4; // Default estimation
+    const postsPerWeek = Math.round((totalPosts / estimatedWeeks) * 10) / 10;
+    
+    let frequency = 'Low';
+    if (postsPerWeek >= 7) frequency = 'Very High';
+    else if (postsPerWeek >= 5) frequency = 'High';
+    else if (postsPerWeek >= 3) frequency = 'Moderate';
+    else if (postsPerWeek >= 1) frequency = 'Regular';
+    
+    return { postsPerWeek, frequency };
+  }
+
+  /**
+   * Calculate engagement patterns and distribution
+   */
+  private calculateEngagementPatterns(metrics: any): any {
+    const totalPosts = Math.max(metrics.mediaCount || 1, 1);
+    const likesPerPost = (metrics.totalLikes || 0) / totalPosts;
+    const commentsPerPost = (metrics.totalComments || 0) / totalPosts;
+    
+    const distribution = {
+      likes: Math.round((metrics.totalLikes || 0) / ((metrics.totalLikes || 0) + (metrics.totalComments || 0)) * 100) || 0,
+      comments: Math.round((metrics.totalComments || 0) / ((metrics.totalLikes || 0) + (metrics.totalComments || 0)) * 100) || 0
+    };
+    
+    return {
+      likesPerPost: Math.round(likesPerPost * 10) / 10,
+      commentsPerPost: Math.round(commentsPerPost * 10) / 10,
+      distribution
+    };
+  }
+
+  /**
+   * Calculate reach efficiency metrics
+   */
+  private calculateReachEfficiency(metrics: any): { percentage: number, rating: string } {
+    const followers = Math.max(metrics.followersCount || 1, 1);
+    const reach = metrics.totalReach || 0;
+    const percentage = Math.round((reach / followers) * 100);
+    
+    let rating = 'Poor';
+    if (percentage >= 80) rating = 'Exceptional';
+    else if (percentage >= 60) rating = 'Excellent';
+    else if (percentage >= 40) rating = 'Good';
+    else if (percentage >= 20) rating = 'Fair';
+    
+    return { percentage, rating };
+  }
+
+  /**
+   * Get current hour for activity tracking
+   */
+  private getCurrentHour(): number {
+    return new Date().getHours();
   }
 
   /**

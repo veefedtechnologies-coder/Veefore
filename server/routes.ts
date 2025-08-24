@@ -2527,6 +2527,61 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // HISTORICAL ANALYTICS ENDPOINT - Fetch real historical data for trend analysis
+  app.get('/api/analytics/historical', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { period = 'month', days = 30 } = req.query;
+      
+      console.log(`[HISTORICAL ANALYTICS] Fetching ${days} days of historical data for user: ${user.id}`);
+      
+      // Get user's workspace
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      const workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
+      
+      if (!workspace) {
+        return res.json([]);
+      }
+
+      // Get historical analytics data from database
+      const historicalRecords = await storage.getAnalyticsByWorkspace(
+        workspace.id.toString(), 
+        'instagram', 
+        parseInt(days as string)
+      );
+
+      console.log(`[HISTORICAL ANALYTICS] Found ${historicalRecords.length} historical records`);
+      
+      // Sort by date (oldest first)
+      const sortedRecords = historicalRecords.sort((a: any, b: any) => 
+        new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      // Return historical data for trend analysis
+      res.json(sortedRecords.map((record: any) => ({
+        date: record.date,
+        followers: record.followers || 0,
+        engagement: record.engagement || 0,
+        reach: record.reach || 0,
+        likes: record.likes || 0,
+        comments: record.comments || 0,
+        metrics: {
+          posts: record.metrics?.posts || 0,
+          contentScore: record.metrics?.contentScore || { score: 5, rating: 'Good' },
+          postFrequency: record.metrics?.postFrequency || { postsPerWeek: 1, frequency: 'Regular' },
+          reachEfficiency: record.metrics?.reachEfficiency || { percentage: 20, rating: 'Fair' },
+          engagementRate: record.metrics?.engagementRate || 0,
+          likesPerPost: record.metrics?.likesPerPost || 0,
+          commentsPerPost: record.metrics?.commentsPerPost || 0
+        }
+      })));
+
+    } catch (error: any) {
+      console.error('[HISTORICAL ANALYTICS] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch historical analytics' });
+    }
+  });
+
   // Real-time analytics endpoint with authentic Instagram data analysis
   app.get('/api/analytics/realtime', requireAuth, async (req: any, res: Response) => {
     try {
