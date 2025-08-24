@@ -25,9 +25,7 @@ import {
   Archive,
   Trash2,
   Square,
-  Edit2,
-  Sparkles,
-  Brain
+  Edit2
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -1745,7 +1743,7 @@ export default function VeeGPT() {
                   )}
                   {message.role === 'assistant' && (
                     <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                      <span className="text-purple-600 font-bold mr-1">logo</span>
+                      <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4 mr-1" />
                       {isGenerating ? "eegpt is Working..." : "eegpt 🚀 Mission Accomplished!"}
                     </div>
                   )}
@@ -1857,7 +1855,7 @@ export default function VeeGPT() {
               <div className="flex flex-col space-y-2 items-start">
                 <div className="max-w-4xl w-full">
                   <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                    <span className="text-purple-600 font-bold mr-1">logo</span>
+                    <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4 mr-1" />
                     {isGenerating ? "eegpt is Working..." : "eegpt 🚀 Mission Accomplished!"}
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
