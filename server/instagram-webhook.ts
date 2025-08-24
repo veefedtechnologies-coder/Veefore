@@ -229,6 +229,24 @@ export class InstagramWebhookHandler {
             shouldSync = true;
             syncReasons.push('story insights updated');
           }
+          
+          // ✅ NEW: Sync on follower count changes (follows/unfollows)
+          if (change.field === 'follows' || change.field === 'followers' || change.field === 'user_follows') {
+            shouldSync = true;
+            syncReasons.push('follower count changed');
+          }
+          
+          // ✅ NEW: Sync on account level changes (follower_count, media_count updates)
+          if (change.field === 'account' || change.field === 'profile' || change.field === 'business_account') {
+            shouldSync = true;
+            syncReasons.push('account profile updated');
+          }
+          
+          // ✅ NEW: Handle any field that might indicate follower changes
+          if (change.field === 'insights' || change.field === 'user_insights') {
+            shouldSync = true;
+            syncReasons.push('account insights updated');
+          }
         }
       }
 
