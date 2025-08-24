@@ -2153,13 +2153,21 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const totalEngagements = aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments;
       const totalReach = Math.max(aggregatedMetrics.totalReach, aggregatedMetrics.totalViews);
       
-      // Calculate real engagement rate only if we have real reach data
+      // Calculate real engagement rate using available data
       let engagementRate = 0;
       if (totalReach > 0 && totalEngagements > 0) {
+        // Use reach if available (preferred)
         engagementRate = (totalEngagements / totalReach) * 100;
+        console.log('[REAL DATA] Calculated engagement rate using reach:', engagementRate.toFixed(2), '%');
+      } else if (aggregatedMetrics.totalFollowers > 0 && totalEngagements > 0 && aggregatedMetrics.totalPosts > 0) {
+        // Fallback: Use followers and calculate per-post engagement rate
+        const avgEngagementPerPost = totalEngagements / aggregatedMetrics.totalPosts;
+        engagementRate = (avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100;
+        console.log('[REAL DATA] Calculated engagement rate using followers (per post):', engagementRate.toFixed(2), '%');
+        console.log('[REAL DATA] Details: avgEngagement/post =', avgEngagementPerPost.toFixed(1), ', followers =', aggregatedMetrics.totalFollowers);
       }
       
-      console.log('[REAL DATA] Using authentic engagement rate:', engagementRate, '% (no fake overrides)');
+      console.log('[REAL DATA] Final engagement rate:', engagementRate.toFixed(2), '% (authentic calculation)');
 
       console.log('[MULTI-PLATFORM ENGAGEMENT] Cross-platform engagement analysis:', {
         totalLikes: aggregatedMetrics.totalLikes,
