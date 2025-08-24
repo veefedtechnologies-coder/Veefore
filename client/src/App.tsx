@@ -221,7 +221,10 @@ function App() {
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
                     {/* Left Column - Performance Score + Get Started + Scheduled Posts + Drafts */}
                     <div className="space-y-6">
-                      <PerformanceScore />
+                      {/* <PerformanceScore /> */}
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Performance component temporarily disabled</p>
+                      </div>
                       <GetStarted />
                       <ScheduledPostsSection />
                       <DraftsSection />
