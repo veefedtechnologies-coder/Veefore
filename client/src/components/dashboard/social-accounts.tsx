@@ -12,12 +12,12 @@ export function SocialAccounts() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   
-  // Fetch real social accounts data - Ultra-responsive updates
+  // Fetch social accounts data - Balanced updates with rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 5000, // Refresh every 5 seconds for immediate data changes
-    staleTime: 0, // Always fetch latest data when needed
+    refetchInterval: 30000, // 30 seconds - conservative for rate limit safety
+    staleTime: 10000, // 10 seconds cache to prevent excessive requests
   })
 
   // Manual sync mutation for Instagram data - IMMEDIATE mode
@@ -71,11 +71,11 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - Much more responsive for immediate updates
+  // Polling status query - Rate limit safe
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 3000, // Check status every 3 seconds for immediate updates
+    refetchInterval: 60000, // 1 minute - much safer for rate limits
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 

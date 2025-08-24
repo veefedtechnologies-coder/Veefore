@@ -24,18 +24,19 @@ export class InstagramSmartPolling {
   private pollingConfigs: Map<string, PollingConfig> = new Map();
   private rateLimitTrackers: Map<string, RateLimitTracker> = new Map();
   private pollingIntervals: Map<string, NodeJS.Timeout> = new Map();
+  private requestHistory: Array<{ timestamp: number; accountId: string }> = [];
   
   // Instagram API rate limits: 200 requests per hour per user
   private readonly MAX_REQUESTS_PER_HOUR = 200;
   private readonly HOUR_IN_MS = 60 * 60 * 1000;
   
-  // Adaptive polling intervals (in milliseconds) - ULTRA-RESPONSIVE for immediate updates
+  // SECURE polling intervals respecting Instagram's 200 req/hour limit (18 seconds minimum)
   private readonly INTERVALS = {
-    ACTIVE_USER: 3 * 1000,       // 3 seconds when user is active (IMMEDIATE updates)
-    NORMAL: 10 * 1000,           // 10 seconds normal (very fast)
-    REDUCED: 30 * 1000,          // 30 seconds when no changes (still responsive)
-    MINIMAL: 1 * 60 * 1000,      // 1 minute when inactive (much faster)
-    NIGHT: 2 * 60 * 1000         // 2 minutes during night hours (still responsive)
+    ACTIVE_USER: 20 * 1000,      // 20 seconds when user is active (SAFE + responsive)
+    NORMAL: 45 * 1000,           // 45 seconds normal (within limits)
+    REDUCED: 2 * 60 * 1000,      // 2 minutes when no changes
+    MINIMAL: 5 * 60 * 1000,      // 5 minutes when inactive
+    NIGHT: 10 * 60 * 1000        // 10 minutes during night hours
   };
 
   constructor(storage: IStorage) {
@@ -439,8 +440,8 @@ export class InstagramSmartPolling {
     return {
       totalAccounts: this.pollingConfigs.size,
       activeAccounts: Array.from(this.pollingConfigs.values()).filter(config => config.isActive).length,
-      totalRequestsToday: this.requestHistory.length,
-      rateLimitRemaining: Math.max(0, this.MAX_REQUESTS_PER_HOUR - this.requestHistory.length),
+      totalRequestsToday: this.requestHistory?.length || 0,
+      rateLimitRemaining: Math.max(0, this.MAX_REQUESTS_PER_HOUR - (this.requestHistory?.length || 0)),
       accounts: accounts
     };
   }
