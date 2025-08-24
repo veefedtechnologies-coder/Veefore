@@ -1703,7 +1703,9 @@ export default function VeeGPT() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <h1 className="text-lg font-semibold text-gray-900">VeeGPT</h1>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {isGenerating ? "VeeGPT is Working..." : "VeeGPT"}
+                </h1>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </div>
             </div>
@@ -1746,7 +1748,7 @@ export default function VeeGPT() {
                   {message.role === 'assistant' && (
                     <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
                       <Sparkles className="w-3 h-3 mr-1" />
-                      VeeGPT
+                      {isGenerating ? "VeeGPT is Working..." : "VeeGPT"}
                     </div>
                   )}
                   <div className={`px-4 py-3 rounded-2xl ${
@@ -1858,7 +1860,7 @@ export default function VeeGPT() {
                 <div className="max-w-4xl w-full">
                   <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
                     <Brain className="w-3 h-3 mr-1" />
-                    VeeGPT
+                    {isGenerating ? "VeeGPT is Working..." : "VeeGPT"}
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
                     <div className="flex items-center text-gray-600">
