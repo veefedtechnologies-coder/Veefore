@@ -304,8 +304,8 @@ export class InstagramSmartPolling {
       this.recordRequest(accountId);
       this.recordRequestHistory(accountId);
 
-      // Make comprehensive Instagram API call
-      const apiUrl = `https://graph.instagram.com/me?fields=followers_count,media_count,following_count,account_type&access_token=${config.accessToken}`;
+      // Make comprehensive Instagram API call (using only available fields)
+      const apiUrl = `https://graph.instagram.com/me?fields=followers_count,media_count,account_type&access_token=${config.accessToken}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -315,7 +315,6 @@ export class InstagramSmartPolling {
 
       const newFollowerCount = data.followers_count;
       const mediaCount = data.media_count;
-      const followingCount = data.following_count;
       
       // Fetch comprehensive engagement metrics
       const engagementMetrics = await this.fetchEngagementMetrics(config.accessToken);
@@ -339,10 +338,9 @@ export class InstagramSmartPolling {
         
         console.log(`[SMART POLLING] 📊 Changes detected for @${config.username}: ${changes.join(', ')}`);
         
-        // Update database with ALL metrics
+        // Update database with ALL available metrics
         await this.updateAccountData(config, {
           followersCount: newFollowerCount,
-          followingCount: followingCount,
           mediaCount: mediaCount,
           avgLikes: engagementMetrics.avgLikes,
           avgComments: engagementMetrics.avgComments,
