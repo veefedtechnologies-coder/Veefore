@@ -586,8 +586,8 @@ export default function VeeGPT() {
 
     switch (data.type) {
       case 'status':
-        // Real-time AI processing status updates - but only if not already streaming content
-        if (!isContentStreaming) {
+        // Real-time AI processing status updates - but ONLY before streaming starts
+        if (!isContentStreaming && !isGeneratingRef.current) {
           console.log('VeeGPT: STATUS UPDATE:', data.content || data.status)
           setAiStatus(data.content || data.status)
           
@@ -602,7 +602,7 @@ export default function VeeGPT() {
             setAiStatus(null)
           }, 3000)
         } else {
-          console.log('VeeGPT: STATUS UPDATE IGNORED (content streaming):', data.content || data.status)
+          console.log('VeeGPT: STATUS UPDATE IGNORED (streaming active):', data.content || data.status)
         }
         break
 
@@ -623,7 +623,8 @@ export default function VeeGPT() {
         break
 
       case 'aiMessageStart':
-        // Don't clear status yet - wait for first chunk
+        // Clear status immediately when AI generation starts
+        setAiStatus(null)
         
         // Initialize streaming content for this message
         if (data.messageId) {
