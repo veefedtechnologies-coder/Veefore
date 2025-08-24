@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
+import { useLocation } from 'wouter'
 import { apiRequest } from '@/lib/queryClient'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye } from 'lucide-react'
 
 export function PerformanceScore() {
+  const [, setLocation] = useLocation()
+  
   // Fetch real dashboard analytics data
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
@@ -196,7 +199,10 @@ export function PerformanceScore() {
                 <span className="text-sm font-medium text-blue-700">LinkedIn</span>
               </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold text-lg">
+            <Button 
+              onClick={() => setLocation('/integration')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold text-lg"
+            >
               Connect Your First Platform
             </Button>
           </div>
