@@ -145,19 +145,11 @@ export class InstagramCommentWebhookHandler {
         buttonUrl: dmTemplate.buttonUrl
       });
 
-      // Convert Instagram User ID to PSID (use pageId from account or fallback to accountId)
-      const pageIdToUse = socialAccount.pageId || socialAccount.accountId || instagramAccountId;
-      const psid = await this.convertToPSID(commentData.from.id, pageIdToUse, socialAccount);
-      if (!psid) {
-        console.log('[INSTAGRAM WEBHOOK] Failed to convert Instagram User ID to PSID');
-        return;
-      }
-
-      console.log('[INSTAGRAM WEBHOOK] Converted to PSID:', psid);
-
-      // Send dynamic button-style DM
-      await this.sendDynamicMessage(
-        psid,
+      // Send Instagram direct message without PSID conversion
+      console.log('[INSTAGRAM WEBHOOK] Sending DM directly to Instagram user:', commentData.from.id);
+      
+      await this.sendInstagramDirectMessage(
+        commentData.from.id,
         dmTemplate.messageText,
         dmTemplate.buttonText,
         dmTemplate.buttonUrl,
@@ -269,7 +261,78 @@ export class InstagramCommentWebhookHandler {
   }
 
   /**
-   * Send dynamic button-style message using Messenger Send API
+   * Send Instagram direct message with button using Instagram API
+   */
+  private async sendInstagramDirectMessage(
+    instagramUserId: string,
+    messageText: string,
+    buttonText: string,
+    buttonUrl: string,
+    socialAccount?: any
+  ): Promise<void> {
+    try {
+      // Use Instagram's direct messaging API instead of Messenger
+      let accessToken = process.env.PAGE_ACCESS_TOKEN || process.env.INSTAGRAM_PAGE_ACCESS_TOKEN;
+      
+      if (!accessToken && socialAccount?.accessToken) {
+        accessToken = socialAccount.accessToken;
+        console.log('[INSTAGRAM WEBHOOK] Using Instagram account access token for DM');
+      }
+      
+      if (!accessToken) {
+        throw new Error('No access token available for Instagram messaging');
+      }
+
+      // Instagram Generic Template message with button
+      const messageData = {
+        recipient: {
+          id: instagramUserId
+        },
+        message: {
+          attachment: {
+            type: "template",
+            payload: {
+              template_type: "generic",
+              elements: [{
+                title: "VeeFore AI",
+                subtitle: messageText,
+                buttons: [{
+                  type: "web_url",
+                  url: buttonUrl,
+                  title: buttonText
+                }]
+              }]
+            }
+          }
+        }
+      };
+
+      const response = await fetch(`https://graph.facebook.com/v20.0/me/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify(messageData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[INSTAGRAM WEBHOOK] Instagram DM API error:', errorData);
+        throw new Error(`Instagram messaging failed: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+
+      const result = await response.json();
+      console.log('[INSTAGRAM WEBHOOK] Instagram DM sent successfully:', result);
+
+    } catch (error) {
+      console.error('[INSTAGRAM WEBHOOK] Error sending Instagram DM:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send dynamic button-style message using Messenger Send API (DEPRECATED - kept for fallback)
    */
   private async sendDynamicMessage(
     psid: string,
