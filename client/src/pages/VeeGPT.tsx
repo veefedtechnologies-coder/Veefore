@@ -1026,7 +1026,7 @@ export default function VeeGPT() {
         <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
             {/* Top Header with Logo */}
             <div className="p-3 flex items-center justify-between">
               <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
@@ -1045,7 +1045,7 @@ export default function VeeGPT() {
             </div>
 
             {/* Navigation Menu */}
-            <div className="px-3 pb-3 space-y-1">
+            <div className="px-3 pb-6 space-y-1">
               <button
                 onClick={startNewChat}
                 className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1081,22 +1081,23 @@ export default function VeeGPT() {
               </button>
             </div>
 
-            {/* Search Input */}
-            {showSearchInput && !sidebarCollapsed && (
-              <div className="px-4 pb-4">
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                />
-              </div>
-            )}
-
-            {/* Conversations Section */}
+            {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto">
+              {/* Search Input */}
+              {showSearchInput && !sidebarCollapsed && (
+                <div className="px-3 pb-4">
+                  <input
+                    type="text"
+                    placeholder="Search conversations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
+                  />
+                </div>
+              )}
+
+              {/* Conversations Section */}
               <div className="px-3">
                 {!sidebarCollapsed && (
                   <div className="text-sm font-medium text-gray-500 mb-3 px-2">
@@ -1231,7 +1232,7 @@ export default function VeeGPT() {
               </div>
             </div>
 
-            {/* Bottom User Section */}
+            {/* Bottom User Section - Fixed */}
             <div className="p-3 border-t border-gray-200">
               <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
@@ -1466,7 +1467,7 @@ export default function VeeGPT() {
       <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
             {/* Top Header with Logo */}
             <div className="p-3 flex items-center justify-between">
               <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
@@ -1485,7 +1486,7 @@ export default function VeeGPT() {
             </div>
 
             {/* Navigation Menu */}
-            <div className="px-3 pb-3 space-y-1">
+            <div className="px-3 pb-6 space-y-1">
               <button
                 onClick={startNewChat}
                 className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1697,7 +1698,7 @@ export default function VeeGPT() {
               </div>
             </div>
 
-            {/* Bottom User Section */}
+            {/* Bottom User Section - Fixed */}
             <div className="p-3 border-t border-gray-200">
               <div className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                 <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
