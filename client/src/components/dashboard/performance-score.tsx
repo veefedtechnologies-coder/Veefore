@@ -13,14 +13,19 @@ export function PerformanceScore() {
     queryKey: ['/api/dashboard/analytics'],
     queryFn: () => apiRequest('/api/dashboard/analytics'),
     refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 5000, // Consider data stale after 5 seconds
   })
 
   // Fetch real social accounts data  
-  const { data: socialAccounts } = useQuery({
+  const { data: socialAccounts, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
     refetchInterval: 30000,
+    staleTime: 5000, // Consider data stale after 5 seconds
   })
+
+  // Debug logging
+  console.log('Performance Score - Social accounts data:', socialAccounts)
 
   if (isLoading) {
     return (
@@ -44,8 +49,11 @@ export function PerformanceScore() {
     )
   }
 
-  // Map real connected platforms from social accounts
-  const connectedPlatforms = socialAccounts?.filter((account: any) => account.isConnected || account.followersCount > 0)?.map((account: any) => ({
+  // Map real connected platforms from social accounts - improved filtering
+  const connectedPlatforms = socialAccounts?.filter((account: any) => {
+    console.log('Filtering account:', account.username, 'followers:', account.followersCount, 'isConnected:', account.isConnected, 'hasToken:', !!account.accessToken)
+    return account.isConnected || account.followersCount > 0 || account.accessToken
+  })?.map((account: any) => ({
     name: account.platform === 'instagram' ? 'Instagram' : 
           account.platform === 'youtube' ? 'YouTube' : 
           account.platform === 'twitter' ? 'Twitter' : 

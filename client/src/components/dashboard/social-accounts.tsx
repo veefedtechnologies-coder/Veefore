@@ -11,16 +11,23 @@ export function SocialAccounts() {
   const [, setLocation] = useLocation()
   
   // Fetch real social accounts data
-  const { data: socialAccounts, isLoading } = useQuery({
+  const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
     refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 5000, // Consider data stale after 5 seconds
   })
 
-  // Filter for connected accounts with real data
-  const connectedAccounts = socialAccounts?.filter((account: any) => 
-    account.isConnected || account.followersCount > 0 || account.accessToken
-  ) || []
+  // Debug logging
+  console.log('Social Accounts - Raw data:', socialAccounts)
+
+  // Filter for connected accounts with real data - improved logic
+  const connectedAccounts = socialAccounts?.filter((account: any) => {
+    console.log('Social Accounts - Filtering account:', account.username, 'followers:', account.followersCount, 'isConnected:', account.isConnected, 'hasToken:', !!account.accessToken)
+    return account.isConnected || account.followersCount > 0 || account.accessToken
+  }) || []
+  
+  console.log('Social Accounts - Connected accounts:', connectedAccounts.length)
 
   const [selectedAccount, setSelectedAccount] = useState(connectedAccounts[0]?.platform || 'instagram')
 
