@@ -254,10 +254,17 @@ function App() {
                   })
                   if (response.ok) {
                     console.log('✅ Onboarding completed successfully!')
-                    // Immediately open walkthrough modal
-                    setIsWalkthroughOpen(true)
+                    
+                    // First, close the onboarding modal immediately
+                    setIsOnboardingModalOpen(false)
+                    
                     // Invalidate and refetch user data in background
                     queryClient.invalidateQueries({ queryKey: ['/api/user'] })
+                    
+                    // Wait a bit for the modal to close, then start the guided tour
+                    setTimeout(() => {
+                      setIsWalkthroughOpen(true)
+                    }, 500) // Small delay to ensure modal closes first
                   } else {
                     console.error('❌ Failed to complete onboarding')
                   }
