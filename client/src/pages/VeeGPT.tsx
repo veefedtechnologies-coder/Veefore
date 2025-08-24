@@ -27,7 +27,8 @@ import {
   Trash2,
   Square,
   Edit2,
-  Sparkles
+  Sparkles,
+  Brain
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
@@ -1861,7 +1862,7 @@ export default function VeeGPT() {
               <div className="flex flex-col space-y-2 items-start">
                 <div className="max-w-4xl w-full">
                   <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
-                    <Bot className="w-3 h-3 mr-1" />
+                    <Brain className="w-3 h-3 mr-1" />
                     VeeGPT
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
