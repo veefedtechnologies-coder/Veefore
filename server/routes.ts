@@ -2231,27 +2231,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Update multi-platform cache for future requests
       dashboardCache.updateCache(workspaceIdStr, responseData);
       
-      // Background sync for all connected platforms - with phantom account prevention
-      setImmediate(() => {
-        // Sync Instagram data ONLY if real accounts exist and have access tokens
-        if (aggregatedMetrics.platformData.instagram && allSocialAccounts.length > 0) {
-          const instagramAccounts = allSocialAccounts.filter((acc: any) => 
-            acc.platform === 'instagram' && acc.isActive && acc.accessToken
-          );
-          
-          if (instagramAccounts.length > 0) {
-            console.log(`[MULTI-PLATFORM] Starting background sync for ${instagramAccounts.length} verified Instagram accounts`);
-            instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
-              .then(() => console.log('[MULTI-PLATFORM] Instagram background sync completed'))
-              .catch((error) => console.log('[MULTI-PLATFORM] Instagram sync error:', error.message));
-          } else {
-            console.log('[MULTI-PLATFORM] No verified Instagram accounts with access tokens - skipping background sync');
-          }
-        } else {
-          console.log('[MULTI-PLATFORM] No Instagram platform data or accounts found - skipping background sync');
-        }
-        // Additional platform syncs can be added here for YouTube, X, etc.
-      });
+      // Background sync disabled - webhooks handle real-time updates
+      // setImmediate(() => {
+      //   // Sync Instagram data ONLY if real accounts exist and have access tokens
+      //   if (aggregatedMetrics.platformData.instagram && allSocialAccounts.length > 0) {
+      //     const instagramAccounts = allSocialAccounts.filter((acc: any) => 
+      //       acc.platform === 'instagram' && acc.isActive && acc.accessToken
+      //     );
+      //     
+      //     if (instagramAccounts.length > 0) {
+      //       console.log(`[MULTI-PLATFORM] Starting background sync for ${instagramAccounts.length} verified Instagram accounts`);
+      //       instagramDirectSync.updateAccountWithRealData(workspaceIdStr)
+      //         .then(() => console.log('[MULTI-PLATFORM] Instagram background sync completed'))
+      //         .catch((error) => console.log('[MULTI-PLATFORM] Instagram sync error:', error.message));
+      //     } else {
+      //       console.log('[MULTI-PLATFORM] No verified Instagram accounts with access tokens - skipping background sync');
+      //     }
+      //   } else {
+      //     console.log('[MULTI-PLATFORM] No Instagram platform data or accounts found - skipping background sync');
+      //   }
+      //   // Additional platform syncs can be added here for YouTube, X, etc.
+      // });
+      
+      console.log('[MULTI-PLATFORM] ❌ Background sync disabled - webhooks provide real-time updates');
 
       res.json(responseData);
 
