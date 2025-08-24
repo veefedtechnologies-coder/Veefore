@@ -3679,6 +3679,20 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       console.log(`[INSTAGRAM CALLBACK] Social account saved successfully`);
       
+      // Sync analytics data immediately after successful connection
+      console.log(`[INSTAGRAM CALLBACK] Starting analytics sync for @${profile.username}...`);
+      try {
+        const { InstagramSyncService } = await import('./instagram-sync-service');
+        const syncService = new InstagramSyncService();
+        
+        // Sync analytics data for the connected account
+        await syncService.syncInstagramAccount(profile.id, longLivedToken.access_token, workspaceId.toString());
+        console.log(`[INSTAGRAM CALLBACK] ✅ Analytics sync completed for @${profile.username}`);
+      } catch (syncError) {
+        console.error(`[INSTAGRAM CALLBACK] Analytics sync failed:`, syncError);
+        // Don't block the connection if sync fails
+      }
+      
       // If this is during onboarding, also create default workspace if needed
       if (stateData.source === 'onboarding' && stateData.userId) {
         console.log(`[INSTAGRAM CALLBACK] Creating default workspace for onboarding user ${stateData.userId}`);
@@ -3710,6 +3724,59 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
       
       res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(errorMessage)}`);
+    }
+  });
+
+  // Manual Instagram analytics sync endpoint
+  app.post('/api/instagram/sync/:accountId', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { accountId } = req.params;
+      
+      console.log(`[INSTAGRAM SYNC] Manual sync requested for account ${accountId} by user ${user.id}`);
+      
+      // Get the social account to verify ownership and get access token
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      let socialAccount = null;
+      
+      for (const workspace of workspaces) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        socialAccount = accounts.find(acc => acc.id === accountId && acc.platform === 'instagram');
+        if (socialAccount) break;
+      }
+      
+      if (!socialAccount) {
+        return res.status(404).json({ error: 'Instagram account not found or access denied' });
+      }
+      
+      if (!socialAccount.accessToken) {
+        return res.status(400).json({ error: 'Instagram account has no access token. Please reconnect the account.' });
+      }
+      
+      console.log(`[INSTAGRAM SYNC] Starting manual sync for @${socialAccount.username}...`);
+      
+      // Import and run the sync service
+      const { InstagramSyncService } = await import('./instagram-sync-service');
+      const syncService = new InstagramSyncService();
+      
+      // Sync analytics data
+      await syncService.syncInstagramAccount(socialAccount.accountId, socialAccount.accessToken, socialAccount.workspaceId);
+      
+      console.log(`[INSTAGRAM SYNC] ✅ Manual sync completed for @${socialAccount.username}`);
+      
+      // Return updated account data
+      const updatedAccounts = await storage.getSocialAccountsByWorkspace(socialAccount.workspaceId);
+      const updatedAccount = updatedAccounts.find(acc => acc.id === accountId);
+      
+      res.json({ 
+        success: true, 
+        message: `Analytics synced successfully for @${socialAccount.username}`,
+        account: updatedAccount
+      });
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM SYNC] Manual sync error:', error);
+      res.status(500).json({ error: error.message || 'Failed to sync Instagram analytics' });
     }
   });
 
