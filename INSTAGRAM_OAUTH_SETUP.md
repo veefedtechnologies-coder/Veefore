@@ -8,9 +8,9 @@ The Instagram OAuth is failing because the redirect URI in your Facebook Develop
 ### 1. Facebook Developer Console Setup
 Go to [Facebook for Developers](https://developers.facebook.com/) and update your Instagram Basic Display app:
 
-**Current Replit Domain:** `87f5fabc-836d-4fa7-b2af-5e95500eefe2-00-f78zxz6hwhnw.janeway.replit.dev`
+**Current Replit Domain:** `393861ee-ce5d-42cd-9ffd-40f54ad0f848-00-ppbc7nwodik9.kirk.replit.dev`
 
-**Required Redirect URI:** `https://87f5fabc-836d-4fa7-b2af-5e95500eefe2-00-f78zxz6hwhnw.janeway.replit.dev/api/instagram/callback`
+**Required Redirect URI:** `https://393861ee-ce5d-42cd-9ffd-40f54ad0f848-00-ppbc7nwodik9.kirk.replit.dev/api/instagram/callback`
 
 ### 2. Steps to Fix:
 
@@ -22,7 +22,7 @@ Go to [Facebook for Developers](https://developers.facebook.com/) and update you
    - Go to Instagram Basic Display → Basic Display
    - In "OAuth Redirect URIs" section, add:
      ```
-     https://87f5fabc-836d-4fa7-b2af-5e95500eefe2-00-f78zxz6hwhnw.janeway.replit.dev/api/instagram/callback
+     https://393861ee-ce5d-42cd-9ffd-40f54ad0f848-00-ppbc7nwodik9.kirk.replit.dev/api/instagram/callback
      ```
 
 3. **Update Valid OAuth Redirect URIs**
@@ -31,7 +31,7 @@ Go to [Facebook for Developers](https://developers.facebook.com/) and update you
    - Save changes
 
 4. **Webhook Configuration** (Optional)
-   - Webhook URL: `https://87f5fabc-836d-4fa7-b2af-5e95500eefe2-00-f78zxz6hwhnw.janeway.replit.dev/webhook/instagram`
+   - Webhook URL: `https://393861ee-ce5d-42cd-9ffd-40f54ad0f848-00-ppbc7nwodik9.kirk.replit.dev/webhook/instagram`
    - Verify Token: Use the value from `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` secret
 
 ### 3. Test the Integration
