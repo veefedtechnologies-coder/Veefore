@@ -3519,8 +3519,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log(`[INSTAGRAM AUTH] Redirect URI: ${redirectUri}`);
       console.log(`[INSTAGRAM AUTH] State data:`, stateData);
       
-      // Instagram Business API OAuth - proper business scopes for real engagement data
-      const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights&state=${state}`;
+      // Instagram Business API OAuth via Facebook Graph API - proper business scopes for real engagement data
+      const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=instagram_basic%2Cinstagram_manage_messages%2Cinstagram_manage_comments%2Cinstagram_content_publish%2Cpages_show_list%2Cpages_read_engagement&state=${state}`;
       
       res.json({ authUrl });
     } catch (error: any) {
