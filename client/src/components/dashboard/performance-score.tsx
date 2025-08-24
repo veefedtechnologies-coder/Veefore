@@ -107,64 +107,100 @@ export function PerformanceScore() {
           </div>
         </div>
 
-        {/* Main Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {/* Total Followers */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 relative overflow-hidden">
-            <div className="absolute top-2 right-2 opacity-20">
-              <Users className="w-6 h-6 text-blue-600" />
+        {/* Main Metrics Grid or Connect Platforms Call-to-Action */}
+        {connectedPlatforms.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {/* Total Followers */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 relative overflow-hidden">
+              <div className="absolute top-2 right-2 opacity-20">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="relative z-10">
+                <div className="text-2xl font-bold text-blue-600 mb-1">{formatNumber(totalFollowers)}</div>
+                <div className="text-xs text-gray-600 font-medium mb-2">Total Followers</div>
+                <div className="w-full bg-white/60 rounded-full h-1.5">
+                  <div className="bg-blue-500 h-1.5 rounded-full w-3/4 transition-all duration-1000"></div>
+                </div>
+              </div>
             </div>
-            <div className="relative z-10">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{formatNumber(totalFollowers)}</div>
-              <div className="text-xs text-gray-600 font-medium mb-2">Total Followers</div>
-              <div className="w-full bg-white/60 rounded-full h-1.5">
-                <div className="bg-blue-500 h-1.5 rounded-full w-3/4 transition-all duration-1000"></div>
+            
+            {/* Average Engagement */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 relative overflow-hidden">
+              <div className="absolute top-2 right-2 opacity-20">
+                <Heart className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="relative z-10">
+                <div className="text-2xl font-bold text-green-600 mb-1">{avgEngagement.toFixed(1)}%</div>
+                <div className="text-xs text-gray-600 font-medium mb-2">Avg Engagement</div>
+                <div className="w-full bg-white/60 rounded-full h-1.5">
+                  <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total Reach */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 relative overflow-hidden">
+              <div className="absolute top-2 right-2 opacity-20">
+                <Eye className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="relative z-10">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{formatNumber(totalReach)}</div>
+                <div className="text-xs text-gray-600 font-medium mb-2">Total Reach</div>
+                <div className="w-full bg-white/60 rounded-full h-1.5">
+                  <div className="bg-purple-500 h-1.5 rounded-full w-2/3 transition-all duration-1000"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total Posts */}
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 relative overflow-hidden">
+              <div className="absolute top-2 right-2 opacity-20">
+                <Share className="w-6 h-6 text-orange-600" />
+              </div>
+              <div className="relative z-10">
+                <div className="text-2xl font-bold text-orange-600 mb-1">{totalPosts}</div>
+                <div className="text-xs text-gray-600 font-medium mb-2">Total Posts</div>
+                <div className="w-full bg-white/60 rounded-full h-1.5">
+                  <div className="bg-orange-500 h-1.5 rounded-full w-5/6 transition-all duration-1000"></div>
+                </div>
               </div>
             </div>
           </div>
-          
-          {/* Average Engagement */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 relative overflow-hidden">
-            <div className="absolute top-2 right-2 opacity-20">
-              <Heart className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="relative z-10">
-              <div className="text-2xl font-bold text-green-600 mb-1">{avgEngagement.toFixed(1)}%</div>
-              <div className="text-xs text-gray-600 font-medium mb-2">Avg Engagement</div>
-              <div className="w-full bg-white/60 rounded-full h-1.5">
-                <div className="bg-green-500 h-1.5 rounded-full w-4/5 transition-all duration-1000"></div>
+        ) : (
+          /* Connect Platforms Call-to-Action */
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 text-center mb-8 border-2 border-dashed border-gray-300">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-10 h-10 text-blue-600" />
               </div>
             </div>
-          </div>
-          
-          {/* Total Reach */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 relative overflow-hidden">
-            <div className="absolute top-2 right-2 opacity-20">
-              <Eye className="w-6 h-6 text-purple-600" />
-            </div>
-            <div className="relative z-10">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{formatNumber(totalReach)}</div>
-              <div className="text-xs text-gray-600 font-medium mb-2">Total Reach</div>
-              <div className="w-full bg-white/60 rounded-full h-1.5">
-                <div className="bg-purple-500 h-1.5 rounded-full w-2/3 transition-all duration-1000"></div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Connect Your Social Platforms</h3>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              Start tracking your social media performance by connecting your accounts. Get insights on followers, engagement, reach, and more across all your platforms.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <div className="flex items-center space-x-2 bg-pink-50 px-4 py-2 rounded-full border border-pink-200">
+                <span>📷</span>
+                <span className="text-sm font-medium text-pink-700">Instagram</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-red-50 px-4 py-2 rounded-full border border-red-200">
+                <span>🎥</span>
+                <span className="text-sm font-medium text-red-700">YouTube</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+                <span>🐦</span>
+                <span className="text-sm font-medium text-blue-700">Twitter</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+                <span>💼</span>
+                <span className="text-sm font-medium text-blue-700">LinkedIn</span>
               </div>
             </div>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold text-lg">
+              Connect Your First Platform
+            </Button>
           </div>
-          
-          {/* Total Posts */}
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 relative overflow-hidden">
-            <div className="absolute top-2 right-2 opacity-20">
-              <Share className="w-6 h-6 text-orange-600" />
-            </div>
-            <div className="relative z-10">
-              <div className="text-2xl font-bold text-orange-600 mb-1">{totalPosts}</div>
-              <div className="text-xs text-gray-600 font-medium mb-2">Total Posts</div>
-              <div className="w-full bg-white/60 rounded-full h-1.5">
-                <div className="bg-orange-500 h-1.5 rounded-full w-5/6 transition-all duration-1000"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Performance Chart Section */}
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
