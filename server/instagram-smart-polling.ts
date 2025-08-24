@@ -29,13 +29,13 @@ export class InstagramSmartPolling {
   private readonly MAX_REQUESTS_PER_HOUR = 200;
   private readonly HOUR_IN_MS = 60 * 60 * 1000;
   
-  // Adaptive polling intervals (in milliseconds)
+  // Adaptive polling intervals (in milliseconds) - optimized for real-time updates
   private readonly INTERVALS = {
-    ACTIVE_USER: 30 * 1000,      // 30 seconds when user is active
-    NORMAL: 2 * 60 * 1000,       // 2 minutes normal
-    REDUCED: 5 * 60 * 1000,      // 5 minutes when no changes
-    MINIMAL: 15 * 60 * 1000,     // 15 minutes when inactive
-    NIGHT: 30 * 60 * 1000        // 30 minutes during night hours
+    ACTIVE_USER: 15 * 1000,      // 15 seconds when user is active (faster updates)
+    NORMAL: 45 * 1000,           // 45 seconds normal (more frequent)
+    REDUCED: 2 * 60 * 1000,      // 2 minutes when no changes
+    MINIMAL: 5 * 60 * 1000,      // 5 minutes when inactive
+    NIGHT: 10 * 60 * 1000        // 10 minutes during night hours (still responsive)
   };
 
   constructor(storage: IStorage) {
@@ -69,13 +69,33 @@ export class InstagramSmartPolling {
    */
   private async getAllInstagramAccounts(): Promise<any[]> {
     try {
-      // This is a simplified approach - in a real scenario, you'd query all workspaces
-      // For now, we'll work with the accounts we can find
       const allAccounts: any[] = [];
+      console.log('[SMART POLLING] Discovering Instagram accounts across all workspaces...');
       
-      // Get accounts from storage (this might need to be adapted based on your storage interface)
-      // Since we don't have a "get all accounts" method, we'll use a workaround
-      console.log('[SMART POLLING] Discovering Instagram accounts...');
+      // Query MongoDB directly to get all Instagram accounts
+      const storage = this.storage as any;
+      if (storage.SocialAccount) {
+        const instagramAccounts = await storage.SocialAccount.find({
+          platform: 'instagram',
+          isActive: true,
+          accessToken: { $exists: true, $ne: null }
+        }).lean();
+        
+        for (const account of instagramAccounts) {
+          allAccounts.push({
+            id: account._id.toString(),
+            accountId: account.accountId,
+            workspaceId: account.workspaceId,
+            username: account.username,
+            platform: account.platform,
+            accessToken: account.accessToken,
+            isActive: account.isActive,
+            followersCount: account.followersCount || 0
+          });
+        }
+        
+        console.log(`[SMART POLLING] Found ${allAccounts.length} active Instagram accounts`);
+      }
       
       return allAccounts;
     } catch (error) {
@@ -189,8 +209,8 @@ export class InstagramSmartPolling {
       return this.INTERVALS.REDUCED;
     }
     
-    // User recently active (within 5 minutes)
-    if (timeSinceLastActivity < 5 * 60 * 1000) {
+    // User recently active (within 10 minutes) - extended for better responsiveness
+    if (timeSinceLastActivity < 10 * 60 * 1000) {
       return this.INTERVALS.ACTIVE_USER;
     }
     
@@ -394,5 +414,34 @@ export class InstagramSmartPolling {
     this.pollingConfigs.clear();
     this.rateLimitTrackers.clear();
     console.log('[SMART POLLING] ⏹️ Stopped all polling');
+  }
+
+  /**
+   * Get current polling status for all accounts
+   */
+  getPollingStatus(): any {
+    const accounts = Array.from(this.pollingConfigs.values()).map(config => {
+      const interval = this.calculatePollingInterval(config);
+      const nextPollTime = new Date(config.lastActivity + interval);
+      const nextPollIn = Math.max(0, nextPollTime.getTime() - Date.now());
+      
+      return {
+        id: config.accountId,
+        username: config.username,
+        isActive: config.isActive,
+        lastPolled: new Date(config.lastActivity),
+        nextPollIn: nextPollIn,
+        interval: interval,
+        requestsToday: 0 // Simplified for now
+      };
+    });
+
+    return {
+      totalAccounts: this.pollingConfigs.size,
+      activeAccounts: Array.from(this.pollingConfigs.values()).filter(config => config.isActive).length,
+      totalRequestsToday: this.requestHistory.length,
+      rateLimitRemaining: Math.max(0, this.MAX_REQUESTS_PER_HOUR - this.requestHistory.length),
+      accounts: accounts
+    };
   }
 }

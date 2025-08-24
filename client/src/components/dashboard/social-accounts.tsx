@@ -26,7 +26,7 @@ export function SocialAccounts() {
     onSuccess: (data) => {
       toast({
         title: "✅ Instagram data synced",
-        description: `Updated to ${data.followers} followers`,
+        description: `Updated to ${data.followers} followers via ${data.method === 'smart_polling' ? 'smart polling' : 'direct API'}`,
       })
       // Invalidate relevant queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
@@ -41,6 +41,27 @@ export function SocialAccounts() {
     }
   })
 
+  // Auto-start polling mutation
+  const startPollingMutation = useMutation({
+    mutationFn: () => apiRequest('/api/instagram/start-polling', { method: 'POST' }),
+    onSuccess: (data) => {
+      toast({
+        title: "🔄 Real-time polling started",
+        description: `Smart polling active for @${data.account}`,
+      })
+    },
+    onError: (error: any) => {
+      console.error('Failed to start polling:', error)
+    }
+  })
+
+  // Polling status query (will be defined after connectedAccounts is declared)
+  const { data: pollingStatus } = useQuery({
+    queryKey: ['/api/instagram/polling-status'],
+    queryFn: () => apiRequest('/api/instagram/polling-status'),
+    refetchInterval: 30000, // Check status every 30 seconds
+    enabled: !!socialAccounts && socialAccounts.length > 0
+  })
 
   // Filter for connected accounts with real data
   const connectedAccounts = socialAccounts?.filter((account: any) => {
@@ -48,6 +69,18 @@ export function SocialAccounts() {
   }) || []
 
   const [selectedAccount, setSelectedAccount] = useState(connectedAccounts[0]?.platform || 'instagram')
+
+  // Auto-start polling when component mounts and Instagram account exists
+  React.useEffect(() => {
+    const instagramAccount = connectedAccounts.find((acc: any) => acc.platform === 'instagram')
+    if (instagramAccount && !startPollingMutation.isPending) {
+      // Small delay to ensure account is fully loaded
+      const timer = setTimeout(() => {
+        startPollingMutation.mutate()
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [connectedAccounts, startPollingMutation.isPending])
 
   if (isLoading) {
     return (
@@ -144,6 +177,14 @@ export function SocialAccounts() {
               <p className="text-sm text-gray-600 mt-1">Manage your connected platforms</p>
             </div>
             <div className="flex space-x-2">
+              {/* Polling status indicator */}
+              {pollingStatus && pollingStatus.totalAccounts > 0 && (
+                <div className="flex items-center space-x-1 px-2 py-1 bg-green-50 border border-green-200 rounded text-xs text-green-700">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span>Live polling active</span>
+                </div>
+              )}
+              
               {/* Manual sync button for Instagram */}
               <Button 
                 variant="outline" 
@@ -151,10 +192,12 @@ export function SocialAccounts() {
                 onClick={() => syncMutation.mutate()}
                 disabled={syncMutation.isPending}
                 className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                title="Get latest follower count immediately"
               >
                 <RefreshCw className={`w-4 h-4 mr-1 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-                {syncMutation.isPending ? 'Syncing...' : 'Sync Data'}
+                {syncMutation.isPending ? 'Syncing...' : 'Sync Now'}
               </Button>
+              
               <Button variant="outline" size="sm" className="text-slate-600 border-slate-200 hover:bg-slate-50">
                 See all accounts
               </Button>
@@ -223,6 +266,18 @@ export function SocialAccounts() {
                           currentAccount.lastSync ? new Date(currentAccount.lastSync).toLocaleDateString() : 'Never'
                         }
                       </span>
+                      
+                      {/* Real-time polling status for this account */}
+                      {pollingStatus?.accounts?.find((acc: any) => acc.username === currentAccount.username) && (
+                        <div className="text-xs text-blue-600 mt-1 flex items-center space-x-1">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span>Smart polling: next check in {
+                            Math.round(
+                              (pollingStatus.accounts.find((acc: any) => acc.username === currentAccount.username)?.nextPollIn || 0) / 1000 / 60
+                            )
+                          } min</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

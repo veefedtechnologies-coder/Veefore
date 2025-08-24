@@ -13,6 +13,7 @@ import { InstagramTokenRefresh } from "./instagram-token-refresh";
 import { InstagramAutomation } from "./instagram-automation";
 import { InstagramWebhookHandler } from "./instagram-webhook";
 import { InstagramSmartPolling } from "./instagram-smart-polling";
+import { InstagramAccountMonitor } from "./instagram-account-monitor";
 import { InstagramCommentWebhookHandler } from "./instagram-comment-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
@@ -83,6 +84,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // NEW AUTOMATION SYSTEM INSTANCES
   const newAutomationSystem = new NewAutomationSystem(storage);
   const newWebhookProcessor = new NewWebhookProcessor(storage);
+  
+  // Start smart polling and account monitoring for immediate real-time updates
+  console.log('[SMART POLLING] 🚀 Activating intelligent Instagram polling system...');
+  const accountMonitor = new InstagramAccountMonitor(storage, smartPolling);
+  console.log('[SMART POLLING] ✅ Real-time Instagram monitoring active with rate limit protection');
 
   // TEST ROUTE - Optimized generation test (early placement to avoid middleware issues)
   app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
@@ -2910,6 +2916,47 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error) {
       console.error('[INSTAGRAM SYNC] Error syncing data:', error);
       res.status(500).json({ error: 'Failed to sync Instagram data' });
+    }
+  });
+
+  // Start smart polling for an Instagram account
+  app.post("/api/instagram/start-polling", requireAuth, async (req: any, res: any) => {
+    try {
+      const workspaceId = req.body.workspaceId || (await storage.getDefaultWorkspace(req.user.id))?.id;
+      
+      // Get Instagram account
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram' && acc.isActive);
+      
+      if (!instagramAccount || !instagramAccount.accessToken) {
+        return res.status(400).json({ error: "No connected Instagram account found" });
+      }
+
+      console.log(`[SMART POLLING] Starting polling for @${instagramAccount.username}`);
+      
+      // Setup polling for this account
+      await smartPolling.setupAccountPolling(instagramAccount);
+      
+      res.json({ 
+        success: true, 
+        message: `Smart polling started for @${instagramAccount.username}`,
+        account: instagramAccount.username
+      });
+
+    } catch (error: any) {
+      console.error('[START POLLING] Error:', error);
+      res.status(500).json({ error: 'Failed to start polling' });
+    }
+  });
+
+  // Get smart polling status
+  app.get("/api/instagram/polling-status", requireAuth, async (req: any, res: any) => {
+    try {
+      const status = smartPolling.getPollingStatus();
+      res.json(status);
+    } catch (error: any) {
+      console.error('[POLLING STATUS] Error:', error);
+      res.status(500).json({ error: 'Failed to get polling status' });
     }
   });
 
