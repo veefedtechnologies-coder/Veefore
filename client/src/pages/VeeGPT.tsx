@@ -36,40 +36,7 @@ import { getAuth } from 'firebase/auth'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-// Intelligent status function that analyzes question complexity immediately
-const getIntelligentStatus = (question: string): string => {
-  const lowerQ = question.toLowerCase()
-  
-  // Analyze question type and complexity
-  const isMarketing = lowerQ.includes('marketing') || lowerQ.includes('campaign') || lowerQ.includes('brand') || lowerQ.includes('promotion')
-  const isCreative = lowerQ.includes('creative') || lowerQ.includes('design') || lowerQ.includes('ideas') || lowerQ.includes('content')
-  const isResearch = lowerQ.includes('trend') || lowerQ.includes('data') || lowerQ.includes('research') || lowerQ.includes('analyze')
-  const isStrategy = lowerQ.includes('strategy') || lowerQ.includes('plan') || lowerQ.includes('approach') || lowerQ.includes('framework')
-  const isTechnical = lowerQ.includes('technical') || lowerQ.includes('code') || lowerQ.includes('development') || lowerQ.includes('implementation')
-  
-  // Complexity indicators
-  const isComplex = question.length > 100 || lowerQ.split(' ').length > 15
-  const isSpecific = lowerQ.includes('for my') || lowerQ.includes('specific') || lowerQ.includes('detailed')
-  
-  // Generate dynamic status based on analysis
-  if (isMarketing && isStrategy) {
-    return isComplex ? 'Analyzing marketing strategy complexity - preparing comprehensive multi-AI approach...' : 'Processing marketing strategy request with strategic analysis...'
-  } else if (isMarketing) {
-    return isSpecific ? 'Analyzing your specific marketing needs - coordinating specialized insights...' : 'Processing marketing request with campaign expertise...'
-  } else if (isCreative && isResearch) {
-    return 'Complex creative research detected - activating hybrid AI coordination...'
-  } else if (isCreative) {
-    return isComplex ? '✨ Analyzing creative complexity - preparing innovative multi-perspective approach...' : '✨ Processing creative request with innovative insights...'
-  } else if (isResearch || isStrategy) {
-    return '🔍 Analyzing strategic complexity - preparing comprehensive research and analysis...'
-  } else if (isTechnical) {
-    return 'Processing technical request with advanced reasoning capabilities...'
-  } else if (isComplex) {
-    return 'Complex question detected - analyzing optimal AI coordination strategy...'
-  } else {
-    return 'Analyzing question and selecting optimal AI approach for best results...'
-  }
-}
+// Removed hardcoded intelligent status function - now using only real backend AI status
 
 // Real-time streaming - no animation, chunks appear immediately as they arrive
 
@@ -859,9 +826,8 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
-    // Show immediate intelligent status based on question complexity
-    const intelligentStatus = getIntelligentStatus(messageContent)
-    setAiStatus(intelligentStatus)
+    // Reset state for new message - wait for real backend AI status
+    setAiStatus(null) // No immediate hardcoded status - wait for backend
     setIsGenerating(true)
     setIsContentStreaming(false) // Reset streaming flag for new message
     isGeneratingRef.current = true
