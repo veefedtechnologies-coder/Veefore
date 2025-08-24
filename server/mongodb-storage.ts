@@ -1243,19 +1243,32 @@ export class MongoStorage implements IStorage {
     console.log(`[MONGODB DEBUG] getSocialAccountByPageId called with pageId: ${pageId}`);
     
     try {
-      const account = await SocialAccountModel.findOne({ 
+      // First try to find by pageId field
+      let account = await SocialAccountModel.findOne({ 
         pageId: pageId,
         platform: 'instagram',
         isActive: true 
       });
       
-      console.log(`[MONGODB DEBUG] Found account by pageId:`, account ? 'Yes' : 'No');
+      // If not found, try to find by accountId field (Instagram stores ID here)
+      if (!account) {
+        console.log(`[MONGODB DEBUG] No account found by pageId, trying accountId...`);
+        account = await SocialAccountModel.findOne({ 
+          accountId: pageId,
+          platform: 'instagram',
+          isActive: true 
+        });
+      }
+      
+      console.log(`[MONGODB DEBUG] Found account by pageId/accountId:`, account ? 'Yes' : 'No');
       
       if (account) {
         console.log(`[MONGODB DEBUG] Account details:`, {
           id: account._id,
           username: account.username,
-          workspaceId: account.workspaceId
+          workspaceId: account.workspaceId,
+          accountId: account.accountId,
+          pageId: account.pageId
         });
       }
       
