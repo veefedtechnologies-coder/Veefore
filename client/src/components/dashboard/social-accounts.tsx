@@ -16,7 +16,7 @@ export function SocialAccounts() {
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 2000, // Refresh every 2 seconds - instant database updates
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
     staleTime: 0, // Always get fresh data to show new likes/comments immediately
   })
 

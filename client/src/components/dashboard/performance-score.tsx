@@ -12,7 +12,7 @@ export function PerformanceScore() {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['/api/dashboard/analytics'],
     queryFn: () => apiRequest('/api/dashboard/analytics'),
-    refetchInterval: 2000, // Refresh every 2 seconds - instant database updates
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
     staleTime: 0, // Always fetch latest data when needed
   })
 
@@ -20,7 +20,7 @@ export function PerformanceScore() {
   const { data: socialAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 2000, // Refresh every 2 seconds - instant database updates
+    refetchInterval: 15000, // Refresh every 15 seconds for real-time updates
     staleTime: 0, // Always fetch latest data when needed
   })
 
