@@ -823,8 +823,8 @@ export default function VeeGPT() {
 
     console.log('VeeGPT: Sending message:', messageContent)
     
-    // Show dynamic status - let backend determine the appropriate message
-    setAiStatus('🧠 Analyzing your question...')
+    // Let backend drive all status messages - no hardcoded status
+    setAiStatus(null) // Backend will send first status message immediately
     setIsGenerating(true)
     setIsContentStreaming(false) // Reset streaming flag for new message
     isGeneratingRef.current = true
