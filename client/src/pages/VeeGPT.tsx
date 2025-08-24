@@ -1031,9 +1031,7 @@ export default function VeeGPT() {
             <div className="flex-1 overflow-y-auto">
               {/* Top Header with Logo */}
               <div className="p-3 flex items-center justify-between">
-                <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                  <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
-                </div>
+                <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                   className="p-1 hover:bg-gray-100 rounded transition-colors"
@@ -1471,9 +1469,7 @@ export default function VeeGPT() {
             <div className="flex-1 overflow-y-auto">
               {/* Top Header with Logo */}
               <div className="p-3 flex items-center justify-between">
-                <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                  <img src="/veefore-logo.png" alt="VeeFore" className="w-5 h-5 invert" />
-                </div>
+                <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
                 <button
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                   className="p-1 hover:bg-gray-100 rounded transition-colors"
