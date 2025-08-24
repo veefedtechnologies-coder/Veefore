@@ -2205,11 +2205,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const responseData = {
         // Multi-platform aggregated metrics
         totalPosts: aggregatedMetrics.totalPosts,
-        totalReach: totalReach,
+        totalReach: aggregatedMetrics.totalReach,
         engagementRate: engagementRate,
         topPlatform: topPlatform,
         followers: aggregatedMetrics.totalFollowers,
-        impressions: totalReach,
+        impressions: aggregatedMetrics.totalReach,
         totalLikes: aggregatedMetrics.totalLikes,
         totalComments: aggregatedMetrics.totalComments,
         totalViews: aggregatedMetrics.totalViews,
