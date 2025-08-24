@@ -3577,8 +3577,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
-        console.error(`[INSTAGRAM CALLBACK] Token exchange failed:`, errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
+        console.error(`[INSTAGRAM CALLBACK] Token exchange failed - Status: ${tokenResponse.status}`);
+        console.error(`[INSTAGRAM CALLBACK] Token exchange error response:`, errorText);
+        console.error(`[INSTAGRAM CALLBACK] Request URL was: https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${process.env.INSTAGRAM_APP_SECRET}&code=${code}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`);
       }
 
       const tokenData = await tokenResponse.json();
