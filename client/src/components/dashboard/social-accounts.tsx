@@ -12,12 +12,12 @@ export function SocialAccounts() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   
-  // Fetch social accounts data - Balanced updates with rate limit protection
+  // Fetch social accounts data - ULTRA-SAFE rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    refetchInterval: 30000, // 30 seconds - conservative for rate limit safety
-    staleTime: 10000, // 10 seconds cache to prevent excessive requests
+    refetchInterval: 5 * 60 * 1000, // 5 minutes - very conservative for rate limit safety
+    staleTime: 60000, // 1 minute cache to prevent excessive requests
   })
 
   // Manual sync mutation for Instagram data - IMMEDIATE mode
@@ -71,11 +71,11 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - Rate limit safe
+  // Polling status query - ULTRA-SAFE rate limit protection
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 60000, // 1 minute - much safer for rate limits
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - ultra-safe for rate limits
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 

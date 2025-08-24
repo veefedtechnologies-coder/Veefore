@@ -30,18 +30,19 @@ export class InstagramSmartPolling {
   private readonly MAX_REQUESTS_PER_HOUR = 200;
   private readonly HOUR_IN_MS = 60 * 60 * 1000;
   
-  // SECURE polling intervals respecting Instagram's 200 req/hour limit (18 seconds minimum)
+  // ULTRA-SECURE polling intervals - BULLETPROOF rate limit protection
   private readonly INTERVALS = {
-    ACTIVE_USER: 20 * 1000,      // 20 seconds when user is active (SAFE + responsive)
-    NORMAL: 45 * 1000,           // 45 seconds normal (within limits)
-    REDUCED: 2 * 60 * 1000,      // 2 minutes when no changes
-    MINIMAL: 5 * 60 * 1000,      // 5 minutes when inactive
-    NIGHT: 10 * 60 * 1000        // 10 minutes during night hours
+    ACTIVE_USER: 60 * 1000,      // 1 minute when user is active (ULTRA-SAFE)
+    NORMAL: 3 * 60 * 1000,       // 3 minutes normal (VERY CONSERVATIVE)
+    REDUCED: 5 * 60 * 1000,      // 5 minutes when no changes
+    MINIMAL: 10 * 60 * 1000,     // 10 minutes when inactive
+    NIGHT: 15 * 60 * 1000        // 15 minutes during night hours
   };
 
   constructor(storage: IStorage) {
     this.storage = storage;
     this.dashboardCache = new DashboardCache(storage);
+    this.requestHistory = []; // Initialize request history
     this.initializePolling();
   }
 
@@ -145,35 +146,53 @@ export class InstagramSmartPolling {
   }
 
   /**
-   * Check if we can make an API request without hitting rate limits
+   * BULLETPROOF rate limiting check - Multiple safety layers
    */
   private canMakeRequest(accountId: string): boolean {
+    const now = Date.now();
+    
+    // Layer 1: Global rate limiting (across all accounts)
+    this.cleanupRequestHistory();
+    if (this.requestHistory.length >= this.MAX_REQUESTS_PER_HOUR) {
+      console.log(`[SMART POLLING] 🚫 GLOBAL rate limit reached: ${this.requestHistory.length}/200 requests in last hour`);
+      return false;
+    }
+
+    // Layer 2: Per-account rate limiting  
     const tracker = this.rateLimitTrackers.get(accountId);
     if (!tracker) return false;
 
-    const now = Date.now();
-    
     // Reset window if hour has passed
     if (now - tracker.windowStart >= this.HOUR_IN_MS) {
       tracker.requestCount = 0;
       tracker.windowStart = now;
     }
 
-    // Check if we have requests left
-    if (tracker.requestCount >= this.MAX_REQUESTS_PER_HOUR) {
-      const resetTime = tracker.windowStart + this.HOUR_IN_MS;
-      const minutesUntilReset = Math.ceil((resetTime - now) / (60 * 1000));
-      console.log(`[SMART POLLING] ⚠️ Rate limit reached for ${accountId}. Reset in ${minutesUntilReset} minutes`);
+    // Check per-account limit (25% of total to be safe with multiple accounts)
+    const maxPerAccount = Math.floor(this.MAX_REQUESTS_PER_HOUR / 4); // 50 requests max per account
+    if (tracker.requestCount >= maxPerAccount) {
+      console.log(`[SMART POLLING] 🚫 Account rate limit reached for ${accountId}: ${tracker.requestCount}/${maxPerAccount}`);
       return false;
     }
 
-    // Ensure minimum gap between requests (18 seconds to be safe)
-    const minGap = Math.ceil(this.HOUR_IN_MS / this.MAX_REQUESTS_PER_HOUR);
+    // Layer 3: Minimum gap enforcement (doubled for safety: 36 seconds)
+    const minGap = (this.HOUR_IN_MS / this.MAX_REQUESTS_PER_HOUR) * 2; // 36 seconds minimum
     if (now - tracker.lastRequest < minGap) {
+      console.log(`[SMART POLLING] ⏱️ Too soon for ${accountId}, waiting ${Math.ceil((minGap - (now - tracker.lastRequest)) / 1000)}s`);
       return false;
     }
 
     return true;
+  }
+
+  /**
+   * Clean up old requests from history (older than 1 hour)
+   */
+  private cleanupRequestHistory(): void {
+    const now = Date.now();
+    this.requestHistory = this.requestHistory.filter(
+      req => now - req.timestamp < this.HOUR_IN_MS
+    );
   }
 
   /**
@@ -185,6 +204,15 @@ export class InstagramSmartPolling {
       tracker.requestCount++;
       tracker.lastRequest = Date.now();
     }
+  }
+
+  /**
+   * Record a request in global history for rate limiting tracking
+   */
+  private recordRequestHistory(accountId: string): void {
+    const now = Date.now();
+    this.requestHistory.push({ timestamp: now, accountId });
+    this.cleanupRequestHistory();
   }
 
   /**
@@ -270,6 +298,7 @@ export class InstagramSmartPolling {
       
       // Record the API request
       this.recordRequest(accountId);
+      this.recordRequestHistory(accountId);
 
       // Make Instagram API call
       const apiUrl = `https://graph.instagram.com/me?fields=followers_count,media_count,account_type&access_token=${config.accessToken}`;
