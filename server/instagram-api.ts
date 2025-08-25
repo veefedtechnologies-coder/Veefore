@@ -38,6 +38,20 @@ export class InstagramAPI {
   private baseUrl = 'https://graph.instagram.com';
   
   constructor() {}
+  
+  // Environment-agnostic URL generation helper
+  private getBaseUrl(): string {
+    if (process.env.REPLIT_DEV_DOMAIN) {
+      return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+    }
+    if (process.env.REPL_SLUG && process.env.REPL_OWNER) {
+      return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    }
+    if (process.env.VITE_APP_URL) {
+      return process.env.VITE_APP_URL;
+    }
+    return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+  }
 
   // Generate Instagram Business Login OAuth URL (Direct Instagram API)
   generateAuthUrl(redirectUri: string, state?: string): string {
@@ -345,7 +359,7 @@ export class InstagramAPI {
         // Ensure clean path format
         cleanPath = cleanPath.replace(/\\/g, '/');
         const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
-        fullImageUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        fullImageUrl = `${this.getBaseUrl()}${basePath}`;
         
         console.log(`[INSTAGRAM API] Cleaned photo URL: ${fullImageUrl}`);
       }
@@ -409,7 +423,7 @@ export class InstagramAPI {
         // Ensure clean path format
         cleanPath = cleanPath.replace(/\\/g, '/');
         const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
-        fullVideoUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        fullVideoUrl = `${this.getBaseUrl()}${basePath}`;
         
         console.log(`[INSTAGRAM API] Cleaned reel URL: ${fullVideoUrl}`);
       }
@@ -705,7 +719,7 @@ export class InstagramAPI {
         // Ensure clean path format
         cleanPath = cleanPath.replace(/\\/g, '/');
         const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
-        fullVideoUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        fullVideoUrl = `${this.getBaseUrl()}${basePath}`;
         
         console.log(`[INSTAGRAM API] Cleaned video URL: ${fullVideoUrl}`);
       }

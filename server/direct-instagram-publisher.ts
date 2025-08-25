@@ -42,10 +42,22 @@ export class DirectInstagramPublisher {
       }
     }
     
-    // Ensure full URL for Instagram API
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-      : 'http://localhost:5000';
+    // Ensure full URL for Instagram API - environment agnostic
+    const getBaseUrl = () => {
+      if (process.env.REPLIT_DEV_DOMAIN) {
+        return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      }
+      if (process.env.REPL_SLUG && process.env.REPL_OWNER) {
+        return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+      }
+      if (process.env.VITE_APP_URL) {
+        return process.env.VITE_APP_URL;
+      }
+      // Local development fallback
+      return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+    };
+    
+    const baseUrl = getBaseUrl();
     
     const fullVideoUrl = currentVideoUrl.startsWith('http') 
       ? currentVideoUrl 
