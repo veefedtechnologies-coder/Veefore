@@ -574,7 +574,7 @@ export class InstagramAPI {
         // Ensure clean path format
         cleanPath = cleanPath.replace(/\\/g, '/');
         const basePath = cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath;
-        fullMediaUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co${basePath}`;
+        fullMediaUrl = `${this.getBaseUrl()}${basePath}`;
         
         console.log(`[INSTAGRAM API] Cleaned story URL: ${fullMediaUrl}`);
       }

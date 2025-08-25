@@ -6,6 +6,16 @@
 export class InstagramURLConverter {
   
   /**
+   * Environment-agnostic URL generation helper
+   */
+  private static getBaseUrl(): string {
+    if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+    if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+    return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+  }
+  
+  /**
    * Convert any URL to Instagram-compatible format
    */
   static convertToInstagramURL(inputUrl: string): string {
@@ -17,7 +27,7 @@ export class InstagramURLConverter {
       const mediaId = blobParts[blobParts.length - 1];
       
       // Convert to direct server URL
-      const convertedUrl = `${process.env.REPLIT_DEV_DOMAIN || 'https://workspace.brandboost09.repl.co'}/uploads/${mediaId}`;
+      const convertedUrl = `${this.getBaseUrl()}/uploads/${mediaId}`;
       console.log(`[URL CONVERTER] Blob URL converted: ${convertedUrl}`);
       return convertedUrl;
     }
@@ -29,7 +39,7 @@ export class InstagramURLConverter {
       const mediaId = urlParts[urlParts.length - 1];
       
       // Convert to clean server URL
-      const convertedUrl = `${process.env.REPLIT_DEV_DOMAIN || 'https://workspace.brandboost09.repl.co'}/uploads/${mediaId}`;
+      const convertedUrl = `${this.getBaseUrl()}/uploads/${mediaId}`;
       console.log(`[URL CONVERTER] Replit URL converted: ${convertedUrl}`);
       return convertedUrl;
     }
@@ -39,7 +49,7 @@ export class InstagramURLConverter {
       const urlParts = inputUrl.split('/');
       const mediaId = urlParts[urlParts.length - 1];
       
-      const convertedUrl = `${process.env.REPLIT_DEV_DOMAIN || 'https://workspace.brandboost09.repl.co'}/uploads/${mediaId}`;
+      const convertedUrl = `${this.getBaseUrl()}/uploads/${mediaId}`;
       console.log(`[URL CONVERTER] Localhost URL converted: ${convertedUrl}`);
       return convertedUrl;
     }
@@ -52,7 +62,7 @@ export class InstagramURLConverter {
     
     // Fallback: try to extract filename and create server URL
     const filename = inputUrl.split('/').pop() || 'media';
-    const fallbackUrl = `${process.env.REPLIT_DEV_DOMAIN || 'https://workspace.brandboost09.repl.co'}/uploads/${filename}`;
+    const fallbackUrl = `${this.getBaseUrl()}/uploads/${filename}`;
     console.log(`[URL CONVERTER] Fallback URL created: ${fallbackUrl}`);
     return fallbackUrl;
   }

@@ -13807,7 +13807,12 @@ Create a detailed growth strategy in JSON format:
       
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${process.env.YOUTUBE_CLIENT_ID}&` +
-        `redirect_uri=${encodeURIComponent(`${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/api/youtube/callback`)}&` +
+        `redirect_uri=${encodeURIComponent(`${(() => {
+          if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+          if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+          if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+          return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+        })()/api/youtube/callback`)}&` +
         `scope=${encodeURIComponent(scopes.join(' '))}&` +
         `response_type=code&` +
         `access_type=offline&` +

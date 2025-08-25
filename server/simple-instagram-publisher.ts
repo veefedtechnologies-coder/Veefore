@@ -139,9 +139,15 @@ export class SimpleInstagramPublisher {
       return mediaFile.url;
     }
 
-    // Get the current domain
-    const currentDomain = process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
-    const baseUrl = currentDomain.includes('localhost') ? `http://${currentDomain}` : `https://${currentDomain}`;
+    // Environment-agnostic URL generation
+    const getBaseUrl = () => {
+      if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+      if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+      return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+    };
+    
+    const baseUrl = getBaseUrl();
     
     return `${baseUrl}${mediaFile.url}`;
   }

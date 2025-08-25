@@ -89,6 +89,16 @@ export class InstagramDirectPublisher {
   }
   
   /**
+   * Environment-agnostic URL generation helper
+   */
+  private static getBaseUrl(): string {
+    if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+    if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+    return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+  }
+  
+  /**
    * Clean URL for Instagram compatibility
    */
   static cleanMediaURL(inputUrl: string): string {
@@ -96,23 +106,23 @@ export class InstagramDirectPublisher {
     if (inputUrl.startsWith('blob:')) {
       const parts = inputUrl.split('/');
       const mediaId = parts[parts.length - 1];
-      return `https://workspace.brandboost09.repl.co/uploads/${mediaId}`;
+      return `${this.getBaseUrl()}/uploads/${mediaId}`;
     }
     
     // Handle malformed nested URLs
     if (inputUrl.includes('replit.dev') && inputUrl.includes('/uploads/')) {
       const uploadsPart = inputUrl.substring(inputUrl.indexOf('/uploads/'));
-      return `https://workspace.brandboost09.repl.co${uploadsPart}`;
+      return `${this.getBaseUrl()}${uploadsPart}`;
     }
     
     // Handle direct file URLs
-    if (inputUrl.startsWith('https://workspace.brandboost09.repl.co')) {
+    if (inputUrl.startsWith(this.getBaseUrl())) {
       return inputUrl;
     }
     
     // Extract filename and create clean URL
     const filename = inputUrl.split('/').pop() || 'media';
-    return `https://workspace.brandboost09.repl.co/uploads/${filename}`;
+    return `${this.getBaseUrl()}/uploads/${filename}`;
   }
   
   /**

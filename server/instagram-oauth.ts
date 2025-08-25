@@ -8,7 +8,15 @@ export class InstagramOAuthService {
   constructor(private storage: IStorage) {
     this.appId = process.env.INSTAGRAM_APP_ID!;
     this.appSecret = process.env.INSTAGRAM_APP_SECRET!;
-    this.redirectUri = `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/api/instagram/callback`;
+    // Environment-agnostic URL generation
+    const getBaseUrl = () => {
+      if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+      if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+      if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+      return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+    };
+    
+    this.redirectUri = `${getBaseUrl()}/api/instagram/callback`;
   }
 
   getAuthUrl(workspaceId: string): string {

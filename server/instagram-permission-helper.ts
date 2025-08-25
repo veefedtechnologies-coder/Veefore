@@ -99,7 +99,15 @@ export class InstagramPermissionHelper {
       if (mediaUrl.startsWith('blob:')) {
         const urlParts = mediaUrl.split('/');
         const mediaId = urlParts[urlParts.length - 1];
-        processedUrl = `${process.env.REPLIT_DEV_DOMAIN || 'https://workspace.brandboost09.repl.co'}/uploads/${mediaId}.jpg`;
+        // Environment-agnostic URL generation
+        const getBaseUrl = () => {
+          if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+          if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+          if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
+          return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+        };
+        
+        processedUrl = `${getBaseUrl()}/uploads/${mediaId}.jpg`;
       }
       
       const videoCaption = `🎬 ${caption}\n\n📹 Video content preview - Full video available on our platform`;
