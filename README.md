@@ -2,41 +2,46 @@
 
 > **Production-Ready Deployment** - Successfully migrated from Replit development environment to standard Node.js deployment with comprehensive multi-platform support.
 
-## 🚀 Quick Start
+## 🚀 Quick Start - Cross-Platform Development
 
-### Prerequisites
-- Node.js 18+
-- MongoDB Atlas connection string
-- Required API keys (OpenAI, SendGrid, Firebase, etc.)
+This project is configured to run seamlessly on both Replit (cloud) and locally on any IDE (Cursor, VSCode, etc.) with the same codebase.
 
-### Installation
+### Running Locally (Cursor/VSCode/etc.)
+
 ```bash
-# Clone the repository
-git clone <repository-url>
+# 1. Clone the repository
+git clone <repo-url>
 cd veefore
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Configure environment variables
+# 3. Copy example environment files
 cp .env.example .env
-# Edit .env with your configuration
+cp server/.env.example server/.env  
+cp client/.env.example client/.env
 
-# Start development server
+# 4. Edit the .env files with your actual values
+# Update .env, server/.env, and client/.env with real API keys
+
+# 5. Start development server
 npm run dev
 ```
 
-### Production Deployment
-```bash
-# Build for production
-npm run build
+### Running on Replit
 
-# Start production server
-npm start
+- Environment variables can be set via the Replit Secrets tab
+- The same codebase will run without modification
+- All .env.example files show which secrets need to be configured
 
-# Validate deployment readiness
-node validate-deployment.js
-```
+### Environment Configuration
+
+The project uses three .env files:
+- `/.env` - Root level environment variables
+- `/server/.env` - Server-specific variables  
+- `/client/.env` - Client-specific variables (VITE_ prefixed)
+
+All example files (`.env.example`) are tracked in Git and contain placeholder values. Real `.env` files are ignored by Git for security.
 
 ## 🏗️ Architecture Overview
 
