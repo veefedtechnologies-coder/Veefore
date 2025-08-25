@@ -129,7 +129,7 @@ app.use((req, res, next) => {
       log = fallbackLog;
     }
   } catch (error) {
-    console.warn('[WARN] Vite modules not available, using fallback log function:', error.message);
+    console.warn('[WARN] Vite modules not available, using fallback log function:', (error as Error).message);
     log = fallbackLog;
   }
   
@@ -157,7 +157,7 @@ app.use((req, res, next) => {
           totalDeleted += userResult;
         }
       } catch (error) {
-        console.log(`⚠️  Error clearing users: ${error.message}`);
+        console.log(`⚠️  Error clearing users: ${(error as Error).message}`);
       }
       
       try {
@@ -169,7 +169,7 @@ app.use((req, res, next) => {
           totalDeleted += waitlistResult;
         }
       } catch (error) {
-        console.log(`⚠️  Error clearing waitlist_users: ${error.message}`);
+        console.log(`⚠️  Error clearing waitlist_users: ${(error as Error).message}`);
       }
       
       try {
@@ -181,7 +181,7 @@ app.use((req, res, next) => {
           totalDeleted += workspaceResult;
         }
       } catch (error) {
-        console.log(`⚠️  Error clearing workspaces: ${error.message}`);
+        console.log(`⚠️  Error clearing workspaces: ${(error as Error).message}`);
       }
       
       try {
@@ -193,7 +193,7 @@ app.use((req, res, next) => {
           totalDeleted += socialResult;
         }
       } catch (error) {
-        console.log(`⚠️  Error clearing social_accounts: ${error.message}`);
+        console.log(`⚠️  Error clearing social_accounts: ${(error as Error).message}`);
       }
       
       try {
@@ -205,7 +205,7 @@ app.use((req, res, next) => {
           totalDeleted += contentResult;
         }
       } catch (error) {
-        console.log(`⚠️  Error clearing content: ${error.message}`);
+        console.log(`⚠️  Error clearing content: ${(error as Error).message}`);
       }
       
       console.log(`✅ DATABASE RESET COMPLETED - Total documents deleted: ${totalDeleted}`);
@@ -223,20 +223,20 @@ app.use((req, res, next) => {
       res.status(500).json({
         success: false,
         error: 'Database reset failed',
-        message: error.message
+        message: (error as Error).message
       });
     }
   });
   
   // Start the background scheduler service
-  startSchedulerService(storage);
+  startSchedulerService(storage as any);
   
   // Auto-sync disabled - using webhooks for real-time updates
   // console.log('[AUTO SYNC] Starting automatic Instagram sync service...');
   // const autoSyncService = new AutoSyncService(storage);
   // autoSyncService.start();
   
-  const server = await registerRoutes(app, storage, upload);
+  const server = await registerRoutes(app, storage as any, upload);
 
   // Set up WebSocket server for real-time chat streaming
   const { createServer } = await import('http');
@@ -288,7 +288,7 @@ app.use((req, res, next) => {
     
     ws.on('close', () => {
       // Remove from all conversations
-      for (const connections of wsConnections.values()) {
+      for (const [, connections] of wsConnections) {
         connections.delete(ws);
       }
       console.log('[WebSocket] Client disconnected');
