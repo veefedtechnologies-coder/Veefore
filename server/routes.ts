@@ -13812,7 +13812,7 @@ Create a detailed growth strategy in JSON format:
           if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
           if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
           return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
-        })()/api/youtube/callback`)}&` +
+        })()}/api/youtube/callback`)}&` +
         `scope=${encodeURIComponent(scopes.join(' '))}&` +
         `response_type=code&` +
         `access_type=offline&` +
