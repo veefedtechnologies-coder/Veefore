@@ -634,6 +634,8 @@ function SignUpIntegrated() {
                           <div className="relative z-10 flex items-center p-4">
                             <User className="w-5 h-5 text-gray-400 mr-3" />
                             <input
+                              id="fullName"
+                              name="fullName"
                               type="text"
                               value={formData.fullName}
                               onChange={(e) => handleInputChange('fullName', e.target.value)}
@@ -653,6 +655,8 @@ function SignUpIntegrated() {
                           <div className="relative z-10 flex items-center p-4">
                             <Mail className="w-5 h-5 text-gray-400 mr-3" />
                             <input
+                              id="email"
+                              name="email"
                               type="email"
                               value={formData.email}
                               onChange={(e) => handleInputChange('email', e.target.value)}
@@ -672,6 +676,8 @@ function SignUpIntegrated() {
                           <div className="relative z-10 flex items-center p-4">
                             <Lock className="w-5 h-5 text-gray-400 mr-3" />
                             <input
+                              id="password"
+                              name="password"
                               type={showPassword ? "text" : "password"}
                               value={formData.password}
                               onChange={(e) => handleInputChange('password', e.target.value)}

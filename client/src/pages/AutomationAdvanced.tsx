@@ -485,6 +485,8 @@ export default function AutomationAdvanced() {
             </label>
             <label className="flex items-center gap-2">
               <input
+                id="targetVerified"
+                name="targetVerified"
                 type="checkbox"
                 checked={targetVerified}
                 onChange={(e) => setTargetVerified(e.target.checked)}
@@ -494,6 +496,8 @@ export default function AutomationAdvanced() {
             </label>
             <label className="flex items-center gap-2">
               <input
+                id="targetBusinessAccounts"
+                name="targetBusinessAccounts"
                 type="checkbox"
                 checked={targetBusinessAccounts}
                 onChange={(e) => setTargetBusinessAccounts(e.target.checked)}
@@ -509,6 +513,8 @@ export default function AutomationAdvanced() {
                 Min Followers
               </label>
               <input
+                id="minFollowersTarget"
+                name="minFollowersTarget"
                 type="number"
                 value={minFollowersTarget}
                 onChange={(e) => setMinFollowersTarget(Number(e.target.value))}
@@ -520,6 +526,8 @@ export default function AutomationAdvanced() {
                 Max Followers
               </label>
               <input
+                id="maxFollowersTarget"
+                name="maxFollowersTarget"
                 type="number"
                 value={maxFollowersTarget}
                 onChange={(e) => setMaxFollowersTarget(Number(e.target.value))}
@@ -538,6 +546,8 @@ export default function AutomationAdvanced() {
         <div className="space-y-4">
           <label className="flex items-center gap-2">
             <input
+              id="autoFollowEnabled"
+              name="autoFollowEnabled"
               type="checkbox"
               checked={autoFollowEnabled}
               onChange={(e) => setAutoFollowEnabled(e.target.checked)}
