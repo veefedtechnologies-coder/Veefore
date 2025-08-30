@@ -1594,6 +1594,24 @@ export class MongoStorage implements IStorage {
         const trigger = rule.trigger || {};
         const action = rule.action || {};
         
+        // Handle different response structures for frontend compatibility
+        let displayResponses = [];
+        let displayDmResponses = [];
+        let targetMediaIds = [];
+        
+        if (rule.responses) {
+          if (typeof rule.responses === 'object' && rule.responses.responses) {
+            displayResponses = rule.responses.responses || [];
+            displayDmResponses = rule.responses.dmResponses || [];
+          } else if (Array.isArray(rule.responses)) {
+            displayResponses = rule.responses;
+          }
+        }
+        
+        if (rule.targetMediaIds) {
+          targetMediaIds = rule.targetMediaIds || [];
+        }
+        
         return {
           id: rule._id.toString(),
           name: rule.name || '',
@@ -1605,8 +1623,10 @@ export class MongoStorage implements IStorage {
           trigger: trigger,
           triggers: rule.triggers || trigger, // Include triggers field for compatibility
           action: action,
-          keywords: rule.keywords || [], // Include keywords field
-          responses: rule.responses || [], // Include responses field
+          keywords: rule.keywords || [], // Direct keywords array from rule
+          responses: displayResponses, // Comment responses for display  
+          dmResponses: displayDmResponses, // DM responses for display
+          targetMediaIds: targetMediaIds, // Target posts for display
           lastRun: rule.lastRun ? new Date(rule.lastRun) : null,
           nextRun: rule.nextRun ? new Date(rule.nextRun) : null,
           createdAt: rule.createdAt ? new Date(rule.createdAt) : new Date(),
