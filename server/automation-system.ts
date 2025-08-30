@@ -298,27 +298,50 @@ export class AutomationSystem {
               isBusinessAccount: instagramAccount?.isBusinessAccount
             });
             
-            // Use pageId if available, otherwise try accountId for Business API
-            const businessId = instagramAccount?.pageId || instagramAccount?.accountId;
-            if (businessId && instagramAccount?.isBusinessAccount) {
-              console.log('[AUTOMATION] Using Instagram Business API with ID:', businessId);
-              const response = await fetch(`https://graph.instagram.com/v21.0/${businessId}/messages`, {
+            // 🎯 MANYCHAT-STYLE DM API (using Page ID for Instagram Business)
+            const pageId = instagramAccount?.pageId;
+            if (pageId && instagramAccount?.isBusinessAccount) {
+              console.log('[AUTOMATION] 🚀 ManyChat-style DM: Using Page ID for Business API:', pageId);
+              
+              // Method 1: Instagram Page Messages API (like ManyChat)
+              const pageMessagesResponse = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   recipient: { id: userId },
                   message: { text: message },
+                  messaging_type: "RESPONSE", // Critical for Instagram Business
                   access_token: accessToken
                 })
               });
               
-              if (response.ok) {
-                const data = await response.json();
-                console.log('[AUTOMATION] ✅ DM sent successfully via Business API:', data.message_id);
+              if (pageMessagesResponse.ok) {
+                const data = await pageMessagesResponse.json();
+                console.log('[AUTOMATION] ✅ ManyChat-style DM sent via Page Messages API:', data.message_id);
                 return true;
               } else {
-                const error = await response.text();
-                console.error('[AUTOMATION] ❌ Business API DM failed:', error);
+                const pageError = await pageMessagesResponse.text();
+                console.log('[AUTOMATION] 📋 Page Messages API response:', pageError);
+                
+                // Method 2: Try Instagram-specific endpoint
+                const igResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    recipient: { id: userId },
+                    message: { text: message },
+                    access_token: accessToken
+                  })
+                });
+                
+                if (igResponse.ok) {
+                  const igData = await igResponse.json();
+                  console.log('[AUTOMATION] ✅ DM sent via Instagram Business API:', igData.message_id);
+                  return true;
+                } else {
+                  const igError = await igResponse.text();
+                  console.error('[AUTOMATION] ❌ Instagram Business API failed:', igError);
+                }
               }
             }
           }
