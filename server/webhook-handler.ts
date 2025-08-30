@@ -136,20 +136,38 @@ export class WebhookHandler {
    */
   private async findSocialAccountByPostId(postId: string): Promise<{ workspaceId: string; accessToken: string } | null> {
     try {
-      // Get all social accounts and find the one that owns this post
-      const allAccounts = await this.storage.getAllSocialAccounts();
+      console.log('[WEBHOOK] Looking for social account that owns post:', postId);
       
+      // Get all workspaces and their automation rules to find which one targets this post
+      const allAccounts = await this.storage.getAllSocialAccounts();
+      console.log('[WEBHOOK] Found', allAccounts.length, 'total accounts');
+      
+      // Check each Instagram account's automation rules for this post ID
       for (const account of allAccounts) {
         if (account.platform === 'instagram' && account.accessToken) {
-          // In a real implementation, you might need to verify the post belongs to this account
-          // For now, we'll return the first Instagram account with access token
-          return {
-            workspaceId: account.workspaceId,
-            accessToken: account.accessToken
-          };
+          console.log('[WEBHOOK] Checking account:', account.username, 'in workspace:', account.workspaceId);
+          
+          // Get automation rules for this workspace
+          const rules = await this.storage.getAutomationRules(account.workspaceId);
+          console.log('[WEBHOOK] Found', rules.length, 'rules for workspace:', account.workspaceId);
+          
+          // Check if any rule targets this post
+          for (const rule of rules) {
+            const targetMediaIds = (rule as any).targetMediaIds || [];
+            console.log('[WEBHOOK] Rule', rule.name, 'targets posts:', targetMediaIds);
+            
+            if (targetMediaIds.includes(postId)) {
+              console.log('[WEBHOOK] ✅ Found matching account:', account.username, 'for post:', postId);
+              return {
+                workspaceId: account.workspaceId,
+                accessToken: account.accessToken
+              };
+            }
+          }
         }
       }
       
+      console.log('[WEBHOOK] ❌ No social account found that targets post:', postId);
       return null;
     } catch (error) {
       console.error('[WEBHOOK] Error finding social account:', error);
