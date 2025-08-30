@@ -7103,66 +7103,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Instagram Automation Routes
-  app.post('/api/automation/comment', requireAuth, async (req, res) => {
-    try {
-      const { workspaceId, mediaId, message } = req.body;
-      
-      if (!workspaceId || !mediaId || !message) {
-        return res.status(400).json({ error: 'Workspace ID, media ID, and message are required' });
-      }
+  // Note: Manual comment automation removed - using webhook-based automation instead
 
-      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
-      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
-      
-      if (!instagramAccount?.accessToken) {
-        return res.status(400).json({ error: 'No Instagram account connected' });
-      }
-
-      const result = await instagramAutomation.sendAutomatedComment(
-        instagramAccount.accessToken,
-        mediaId,
-        message,
-        workspaceId,
-        'manual-comment' // Rule ID for manual comments
-      );
-
-      res.json(result);
-    } catch (error: any) {
-      console.error('[AUTOMATION] Comment API error:', error);
-      res.status(500).json({ error: 'Failed to send comment' });
-    }
-  });
-
-  app.post('/api/automation/dm', requireAuth, async (req, res) => {
-    try {
-      const { workspaceId, recipientId, message } = req.body;
-      
-      if (!workspaceId || !recipientId || !message) {
-        return res.status(400).json({ error: 'Workspace ID, recipient ID, and message are required' });
-      }
-
-      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
-      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
-      
-      if (!instagramAccount?.accessToken) {
-        return res.status(400).json({ error: 'No Instagram account connected' });
-      }
-
-      const result = await instagramAutomation.sendAutomatedDM(
-        instagramAccount.accessToken,
-        recipientId,
-        message,
-        workspaceId,
-        'manual-dm' // Rule ID for manual DMs
-      );
-
-      res.json(result);
-    } catch (error: any) {
-      console.error('[AUTOMATION] DM API error:', error);
-      res.status(500).json({ error: 'Failed to send DM' });
-    }
-  });
+  // Note: Manual DM automation removed - using webhook-based automation instead
 
   // OLD AUTOMATION ENDPOINT - REPLACED BY NEW SYSTEM
 
@@ -7239,19 +7182,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Process mentions endpoint for manual trigger
-  app.post('/api/automation/process-mentions/:workspaceId', requireAuth, async (req, res) => {
-    try {
-      const { workspaceId } = req.params;
-      
-      await instagramAutomation.processMentions(workspaceId);
-      
-      res.json({ success: true, message: 'Mentions processed' });
-    } catch (error: any) {
-      console.error('[AUTOMATION] Process mentions error:', error);
-      res.status(500).json({ error: 'Failed to process mentions' });
-    }
-  });
+  // Note: Process mentions removed - using webhook-based automation instead
 
   // Instagram Webhook Routes - Updated for v18.0 API
 
@@ -7530,51 +7461,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // 🧪 DIRECT AUTOMATION TEST - DEBUG PARAMETERS
-  app.post('/api/test-external-comment', async (req, res) => {
-    try {
-      console.log('[TEST] 🧪 DEBUGGING parameter order issue...');
-      console.log('[TEST] Expected processComment signature:');
-      console.log('[TEST] 1. workspaceId:', '684402c2fd2cd4eb6521b386');
-      console.log('[TEST] 2. commentText:', 'uu testing automation');
-      console.log('[TEST] 3. commentId:', 'test_comment_123');
-      console.log('[TEST] 4. userId:', 'test_user_id');
-      console.log('[TEST] 5. username:', 'test_external_user');
-      console.log('[TEST] 6. accessToken:', 'test_token_123');
-      console.log('[TEST] 7. mediaId:', '17855248212513160');
-      
-      const automationSystem = new AutomationSystem(storage);
-      
-      // Test with exact real webhook pattern 
-      const result = await automationSystem.processComment(
-        '684402c2fd2cd4eb6521b386', // 1. workspaceId 
-        'uu testing automation',     // 2. commentText
-        'test_comment_123',          // 3. commentId
-        'test_user_id',              // 4. userId  
-        'test_external_user',        // 5. username
-        'test_token_123',            // 6. accessToken
-        '17855248212513160'          // 7. mediaId (optional)
-      );
-      
-      console.log('[TEST] 🎯 Result:', result);
-      
-      res.json({ 
-        success: true,
-        result: result,
-        debug: {
-          parametersUsed: {
-            workspaceId: '684402c2fd2cd4eb6521b386',
-            commentText: 'uu testing automation',
-            mediaId: '17855248212513160'
-          }
-        }
-      });
-      
-    } catch (error: any) {
-      console.error('[TEST] ❌ Error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // Private Replies API format fixed - system ready for App Review
 
   // 🎯 UPDATE AUTOMATION RULES TO TARGET CURRENT POSTS
   app.post('/api/update-automation-targeting', async (req, res) => {

@@ -373,15 +373,21 @@ export class AutomationSystem {
           isBusinessAccount: instagramAccount.isBusinessAccount
         });
 
-        // 🎯 OFFICIAL PRIVATE REPLIES API (from Instagram documentation)
-        const response = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
+        // 🎯 OFFICIAL PRIVATE REPLIES API (Fixed format from Facebook docs)
+        const params = new URLSearchParams({
+          'recipient': JSON.stringify({ comment_id: commentId }),
+          'message': JSON.stringify({ text: message }),
+          'access_token': accessToken
+        });
+        
+        console.log('[AUTOMATION] 📝 Private Reply API Request:');
+        console.log('[AUTOMATION] URL:', `https://graph.facebook.com/${pageId}/messages`);
+        console.log('[AUTOMATION] Params:', params.toString());
+        
+        const response = await fetch(`https://graph.facebook.com/${pageId}/messages`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recipient: { comment_id: commentId },  // 🔑 Key difference: comment_id instead of user id
-            message: { text: message },
-            access_token: accessToken
-          })
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
         });
 
         if (response.ok) {
