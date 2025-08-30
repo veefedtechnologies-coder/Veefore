@@ -254,6 +254,14 @@ export class ComprehensiveInstagramWebhook {
       
       console.log(`[COMPREHENSIVE WEBHOOK] 🎯 New comment from @${from.username}: "${text}"`);
 
+      // 🔧 CRITICAL FIX: Ignore comments from business account itself (automated replies)
+      if (from.username === socialAccount.username) {
+        console.log(`[COMPREHENSIVE WEBHOOK] ⏭️ Skipping comment from business account itself (automated reply): @${from.username}`);
+        return;
+      }
+      
+      console.log(`[COMPREHENSIVE WEBHOOK] ✅ Processing comment from external user: @${from.username}`);
+
       // Process through automation system for Comment→DM automation
       const automationResult = await this.automationSystem.processComment(
         socialAccount.workspaceId,

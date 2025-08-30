@@ -272,6 +272,15 @@ export class MetaCompliantWebhook {
         commentId: commentId
       });
 
+      // 🔧 CRITICAL FIX: Ignore comments from business account itself (automated replies)
+      console.log('[META COMMENT] 🔍 DEBUG: from.username =', from.username, 'account.username =', account.username);
+      if (from.username === account.username) {
+        console.log('[META COMMENT] ⏭️ Skipping comment from business account itself (automated reply):', from.username);
+        return;
+      }
+      
+      console.log('[META COMMENT] ✅ Processing comment from external user:', from.username);
+
       // CRITICAL: Process through automation system
       const automationResult = await this.automationSystem.processComment(
         account.workspaceId,
