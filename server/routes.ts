@@ -13880,7 +13880,7 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Update automation rule - NEW SYSTEM
-  app.put('/api/automation/rules/:ruleId', async (req: any, res: Response) => {
+  app.put('/api/automation/rules/:ruleId', requireAuth, async (req: any, res: Response) => {
     try {
       const { ruleId } = req.params;
       const updates = req.body;
@@ -13894,7 +13894,7 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Delete automation rule - NEW SYSTEM
-  app.delete('/api/automation/rules/:ruleId', async (req: any, res: Response) => {
+  app.delete('/api/automation/rules/:ruleId', requireAuth, async (req: any, res: Response) => {
     try {
       const { ruleId } = req.params;
       
@@ -13907,7 +13907,7 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Toggle automation rule - NEW SYSTEM
-  app.post('/api/automation/rules/:ruleId/toggle', async (req: any, res: Response) => {
+  app.post('/api/automation/rules/:ruleId/toggle', requireAuth, async (req: any, res: Response) => {
     try {
       const { ruleId } = req.params;
       

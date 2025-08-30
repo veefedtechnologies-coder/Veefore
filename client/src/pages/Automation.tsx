@@ -252,18 +252,30 @@ export default function Automation() {
     queryFn: () => apiRequest('/api/social-accounts')
   })
 
-  // Fetch automation rules from backend API
-  const { data: automationRules = [], isLoading: rulesLoading, refetch: refetchRules } = useQuery<AutomationRule[]>({
-    queryKey: ['/api/automation/rules'],
-    queryFn: () => apiRequest('/api/automation/rules')
+  // Get user data for workspaceId
+  const { data: userData } = useQuery({
+    queryKey: ['/api/user'],
+    queryFn: () => apiRequest('/api/user')
   })
+
+  // Fetch automation rules from backend API
+  const { data: automationRulesResponse, isLoading: rulesLoading, refetch: refetchRules } = useQuery<{ rules: AutomationRule[] }>({
+    queryKey: ['/api/automation/rules', userData?.currentWorkspaceId],
+    queryFn: () => apiRequest(`/api/automation/rules?workspaceId=${userData?.currentWorkspaceId}`),
+    enabled: !!userData?.currentWorkspaceId
+  })
+
+  const automationRules = automationRulesResponse?.rules || []
 
   // Create automation rule mutation
   const createRuleMutation = useMutation({
     mutationFn: (automationData: any) => 
       apiRequest('/api/automation/rules', {
         method: 'POST',
-        body: JSON.stringify(automationData),
+        body: JSON.stringify({
+          ...automationData,
+          workspaceId: userData?.currentWorkspaceId
+        }),
         headers: {
           'Content-Type': 'application/json'
         }
@@ -515,6 +527,8 @@ export default function Automation() {
 
   const InstagramPostPreview = () => {
     const selectedPost = mockPosts.find(p => p.id === formData.selectedPost)
+    const connectedAccount = socialAccounts.find(acc => acc.platform === 'instagram')
+    
     if (!selectedPost) return null
 
     return (
@@ -524,7 +538,7 @@ export default function Automation() {
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-semibold text-gray-800">Live Preview</span>
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Instagram</span>
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Real-time automation preview</span>
           </div>
         </div>
 
@@ -532,11 +546,29 @@ export default function Automation() {
         <div className="p-4 border-b border-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-600" />
+              {connectedAccount?.profilePictureUrl ? (
+                <img 
+                  src={connectedAccount.profilePictureUrl} 
+                  alt={connectedAccount.username}
+                  className="w-8 h-8 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    e.currentTarget.nextElementSibling.style.display = 'flex'
+                  }}
+                />
+              ) : null}
+              <div 
+                className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+                style={{ display: connectedAccount?.profilePictureUrl ? 'none' : 'flex' }}
+              >
+                <span className="text-white text-xs font-bold">
+                  {connectedAccount?.username?.charAt(1)?.toUpperCase() || 'U'}
+                </span>
               </div>
               <div>
-                <p className="font-semibold text-sm text-gray-900">{selectedPost.username}</p>
+                <p className="font-semibold text-sm text-gray-900">
+                  @{connectedAccount?.username || 'your_account'}
+                </p>
                 <p className="text-xs text-gray-500">{selectedPost.timeAgo}</p>
               </div>
             </div>
@@ -598,7 +630,9 @@ export default function Automation() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm">
-                    <span className="font-semibold text-blue-600">{selectedPost.realUsername}</span>{' '}
+                    <span className="font-semibold text-blue-600">
+                      @{connectedAccount?.username || 'your_account'}
+                    </span>{' '}
                     <span className="text-gray-700">{mockReply}</span>
                   </p>
                   <div className="flex items-center space-x-3 mt-1">
