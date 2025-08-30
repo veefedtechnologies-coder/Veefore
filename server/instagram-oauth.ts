@@ -84,7 +84,7 @@ export class InstagramOAuthService {
     try {
       // Step 1: Get basic Instagram profile
       const response = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,picture&access_token=${accessToken}`
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url&access_token=${accessToken}`
       );
 
       if (!response.ok) {
@@ -131,7 +131,7 @@ export class InstagramOAuthService {
         username: profileData.username,
         accountType: profileData.account_type,
         mediaCount: profileData.media_count,
-        profilePictureUrl: profileData.picture,
+        profilePictureUrl: profileData.profile_picture_url,
         pageId: pageId, // 🎯 Critical for Instagram Business DMs
         platform: 'instagram',
       };
@@ -149,9 +149,16 @@ export class InstagramOAuthService {
       const existingInstagram = existingAccounts.find(acc => acc.platform === 'instagram');
 
       if (existingInstagram) {
-        // Update existing account
+        // Update existing account with all profile data
         await this.storage.updateSocialAccount(existingInstagram.id, {
-          ...accountData,
+          username: accountData.username,
+          accountId: accountData.accountId,
+          accessToken: accountData.accessToken,
+          expiresAt: accountData.expiresAt,
+          mediaCount: accountData.mediaCount || 0,
+          profilePictureUrl: accountData.profilePictureUrl,
+          pageId: accountData.pageId,
+          lastSyncAt: new Date(),
           updatedAt: new Date(),
         });
       } else {
@@ -170,7 +177,7 @@ export class InstagramOAuthService {
           mediaCount: accountData.mediaCount || 0,
           biography: null,
           website: null,
-          profilePictureUrl: null,
+          profilePictureUrl: accountData.profilePictureUrl,
           verificationStatus: null,
           businessCategoryId: null,
           businessCategoryName: null,
@@ -178,6 +185,7 @@ export class InstagramOAuthService {
           avgComments: 0,
           avgEngagement: 0,
           totalReach: 0,
+          pageId: accountData.pageId,
           lastSyncAt: new Date(),
         });
       }
