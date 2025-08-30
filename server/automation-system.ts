@@ -373,15 +373,40 @@ export class AutomationSystem {
           isBusinessAccount: instagramAccount.isBusinessAccount
         });
 
-        // 🎯 CORRECT PRIVATE REPLIES API (JSON format based on working examples)
-        const requestBody = {
+        // 🎯 STRUCTURED MESSAGE TEMPLATES for Private Replies API
+        // Use Button Template (officially supported format)
+        const buttonTemplate = {
           recipient: { comment_id: commentId },
-          message: { text: message },
+          message: {
+            attachment: {
+              type: "template",
+              payload: {
+                template_type: "button",
+                text: message,
+                buttons: [
+                  {
+                    type: "web_url",
+                    url: "https://instagram.com/rahulc1020",
+                    title: "Visit Profile"
+                  },
+                  {
+                    type: "postback",
+                    title: "Start Chat",
+                    payload: "START_CHAT_" + commentId
+                  }
+                ]
+              }
+            }
+          },
           access_token: accessToken
         };
         
-        console.log('[AUTOMATION] 📝 Private Reply API Request (CORRECTED):');
+        // Use Button Template as primary (simpler and more reliable)
+        const requestBody = buttonTemplate;
+        
+        console.log('[AUTOMATION] 📝 Private Reply API Request (STRUCTURED TEMPLATE):');
         console.log('[AUTOMATION] URL:', `https://graph.facebook.com/${pageId}/messages`);
+        console.log('[AUTOMATION] Template Type:', requestBody.message.attachment.payload.template_type);
         console.log('[AUTOMATION] Body:', JSON.stringify(requestBody, null, 2));
         
         const response = await fetch(`https://graph.facebook.com/${pageId}/messages`, {
@@ -395,17 +420,73 @@ export class AutomationSystem {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('[AUTOMATION] ✅ Private Reply sent successfully!', data);
-          console.log('[AUTOMATION] 🎉 No conversation window restrictions with Private Replies API!');
+          console.log('[AUTOMATION] ✅ Structured Private Reply sent successfully!', data);
+          console.log('[AUTOMATION] 🎉 Template-based Private Reply worked!');
           return true;
         } else {
           const errorText = await response.text();
-          console.error('[AUTOMATION] ❌ Private Reply API call failed:', errorText);
+          console.error('[AUTOMATION] ❌ Structured Private Reply failed:', errorText);
           
-          // 🚀 SMART WORKAROUND: If Private Reply fails, use public comment reply + DM instruction
+          // Try Generic Template as fallback
           if (errorText.includes('Application does not have the capability')) {
-            console.log('[AUTOMATION] 🔄 Private Replies requires Advanced Access - using workaround...');
-            return await this.sendPublicReplyWithDMPrompt(commentId, message, accessToken, instagramAccount);
+            console.log('[AUTOMATION] 🔄 Trying Generic Template fallback...');
+            
+            const genericFallback = {
+              recipient: { comment_id: commentId },
+              message: {
+                attachment: {
+                  type: "template", 
+                  payload: {
+                    template_type: "generic",
+                    elements: [
+                      {
+                        title: "Thanks for your comment!",
+                        subtitle: message,
+                        image_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=rahulc1020",
+                        default_action: {
+                          type: "web_url",
+                          url: "https://instagram.com/rahulc1020"
+                        },
+                        buttons: [
+                          {
+                            type: "web_url", 
+                            url: "https://instagram.com/rahulc1020",
+                            title: "Visit Profile"
+                          },
+                          {
+                            type: "postback",
+                            title: "Get Info",
+                            payload: "GET_INFO_" + commentId
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              access_token: accessToken
+            };
+            const fallbackResponse = await fetch(`https://graph.facebook.com/${pageId}/messages`, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify(genericFallback)
+            });
+            
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              console.log('[AUTOMATION] ✅ Generic Template Private Reply worked!', fallbackData);
+              return true;
+            } else {
+              const fallbackError = await fallbackResponse.text();
+              console.error('[AUTOMATION] ❌ Generic Template also failed:', fallbackError);
+              
+              // Final fallback to public comment
+              console.log('[AUTOMATION] 🔄 Using public comment workaround...');
+              return await this.sendPublicReplyWithDMPrompt(commentId, message, accessToken, instagramAccount);
+            }
           }
           
           return false;
