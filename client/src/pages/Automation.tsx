@@ -132,6 +132,7 @@ export default function Automation() {
   console.log('[AUTOMATION DEBUG] Social accounts error:', socialAccountsError)
   console.log('[AUTOMATION DEBUG] Social accounts data:', socialAccounts)
   console.log('[AUTOMATION DEBUG] Social accounts length:', socialAccounts?.length || 0)
+  console.log('[AUTOMATION DEBUG] Raw API response:', JSON.stringify(socialAccounts, null, 2))
   
   const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram')
   console.log('[AUTOMATION DEBUG] Instagram account found:', instagramAccount)
@@ -482,10 +483,20 @@ export default function Automation() {
                   @{connectedAccount?.username || 'loading...'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {connectedAccount?.followers !== undefined ? 
-                    `${connectedAccount.followers} followers` : 
-                    'Loading followers...'
-                  } • {selectedPost?.timeAgo || '2h ago'}
+                  {(() => {
+                    console.log('[FOLLOWER DISPLAY DEBUG] connectedAccount:', connectedAccount)
+                    console.log('[FOLLOWER DISPLAY DEBUG] followers value:', connectedAccount?.followers)
+                    console.log('[FOLLOWER DISPLAY DEBUG] followers type:', typeof connectedAccount?.followers)
+                    console.log('[FOLLOWER DISPLAY DEBUG] followers !== undefined:', connectedAccount?.followers !== undefined)
+                    
+                    if (connectedAccount?.followers !== undefined) {
+                      console.log('[FOLLOWER DISPLAY DEBUG] Showing followers count:', connectedAccount.followers)
+                      return `${connectedAccount.followers} followers`
+                    } else {
+                      console.log('[FOLLOWER DISPLAY DEBUG] Followers is undefined, showing loading')
+                      return 'Loading followers...'
+                    }
+                  })()} • {selectedPost?.timeAgo || '2h ago'}
                 </p>
               </div>
               {/* Moved inside the fallback avatar div above */}
