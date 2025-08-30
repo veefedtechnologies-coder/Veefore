@@ -345,7 +345,8 @@ const AutomationRuleSchema = new mongoose.Schema({
   postInteraction: { type: Boolean }, // For comment-to-DM detection
   platform: { type: String }, // Platform (instagram, etc.)
   keywords: [{ type: String }], // Keywords for triggering
-  responses: [{ type: String }], // Response templates
+  responses: { type: mongoose.Schema.Types.Mixed }, // Response templates (can be array or object)
+  targetMediaIds: [{ type: String }], // Target post/media IDs
   trigger: { type: mongoose.Schema.Types.Mixed, default: {} },
   triggers: { type: mongoose.Schema.Types.Mixed, default: {} }, // Alternative triggers format
   action: { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -1720,8 +1721,12 @@ export class MongoStorage implements IStorage {
         workspaceId: rule.workspaceId.toString(),
         description: rule.description || null,
         isActive: rule.isActive !== false,
+        type: rule.type || 'comment_dm',
         trigger: rule.trigger || {},
         action: rule.action || {},
+        keywords: rule.keywords || [],
+        responses: rule.responses || {},
+        targetMediaIds: rule.targetMediaIds || [],
         lastRun: null,
         nextRun: rule.nextRun || null,
         createdAt: new Date(),
@@ -1738,8 +1743,12 @@ export class MongoStorage implements IStorage {
         workspaceId: parseInt(savedRule.workspaceId),
         description: savedRule.description,
         isActive: savedRule.isActive,
+        type: savedRule.type,
         trigger: savedRule.trigger,
         action: savedRule.action,
+        keywords: savedRule.keywords,
+        responses: savedRule.responses,
+        targetMediaIds: savedRule.targetMediaIds,
         lastRun: savedRule.lastRun,
         nextRun: savedRule.nextRun,
         createdAt: savedRule.createdAt,
