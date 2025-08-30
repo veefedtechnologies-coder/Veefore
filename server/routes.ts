@@ -18,7 +18,7 @@ import { videoShortenerAI } from './video-shortener-ai';
 import { RealVideoProcessor } from './real-video-processor';
 import { DashboardCache } from "./dashboard-cache";
 import { AutomationSystem } from "./automation-system";
-import { WebhookHandler } from "./webhook-handler";
+import { ComprehensiveInstagramWebhook } from "./comprehensive-instagram-webhook";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   
   // CLEAN AUTOMATION SYSTEM INSTANCES
   const automationSystem = new AutomationSystem(storage);
-  const webhookHandler = new WebhookHandler(storage);
+  const comprehensiveWebhook = new ComprehensiveInstagramWebhook(storage);
   
   // Start smart polling and account monitoring for immediate real-time updates
   console.log('[SMART POLLING] 🚀 Activating intelligent Instagram polling system...');
@@ -7130,26 +7130,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Instagram Webhook Routes - Updated for v18.0 API
-  app.get('/webhook/instagram', async (req, res) => {
-    console.log('[WEBHOOK] Instagram webhook verification request');
-    await webhookHandler.handleVerification(req, res);
-  });
 
-  app.post('/webhook/instagram', async (req, res) => {
-    console.log('[INSTAGRAM WEBHOOK] Received webhook event for comment-to-DM automation');
-    await webhookHandler.handleWebhookEvent(req, res);
-  });
 
   // Instagram Comment Webhook Routes for DM Automation
-  app.get('/webhook/instagram-comments', async (req, res) => {
-    console.log('[COMMENT WEBHOOK] Instagram comment webhook verification request');
-    await webhookHandler.handleVerification(req, res);
-  });
 
-  app.post('/webhook/instagram-comments', async (req, res) => {
-    console.log('[COMMENT WEBHOOK] Instagram comment webhook event received');
-    await webhookHandler.handleWebhookEvent(req, res);
-  });
 
   // Test webhook system endpoint
   app.post('/api/test-instagram-webhook', requireAuth, async (req: any, res: any) => {
@@ -7368,7 +7352,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // OLD WEBHOOK ENDPOINTS - REPLACED BY NEW SYSTEM
+  // ✅ COMPREHENSIVE INSTAGRAM WEBHOOK SYSTEM
+  // Handles ALL Instagram events: posts, comments, likes, followers, engagement, reach, analytics
+  app.get('/webhook/instagram', async (req, res) => {
+    console.log('[COMPREHENSIVE WEBHOOK] Instagram webhook verification request');
+    await comprehensiveWebhook.handleVerification(req, res);
+  });
+
+  app.post('/webhook/instagram', async (req, res) => {
+    console.log('[COMPREHENSIVE WEBHOOK] 🎯 Instagram webhook event received - processing ALL events');
+    await comprehensiveWebhook.handleWebhookEvent(req, res);
+  });
 
   // Test endpoint for webhook automation demo
   app.post('/api/test-webhook-automation', async (req, res) => {
