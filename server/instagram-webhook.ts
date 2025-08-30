@@ -117,13 +117,17 @@ export class InstagramWebhookHandler {
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    console.log('[WEBHOOK] Verification request:', { mode, token });
+    console.log('[WEBHOOK] Verification request:', { mode, token, challenge });
+    console.log('[WEBHOOK] Expected token:', process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN);
+    console.log('[WEBHOOK] All query params:', req.query);
 
     if (mode === 'subscribe' && token === process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN) {
-      console.log('[WEBHOOK] Webhook verified successfully');
+      console.log('[WEBHOOK] ✅ Webhook verified successfully');
       res.status(200).send(challenge);
     } else {
-      console.log('[WEBHOOK] Webhook verification failed');
+      console.log('[WEBHOOK] ❌ Webhook verification failed');
+      console.log(`[WEBHOOK] Mode: ${mode}, Expected: subscribe`);
+      console.log(`[WEBHOOK] Token: ${token}, Expected: ${process.env.INSTAGRAM_WEBHOOK_VERIFY_TOKEN}`);
       res.sendStatus(403);
     }
   }
