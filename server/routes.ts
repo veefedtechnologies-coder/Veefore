@@ -1252,6 +1252,27 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
+      // Validate user has access to this workspace
+      const workspace = await storage.getWorkspace(workspaceId);
+      if (!workspace) {
+        return res.status(404).json({ error: 'Workspace not found' });
+      }
+      
+      // Check if user owns this workspace - handle multiple ID formats for compatibility
+      const workspaceUserId = workspace.userId.toString();
+      const requestUserId = user.id.toString();
+      const firebaseUid = user.firebaseUid;
+      
+      const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                               workspaceUserId === firebaseUid ||
+                               workspace.userId === user.id ||
+                               workspace.userId === user.firebaseUid;
+      
+      if (!userOwnsWorkspace) {
+        console.log('[FILTERED ANALYTICS] Access denied - user does not own workspace:', workspaceId);
+        return res.status(403).json({ error: 'Access denied to workspace' });
+      }
+
       // Parse platforms filter
       const selectedPlatforms = platforms ? platforms.split(',').filter(Boolean) : [];
       
@@ -1871,12 +1892,27 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log('[DASHBOARD MULTI-PLATFORM] Aggregating analytics from ALL connected social platforms');
       console.log('[DASHBOARD MULTI-PLATFORM] User:', user.id, 'WorkspaceId:', workspaceId);
 
-      // Verify workspace access
+      // Verify workspace access with enhanced validation
       let workspace;
       if (workspaceId) {
         workspace = await storage.getWorkspace(workspaceId);
-        if (!workspace || workspace.userId !== user.id) {
-          return res.status(403).json({ error: 'Workspace not found or access denied' });
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = user.id.toString();
+        const firebaseUid = user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === user.id ||
+                                 workspace.userId === user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[DASHBOARD ANALYTICS] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
         }
       } else {
         const workspaces = await storage.getWorkspacesByUserId(user.id);
@@ -2461,13 +2497,37 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.get('/api/analytics/historical', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const { period = 'month', days = 30 } = req.query;
+      const { period = 'month', days = 30, workspaceId } = req.query;
       
       console.log(`[HISTORICAL ANALYTICS] Fetching ${days} days of historical data for user: ${user.id}`);
       
-      // Get user's workspace
-      const workspaces = await storage.getWorkspacesByUserId(user.id);
-      const workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
+      // Get workspace with proper validation
+      let workspace;
+      if (workspaceId) {
+        workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = user.id.toString();
+        const firebaseUid = user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === user.id ||
+                                 workspace.userId === user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[HISTORICAL ANALYTICS] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      } else {
+        // Get user's default workspace
+        const workspaces = await storage.getWorkspacesByUserId(user.id);
+        workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
+      }
       
       if (!workspace) {
         return res.json([]);
@@ -2596,6 +2656,30 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       console.log('[CREATIVE BRIEF AI] Generating creative brief for user:', userId);
       console.log('[CREATIVE BRIEF AI] Request data:', req.body);
 
+      // Validate workspace access if workspaceId is provided
+      const workspaceId = req.body.workspaceId || req.headers['workspace-id'];
+      if (workspaceId) {
+        const workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = userId.toString();
+        const firebaseUid = user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === userId ||
+                                 workspace.userId === user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[CREATIVE BRIEF AI] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      }
+
       const { creativeBriefAI } = await import('./creative-brief-ai');
       const briefResult = await creativeBriefAI.generateBrief(req.body);
 
@@ -2646,6 +2730,30 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       console.log('[CONTENT REPURPOSE AI] Repurposing content for user:', userId);
       console.log('[CONTENT REPURPOSE AI] Request data:', req.body);
+
+      // Validate workspace access if workspaceId is provided
+      const workspaceId = req.body.workspaceId || req.headers['workspace-id'];
+      if (workspaceId) {
+        const workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = userId.toString();
+        const firebaseUid = user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === userId ||
+                                 workspace.userId === user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[CONTENT REPURPOSE AI] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      }
 
       const { contentRepurposeAI } = await import('./content-repurpose-ai');
       const repurposeResult = await contentRepurposeAI.repurposeContent(req.body);
@@ -2817,6 +2925,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const workspaceId = req.body.workspaceId || (await storage.getDefaultWorkspace(req.user.id))?.id;
       console.log('[FORCE SYNC] Workspace ID:', workspaceId);
 
+      // Validate user has access to this workspace
+      if (workspaceId) {
+        const workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = req.user.id.toString();
+        const firebaseUid = req.user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === req.user.id ||
+                                 workspace.userId === req.user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[FORCE SYNC] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      }
+
       // Get the Instagram account for this workspace
       const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
       const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram' && acc.isActive);
@@ -2921,6 +3052,29 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.post("/api/instagram/start-polling", requireAuth, async (req: any, res: any) => {
     try {
       const workspaceId = req.body.workspaceId || (await storage.getDefaultWorkspace(req.user.id))?.id;
+      
+      // Validate user has access to this workspace
+      if (workspaceId) {
+        const workspace = await storage.getWorkspace(workspaceId);
+        if (!workspace) {
+          return res.status(404).json({ error: 'Workspace not found' });
+        }
+        
+        // Check if user owns this workspace - handle multiple ID formats for compatibility
+        const workspaceUserId = workspace.userId.toString();
+        const requestUserId = req.user.id.toString();
+        const firebaseUid = req.user.firebaseUid;
+        
+        const userOwnsWorkspace = workspaceUserId === requestUserId || 
+                                 workspaceUserId === firebaseUid ||
+                                 workspace.userId === req.user.id ||
+                                 workspace.userId === req.user.firebaseUid;
+        
+        if (!userOwnsWorkspace) {
+          console.log('[START POLLING] Access denied - user does not own workspace:', workspaceId);
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+      }
       
       // Get Instagram account
       const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);

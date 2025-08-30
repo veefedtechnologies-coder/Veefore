@@ -25,7 +25,10 @@ export function SocialAccounts() {
 
   // Manual sync mutation for Instagram data - IMMEDIATE mode
   const syncMutation = useMutation({
-    mutationFn: () => apiRequest('/api/instagram/force-sync', { method: 'POST' }),
+    mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/force-sync', { 
+      method: 'POST',
+      body: JSON.stringify({ workspaceId: currentWorkspace.id })
+    }) : Promise.reject(new Error('No workspace selected')),
     onSuccess: (data) => {
       // Immediately trigger a refresh of all data
       refetchAccounts()
@@ -62,7 +65,10 @@ export function SocialAccounts() {
 
   // Auto-start polling mutation
   const startPollingMutation = useMutation({
-    mutationFn: () => apiRequest('/api/instagram/start-polling', { method: 'POST' }),
+    mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/start-polling', { 
+      method: 'POST',
+      body: JSON.stringify({ workspaceId: currentWorkspace.id })
+    }) : Promise.reject(new Error('No workspace selected')),
     onSuccess: (data) => {
       toast({
         title: "🔄 Real-time polling started",

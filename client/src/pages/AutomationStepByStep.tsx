@@ -42,6 +42,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { useToast } from '@/hooks/use-toast'
+import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 
 // AutomationListManager component
 const AutomationListManager = ({ 
@@ -214,14 +215,18 @@ export default function AutomationStepByStep() {
   const [automationType, setAutomationType] = useState('')
   const [selectedPost, setSelectedPost] = useState('')
   
-  // Fetch real Instagram accounts
+  // Get current workspace
+  const { currentWorkspace } = useCurrentWorkspace()
+
+  // Fetch real Instagram accounts for current workspace
   const { data: socialAccountsData, isLoading: accountsLoading } = useQuery({
-    queryKey: ['/api/social-accounts'],
+    queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: async () => {
-      const response = await apiRequest('/api/social-accounts')
+      if (!currentWorkspace?.id) return []
+      const response = await apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`)
       return response
     },
-    enabled: true
+    enabled: !!currentWorkspace?.id
   })
 
   // Transform real account data

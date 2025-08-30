@@ -120,10 +120,14 @@ export default function Automation() {
   const [mockComment] = useState('cy')
   const [mockReply, setMockReply] = useState('vfrv')
 
-  // Fetch social accounts with better error handling
+  // Get current workspace using the proper hook
+  const { currentWorkspace } = useCurrentWorkspace()
+
+  // Fetch social accounts with better error handling for current workspace
   const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
-    queryKey: ['/api/social-accounts'],
-    queryFn: () => apiRequest('/api/social-accounts'),
+    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    enabled: !!currentWorkspace?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false
   })
@@ -138,9 +142,6 @@ export default function Automation() {
     profilePictureUrl: instagramAccount.profilePictureUrl,
     profilePicture: instagramAccount.profilePicture
   } : 'No Instagram account found')
-
-  // Get current workspace using the proper hook
-  const { currentWorkspace } = useCurrentWorkspace()
 
   // Fetch automation rules from backend API
   const { data: automationRulesResponse, isLoading: rulesLoading } = useQuery<{ rules: AutomationRule[] }>({
