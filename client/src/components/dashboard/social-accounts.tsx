@@ -6,16 +6,19 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
+import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
 
 export function SocialAccounts() {
   const [, setLocation] = useLocation()
   const { toast } = useToast()
+  const { currentWorkspace } = useCurrentWorkspace()
   
-  // Fetch social accounts data - PRODUCTION-SAFE rate limit protection
+  // Fetch social accounts data for current workspace - PRODUCTION-SAFE rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
-    queryKey: ['/api/social-accounts'],
-    queryFn: () => apiRequest('/api/social-accounts'),
+    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    enabled: !!currentWorkspace?.id,
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes to prevent excessive calls
   })

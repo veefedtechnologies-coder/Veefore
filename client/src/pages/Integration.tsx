@@ -140,17 +140,18 @@ export default function Integration() {
     }
   }, [])
 
-  // Fetch connected social accounts
+  // Get current workspace (reactive to workspace switching)
+  const { currentWorkspace, workspaces } = useCurrentWorkspace();
+
+  // Fetch connected social accounts for current workspace
   const { data: connectedAccounts = [], isLoading, refetch } = useQuery({
-    queryKey: ['/api/social-accounts'],
-    queryFn: () => apiRequest('/api/social-accounts'),
+    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    enabled: !!currentWorkspace?.id,
     staleTime: 5 * 60 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true
   })
-
-  // Get current workspace (reactive to workspace switching)
-  const { currentWorkspace, workspaces } = useCurrentWorkspace();
 
   console.log('Integration state:', { 
     isLoading, 
