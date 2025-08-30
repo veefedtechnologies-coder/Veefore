@@ -16,6 +16,9 @@ export interface AutomationRule {
   // Keywords to trigger automation
   keywords: string[];
   
+  // 🎯 POST-SPECIFIC TARGETING (like ManyChat)
+  targetMediaIds?: string[];  // Target specific post/media IDs
+  
   // Responses (new format)
   responses?: {
     responses?: string[];     // Comment responses
@@ -98,7 +101,7 @@ export class AutomationSystem {
   }
 
   /**
-   * Process Instagram comment for automation
+   * Process Instagram comment for automation - with POST-SPECIFIC TARGETING
    */
   async processComment(
     workspaceId: string,
@@ -106,9 +109,15 @@ export class AutomationSystem {
     commentId: string,
     userId: string,
     username: string,
-    accessToken: string
+    accessToken: string,
+    mediaId?: string  // 🎯 POST ID for targeting specific posts
   ): Promise<{ triggered: boolean; actions: string[] }> {
     console.log('[AUTOMATION] Processing comment:', commentText);
+    if (mediaId) {
+      console.log('[AUTOMATION] 🎯 Comment on post/media ID:', mediaId);
+    } else {
+      console.log('[AUTOMATION] ⚠️ No media ID provided - global processing');
+    }
     
     let rules = await this.getRules(workspaceId);
     
@@ -146,6 +155,21 @@ export class AutomationSystem {
       console.log('[AUTOMATION DEBUG] Processing rule:', rule.name);
       console.log('[AUTOMATION DEBUG] Rule keywords:', rule.keywords);
       console.log('[AUTOMATION DEBUG] Rule type:', typeof rule.keywords);
+      
+      // 🎯 POST-SPECIFIC TARGETING CHECK (like ManyChat)
+      if (rule.targetMediaIds && rule.targetMediaIds.length > 0) {
+        if (!mediaId) {
+          console.log('[AUTOMATION] ⏭️ Rule targets specific posts but no mediaId provided, skipping:', rule.name);
+          continue;
+        }
+        if (!rule.targetMediaIds.includes(mediaId)) {
+          console.log('[AUTOMATION] ⏭️ Rule targets different posts, skipping:', rule.name, 'targets:', rule.targetMediaIds, 'current:', mediaId);
+          continue;
+        }
+        console.log('[AUTOMATION] ✅ Rule targets this post:', rule.name, 'mediaId:', mediaId);
+      } else {
+        console.log('[AUTOMATION] 🌐 Rule has global targeting (all posts):', rule.name);
+      }
       
       const keywords = Array.isArray(rule.keywords) ? rule.keywords : [];
       const isTriggered = keywords.some(keyword => 

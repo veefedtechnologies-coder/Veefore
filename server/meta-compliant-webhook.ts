@@ -265,15 +265,16 @@ export class MetaCompliantWebhook {
       // Extract comment ID - Instagram uses 'id' field, not 'comment_id'
       const commentId = value.id || value.comment_id;
       const { text, from } = value;
+      const mediaId = (value as any).media_id || (value as any).parent_id || (value as any).media?.id;
       
       console.log('[META COMMENT] 🎯 Real Instagram comment:', {
         user: from.username,
         text: text,
-        commentId: commentId
+        commentId: commentId,
+        mediaId: mediaId
       });
 
       // 🔧 CRITICAL FIX: Ignore comments from business account itself (automated replies)
-      console.log('[META COMMENT] 🔍 DEBUG: from.username =', from.username, 'account.username =', account.username);
       if (from.username === account.username) {
         console.log('[META COMMENT] ⏭️ Skipping comment from business account itself (automated reply):', from.username);
         return;
@@ -281,14 +282,15 @@ export class MetaCompliantWebhook {
       
       console.log('[META COMMENT] ✅ Processing comment from external user:', from.username);
 
-      // CRITICAL: Process through automation system
+      // CRITICAL: Process through automation system with POST-SPECIFIC TARGETING
       const automationResult = await this.automationSystem.processComment(
         account.workspaceId,
         text,
         commentId || 'meta_webhook',
         from.id,
         from.username,
-        account.accessToken
+        account.accessToken,
+        mediaId  // 🎯 Pass post/media ID for targeting
       );
 
       if (automationResult.triggered) {

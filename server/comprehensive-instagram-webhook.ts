@@ -250,9 +250,12 @@ export class ComprehensiveInstagramWebhook {
         return;
       }
 
-      const { text, from, comment_id, parent_id } = value;
+      const { text, from, comment_id, parent_id, media_id } = value;
       
       console.log(`[COMPREHENSIVE WEBHOOK] 🎯 New comment from @${from.username}: "${text}"`);
+      if (media_id || parent_id) {
+        console.log('[COMPREHENSIVE WEBHOOK] 📱 Post/Media ID:', media_id || parent_id);
+      }
 
       // 🔧 CRITICAL FIX: Ignore comments from business account itself (automated replies)
       if (from.username === socialAccount.username) {
@@ -262,14 +265,15 @@ export class ComprehensiveInstagramWebhook {
       
       console.log(`[COMPREHENSIVE WEBHOOK] ✅ Processing comment from external user: @${from.username}`);
 
-      // Process through automation system for Comment→DM automation
+      // Process through automation system for Comment→DM automation with POST-SPECIFIC TARGETING
       const automationResult = await this.automationSystem.processComment(
         socialAccount.workspaceId,
         text,
         comment_id || 'unknown',
         from.id,
         from.username,
-        socialAccount.accessToken
+        socialAccount.accessToken,
+        media_id || parent_id  // 🎯 Pass post/media ID for targeting
       );
 
       if (automationResult.triggered) {
