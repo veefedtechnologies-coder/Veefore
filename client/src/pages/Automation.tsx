@@ -44,6 +44,7 @@ import {
 // Add social media icons from react-icons  
 import { FaInstagram, FaYoutube, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa'
 import { apiRequest } from '@/lib/queryClient'
+import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 
 interface SocialAccount {
   id: string
@@ -138,17 +139,14 @@ export default function Automation() {
     profilePicture: instagramAccount.profilePicture
   } : 'No Instagram account found')
 
-  // Get user data for workspaceId
-  const { data: userData } = useQuery({
-    queryKey: ['/api/user'],
-    queryFn: () => apiRequest('/api/user')
-  })
+  // Get current workspace using the proper hook
+  const { currentWorkspace } = useCurrentWorkspace()
 
   // Fetch automation rules from backend API
   const { data: automationRulesResponse, isLoading: rulesLoading } = useQuery<{ rules: AutomationRule[] }>({
-    queryKey: ['/api/automation/rules', userData?.currentWorkspaceId],
-    queryFn: () => apiRequest(`/api/automation/rules?workspaceId=${userData?.currentWorkspaceId}`),
-    enabled: !!userData?.currentWorkspaceId
+    queryKey: ['/api/automation/rules', currentWorkspace?.id],
+    queryFn: () => apiRequest(`/api/automation/rules?workspaceId=${currentWorkspace?.id}`),
+    enabled: !!currentWorkspace?.id
   })
 
   const automationRules = automationRulesResponse?.rules || []
@@ -160,7 +158,7 @@ export default function Automation() {
         method: 'POST',
         body: JSON.stringify({
           ...automationData,
-          workspaceId: userData?.currentWorkspaceId
+          workspaceId: currentWorkspace?.id
         }),
         headers: {
           'Content-Type': 'application/json'
