@@ -22,83 +22,129 @@ import {
   Sparkles
 } from 'lucide-react'
 
-// Clean and Professional Workspace Transition
+// Modern Full-Screen Loading Experience
 const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) => {
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center">
-      {/* Clean Background Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 to-purple-900/90" />
+    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center justify-center overflow-hidden">
       
-      {/* Main Card - Perfectly Centered */}
-      <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-12 w-full max-w-md mx-6 animate-in zoom-in-95 duration-700">
+      {/* Animated Background Particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float-advanced"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Animated Grid Background */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="w-full h-full bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] animate-pulse"></div>
+      </div>
+
+      {/* Main Loading Content */}
+      <div className="text-center z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         
-        {/* Content - Simple and Clean */}
-        <div className="text-center">
-          
-          {/* Workspace Icon */}
-          <div className="flex justify-center mb-8">
-            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} flex items-center justify-center shadow-xl`}>
-              <Building2 className="w-10 h-10 text-white" />
+        {/* Large Workspace Icon with Pulse Animation */}
+        <div className="flex justify-center mb-12">
+          <div className="relative">
+            {/* Pulsing Rings */}
+            <div className="absolute -inset-8 rounded-full border-2 border-white/20 animate-ping"></div>
+            <div className="absolute -inset-6 rounded-full border-2 border-white/30 animate-ping" style={{ animationDelay: '0.5s' }}></div>
+            <div className="absolute -inset-4 rounded-full border border-white/40 animate-ping" style={{ animationDelay: '1s' }}></div>
+            
+            {/* Main Icon */}
+            <div className={`relative w-32 h-32 rounded-3xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} flex items-center justify-center shadow-2xl animate-pulse-glow`}>
+              <Building2 className="w-16 h-16 text-white drop-shadow-lg" />
             </div>
           </div>
+        </div>
 
-          {/* Loading Spinner */}
-          <div className="flex justify-center mb-8">
-            <div className="relative w-12 h-12">
-              <div className="absolute inset-0 border-4 border-blue-200/30 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
-            </div>
+        {/* Modern Spinner */}
+        <div className="flex justify-center mb-12">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-transparent border-t-cyan-400 border-r-blue-500 rounded-full animate-spin"></div>
+            <div className="absolute inset-2 border-4 border-transparent border-b-purple-400 border-l-pink-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
           </div>
+        </div>
 
-          {/* Text Content */}
-          <div className="mb-8">
-            <h2 className="text-lg font-medium text-white/80 mb-2">
-              Switching to
-            </h2>
-            <h1 className="text-3xl font-bold text-white mb-4">
+        {/* Loading Text with Animations */}
+        <div className="mb-16 space-y-4">
+          <h1 className="text-6xl font-black text-white mb-4 animate-in slide-in-from-bottom-4 duration-1000">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">
               {workspace.name}
-            </h1>
-            <p className="text-white/60">
-              Loading workspace environment...
-            </p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-              <div className="text-2xl mb-2">{getPersonalityIcon(workspace.aiPersonality)}</div>
-              <div className="text-white/80 text-sm font-medium capitalize">{workspace.aiPersonality}</div>
-              <div className="text-white/60 text-xs">AI Mode</div>
-            </div>
-            <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-              <Sparkles className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
-              <div className="text-white/80 text-sm font-medium">{workspace.credits}</div>
-              <div className="text-white/60 text-xs">Credits</div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
-            </div>
-            <div className="text-white/70 text-sm mt-3">
-              Syncing workspace data...
-            </div>
-          </div>
-
-          {/* Status Indicators */}
-          <div className="flex justify-center space-x-6">
-            {[
-              { name: 'Analytics', color: 'bg-green-400' },
-              { name: 'Social', color: 'bg-blue-400' },
-              { name: 'Content', color: 'bg-purple-400' }
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center space-y-2">
-                <div className={`w-3 h-3 ${item.color} rounded-full animate-pulse`}></div>
-                <span className="text-white/60 text-xs">{item.name}</span>
+            </span>
+          </h1>
+          
+          <div className="space-y-2 animate-in slide-in-from-bottom-5 duration-1000">
+            <p className="text-xl text-white/90 font-medium">Loading workspace environment</p>
+            <div className="flex justify-center items-center space-x-1">
+              <span className="text-white/70">Please wait</span>
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
-            ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Animated Progress Bar */}
+        <div className="w-96 mx-auto mb-12 animate-in slide-in-from-bottom-6 duration-1000">
+          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-full animate-progress-flow" style={{ width: '80%' }}>
+              <div className="h-full bg-white/30 animate-shimmer-advanced"></div>
+            </div>
+          </div>
+          <div className="flex justify-between text-sm text-white/60 mt-3">
+            <span>Initializing workspace</span>
+            <span>80%</span>
+          </div>
+        </div>
+
+        {/* Loading Steps */}
+        <div className="space-y-3 animate-in slide-in-from-bottom-7 duration-1000">
+          {[
+            { step: 'Loading workspace data', status: 'complete', delay: '0s' },
+            { step: 'Syncing social accounts', status: 'active', delay: '0.2s' },
+            { step: 'Preparing dashboard', status: 'pending', delay: '0.4s' }
+          ].map((item, i) => (
+            <div key={i} className="flex items-center justify-center space-x-3 animate-bounce" style={{ animationDelay: item.delay }}>
+              <div className={`w-3 h-3 rounded-full ${
+                item.status === 'complete' ? 'bg-green-400' :
+                item.status === 'active' ? 'bg-blue-400 animate-pulse' :
+                'bg-white/30'
+              }`}></div>
+              <span className={`text-sm ${
+                item.status === 'complete' ? 'text-green-400' :
+                item.status === 'active' ? 'text-blue-400' :
+                'text-white/50'
+              }`}>
+                {item.step}
+              </span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+      {/* Bottom Workspace Info */}
+      <div className="absolute bottom-8 left-8 right-8 animate-in slide-in-from-bottom-8 duration-1000">
+        <div className="flex items-center justify-between text-white/60 text-sm">
+          <div className="flex items-center space-x-3">
+            <div className="text-lg">{getPersonalityIcon(workspace.aiPersonality)}</div>
+            <span className="capitalize">{workspace.aiPersonality} Mode</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            <span>{workspace.credits} Credits</span>
           </div>
         </div>
       </div>
