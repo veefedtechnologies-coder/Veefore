@@ -132,45 +132,61 @@ export class AutomationSystem {
       console.log('[AUTOMATION] Rule triggered:', rule.name);
       console.log('[AUTOMATION DEBUG] Full rule object:', JSON.stringify(rule, null, 2));
       
-      // Handle comment replies
+      // 🎯 PROPER COMMENT→REPLY→DM FLOW (like ManyChat)
+      // Step 1: First reply to comment (establishes conversation context)
+      let commentReplySent = false;
       if ((rule.type === 'comment_dm' || rule.type === 'comment_only')) {
         const responses = (rule as any).responses;
         
         // Handle both nested object format and flat array format
         let commentResponses = [];
-        if (typeof responses === 'object' && responses !== null) {
-          commentResponses = responses.responses || [];
-        } else if (Array.isArray(responses)) {
+        if (Array.isArray(responses)) {
+          // Direct array format: ["Message sent!", "Found it? 😊"]
           commentResponses = responses;
+        } else if (typeof responses === 'object' && responses !== null) {
+          // Nested object format: { responses: ["Message sent!"] }
+          commentResponses = responses.responses || [];
         }
-        
         
         if (Array.isArray(commentResponses) && commentResponses.length > 0) {
           const replyText = commentResponses[Math.floor(Math.random() * commentResponses.length)];
+          console.log('[AUTOMATION] 📝 Step 1: Replying to comment first...');
           const success = await this.sendCommentReply(commentId, replyText, accessToken);
           
           if (success) {
+            commentReplySent = true;
             triggeredActions.push(`Replied to comment: "${replyText}"`);
             await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'sent');
+            console.log('[AUTOMATION] ✅ Comment reply sent - conversation context established');
           } else {
             await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'failed');
+            console.log('[AUTOMATION] ❌ Comment reply failed - DM may not work');
           }
         }
       }
       
-      // Handle DM automation
+      // Step 2: Send DM (now allowed because we replied to comment first)
       if ((rule.type === 'comment_dm' || rule.type === 'dm_only')) {
         const dmResponses = (rule as any).dmResponses || [];
         
         if (Array.isArray(dmResponses) && dmResponses.length > 0) {
+          // Wait 2 seconds after comment reply for Instagram to process
+          if (commentReplySent && rule.type === 'comment_dm') {
+            console.log('[AUTOMATION] ⏱️ Waiting 2s for Instagram to process comment reply...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+          
           const dmMessage = dmResponses[Math.floor(Math.random() * dmResponses.length)];
+          console.log('[AUTOMATION] 💬 Step 2: Sending DM (conversation context established)...');
           const success = await this.sendDM(userId, dmMessage, accessToken);
           
           if (success) {
             triggeredActions.push(`Sent DM: "${dmMessage}"`);
             await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'sent');
+            console.log('[AUTOMATION] ✅ Comment→Reply→DM flow completed successfully!');
           } else {
             await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'failed');
+            console.log('[AUTOMATION] ❌ DM failed even after comment reply');
           }
         }
       }
