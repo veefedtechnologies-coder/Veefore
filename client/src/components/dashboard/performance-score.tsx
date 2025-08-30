@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useLocation } from 'wouter'
 import { useState, useEffect } from 'react'
 import { apiRequest } from '@/lib/queryClient'
+import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight } from 'lucide-react'
@@ -9,6 +10,7 @@ import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpR
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
   const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('month')
+  const { currentWorkspace } = useCurrentWorkspace()
   const [showDataStory, setShowDataStory] = useState(false)
   const [storyAnimation, setStoryAnimation] = useState(0)
 
@@ -62,26 +64,29 @@ export function PerformanceScore() {
     return stories[period]
   }
   
-  // Fetch real dashboard analytics data - PRODUCTION-SAFE
+  // Fetch real dashboard analytics data for current workspace - PRODUCTION-SAFE
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['/api/dashboard/analytics'],
-    queryFn: () => apiRequest('/api/dashboard/analytics'),
+    queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/dashboard/analytics?workspaceId=${currentWorkspace.id}`) : Promise.resolve({}),
+    enabled: !!currentWorkspace?.id,
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
-  // Fetch real social accounts data - PRODUCTION-SAFE
+  // Fetch real social accounts data for current workspace - PRODUCTION-SAFE
   const { data: socialAccounts } = useQuery({
-    queryKey: ['/api/social-accounts'],
-    queryFn: () => apiRequest('/api/social-accounts'),
+    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    enabled: !!currentWorkspace?.id,
     refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
   // Fetch historical analytics data for trend comparisons - PRODUCTION-SAFE
   const { data: historicalData } = useQuery({
-    queryKey: ['/api/analytics/historical', selectedPeriod],
-    queryFn: () => apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}`),
+    queryKey: ['/api/analytics/historical', selectedPeriod, currentWorkspace?.id],
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}&workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    enabled: !!currentWorkspace?.id,
     refetchInterval: 10 * 60 * 1000, // Refresh every 10 minutes - SAFE for production
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
