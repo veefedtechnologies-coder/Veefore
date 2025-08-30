@@ -59,14 +59,11 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
 
   // Update current workspace in localStorage and state
   const handleWorkspaceSwitch = (workspaceId: string) => {
-    console.log('WorkspaceSwitcher: Switching to workspace:', workspaceId)
     setCurrentWorkspaceId(workspaceId)
     localStorage.setItem('currentWorkspaceId', workspaceId)
-    console.log('WorkspaceSwitcher: localStorage updated:', localStorage.getItem('currentWorkspaceId'))
     
     // Dispatch custom event to notify useCurrentWorkspace hook
     window.dispatchEvent(new Event('workspace-changed'))
-    console.log('WorkspaceSwitcher: Custom event dispatched')
     
     // Invalidate queries that depend on workspace
     queryClient.invalidateQueries({ queryKey: ['/api/content'] })
@@ -239,9 +236,7 @@ export function useCurrentWorkspace() {
   // Listen for localStorage changes to keep hook reactive
   useEffect(() => {
     const handleStorageChange = () => {
-      const newWorkspaceId = localStorage.getItem('currentWorkspaceId')
-      console.log('useCurrentWorkspace: Storage changed, new value:', newWorkspaceId)
-      setCurrentWorkspaceId(newWorkspaceId)
+      setCurrentWorkspaceId(localStorage.getItem('currentWorkspaceId'))
     }
     
     // Listen for storage events (when localStorage changes in other tabs)
@@ -265,8 +260,6 @@ export function useCurrentWorkspace() {
   const currentWorkspace = workspaces.find((ws: Workspace) => 
     currentWorkspaceId ? ws.id === currentWorkspaceId : ws.isDefault
   ) || workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
-
-  console.log('useCurrentWorkspace: currentWorkspaceId:', currentWorkspaceId, 'currentWorkspace:', currentWorkspace?.id, 'workspaces count:', workspaces.length)
 
   return {
     currentWorkspace,

@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **SECURITY ENHANCEMENT**: Implemented enterprise-level Content Security Policy without unsafe-eval for both development and production
 - ✅ **TYPESCRIPT OPTIMIZATION**: Fixed all TypeScript environment variable errors with proper Vite type declarations
 - ✅ **FIREBASE IMPROVEMENTS**: Enhanced IndexedDB error handling for better browser compatibility and reduced warnings
+- ✅ **WORKSPACE SWITCHING FIX**: Fixed workspace switching bug where useCurrentWorkspace hook wasn't reactive to localStorage changes, affecting Integration and Automation pages
 
 ## System Architecture
 

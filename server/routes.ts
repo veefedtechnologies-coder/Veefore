@@ -14048,19 +14048,23 @@ Create a detailed growth strategy in JSON format:
   app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
-      console.log(`[SOCIAL ACCOUNTS] Getting social accounts for user ${userId}`);
+      const workspaceId = req.query.workspaceId as string;
+      console.log(`[SOCIAL ACCOUNTS] Getting social accounts for user ${userId}, workspace: ${workspaceId}`);
       
-      // Get user's workspaces
-      const workspaces = await storage.getWorkspacesByUserId(userId);
-      if (!workspaces.length) {
-        return res.json([]);
-      }
-
       let allAccounts = [];
       
-      // Get social accounts for each workspace
-      for (const workspace of workspaces) {
-        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+      // If workspaceId is provided, get accounts for that specific workspace only
+      if (workspaceId) {
+        // Verify user has access to this workspace
+        const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+        const hasAccess = userWorkspaces.some(ws => ws.id === workspaceId);
+        
+        if (!hasAccess) {
+          return res.status(403).json({ error: 'Access denied to workspace' });
+        }
+        
+        console.log(`[SOCIAL ACCOUNTS] Getting accounts for specific workspace: ${workspaceId}`);
+        const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
         
         // Transform accounts to frontend format with profile pictures
         const transformedAccounts = accounts.map(account => {
@@ -14095,7 +14099,7 @@ Create a detailed growth strategy in JSON format:
             profilePictureUrl: profilePictureUrl,
             profilePicture: profilePictureUrl,
             accessToken: account.accessToken ? 'present' : null,
-            workspaceId: workspace.id
+            workspaceId: workspaceId
           };
           
           console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
@@ -14109,7 +14113,67 @@ Create a detailed growth strategy in JSON format:
           return transformedAccount;
         });
         
-        allAccounts.push(...transformedAccounts);
+        allAccounts = transformedAccounts;
+      } else {
+        // Fallback: Get user's workspaces and return all accounts (for backwards compatibility)
+        const workspaces = await storage.getWorkspacesByUserId(userId);
+        if (!workspaces.length) {
+          return res.json([]);
+        }
+        
+        // Get social accounts for each workspace
+        for (const workspace of workspaces) {
+          const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+          
+          // Transform accounts to frontend format with profile pictures
+          const transformedAccounts = accounts.map(account => {
+            console.log(`[BACKEND DEBUG] Raw account data for ${account.username}:`, {
+              followersCount: account.followersCount,
+              followers: account.followers,
+              subscriberCount: account.subscriberCount,
+              profilePictureUrl: account.profilePictureUrl,
+              profilePicture: account.profilePicture,
+              allFields: Object.keys(account)
+            });
+            
+            // Get followers count from any available field
+            const followersCount = account.followersCount || account.followers || account.subscriberCount || 0;
+            
+            // Get the actual profile picture URL or use a fallback
+            const hasRealProfilePic = account.profilePictureUrl && 
+                                     !account.profilePictureUrl.includes('dicebear.com');
+            const profilePictureUrl = hasRealProfilePic ? account.profilePictureUrl :
+                                     (account.profilePicture && !account.profilePicture.includes('dicebear.com') ? account.profilePicture :
+                                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`);
+            
+            const transformedAccount = {
+              id: account.id,
+              platform: account.platform,
+              username: account.username,
+              displayName: account.displayName || account.username,
+              followers: followersCount,
+              isConnected: account.isActive !== false,
+              isVerified: true,
+              lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
+              profilePictureUrl: profilePictureUrl,
+              profilePicture: profilePictureUrl,
+              accessToken: account.accessToken ? 'present' : null,
+              workspaceId: workspace.id
+            };
+            
+            console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
+              originalFollowers: followersCount,
+              finalFollowers: transformedAccount.followers,
+              originalProfilePic: account.profilePictureUrl || account.profilePicture,
+              finalProfilePic: transformedAccount.profilePictureUrl,
+              fullResponse: transformedAccount
+            });
+            
+            return transformedAccount;
+          });
+          
+          allAccounts.push(...transformedAccounts);
+        }
       }
       
       console.log(`[SOCIAL ACCOUNTS] Found ${allAccounts.length} connected accounts`);
