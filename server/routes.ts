@@ -7152,8 +7152,28 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Test webhook system endpoint
-  app.post('/api/test-instagram-webhook', requireAuth, async (req, res) => {
-    await webhookHandler.testWebhookSystem(req, res);
+  app.post('/api/test-instagram-webhook', requireAuth, async (req: any, res: any) => {
+    try {
+      const { comment, workspaceId } = req.body;
+      const testWorkspaceId = workspaceId || (await storage.getDefaultWorkspace(req.user.id))?.id?.toString();
+      
+      if (!testWorkspaceId) {
+        return res.status(400).json({ error: 'No workspace found' });
+      }
+      
+      console.log('[WEBHOOK TEST] Testing automation with comment:', comment);
+      
+      // Import test class
+      const { WebhookTester } = await import('./test-webhook');
+      const tester = new WebhookTester(storage);
+      
+      const result = await tester.testCommentAutomation(testWorkspaceId, comment || 'test comment', '');
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error('[WEBHOOK TEST] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Force Instagram analytics sync endpoint

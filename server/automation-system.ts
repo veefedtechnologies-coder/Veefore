@@ -186,15 +186,49 @@ export class AutomationSystem {
    */
   private async sendDM(userId: string, message: string, accessToken: string): Promise<boolean> {
     try {
-      console.log('[AUTOMATION] Sending DM:', message);
+      console.log('[AUTOMATION] Sending DM to user:', userId);
+      console.log('[AUTOMATION] DM message:', message);
       
-      // Note: Instagram Basic Display API doesn't support sending DMs
-      // This would require Instagram Business API with proper permissions
-      console.log('[AUTOMATION] DM functionality requires Instagram Business API');
+      // Use Instagram Graph API for DM sending
+      const response = await fetch(`https://graph.instagram.com/v19.0/me/messages`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          recipient: { id: userId },
+          message: { text: message }
+        })
+      });
       
-      // For now, we'll simulate success and log the action
-      // In production, implement proper Instagram Business API DM sending
-      return true;
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[AUTOMATION] ✅ DM sent successfully:', data.message_id);
+        return true;
+      } else {
+        const error = await response.text();
+        console.error('[AUTOMATION] ❌ DM failed:', error);
+        
+        // Fallback: Try alternate API endpoint
+        const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${userId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: message,
+            access_token: accessToken
+          })
+        });
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          console.log('[AUTOMATION] ✅ DM sent via fallback:', fallbackData.id);
+          return true;
+        } else {
+          console.error('[AUTOMATION] ❌ Fallback DM also failed');
+          return false;
+        }
+      }
     } catch (error) {
       console.error('[AUTOMATION] DM error:', error);
       return false;
