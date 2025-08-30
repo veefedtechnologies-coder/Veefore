@@ -52,7 +52,7 @@ import {
   Rocket
 } from 'lucide-react'
 
-// Add social media icons from react-icons
+// Add social media icons from react-icons  
 import { FaInstagram, FaYoutube, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa'
 import { apiRequest } from '@/lib/queryClient'
 
@@ -127,7 +127,7 @@ export default function Automation() {
   const [newKeyword, setNewKeyword] = useState('')
   const [newCommentReply, setNewCommentReply] = useState('')
   const [activeTab, setActiveTab] = useState('create')
-  const [mockComment, setMockComment] = useState('cy')
+  const [mockComment] = useState('cy')
   const [mockReply, setMockReply] = useState('vfrv')
 
   // Fetch social accounts with better error handling
@@ -160,7 +160,7 @@ export default function Automation() {
   })
 
   // Fetch automation rules from backend API
-  const { data: automationRulesResponse, isLoading: rulesLoading, refetch: refetchRules } = useQuery<{ rules: AutomationRule[] }>({
+  const { data: automationRulesResponse, isLoading: rulesLoading } = useQuery<{ rules: AutomationRule[] }>({
     queryKey: ['/api/automation/rules', userData?.currentWorkspaceId],
     queryFn: () => apiRequest(`/api/automation/rules?workspaceId=${userData?.currentWorkspaceId}`),
     enabled: !!userData?.currentWorkspaceId
@@ -208,11 +208,11 @@ export default function Automation() {
   ]
 
   const platforms = [
-    { value: 'instagram', label: 'Instagram', icon: Instagram, color: 'from-pink-500 to-purple-600' },
-    { value: 'youtube', label: 'YouTube', icon: Youtube, color: 'from-red-500 to-red-600' },
-    { value: 'facebook', label: 'Facebook', icon: Facebook, color: 'from-blue-500 to-blue-600' },
-    { value: 'twitter', label: 'Twitter', icon: Twitter, color: 'from-blue-400 to-blue-500' },
-    { value: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'from-blue-600 to-blue-700' }
+    { value: 'instagram', label: 'Instagram', icon: FaInstagram, color: 'from-pink-500 to-purple-600' },
+    { value: 'youtube', label: 'YouTube', icon: FaYoutube, color: 'from-red-500 to-red-600' },
+    { value: 'facebook', label: 'Facebook', icon: FaFacebook, color: 'from-blue-500 to-blue-600' },
+    { value: 'twitter', label: 'Twitter', icon: FaTwitter, color: 'from-blue-400 to-blue-500' },
+    { value: 'linkedin', label: 'LinkedIn', icon: FaLinkedin, color: 'from-blue-600 to-blue-700' }
   ]
 
   const getContentTypes = (platform: string) => {
