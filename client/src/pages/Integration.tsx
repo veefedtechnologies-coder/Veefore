@@ -26,6 +26,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import { TokenConverter } from '../components/dashboard/token-converter'
+import { useCurrentWorkspace } from '../components/WorkspaceSwitcher'
 
 interface SocialAccount {
   id: string
@@ -148,14 +149,8 @@ export default function Integration() {
     refetchOnWindowFocus: true
   })
 
-  // Get user's workspaces for OAuth flows
-  const { data: workspaces = [] } = useQuery({
-    queryKey: ['/api/workspaces'],
-    queryFn: () => apiRequest('/api/workspaces'),
-    retry: false,
-  });
-
-  const currentWorkspace = workspaces.find(w => w.isDefault) || workspaces[0];
+  // Get current workspace (reactive to workspace switching)
+  const { currentWorkspace, workspaces } = useCurrentWorkspace();
 
   console.log('Integration state:', { 
     isLoading, 

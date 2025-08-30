@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
@@ -61,6 +61,9 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
   const handleWorkspaceSwitch = (workspaceId: string) => {
     setCurrentWorkspaceId(workspaceId)
     localStorage.setItem('currentWorkspaceId', workspaceId)
+    
+    // Dispatch custom event to notify useCurrentWorkspace hook
+    window.dispatchEvent(new Event('workspace-changed'))
     
     // Invalidate queries that depend on workspace
     queryClient.invalidateQueries({ queryKey: ['/api/content'] })
@@ -224,11 +227,29 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
   )
 }
 
-// Hook to get current workspace ID
+// Hook to get current workspace ID (reactive to localStorage changes)
 export function useCurrentWorkspace() {
-  const [currentWorkspaceId] = useState<string | null>(
+  const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(
     localStorage.getItem('currentWorkspaceId')
   )
+  
+  // Listen for localStorage changes to keep hook reactive
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCurrentWorkspaceId(localStorage.getItem('currentWorkspaceId'))
+    }
+    
+    // Listen for storage events (when localStorage changes in other tabs)
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Custom event for same-tab localStorage changes
+    window.addEventListener('workspace-changed', handleStorageChange)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('workspace-changed', handleStorageChange)
+    }
+  }, [])
   
   const { data: workspaces = [] } = useQuery({
     queryKey: ['/api/workspaces'],
