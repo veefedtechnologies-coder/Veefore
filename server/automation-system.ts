@@ -303,44 +303,47 @@ export class AutomationSystem {
             if (pageId && instagramAccount?.isBusinessAccount) {
               console.log('[AUTOMATION] 🚀 ManyChat-style DM: Using Page ID for Business API:', pageId);
               
-              // Method 1: Instagram Page Messages API (like ManyChat)
-              const pageMessagesResponse = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
+              // 🎯 CORRECT: Instagram Business API (using graph.instagram.com)
+              const instagramDMResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   recipient: { id: userId },
                   message: { text: message },
-                  messaging_type: "RESPONSE", // Critical for Instagram Business
                   access_token: accessToken
                 })
               });
               
-              if (pageMessagesResponse.ok) {
-                const data = await pageMessagesResponse.json();
-                console.log('[AUTOMATION] ✅ ManyChat-style DM sent via Page Messages API:', data.message_id);
+              if (instagramDMResponse.ok) {
+                const data = await instagramDMResponse.json();
+                console.log('[AUTOMATION] ✅ Instagram Business DM sent successfully:', data.message_id);
                 return true;
               } else {
-                const pageError = await pageMessagesResponse.text();
-                console.log('[AUTOMATION] 📋 Page Messages API response:', pageError);
+                const igError = await instagramDMResponse.text();
+                console.log('[AUTOMATION] 📋 Instagram Business API response:', igError);
                 
-                // Method 2: Try Instagram-specific endpoint
-                const igResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    recipient: { id: userId },
-                    message: { text: message },
-                    access_token: accessToken
-                  })
-                });
-                
-                if (igResponse.ok) {
-                  const igData = await igResponse.json();
-                  console.log('[AUTOMATION] ✅ DM sent via Instagram Business API:', igData.message_id);
-                  return true;
-                } else {
-                  const igError = await igResponse.text();
-                  console.error('[AUTOMATION] ❌ Instagram Business API failed:', igError);
+                // Fallback: Try with Instagram account ID instead of Page ID
+                const accountId = instagramAccount?.accountId;
+                if (accountId && accountId !== pageId) {
+                  console.log('[AUTOMATION] Trying fallback with account ID:', accountId);
+                  const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${accountId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      recipient: { id: userId },
+                      message: { text: message },
+                      access_token: accessToken
+                    })
+                  });
+                  
+                  if (fallbackResponse.ok) {
+                    const fallbackData = await fallbackResponse.json();
+                    console.log('[AUTOMATION] ✅ DM sent via Instagram account ID:', fallbackData.message_id);
+                    return true;
+                  } else {
+                    const fallbackError = await fallbackResponse.text();
+                    console.error('[AUTOMATION] ❌ Instagram account ID failed:', fallbackError);
+                  }
                 }
               }
             }
