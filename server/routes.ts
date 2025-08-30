@@ -3543,7 +3543,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Get user profile using Instagram Business API
       console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
       const profileResponse = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${longLivedToken.access_token}`
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url&access_token=${longLivedToken.access_token}`
       );
 
       if (!profileResponse.ok) {
@@ -3566,7 +3566,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         accessToken: longLivedToken.access_token,
         refreshToken: null,
         expiresAt: expiresAt,
-        isActive: true
+        isActive: true,
+        profilePictureUrl: profile.profile_picture_url,
+        mediaCount: profile.media_count || 0,
+        accountType: profile.account_type,
+        lastSyncAt: new Date()
       };
 
       console.log(`[INSTAGRAM CALLBACK] Saving social account for workspace ${workspaceId}...`);
@@ -3616,7 +3620,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       const redirectPage = stateData.source === 'onboarding' ? 'onboarding' : 'integrations';
       console.log(`[INSTAGRAM CALLBACK] Redirecting to ${redirectPage} page`);
-      res.redirect(`https://${req.get('host')}/${redirectPage}?success=instagram_connected&username=${profile.username}`);
+      
+      // Use the correct redirect format that matches the frontend routing
+      const redirectUrl = redirectPage === 'integrations' 
+        ? `https://${req.get('host')}/integration?success=true&connected=instagram&username=${profile.username}`
+        : `https://${req.get('host')}/${redirectPage}?success=instagram_connected&username=${profile.username}`;
+      
+      console.log(`[INSTAGRAM CALLBACK] Final redirect URL: ${redirectUrl}`);
+      res.redirect(redirectUrl);
       
     } catch (error: any) {
       console.error('[INSTAGRAM CALLBACK] Error details:', {
@@ -3646,6 +3657,56 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error) {
       console.error('[CHAT PERFORMANCE] Error analyzing chat performance:', error);
       res.status(500).json({ error: 'Failed to analyze chat performance' });
+    }
+  });
+
+  // Fix Instagram profile picture by fetching real profile picture from API
+  app.post("/api/instagram/fix-profile-picture", requireAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      console.log('[PROFILE FIX] Fixing Instagram profile pictures...');
+      
+      // Get user's workspaces
+      const workspaces = await storage.getWorkspacesByUserId(userId);
+      
+      for (const workspace of workspaces) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        const instagramAccounts = accounts.filter(acc => acc.platform === 'instagram' && acc.accessToken);
+        
+        for (const account of instagramAccounts) {
+          console.log(`[PROFILE FIX] Fetching real profile picture for @${account.username}...`);
+          
+          try {
+            // Fetch real profile picture from Instagram API
+            const profileResponse = await fetch(
+              `https://graph.instagram.com/me?fields=profile_picture_url&access_token=${account.accessToken}`
+            );
+            
+            if (profileResponse.ok) {
+              const profileData = await profileResponse.json();
+              
+              if (profileData.profile_picture_url) {
+                console.log(`[PROFILE FIX] ✅ Found real profile picture for @${account.username}`);
+                
+                // Update account with real profile picture
+                await storage.updateSocialAccount(account.id, {
+                  profilePictureUrl: profileData.profile_picture_url,
+                  lastSyncAt: new Date()
+                });
+                
+                console.log(`[PROFILE FIX] ✅ Updated @${account.username} with real profile picture`);
+              }
+            }
+          } catch (error) {
+            console.error(`[PROFILE FIX] Error updating @${account.username}:`, error);
+          }
+        }
+      }
+      
+      res.json({ success: true, message: 'Profile pictures updated' });
+    } catch (error: any) {
+      console.error('[PROFILE FIX] Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 
@@ -14065,9 +14126,11 @@ Create a detailed growth strategy in JSON format:
           const followersCount = account.followersCount || account.followers || account.subscriberCount || 0;
           
           // Get the actual profile picture URL or use a fallback
-          const profilePictureUrl = account.profilePictureUrl || 
-                                   account.profilePicture || 
-                                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`;
+          const hasRealProfilePic = account.profilePictureUrl && 
+                                   !account.profilePictureUrl.includes('dicebear.com');
+          const profilePictureUrl = hasRealProfilePic ? account.profilePictureUrl :
+                                   (account.profilePicture && !account.profilePicture.includes('dicebear.com') ? account.profilePicture :
+                                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`);
           
           const transformedAccount = {
             id: account.id,
