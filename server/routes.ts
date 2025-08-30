@@ -7488,6 +7488,48 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     await metaWebhook.handleEvent(req, res);
   });
 
+  // 🔧 UPDATE INSTAGRAM TOKEN ENDPOINT
+  app.post('/api/update-instagram-token', requireAuth, async (req, res) => {
+    try {
+      console.log('[TOKEN UPDATE] Updating Instagram access token from environment...');
+      
+      const newToken = process.env.PAGE_ACCESS_TOKEN;
+      if (!newToken) {
+        return res.status(400).json({ error: 'PAGE_ACCESS_TOKEN not found in environment' });
+      }
+      
+      // Find user's Instagram account
+      const user = req.user;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      
+      for (const workspace of workspaces) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        const instagramAccount = accounts.find(acc => acc.platform === 'instagram');
+        
+        if (instagramAccount) {
+          // Update the access token
+          await storage.updateSocialAccount(instagramAccount.id!, {
+            accessToken: newToken,
+            lastSync: new Date(),
+            updatedAt: new Date()
+          });
+          
+          console.log('[TOKEN UPDATE] ✅ Updated Instagram token for account:', instagramAccount.username);
+          return res.json({ 
+            success: true, 
+            message: `Instagram token updated for @${instagramAccount.username}`,
+            username: instagramAccount.username
+          });
+        }
+      }
+      
+      return res.status(404).json({ error: 'No Instagram account found' });
+    } catch (error: any) {
+      console.error('[TOKEN UPDATE] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Test endpoint for webhook automation demo
   app.post('/api/test-webhook-automation', async (req, res) => {
     try {
