@@ -7461,6 +7461,181 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // 🔄 TOKEN CONVERSION SYSTEM - Convert User tokens to Page tokens
+  app.post('/api/instagram/convert-token', requireAuth, async (req, res) => {
+    try {
+      const { userToken } = req.body;
+      
+      if (!userToken) {
+        return res.status(400).json({ error: 'User access token is required' });
+      }
+
+      console.log('[TOKEN CONVERTER] Converting User token to Page tokens...');
+
+      // Get user's Facebook pages
+      const pagesResponse = await fetch(`https://graph.facebook.com/me/accounts?access_token=${userToken}`);
+      const pagesData = await pagesResponse.json();
+
+      if (pagesData.error) {
+        console.error('[TOKEN CONVERTER] Facebook API error:', pagesData.error);
+        return res.status(400).json({ 
+          error: pagesData.error.message,
+          type: 'facebook_api_error'
+        });
+      }
+
+      const pages = [];
+      
+      // Check each page for Instagram Business Account
+      for (const page of pagesData.data) {
+        console.log('[TOKEN CONVERTER] Checking page:', page.name);
+        
+        try {
+          // Check if page has Instagram Business Account
+          const igResponse = await fetch(`https://graph.facebook.com/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`);
+          const igData = await igResponse.json();
+          
+          const pageInfo = {
+            id: page.id,
+            name: page.name,
+            access_token: page.access_token,
+            permissions: page.tasks || [],
+            hasInstagram: !!igData.instagram_business_account,
+            instagramAccountId: igData.instagram_business_account?.id || null,
+            isRecommended: !!igData.instagram_business_account
+          };
+          
+          pages.push(pageInfo);
+          
+          if (pageInfo.hasInstagram) {
+            console.log('[TOKEN CONVERTER] ✅ Found Instagram Business Account on page:', page.name);
+          }
+          
+        } catch (error) {
+          console.log('[TOKEN CONVERTER] Error checking Instagram for page:', page.name, error);
+          // Still include the page but mark it as unknown
+          pages.push({
+            id: page.id,
+            name: page.name,
+            access_token: page.access_token,
+            permissions: page.tasks || [],
+            hasInstagram: false,
+            instagramAccountId: null,
+            isRecommended: false,
+            error: 'Could not verify Instagram connection'
+          });
+        }
+      }
+
+      console.log('[TOKEN CONVERTER] ✅ Found', pages.length, 'pages, Instagram pages:', pages.filter(p => p.hasInstagram).length);
+
+      res.json({
+        success: true,
+        pages: pages,
+        recommendedPage: pages.find(p => p.hasInstagram) || null,
+        message: `Found ${pages.length} Facebook pages, ${pages.filter(p => p.hasInstagram).length} with Instagram Business Account`
+      });
+
+    } catch (error: any) {
+      console.error('[TOKEN CONVERTER] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to convert token',
+        details: error.message 
+      });
+    }
+  });
+
+  // 💾 Save Instagram Page Access Token
+  app.post('/api/instagram/save-page-token', requireAuth, async (req, res) => {
+    try {
+      const { pageAccessToken, pageId, pageName } = req.body;
+      
+      if (!pageAccessToken) {
+        return res.status(400).json({ error: 'Page access token is required' });
+      }
+
+      console.log('[TOKEN SAVER] Saving Page Access Token for page:', pageName);
+
+      // Validate the token by testing it
+      const testResponse = await fetch(`https://graph.facebook.com/me?access_token=${pageAccessToken}`);
+      const testData = await testResponse.json();
+
+      if (testData.error) {
+        return res.status(400).json({ 
+          error: 'Invalid page access token',
+          details: testData.error.message 
+        });
+      }
+
+      console.log('[TOKEN SAVER] ✅ Valid Page Access Token received');
+      console.log('[TOKEN SAVER] 🔑 Page ID:', pageId);
+      console.log('[TOKEN SAVER] 📄 Page Name:', pageName);
+
+      // Update the Instagram account with the new Page Access Token
+      const user = req.user;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      let tokenUpdated = false;
+      
+      for (const workspace of workspaces) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        const instagramAccount = accounts.find(acc => 
+          acc.platform === 'instagram' && 
+          (acc.pageId === pageId || acc.instagramId === pageId || acc.accountId === pageId)
+        );
+        
+        if (instagramAccount) {
+          await storage.updateSocialAccount(instagramAccount.id!, {
+            accessToken: pageAccessToken,
+            pageId: pageId,
+            lastSync: new Date(),
+            updatedAt: new Date()
+          });
+          
+          console.log('[TOKEN SAVER] ✅ Updated Instagram account @' + instagramAccount.username + ' with new Page Access Token');
+          tokenUpdated = true;
+          break;
+        }
+      }
+
+      // Always log for manual addition to Replit secrets as backup
+      console.log('[TOKEN SAVER] 🎯 IMPORTANT: Add this to your Replit Secrets as PAGE_ACCESS_TOKEN');
+      console.log('[TOKEN SAVER] 💾 Token:', pageAccessToken);
+      console.log('[TOKEN SAVER] 📝 To add to Replit Secrets:');
+      console.log('[TOKEN SAVER] 1. Go to Replit Secrets tab');
+      console.log('[TOKEN SAVER] 2. Add key: PAGE_ACCESS_TOKEN');
+      console.log('[TOKEN SAVER] 3. Add value: ' + pageAccessToken);
+
+      res.json({
+        success: true,
+        message: tokenUpdated ? 
+          `Page Access Token validated and updated for Instagram account` :
+          `Page Access Token validated. Please update your Instagram account manually.`,
+        pageInfo: {
+          id: pageId,
+          name: pageName,
+          tokenValidated: true,
+          accountUpdated: tokenUpdated
+        },
+        instructions: {
+          replitSecrets: 'Add the token to Replit Secrets as PAGE_ACCESS_TOKEN',
+          token: pageAccessToken,
+          steps: [
+            'Go to Replit Secrets tab',
+            'Add key: PAGE_ACCESS_TOKEN', 
+            'Add value: ' + pageAccessToken
+          ]
+        }
+      });
+
+    } catch (error: any) {
+      console.error('[TOKEN SAVER] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to save token',
+        details: error.message 
+      });
+    }
+  });
+
   // Instagram Private Replies API format corrected - ready for production
 
   // 🎯 UPDATE AUTOMATION RULES TO TARGET CURRENT POSTS

@@ -25,6 +25,7 @@ import {
   Shield,
   Sparkles
 } from 'lucide-react'
+import { TokenConverter } from '../components/dashboard/token-converter'
 
 interface SocialAccount {
   id: string
@@ -505,6 +506,15 @@ export default function Integration() {
               renderPlatformCard(platform as keyof typeof platformConfig)
             )}
           </div>
+        </div>
+
+        {/* Instagram Token Converter */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <Settings className="w-6 h-6 mr-3 text-pink-600" />
+            Instagram Token Management
+          </h2>
+          <TokenConverter />
         </div>
 
         {/* Help Section */}
