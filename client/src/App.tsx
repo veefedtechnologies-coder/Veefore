@@ -113,6 +113,12 @@ function App() {
     return <LoadingSpinner />
   }
   
+  // Show loading spinner for protected routes when auth is still loading
+  const protectedRoutes = ['/integration', '/plan', '/create', '/analytics', '/inbox', '/video-generator', '/workspaces', '/profile', '/automation', '/veegpt']
+  if (!user && protectedRoutes.some(route => location.startsWith(route))) {
+    return <LoadingSpinner />
+  }
+  
   // If we have evidence of existing authentication but no user yet, show loading
   const hasFirebaseAuth = Object.keys(localStorage).some(key => 
     key.includes('firebase:authUser') && localStorage.getItem(key)
