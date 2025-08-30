@@ -448,6 +448,8 @@ export default function AutomationAdvanced() {
               DM Message
             </label>
             <textarea
+              id="dmMessage"
+              name="dmMessage"
               value={dmMessage}
               onChange={(e) => setDmMessage(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg resize-none"
@@ -471,6 +473,8 @@ export default function AutomationAdvanced() {
           <div className="grid grid-cols-2 gap-4">
             <label className="flex items-center gap-2">
               <input
+                id="targetFollowers"
+                name="targetFollowers"
                 type="checkbox"
                 checked={targetFollowers}
                 onChange={(e) => setTargetFollowers(e.target.checked)}
@@ -480,6 +484,8 @@ export default function AutomationAdvanced() {
             </label>
             <label className="flex items-center gap-2">
               <input
+                id="targetNonFollowers"
+                name="targetNonFollowers"
                 type="checkbox"
                 checked={targetNonFollowers}
                 onChange={(e) => setTargetNonFollowers(e.target.checked)}
@@ -568,6 +574,8 @@ export default function AutomationAdvanced() {
                     Follows per Day
                   </label>
                   <input
+                    id="followersPerDay"
+                    name="followersPerDay"
                     type="number"
                     value={followersPerDay}
                     onChange={(e) => setFollowersPerDay(Number(e.target.value))}
@@ -579,6 +587,8 @@ export default function AutomationAdvanced() {
                     Unfollow After (days)
                   </label>
                   <input
+                    id="unfollowAfterDays"
+                    name="unfollowAfterDays"
                     type="number"
                     value={unfollowAfterDays}
                     onChange={(e) => setUnfollowAfterDays(Number(e.target.value))}
