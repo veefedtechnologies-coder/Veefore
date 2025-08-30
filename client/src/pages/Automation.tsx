@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 // Removed unused import
 import { 
-  Check,
   Heart,
   MessageCircle,
   Send,
@@ -20,7 +19,6 @@ import {
   Plus,
   ArrowRight,
   ArrowLeft,
-  Zap,
   Settings,
   Play,
   Pause,
@@ -33,21 +31,12 @@ import {
   FileText,
   Camera,
   CheckCircle,
-  AlertCircle,
-  Globe,
-  ExternalLink,
   Sparkles,
   Target,
   TrendingUp,
   Clock,
-  Filter,
-  Search,
-  Star,
   Users,
-  Activity,
   Eye,
-  RefreshCw,
-  Bell,
   Hash,
   Rocket
 } from 'lucide-react'
