@@ -91,6 +91,7 @@ export interface IStorage {
   getLatestAnalytics(workspaceId: number, platform: string): Promise<Analytics | undefined>;
 
   // Automation rules
+  getAutomationRule(id: string): Promise<AutomationRule | undefined>;
   getAutomationRules(workspaceId: number | string): Promise<AutomationRule[]>;
   getActiveAutomationRules(): Promise<AutomationRule[]>;
   getAutomationRulesByType(type: string): Promise<AutomationRule[]>;

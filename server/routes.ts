@@ -10,19 +10,15 @@ import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
-import { InstagramAutomation } from "./instagram-automation";
-import { InstagramWebhookHandler } from "./instagram-webhook";
 import { InstagramSmartPolling } from "./instagram-smart-polling";
 import { InstagramAccountMonitor } from "./instagram-account-monitor";
-import { InstagramCommentWebhookHandler } from "./instagram-comment-webhook";
 import { generateIntelligentSuggestions } from './ai-suggestions-service';
 import { CreditService } from "./credit-service";
 import { videoShortenerAI } from './video-shortener-ai';
 import { RealVideoProcessor } from './real-video-processor';
-import { EnhancedAutoDMService } from "./enhanced-auto-dm-service";
 import { DashboardCache } from "./dashboard-cache";
-import { NewAutomationSystem } from "./new-automation-system";
-import { NewWebhookProcessor } from "./new-webhook-processor";
+import { AutomationSystem } from "./automation-system";
+import { WebhookHandler } from "./webhook-handler";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
@@ -71,19 +67,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const instagramSync = new InstagramSyncService(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);
-  const instagramAutomation = new InstagramAutomation(storage);
-  const webhookHandler = new InstagramWebhookHandler(storage);
-  const commentWebhookHandler = new InstagramCommentWebhookHandler(storage);
   const smartPolling = new InstagramSmartPolling(storage);
   const creditService = new CreditService();
-  const enhancedDMService = new EnhancedAutoDMService(storage as any);
   const dashboardCache = new DashboardCache(storage);
   const thumbnailAIService = new ThumbnailAIService(storage);
   const trendingTopicsAPI = TrendingTopicsAPI.getInstance();
   
-  // NEW AUTOMATION SYSTEM INSTANCES
-  const newAutomationSystem = new NewAutomationSystem(storage);
-  const newWebhookProcessor = new NewWebhookProcessor(storage);
+  // CLEAN AUTOMATION SYSTEM INSTANCES
+  const automationSystem = new AutomationSystem(storage);
+  const webhookHandler = new WebhookHandler(storage);
   
   // Start smart polling and account monitoring for immediate real-time updates
   console.log('[SMART POLLING] 🚀 Activating intelligent Instagram polling system...');
@@ -7151,17 +7143,17 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // Instagram Comment Webhook Routes for DM Automation
   app.get('/webhook/instagram-comments', async (req, res) => {
     console.log('[COMMENT WEBHOOK] Instagram comment webhook verification request');
-    await commentWebhookHandler.handleVerification(req, res);
+    await webhookHandler.handleVerification(req, res);
   });
 
   app.post('/webhook/instagram-comments', async (req, res) => {
     console.log('[COMMENT WEBHOOK] Instagram comment webhook event received');
-    await commentWebhookHandler.handleWebhookEvent(req, res);
+    await webhookHandler.handleWebhookEvent(req, res);
   });
 
   // Test webhook system endpoint
   app.post('/api/test-instagram-webhook', requireAuth, async (req, res) => {
-    await commentWebhookHandler.testWebhookSystem(req, res);
+    await webhookHandler.testWebhookSystem(req, res);
   });
 
   // Force Instagram analytics sync endpoint
@@ -7278,7 +7270,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      const template = await commentWebhookHandler.createDmTemplate(
+      const template = await webhookHandler.createDmTemplate(
         user.id.toString(),
         workspaceId,
         messageText,
@@ -7311,7 +7303,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      const template = await commentWebhookHandler.getActiveDmTemplate(workspaceId);
+      const template = await webhookHandler.getActiveDmTemplate(workspaceId);
       res.json(template);
     } catch (error: any) {
       console.error('[DM TEMPLATE] Error fetching template:', error);
@@ -7338,7 +7330,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(403).json({ error: 'Access denied to workspace' });
       }
 
-      const template = await commentWebhookHandler.updateDmTemplate(
+      const template = await webhookHandler.updateDmTemplate(
         workspaceId,
         messageText,
         buttonText,
@@ -8127,18 +8119,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Start Instagram automation service
-  instagramAutomation.startAutomationService().catch(console.error);
+  // Clean automation system is now ready
+  console.log('[AUTOMATION] ✅ Clean automation system initialized');
 
-  // Start memory cleanup scheduler (runs daily)
-  setInterval(async () => {
-    try {
-      console.log('[SCHEDULER] Running conversation memory cleanup');
-      await enhancedDMService.cleanupExpiredMemory();
-    } catch (error) {
-      console.error('[SCHEDULER] Memory cleanup failed:', error);
-    }
-  }, 24 * 60 * 60 * 1000); // 24 hours
+  // Memory cleanup scheduler removed - using clean automation system
 
   // Scheduler endpoints
   app.post('/api/scheduler/create', requireAuth, async (req: any, res: any) => {
@@ -13810,7 +13794,7 @@ Create a detailed growth strategy in JSON format:
         return res.status(400).json({ error: 'Workspace ID is required' });
       }
 
-      const rules = await newAutomationSystem.getRules(workspaceId);
+      const rules = await automationSystem.getRules(workspaceId);
       res.json({ rules });
     } catch (error: any) {
       console.error('[NEW AUTOMATION] Get rules error:', error);
@@ -13833,7 +13817,7 @@ Create a detailed growth strategy in JSON format:
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      const rule = await newAutomationSystem.createRule({
+      const rule = await automationSystem.createRule({
         workspaceId,
         name,
         type,
@@ -13856,7 +13840,7 @@ Create a detailed growth strategy in JSON format:
       const { ruleId } = req.params;
       const updates = req.body;
       
-      const rule = await newAutomationSystem.updateRule(ruleId, updates);
+      const rule = await automationSystem.updateRule(ruleId, updates);
       res.json({ rule });
     } catch (error: any) {
       console.error('[NEW AUTOMATION] Update rule error:', error);
@@ -13869,7 +13853,7 @@ Create a detailed growth strategy in JSON format:
     try {
       const { ruleId } = req.params;
       
-      await newAutomationSystem.deleteRule(ruleId);
+      await automationSystem.deleteRule(ruleId);
       res.json({ success: true });
     } catch (error: any) {
       console.error('[NEW AUTOMATION] Delete rule error:', error);
@@ -13882,7 +13866,7 @@ Create a detailed growth strategy in JSON format:
     try {
       const { ruleId } = req.params;
       
-      const rule = await newAutomationSystem.toggleRule(ruleId);
+      const rule = await automationSystem.toggleRule(ruleId);
       res.json({ rule });
     } catch (error: any) {
       console.error('[NEW AUTOMATION] Toggle rule error:', error);
@@ -13899,7 +13883,7 @@ Create a detailed growth strategy in JSON format:
       const webhookData = req.body;
       if (webhookData?.entry?.[0]?.changes?.[0]?.field === 'comments') {
         console.log('[NEW WEBHOOK] Comment event detected - routing to comment webhook handler');
-        await commentWebhookHandler.handleWebhookEvent(req, res);
+        await webhookHandler.handleWebhookEvent(req, res);
         return;
       }
       

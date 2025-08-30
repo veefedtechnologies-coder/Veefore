@@ -120,7 +120,7 @@ export default function Automation() {
   const [mockReply, setMockReply] = useState('vfrv')
 
   // Fetch social accounts with better error handling
-  const { data: socialAccounts = [], isLoading: socialAccountsLoading, error: socialAccountsError } = useQuery<SocialAccount[]>({
+  const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
     queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
     staleTime: 1000 * 60 * 5, // 5 minutes
