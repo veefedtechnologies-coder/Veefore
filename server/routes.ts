@@ -3649,6 +3649,81 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // PERMANENT FIX: Copy Page ID from wrong workspace to correct workspace
+  app.post("/api/fix-page-id", async (req: any, res) => {
+    try {
+      console.log('[PERMANENT FIX] 🔧 Permanently fixing Page ID for automation...');
+      
+      // Get all Instagram accounts for rahulc1020
+      const allAccounts = await storage.getAllSocialAccounts();
+      const rahulAccounts = allAccounts.filter(acc => 
+        acc.platform === 'instagram' && acc.username === 'rahulc1020'
+      );
+      
+      console.log('[PERMANENT FIX] Found', rahulAccounts.length, 'Instagram accounts for rahulc1020');
+      
+      let sourceAccount = null;
+      let targetAccount = null;
+      
+      for (const account of rahulAccounts) {
+        console.log(`[PERMANENT FIX] Account: workspace=${account.workspaceId}, pageId=${account.pageId || 'MISSING'}, accountId=${account.accountId}`);
+        
+        if (account.workspaceId === '6847b9cdfabaede1706f2994' && account.pageId) {
+          sourceAccount = account; // Wrong workspace but has pageId
+        }
+        if (account.workspaceId === '684402c2fd2cd4eb6521b386') {
+          targetAccount = account; // Correct workspace but missing pageId
+        }
+      }
+      
+      if (!sourceAccount || !targetAccount) {
+        return res.json({ 
+          error: 'Cannot find both accounts',
+          source: sourceAccount ? 'found' : 'missing',
+          target: targetAccount ? 'found' : 'missing',
+          accounts: rahulAccounts.map(acc => ({
+            workspace: acc.workspaceId,
+            pageId: acc.pageId || 'MISSING',
+            accountId: acc.accountId
+          }))
+        });
+      }
+      
+      console.log('[PERMANENT FIX] 🎯 COPYING Page ID from wrong workspace to correct workspace...');
+      console.log('[PERMANENT FIX] 📋 Source (wrong workspace):', sourceAccount.pageId);
+      console.log('[PERMANENT FIX] 📋 Target (correct workspace):', targetAccount.pageId || 'MISSING');
+      
+      // Copy ALL Instagram Business identifiers
+      const updateData = {
+        pageId: sourceAccount.pageId, // Critical for DMs
+        instagramId: sourceAccount.instagramId || sourceAccount.pageId, // Backup identifier
+        updatedAt: new Date(),
+      };
+      
+      await storage.updateSocialAccount(targetAccount.id, updateData);
+      
+      console.log('[PERMANENT FIX] ✅ SUCCESSFULLY COPIED Page ID:', sourceAccount.pageId);
+      console.log('[PERMANENT FIX] ✅ Correct workspace account now has pageId!');
+      console.log('[PERMANENT FIX] ✅ Automation should now PERMANENTLY use correct workspace!');
+      
+      res.json({ 
+        success: true, 
+        message: 'Page ID permanently fixed! Automation will now use correct workspace.',
+        copiedPageId: sourceAccount.pageId,
+        fromWorkspace: sourceAccount.workspaceId,
+        toWorkspace: targetAccount.workspaceId,
+        updateData
+      });
+      
+    } catch (error) {
+      console.error('[PERMANENT FIX] Error:', error);
+      res.status(500).json({ 
+        error: 'Permanent Page ID fix failed',
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Refresh Instagram account to fetch missing Page ID (required for DMs)
   app.post("/api/instagram/refresh-page-id", requireAuth, async (req: any, res) => {
     try {
