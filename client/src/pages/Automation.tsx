@@ -534,9 +534,13 @@ export default function Automation() {
     const selectedPost = mockPosts.find(p => p.id === formData.selectedPost)
     const connectedAccount = socialAccounts.find(acc => acc.platform === 'instagram')
     
+    // More detailed debugging
+    console.log('[LIVE PREVIEW DEBUG] All social accounts:', socialAccounts)
     console.log('[LIVE PREVIEW DEBUG] Connected account:', connectedAccount)
-    console.log('[LIVE PREVIEW DEBUG] Profile picture URL:', connectedAccount?.profilePictureUrl)
+    console.log('[LIVE PREVIEW DEBUG] Profile picture URL:', connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture)
     console.log('[LIVE PREVIEW DEBUG] Followers:', connectedAccount?.followers)
+    console.log('[LIVE PREVIEW DEBUG] Username:', connectedAccount?.username)
+    console.log('[LIVE PREVIEW DEBUG] All account fields:', connectedAccount ? Object.keys(connectedAccount) : 'No account')
     
     if (!selectedPost) return null
 
@@ -555,32 +559,48 @@ export default function Automation() {
         <div className="p-4 border-b border-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {(connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture) ? (
-                <img 
-                  src={connectedAccount.profilePictureUrl || connectedAccount.profilePicture} 
-                  alt={connectedAccount.username}
-                  className="w-8 h-8 rounded-full object-cover"
-                  onError={(e) => {
-                    console.log('[LIVE PREVIEW] Profile picture failed to load:', e.currentTarget.src)
-                    e.currentTarget.style.display = 'none'
-                    e.currentTarget.nextElementSibling.style.display = 'flex'
-                  }}
-                />
-              ) : null}
+              {(() => {
+                const profilePic = connectedAccount?.profilePictureUrl || 
+                                  connectedAccount?.profilePicture || 
+                                  (connectedAccount?.username ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${connectedAccount.username}` : null);
+                
+                console.log('[LIVE PREVIEW] Trying to load profile picture:', profilePic);
+                
+                return profilePic ? (
+                  <img 
+                    src={profilePic}
+                    alt={connectedAccount?.username || 'User'}
+                    className="w-8 h-8 rounded-full object-cover"
+                    onError={(e) => {
+                      console.log('[LIVE PREVIEW] Profile picture failed to load:', e.currentTarget.src)
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.nextElementSibling.style.display = 'flex'
+                    }}
+                  />
+                ) : null;
+              })()}
               <div 
                 className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
-                style={{ display: (connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture) ? 'none' : 'flex' }}
+                style={{ 
+                  display: (connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture) ? 'none' : 'flex' 
+                }}
               >
                 <span className="text-white text-xs font-bold">
-                  {connectedAccount?.username?.charAt(1)?.toUpperCase() || 'U'}
+                  {connectedAccount?.username ? connectedAccount.username.charAt(0).toUpperCase() : 'U'}
                 </span>
               </div>
               <div>
                 <p className="font-semibold text-sm text-gray-900">
-                  @{connectedAccount?.username || 'your_account'}
+                  @{connectedAccount?.username || 'loading...'}
                 </p>
-                <p className="text-xs text-gray-500">{selectedPost.timeAgo}</p>
+                <p className="text-xs text-gray-500">
+                  {connectedAccount?.followers !== undefined ? 
+                    `${connectedAccount.followers} followers` : 
+                    'Loading followers...'
+                  } • {selectedPost?.timeAgo || '2h ago'}
+                </p>
               </div>
+              {/* Moved inside the fallback avatar div above */}
             </div>
             <MoreHorizontal className="w-5 h-5 text-gray-400" />
           </div>

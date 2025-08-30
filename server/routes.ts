@@ -13626,20 +13626,36 @@ Create a detailed growth strategy in JSON format:
         const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
         
         // Transform accounts to frontend format with profile pictures
-        const transformedAccounts = accounts.map(account => ({
-          id: account.id,
-          platform: account.platform,
-          username: account.username,
-          displayName: account.displayName || account.username,
-          followers: account.followersCount || account.subscriberCount || 0,
-          isConnected: account.isActive,
-          isVerified: true,
-          lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
-          profilePictureUrl: account.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`,
-          profilePicture: account.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`,
-          accessToken: account.accessToken ? 'present' : null,
-          workspaceId: workspace.id
-        }));
+        const transformedAccounts = accounts.map(account => {
+          // Get the actual profile picture URL or use a fallback
+          const profilePictureUrl = account.profilePictureUrl || 
+                                   account.profilePicture || 
+                                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`;
+          
+          const transformedAccount = {
+            id: account.id,
+            platform: account.platform,
+            username: account.username,
+            displayName: account.displayName || account.username,
+            followers: account.followersCount || account.subscriberCount || account.followers || 0,
+            isConnected: account.isActive,
+            isVerified: true,
+            lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
+            profilePictureUrl: profilePictureUrl,
+            profilePicture: profilePictureUrl,
+            accessToken: account.accessToken ? 'present' : null,
+            workspaceId: workspace.id
+          };
+          
+          console.log(`[SOCIAL ACCOUNTS TRANSFORM] Account: ${account.username}`, {
+            originalFollowers: account.followersCount || account.subscriberCount || account.followers,
+            transformedFollowers: transformedAccount.followers,
+            originalProfilePic: account.profilePictureUrl || account.profilePicture,
+            transformedProfilePic: transformedAccount.profilePictureUrl
+          });
+          
+          return transformedAccount;
+        });
         
         allAccounts.push(...transformedAccounts);
       }
