@@ -159,7 +159,7 @@ const AutomationListManager = ({
 
                     <div>
                       <span className="text-sm text-gray-500">Responses:</span>
-                      <p className="text-sm text-gray-900">{rule.responses?.responses?.length || 0} comment + {rule.responses?.dmResponses?.length || 0} DM</p>
+                      <p className="text-sm text-gray-900">{rule.responses?.length || 0} comment + {rule.dmResponses?.length || 0} DM</p>
                     </div>
                   </div>
 
