@@ -3,8 +3,8 @@ import { User, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export const useFirebaseAuth = () => {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true) // Always start with loading true
+  const [user, setUser] = useState<User | null>(auth.currentUser) // Initialize with current user if available
+  const [loading, setLoading] = useState(!auth.currentUser) // Start loading false if user already exists
 
   useEffect(() => {
     console.log('useFirebaseAuth: Setting up Firebase auth listener')
@@ -15,13 +15,13 @@ export const useFirebaseAuth = () => {
     )
     console.log('useFirebaseAuth: Firebase localStorage keys:', firebaseKeys)
     
-    // Add timeout to prevent infinite loading
+    // Shorter timeout for faster loading
     const loadingTimeout = setTimeout(() => {
       console.log('useFirebaseAuth: Timeout reached, stopping loading state')
       setLoading(false)
-    }, 5000) // 5 second timeout for better auth persistence
+    }, 1000) // 1 second timeout for faster auth
     
-    // Check if there's already a current user (for persistence)
+    // If user is already available, clear loading immediately
     if (auth.currentUser) {
       console.log('useFirebaseAuth: Found existing authenticated user:', auth.currentUser.email)
       setUser(auth.currentUser)
