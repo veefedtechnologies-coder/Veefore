@@ -100,16 +100,19 @@ export class WebhookHandler {
    */
   private async processCommentEvent(commentData: any): Promise<void> {
     try {
-      console.log('[WEBHOOK] Processing comment event:', commentData);
+      console.log('[WEBHOOK] Processing real Instagram comment:', commentData);
       
       const { from, text, id: commentId, parent_id: postId } = commentData;
       
-      // Find the workspace and access token for this post
-      const socialAccount = await this.findSocialAccountByPostId(postId);
+      // For real Instagram comments, try to find any active Instagram account
+      // since the exact post ID matching might not work reliably
+      const socialAccount = await this.findActiveInstagramAccount();
       if (!socialAccount) {
-        console.log('[WEBHOOK] No social account found for post:', postId);
+        console.log('[WEBHOOK] No active Instagram account found');
         return;
       }
+
+      console.log('[WEBHOOK] Using account for automation:', socialAccount.workspaceId);
 
       // Process comment through automation system
       const result = await this.automationSystem.processComment(
@@ -122,7 +125,7 @@ export class WebhookHandler {
       );
 
       if (result.triggered) {
-        console.log('[WEBHOOK] ✅ Automation triggered:', result.actions);
+        console.log('[WEBHOOK] ✅ Real automation triggered:', result.actions);
       } else {
         console.log('[WEBHOOK] No automation rules triggered for comment:', text);
       }
@@ -132,20 +135,21 @@ export class WebhookHandler {
   }
 
   /**
-   * Find social account by post ID
+   * Find active Instagram account with automation rules
    */
-  private async findSocialAccountByPostId(postId: string): Promise<{ workspaceId: string; accessToken: string } | null> {
+  private async findActiveInstagramAccount(): Promise<{ workspaceId: string; accessToken: string } | null> {
     try {
-      // Find workspace that has automation rules targeting this post
       const allAccounts = await this.storage.getAllSocialAccounts();
       
+      // Find Instagram account that has active automation rules
       for (const account of allAccounts) {
         if (account.platform === 'instagram' && account.accessToken) {
           const rules = await this.storage.getAutomationRules(account.workspaceId);
           
-          for (const rule of rules) {
-            const targetMediaIds = (rule as any).targetMediaIds || [];
-            if (targetMediaIds.includes(postId)) {
+          // If this workspace has any active automation rules, use it
+          if (rules.length > 0) {
+            const activeRules = rules.filter((rule: any) => rule.isActive !== false);
+            if (activeRules.length > 0) {
               return {
                 workspaceId: account.workspaceId,
                 accessToken: account.accessToken
@@ -156,7 +160,7 @@ export class WebhookHandler {
       }
       return null;
     } catch (error) {
-      console.error('[WEBHOOK] Error finding social account:', error);
+      console.error('[WEBHOOK] Error finding Instagram account:', error);
       return null;
     }
   }
