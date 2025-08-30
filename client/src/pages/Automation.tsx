@@ -246,16 +246,28 @@ export default function Automation() {
   const [mockComment, setMockComment] = useState('cy')
   const [mockReply, setMockReply] = useState('vfrv')
 
-  // Fetch social accounts
-  const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
+  // Fetch social accounts with better error handling
+  const { data: socialAccounts = [], isLoading: socialAccountsLoading, error: socialAccountsError } = useQuery<SocialAccount[]>({
     queryKey: ['/api/social-accounts'],
-    queryFn: () => apiRequest('/api/social-accounts')
+    queryFn: () => apiRequest('/api/social-accounts'),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false
   })
 
-  // Debug the social accounts data
+  // Debug the social accounts data - this will show up when data loads
+  console.log('[AUTOMATION DEBUG] Social accounts loading:', socialAccountsLoading)
+  console.log('[AUTOMATION DEBUG] Social accounts error:', socialAccountsError)
   console.log('[AUTOMATION DEBUG] Social accounts data:', socialAccounts)
+  console.log('[AUTOMATION DEBUG] Social accounts length:', socialAccounts?.length || 0)
+  
   const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram')
-  console.log('[AUTOMATION DEBUG] Instagram account:', instagramAccount)
+  console.log('[AUTOMATION DEBUG] Instagram account found:', instagramAccount)
+  console.log('[AUTOMATION DEBUG] Instagram account details:', instagramAccount ? {
+    username: instagramAccount.username,
+    followers: instagramAccount.followers,
+    profilePictureUrl: instagramAccount.profilePictureUrl,
+    profilePicture: instagramAccount.profilePicture
+  } : 'No Instagram account found')
 
   // Get user data for workspaceId
   const { data: userData } = useQuery({
