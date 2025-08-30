@@ -141,7 +141,24 @@ export class WebhookHandler {
     try {
       const allAccounts = await this.storage.getAllSocialAccounts();
       
-      // Find Instagram account that has active automation rules
+      // Priority 1: Find Instagram account for workspace 684402c2fd2cd4eb6521b386 (main user workspace)
+      for (const account of allAccounts) {
+        if (account.platform === 'instagram' && account.accessToken && 
+            account.workspaceId === '684402c2fd2cd4eb6521b386') {
+          console.log('[WEBHOOK] 🎯 Found main workspace account:', account.workspaceId);
+          const rules = await this.storage.getAutomationRules(account.workspaceId);
+          console.log('[WEBHOOK] 🎯 Main workspace rules count:', rules.length);
+          if (rules.length > 0) {
+            console.log('[WEBHOOK] ✅ Using main workspace:', account.workspaceId);
+            return {
+              workspaceId: account.workspaceId,
+              accessToken: account.accessToken
+            };
+          }
+        }
+      }
+      
+      // Priority 2: Find any Instagram account that has active automation rules
       for (const account of allAccounts) {
         if (account.platform === 'instagram' && account.accessToken) {
           const rules = await this.storage.getAutomationRules(account.workspaceId);
@@ -150,6 +167,7 @@ export class WebhookHandler {
           if (rules.length > 0) {
             const activeRules = rules.filter((rule: any) => rule.isActive !== false);
             if (activeRules.length > 0) {
+              console.log('[WEBHOOK] ✅ Using workspace:', account.workspaceId);
               return {
                 workspaceId: account.workspaceId,
                 accessToken: account.accessToken

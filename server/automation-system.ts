@@ -114,6 +114,7 @@ export class AutomationSystem {
     const activeRules = rules.filter(rule => rule.isActive);
     
     const triggeredActions: string[] = [];
+    let anyRuleTriggered = false;
     
     for (const rule of activeRules) {
       console.log('[AUTOMATION DEBUG] Processing rule:', rule.name);
@@ -127,6 +128,7 @@ export class AutomationSystem {
       
       if (!isTriggered) continue;
       
+      anyRuleTriggered = true;
       console.log('[AUTOMATION] Rule triggered:', rule.name);
       console.log('[AUTOMATION DEBUG] Full rule object:', JSON.stringify(rule, null, 2));
       
@@ -175,7 +177,7 @@ export class AutomationSystem {
     }
     
     return {
-      triggered: triggeredActions.length > 0,
+      triggered: anyRuleTriggered,
       actions: triggeredActions
     };
   }
