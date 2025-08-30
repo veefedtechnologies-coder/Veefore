@@ -7530,6 +7530,205 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // 🧪 DIRECT AUTOMATION TEST - DEBUG PARAMETERS
+  app.post('/api/test-external-comment', async (req, res) => {
+    try {
+      console.log('[TEST] 🧪 DEBUGGING parameter order issue...');
+      console.log('[TEST] Expected processComment signature:');
+      console.log('[TEST] 1. workspaceId:', '684402c2fd2cd4eb6521b386');
+      console.log('[TEST] 2. commentText:', 'uu testing automation');
+      console.log('[TEST] 3. commentId:', 'test_comment_123');
+      console.log('[TEST] 4. userId:', 'test_user_id');
+      console.log('[TEST] 5. username:', 'test_external_user');
+      console.log('[TEST] 6. accessToken:', 'test_token_123');
+      console.log('[TEST] 7. mediaId:', '17855248212513160');
+      
+      const automationSystem = new AutomationSystem(storage);
+      
+      // Test with exact real webhook pattern 
+      const result = await automationSystem.processComment(
+        '684402c2fd2cd4eb6521b386', // 1. workspaceId 
+        'uu testing automation',     // 2. commentText
+        'test_comment_123',          // 3. commentId
+        'test_user_id',              // 4. userId  
+        'test_external_user',        // 5. username
+        'test_token_123',            // 6. accessToken
+        '17855248212513160'          // 7. mediaId (optional)
+      );
+      
+      console.log('[TEST] 🎯 Result:', result);
+      
+      res.json({ 
+        success: true,
+        result: result,
+        debug: {
+          parametersUsed: {
+            workspaceId: '684402c2fd2cd4eb6521b386',
+            commentText: 'uu testing automation',
+            mediaId: '17855248212513160'
+          }
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('[TEST] ❌ Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 🎯 UPDATE AUTOMATION RULES TO TARGET CURRENT POSTS
+  app.post('/api/update-automation-targeting', async (req, res) => {
+    try {
+      console.log('[UPDATE] 🎯 Updating automation rules to target current posts...');
+      
+      const mongoose = (await import('mongoose')).default;
+      
+      // Get the current post IDs from recent webhook activity
+      const currentPostIds = [
+        '17855248212513160',  // From recent webhook logs
+        '18290798503271967',  // From recent webhook logs  
+        '18076220419901491'   // Original test post
+      ];
+      
+      console.log('[UPDATE] Target post IDs:', currentPostIds);
+      
+      // Update all automation rules to target these current posts
+      const result = await mongoose.connection.db.collection('automationrules').updateMany(
+        { 
+          workspaceId: '684402c2fd2cd4eb6521b386',
+          isActive: true 
+        },
+        { 
+          $set: { targetMediaIds: currentPostIds }
+        }
+      );
+      
+      console.log('[UPDATE] ✅ Updated', result.modifiedCount, 'automation rules');
+      
+      // Verify the update
+      const rules = await mongoose.connection.db.collection('automationrules').find({
+        workspaceId: '684402c2fd2cd4eb6521b386',
+        isActive: true
+      }).toArray();
+      
+      rules.forEach((rule, index) => {
+        console.log(`[UPDATE] Rule ${index + 1} updated:`, {
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds,
+          type: rule.type
+        });
+      });
+      
+      res.json({
+        success: true,
+        message: 'Automation rules updated to target current posts',
+        rulesUpdated: result.modifiedCount,
+        targetPosts: currentPostIds,
+        rules: rules.map(rule => ({
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds,
+          isActive: rule.isActive
+        }))
+      });
+      
+    } catch (error: any) {
+      console.error('[UPDATE] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 🔧 FIX AUTOMATION RULES - MAKE GLOBAL
+  app.post('/api/fix-automation-rules', async (req, res) => {
+    try {
+      console.log('[FIX] 🔧 Making automation rules work on ALL posts...');
+      
+      const mongoose = (await import('mongoose')).default;
+      
+      // Update all automation rules to have global targeting (empty targetMediaIds)
+      const result = await mongoose.connection.db.collection('automationrules').updateMany(
+        { 
+          workspaceId: '684402c2fd2cd4eb6521b386',
+          isActive: true 
+        },
+        { 
+          $unset: { targetMediaIds: "" } // Remove specific post targeting
+        }
+      );
+      
+      console.log('[FIX] ✅ Updated', result.modifiedCount, 'automation rules to work globally');
+      
+      // Verify the fix
+      const rules = await mongoose.connection.db.collection('automationrules').find({
+        workspaceId: '684402c2fd2cd4eb6521b386',
+        isActive: true
+      }).toArray();
+      
+      rules.forEach((rule, index) => {
+        console.log(`[FIX] Rule ${index + 1} after fix:`, {
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds || 'GLOBAL (all posts)',
+          type: rule.type
+        });
+      });
+      
+      res.json({
+        success: true,
+        message: 'Automation rules updated to work on ALL posts',
+        rulesUpdated: result.modifiedCount,
+        rules: rules.map(rule => ({
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds || 'GLOBAL',
+          isActive: rule.isActive
+        }))
+      });
+      
+    } catch (error: any) {
+      console.error('[FIX] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 🔍 DEBUG AUTOMATION RULES ENDPOINT
+  app.get('/api/debug-automation-rules', async (req, res) => {
+    try {
+      const mongoose = (await import('mongoose')).default;
+      
+      const rules = await mongoose.connection.db.collection('automationrules').find({
+        workspaceId: '684402c2fd2cd4eb6521b386',
+        isActive: true
+      }).toArray();
+      
+      console.log('[DEBUG] Found automation rules:', rules.length);
+      rules.forEach((rule, index) => {
+        console.log(`[DEBUG] Rule ${index + 1}:`, {
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds,
+          type: rule.type
+        });
+      });
+      
+      res.json({
+        rulesCount: rules.length,
+        rules: rules.map(rule => ({
+          name: rule.name,
+          keywords: rule.keywords,
+          targetMediaIds: rule.targetMediaIds,
+          type: rule.type,
+          isActive: rule.isActive
+        }))
+      });
+      
+    } catch (error: any) {
+      console.error('[DEBUG] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Test endpoint for webhook automation demo
   app.post('/api/test-webhook-automation', async (req, res) => {
     try {
