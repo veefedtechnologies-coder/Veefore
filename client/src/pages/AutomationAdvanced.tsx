@@ -402,6 +402,8 @@ export default function AutomationAdvanced() {
           
           <div className="flex gap-2">
             <input
+              id="newKeyword"
+              name="newKeyword"
               type="text"
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
@@ -431,6 +433,8 @@ export default function AutomationAdvanced() {
               Comment Reply
             </label>
             <textarea
+              id="commentReply"
+              name="commentReply"
               value={commentReply}
               onChange={(e) => setCommentReply(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg resize-none"
@@ -737,6 +741,8 @@ export default function AutomationAdvanced() {
                   Timezone
                 </label>
                 <select
+                  id="timezone"
+                  name="timezone"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg"
@@ -764,6 +770,8 @@ export default function AutomationAdvanced() {
               Max Replies/Day
             </label>
             <input
+              id="maxRepliesPerDay"
+              name="maxRepliesPerDay"
               type="number"
               value={maxRepliesPerDay}
               onChange={(e) => setMaxRepliesPerDay(Number(e.target.value))}
@@ -775,6 +783,8 @@ export default function AutomationAdvanced() {
               Cooldown (minutes)
             </label>
             <input
+              id="cooldownPeriod"
+              name="cooldownPeriod"
               type="number"
               value={cooldownPeriod}
               onChange={(e) => setCooldownPeriod(Number(e.target.value))}
@@ -799,6 +809,8 @@ export default function AutomationAdvanced() {
               Personality Type
             </label>
             <select
+              id="aiPersonality"
+              name="aiPersonality"
               value={aiPersonality}
               onChange={(e) => setAiPersonality(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-lg"
@@ -815,6 +827,8 @@ export default function AutomationAdvanced() {
           <div className="grid grid-cols-2 gap-4">
             <label className="flex items-center gap-2">
               <input
+                id="useAiPersonalization"
+                name="useAiPersonalization"
                 type="checkbox"
                 checked={useAiPersonalization}
                 onChange={(e) => setUseAiPersonalization(e.target.checked)}
@@ -824,6 +838,8 @@ export default function AutomationAdvanced() {
             </label>
             <label className="flex items-center gap-2">
               <input
+                id="aiLearningEnabled"
+                name="aiLearningEnabled"
                 type="checkbox"
                 checked={aiLearningEnabled}
                 onChange={(e) => setAiLearningEnabled(e.target.checked)}

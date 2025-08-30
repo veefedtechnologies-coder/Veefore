@@ -758,6 +758,8 @@ function SignUpIntegrated() {
                           <div className="absolute inset-0 bg-gray-50 rounded-xl border border-gray-200" />
                           <div className="relative z-10 p-4">
                             <input
+                              id="otpCode"
+                              name="otpCode"
                               type="text"
                               value={otpData.code}
                               onChange={(e) => {
