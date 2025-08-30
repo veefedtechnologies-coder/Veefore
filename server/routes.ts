@@ -13651,7 +13651,8 @@ Create a detailed growth strategy in JSON format:
             originalFollowers: account.followersCount || account.subscriberCount || account.followers,
             transformedFollowers: transformedAccount.followers,
             originalProfilePic: account.profilePictureUrl || account.profilePicture,
-            transformedProfilePic: transformedAccount.profilePictureUrl
+            transformedProfilePic: transformedAccount.profilePictureUrl,
+            fullTransformedAccount: transformedAccount
           });
           
           return transformedAccount;
