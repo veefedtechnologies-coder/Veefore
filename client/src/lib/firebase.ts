@@ -14,13 +14,18 @@ const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 
 // Set persistence to local storage to maintain login across sessions
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log('Firebase: Auth persistence set to LOCAL')
-  })
-  .catch((error) => {
-    console.error('Firebase: Failed to set persistence:', error)
-  })
+// Wrapped in try-catch to handle IndexedDB issues gracefully
+try {
+  setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+      console.log('Firebase: Auth persistence set to LOCAL')
+    })
+    .catch((error) => {
+      console.warn('Firebase: Persistence setup failed, using default:', error.message)
+    })
+} catch (error) {
+  console.warn('Firebase: IndexedDB not available, using memory persistence')
+}
 
 export const googleProvider = new GoogleAuthProvider()
 

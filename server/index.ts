@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
@@ -29,6 +30,64 @@ let serveStatic: any = null;
 const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
+
+// Security headers with proper CSP configuration
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://fonts.googleapis.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://apis.google.com",
+        "blob:"
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com"
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com",
+        "data:"
+      ],
+      imgSrc: [
+        "'self'",
+        "https:",
+        "data:",
+        "blob:",
+        "https://scontent-sea1-1.cdninstagram.com",
+        "https://lh3.googleusercontent.com"
+      ],
+      connectSrc: [
+        "'self'",
+        "https:",
+        "wss:",
+        "ws:",
+        "https://identitytoolkit.googleapis.com",
+        "https://securetoken.googleapis.com",
+        "https://graph.instagram.com",
+        "https://api.instagram.com"
+      ],
+      frameSrc: [
+        "'self'",
+        "https://www.google.com",
+        "https://accounts.google.com"
+      ],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
@@ -146,7 +205,7 @@ app.use((req, res, next) => {
       await storage.connect();
       
       let totalDeleted = 0;
-      const resetResults = [];
+      const resetResults: Array<{ collection: string; deleted: number }> = [];
       
       // Clear all data through the storage interface
       try {
@@ -413,7 +472,7 @@ app.use((req, res, next) => {
         path.join(process.cwd(), 'build')
       ];
       
-      let staticPath = null;
+      let staticPath: string | null = null;
       
       for (const possiblePath of possiblePaths) {
         if (fs.existsSync(possiblePath)) {
