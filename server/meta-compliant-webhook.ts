@@ -336,24 +336,66 @@ export class MetaCompliantWebhook {
     try {
       const accounts = await this.storage.getAllSocialAccounts();
       
-      // Find account with matching Page ID or Instagram ID
-      const account = accounts.find(acc => 
+      // Find all matching Instagram accounts with this Page ID
+      const matchingAccounts = accounts.filter(acc => 
         acc.platform === 'instagram' && 
         (acc.pageId === pageId || acc.instagramId === pageId || acc.accountId === pageId)
       );
 
-      if (account) {
-        console.log('[ACCOUNT LOOKUP] ✅ Found account:', account.username);
-        return account;
+      if (matchingAccounts.length === 0) {
+        console.log('[ACCOUNT LOOKUP] ❌ No account found for Page ID:', pageId);
+        console.log('[ACCOUNT LOOKUP] Available accounts:', accounts
+          .filter(acc => acc.platform === 'instagram')
+          .map(acc => ({ username: acc.username, pageId: acc.pageId, accountId: acc.accountId, workspaceId: acc.workspaceId }))
+        );
+        return null;
       }
 
-      console.log('[ACCOUNT LOOKUP] ❌ No account found for Page ID:', pageId);
-      console.log('[ACCOUNT LOOKUP] Available accounts:', accounts
-        .filter(acc => acc.platform === 'instagram')
-        .map(acc => ({ username: acc.username, pageId: acc.pageId, accountId: acc.accountId }))
-      );
+      // Debug all matching accounts
+      console.log('[ACCOUNT LOOKUP] 🔍 All matching accounts found:');
+      matchingAccounts.forEach((acc, index) => {
+        console.log(`[ACCOUNT LOOKUP] Account ${index + 1}: workspace=${acc.workspaceId}, username=${acc.username}, updated=${acc.updatedAt}, created=${acc.createdAt}`);
+      });
+
+      // PRIORITY 1: Prefer the current user's workspace (684402c2fd2cd4eb6521b386)
+      const currentWorkspaceAccounts = matchingAccounts.filter(acc => acc.workspaceId === '684402c2fd2cd4eb6521b386');
       
-      return null;
+      // PRIORITY 2: Avoid the old problematic workspace
+      const goodAccounts = matchingAccounts.filter(acc => acc.workspaceId !== '6847b9cdfabaede1706f2994');
+      
+      let account;
+      if (currentWorkspaceAccounts.length > 0) {
+        // Use account from the current user's workspace
+        account = currentWorkspaceAccounts.sort((a, b) => {
+          const aDate = new Date(a.updatedAt || a.createdAt || 0);
+          const bDate = new Date(b.updatedAt || b.createdAt || 0);
+          return bDate.getTime() - aDate.getTime(); // Most recent first
+        })[0];
+        console.log('[ACCOUNT LOOKUP] ✅ Using CURRENT WORKSPACE account (PRIORITY)');
+      } else if (goodAccounts.length > 0) {
+        // Use the most recently updated good account
+        account = goodAccounts.sort((a, b) => {
+          const aDate = new Date(a.updatedAt || a.createdAt || 0);
+          const bDate = new Date(b.updatedAt || b.createdAt || 0);
+          return bDate.getTime() - aDate.getTime(); // Most recent first
+        })[0];
+        console.log('[ACCOUNT LOOKUP] ✅ Using GOOD account (avoiding old workspace)');
+      } else {
+        // Fallback to most recent if no good accounts found
+        account = matchingAccounts.sort((a, b) => {
+          const aDate = new Date(a.updatedAt || a.createdAt || 0);
+          const bDate = new Date(b.updatedAt || b.createdAt || 0);
+          return bDate.getTime() - aDate.getTime(); // Most recent first
+        })[0];
+        console.log('[ACCOUNT LOOKUP] ⚠️ Using fallback account');
+      }
+
+      console.log('[ACCOUNT LOOKUP] ✅ Found account:', account.username);
+      console.log('[ACCOUNT LOOKUP] Using workspace:', account.workspaceId);
+      if (matchingAccounts.length > 1) {
+        console.log('[ACCOUNT LOOKUP] ⚠️ Multiple accounts found, selected best one');
+      }
+      return account;
     } catch (error) {
       console.error('[ACCOUNT LOOKUP] ❌ Error finding account:', error);
       return null;

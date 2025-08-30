@@ -14410,5 +14410,68 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
+  // Fix workspace assignment for Instagram automation
+  app.post('/api/debug/fix-workspace', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[DEBUG] Fixing workspace assignment for user:', req.user?.email);
+      
+      // Get all social accounts
+      const allAccounts = await storage.getAllSocialAccounts();
+      const instagramAccounts = allAccounts.filter(acc => acc.platform === 'instagram' && acc.username === 'rahulc1020');
+      
+      console.log('[DEBUG] Found Instagram accounts:', instagramAccounts.map(acc => ({
+        id: acc.id,
+        username: acc.username,
+        workspaceId: acc.workspaceId,
+        pageId: acc.pageId,
+        instagramId: acc.instagramId,
+        accountId: acc.accountId
+      })));
+      
+      // Find the account with the correct Page ID (17841474747481653)
+      const targetPageId = '17841474747481653';
+      const correctAccount = instagramAccounts.find(acc => 
+        acc.pageId === targetPageId || acc.instagramId === targetPageId || acc.accountId === targetPageId
+      );
+      
+      if (!correctAccount) {
+        return res.status(404).json({ error: 'No account found with target Page ID' });
+      }
+      
+      // Get user's current workspace
+      const userWorkspaces = await storage.getWorkspacesByUserId(req.user.id);
+      const currentWorkspace = userWorkspaces.find(w => w.id === '684402c2fd2cd4eb6521b386');
+      
+      if (!currentWorkspace) {
+        return res.status(404).json({ error: 'Current workspace not found' });
+      }
+      
+      console.log('[DEBUG] Moving account from workspace', correctAccount.workspaceId, 'to', currentWorkspace.id);
+      
+      // Update the account's workspace
+      const updatedAccount = await storage.updateSocialAccount(correctAccount.id, {
+        workspaceId: currentWorkspace.id
+      });
+      
+      console.log('[DEBUG] ✅ Account workspace updated successfully');
+      
+      res.json({
+        success: true,
+        message: 'Workspace assignment fixed',
+        account: {
+          id: updatedAccount.id,
+          username: updatedAccount.username,
+          oldWorkspace: correctAccount.workspaceId,
+          newWorkspace: currentWorkspace.id,
+          pageId: updatedAccount.pageId
+        }
+      });
+      
+    } catch (error) {
+      console.error('[DEBUG] Error fixing workspace:', error);
+      res.status(500).json({ error: 'Failed to fix workspace assignment' });
+    }
+  });
+
   return httpServer;
 }
