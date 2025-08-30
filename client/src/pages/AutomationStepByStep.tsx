@@ -731,12 +731,33 @@ export default function AutomationStepByStep() {
                   onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
                   className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
                 >
-                  <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
-                    {accountsLoading ? 'Loading accounts...' : selectedAccount 
-                      ? realAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.platform
-                      : 'Choose your social media account...'
-                    }
-                  </span>
+                  <div className="flex items-center space-x-3">
+                    {selectedAccount && !accountsLoading && (
+                      <img 
+                        src={realAccounts.find(acc => acc.id === selectedAccount)?.avatar} 
+                        alt={realAccounts.find(acc => acc.id === selectedAccount)?.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                          const fallback = e.currentTarget.nextElementSibling
+                          if (fallback) fallback.style.display = 'flex'
+                        }}
+                      />
+                    )}
+                    {selectedAccount && !accountsLoading && (
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500" style={{display: 'none'}}>
+                        <span className="text-white text-xs font-bold">
+                          {realAccounts.find(acc => acc.id === selectedAccount)?.name?.charAt(1).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
+                      {accountsLoading ? 'Loading accounts...' : selectedAccount 
+                        ? realAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.platform
+                        : 'Choose your social media account...'
+                      }
+                    </span>
+                  </div>
                   <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${accountDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
@@ -771,7 +792,21 @@ export default function AutomationStepByStep() {
                             className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors duration-150 flex items-center justify-between group"
                           >
                             <div className="flex items-center space-x-3">
-                              <div className={`w-3 h-3 rounded-full ${account.platform === 'Instagram' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : account.platform === 'YouTube' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+                              <img 
+                                src={account.avatar} 
+                                alt={account.name}
+                                className="w-8 h-8 rounded-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  const fallback = e.currentTarget.nextElementSibling
+                                  if (fallback) fallback.style.display = 'flex'
+                                }}
+                              />
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${account.platform === 'instagram' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : account.platform === 'youtube' ? 'bg-red-500' : 'bg-blue-500'}`} style={{display: 'none'}}>
+                                <span className="text-white text-xs font-bold">
+                                  {account.name.charAt(1).toUpperCase()}
+                                </span>
+                              </div>
                               <div>
                                 <div className="font-medium text-gray-900">{account.name}</div>
                                 <div className="text-sm text-gray-500">{account.followers} • {account.platform}</div>
