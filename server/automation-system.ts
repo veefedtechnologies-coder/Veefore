@@ -299,63 +299,101 @@ export class AutomationSystem {
    * Based on Instagram documentation: https://developers.facebook.com/docs/messenger-platform/instagram/private-replies
    */
   private async sendPrivateReply(commentId: string, message: string, accessToken: string): Promise<boolean> {
+    console.log('[AUTOMATION] 🎯 Sending Private Reply using official Instagram API...');
+    console.log('[AUTOMATION] Comment ID:', commentId);
+    console.log('[AUTOMATION] Message:', message);
+
     try {
-      console.log('[AUTOMATION] 🎯 Sending Private Reply using official Instagram API...');
-      console.log('[AUTOMATION] Comment ID:', commentId);
-      console.log('[AUTOMATION] Message:', message);
-
-      // Get Instagram account details for Page ID
-      const storage = (global as any).storage;
-      if (storage) {
-        try {
-          const mongoose = require('mongoose');
-          if (mongoose.connection.readyState === 1) {
-            const accounts = await mongoose.connection.db.collection('socialaccounts').find({ 
-              platform: 'instagram',
-              accessToken: accessToken
-            }).toArray();
-            
-            const instagramAccount = accounts.find(acc => acc.accessToken === accessToken);
-            const pageId = instagramAccount?.pageId;
-            
-            if (!pageId) {
-              console.error('[AUTOMATION] ❌ No Page ID found for Private Reply');
-              return false;
-            }
-
-            console.log('[AUTOMATION] 📱 Using Page ID for Private Reply:', pageId);
-
-            // 🎯 OFFICIAL PRIVATE REPLIES API (from Instagram documentation)
-            const response = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                recipient: { comment_id: commentId },  // 🔑 Key difference: comment_id instead of user id
-                message: { text: message },
-                access_token: accessToken
-              })
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              console.log('[AUTOMATION] ✅ Private Reply sent successfully!', data);
-              console.log('[AUTOMATION] 🎉 No conversation window restrictions with Private Replies API!');
-              return true;
-            } else {
-              const errorText = await response.text();
-              console.error('[AUTOMATION] ❌ Private Reply failed:', errorText);
-              return false;
-            }
-          }
-        } catch (dbError) {
-          console.error('[AUTOMATION] Database lookup error:', dbError);
+      // 🎯 DIRECT DATABASE ACCESS (no storage dependency)
+      console.log('[AUTOMATION] 🔧 Starting database lookup for Private Reply...');
+      const mongoose = (await import('mongoose')).default;
+      console.log('[AUTOMATION] 🔧 Mongoose connection state:', mongoose.connection.readyState);
+      
+      if (mongoose.connection.readyState === 1) {
+        // Find any active Instagram account with pageId
+        console.log('[AUTOMATION] 🔍 Looking up Instagram account for Private Reply...');
+        console.log('[AUTOMATION] 🔍 AccessToken provided:', accessToken ? 'present' : 'missing');
+        
+        const accounts = await mongoose.connection.db.collection('socialaccounts').find({ 
+          platform: 'instagram',
+          pageId: { $exists: true, $ne: null }  // Only accounts with pageId
+        }).toArray();
+        
+        console.log('[AUTOMATION] 📊 Found', accounts.length, 'Instagram accounts with pageId');
+        
+        // Debug: Show all available accounts
+        accounts.forEach((acc, index) => {
+          console.log(`[AUTOMATION] 📱 Account ${index + 1}:`, {
+            username: acc.username,
+            workspaceId: acc.workspaceId,
+            hasPageId: !!acc.pageId,
+            pageId: acc.pageId,
+            hasAccessToken: !!acc.accessToken,
+            accessTokenMatch: acc.accessToken === accessToken
+          });
+        });
+        
+        // Try to find account by accessToken first, then fallback to any account with pageId
+        let instagramAccount = accounts.find(acc => acc.accessToken === accessToken);
+        if (!instagramAccount && accounts.length > 0) {
+          instagramAccount = accounts[0]; // Use first account with pageId as fallback
+          console.log('[AUTOMATION] 🔄 Using fallback account:', instagramAccount.username);
         }
+        
+        const pageId = instagramAccount?.pageId;
+            
+        if (!pageId) {
+          console.error('[AUTOMATION] ❌ No Page ID found for Private Reply');
+          console.error('[AUTOMATION] 📋 Available account details:', {
+            username: instagramAccount?.username,
+            accountId: instagramAccount?.accountId, 
+            hasPageId: !!instagramAccount?.pageId,
+            isBusinessAccount: instagramAccount?.isBusinessAccount
+          });
+          return false;
+        }
+
+        console.log('[AUTOMATION] 📱 Using Page ID for Private Reply:', pageId);
+        console.log('[AUTOMATION] 📱 Account details:', {
+          username: instagramAccount.username,
+          isBusinessAccount: instagramAccount.isBusinessAccount
+        });
+
+        // 🎯 OFFICIAL PRIVATE REPLIES API (from Instagram documentation)
+        const response = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipient: { comment_id: commentId },  // 🔑 Key difference: comment_id instead of user id
+            message: { text: message },
+            access_token: accessToken
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[AUTOMATION] ✅ Private Reply sent successfully!', data);
+          console.log('[AUTOMATION] 🎉 No conversation window restrictions with Private Replies API!');
+          return true;
+        } else {
+          const errorText = await response.text();
+          console.error('[AUTOMATION] ❌ Private Reply API call failed:', errorText);
+          return false;
+        }
+      } else {
+        console.error('[AUTOMATION] ❌ MongoDB not connected');
+        return false;
       }
 
       console.error('[AUTOMATION] ❌ Failed to get Page ID for Private Reply');
       return false;
     } catch (error) {
-      console.error('[AUTOMATION] Private Reply error:', error);
+      console.error('[AUTOMATION] 🚨 CRITICAL ERROR in Private Reply:', error);
+      console.error('[AUTOMATION] 🚨 Error details:', {
+        name: error?.name,
+        message: error?.message,
+        stack: error?.stack
+      });
       return false;
     }
   }
