@@ -18,7 +18,7 @@ import { videoShortenerAI } from './video-shortener-ai';
 import { RealVideoProcessor } from './real-video-processor';
 import { DashboardCache } from "./dashboard-cache";
 import { AutomationSystem } from "./automation-system";
-import { ComprehensiveInstagramWebhook } from "./comprehensive-instagram-webhook";
+import { MetaCompliantWebhook } from "./meta-compliant-webhook";
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   
   // CLEAN AUTOMATION SYSTEM INSTANCES
   const automationSystem = new AutomationSystem(storage);
-  const comprehensiveWebhook = new ComprehensiveInstagramWebhook(storage);
+  const metaWebhook = new MetaCompliantWebhook(storage);
   
   // Start smart polling and account monitoring for immediate real-time updates
   console.log('[SMART POLLING] 🚀 Activating intelligent Instagram polling system...');
@@ -7352,16 +7352,16 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // ✅ COMPREHENSIVE INSTAGRAM WEBHOOK SYSTEM
-  // Handles ALL Instagram events: posts, comments, likes, followers, engagement, reach, analytics
+  // ✅ META-COMPLIANT INSTAGRAM WEBHOOK SYSTEM
+  // Implements Meta's exact webhook requirements for Instagram automation
   app.get('/webhook/instagram', async (req, res) => {
-    console.log('[COMPREHENSIVE WEBHOOK] Instagram webhook verification request');
-    await comprehensiveWebhook.handleVerification(req, res);
+    console.log('[META WEBHOOK] Instagram webhook verification from Meta');
+    await metaWebhook.handleVerification(req, res);
   });
 
   app.post('/webhook/instagram', async (req, res) => {
-    console.log('[COMPREHENSIVE WEBHOOK] 🎯 Instagram webhook event received - processing ALL events');
-    await comprehensiveWebhook.handleWebhookEvent(req, res);
+    console.log('[META WEBHOOK] 🎯 Real Instagram webhook event from Meta');
+    await metaWebhook.handleEvent(req, res);
   });
 
   // Test endpoint for webhook automation demo
