@@ -278,6 +278,9 @@ export class AutomationSystem {
       console.log('[AUTOMATION] Sending DM to user:', userId);
       console.log('[AUTOMATION] DM message:', message);
       
+      // 🎯 CRITICAL FIX: Convert Instagram user ID to Page-Scoped ID (PSID) for DMs
+      console.log('[AUTOMATION] 🔄 Converting user ID to PSID for DM API...');
+      
       // Get page ID from storage for proper Instagram Business API calls
       const storage = (global as any).storage;
       if (storage) {
@@ -298,13 +301,14 @@ export class AutomationSystem {
               isBusinessAccount: instagramAccount?.isBusinessAccount
             });
             
-            // 🎯 MANYCHAT-STYLE DM API (using Page ID for Instagram Business)
+            // 🎯 CRITICAL FIX: Try multiple DM approaches for Instagram Business API
             const pageId = instagramAccount?.pageId;
             if (pageId && instagramAccount?.isBusinessAccount) {
               console.log('[AUTOMATION] 🚀 ManyChat-style DM: Using Page ID for Business API:', pageId);
               
-              // 🎯 CORRECT: Instagram Business API (using graph.instagram.com)
-              const instagramDMResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
+              // Method 1: Try direct user ID (sometimes works)
+              console.log('[AUTOMATION] 📋 Method 1: Trying direct user ID for DM...');
+              const directDMResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -314,19 +318,37 @@ export class AutomationSystem {
                 })
               });
               
-              if (instagramDMResponse.ok) {
-                const data = await instagramDMResponse.json();
-                console.log('[AUTOMATION] ✅ Instagram Business DM sent successfully:', data.message_id);
+              if (directDMResponse.ok) {
+                const data = await directDMResponse.json();
+                console.log('[AUTOMATION] ✅ Direct DM sent successfully:', data.message_id);
                 return true;
               } else {
-                const igError = await instagramDMResponse.text();
-                console.log('[AUTOMATION] 📋 Instagram Business API response:', igError);
+                const directError = await directDMResponse.text();
+                console.log('[AUTOMATION] ❌ Direct DM failed:', directError);
                 
-                // Fallback: Try with Instagram account ID instead of Page ID
-                const accountId = instagramAccount?.accountId;
-                if (accountId && accountId !== pageId) {
-                  console.log('[AUTOMATION] Trying fallback with account ID:', accountId);
-                  const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${accountId}/messages`, {
+                // Method 2: Try using User ID as Instagram Business Account ID
+                console.log('[AUTOMATION] 📋 Method 2: Trying DM with Instagram account endpoint...');
+                const accountDMResponse = await fetch(`https://graph.instagram.com/v21.0/${userId}/messages`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    recipient: { id: pageId },
+                    message: { text: message },
+                    access_token: accessToken
+                  })
+                });
+                
+                if (accountDMResponse.ok) {
+                  const data = await accountDMResponse.json();
+                  console.log('[AUTOMATION] ✅ Account-based DM sent successfully:', data.message_id);
+                  return true;
+                } else {
+                  const accountError = await accountDMResponse.text();
+                  console.log('[AUTOMATION] ❌ Account-based DM failed:', accountError);
+                  
+                  // Method 3: Try Facebook Graph API format (fallback)
+                  console.log('[AUTOMATION] 📋 Method 3: Trying Facebook Graph API format...');
+                  const fbDMResponse = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -336,14 +358,38 @@ export class AutomationSystem {
                     })
                   });
                   
-                  if (fallbackResponse.ok) {
-                    const fallbackData = await fallbackResponse.json();
-                    console.log('[AUTOMATION] ✅ DM sent via Instagram account ID:', fallbackData.message_id);
+                  if (fbDMResponse.ok) {
+                    const data = await fbDMResponse.json();
+                    console.log('[AUTOMATION] ✅ Facebook Graph DM sent successfully:', data.message_id);
                     return true;
                   } else {
-                    const fallbackError = await fallbackResponse.text();
-                    console.error('[AUTOMATION] ❌ Instagram account ID failed:', fallbackError);
+                    const fbError = await fbDMResponse.text();
+                    console.log('[AUTOMATION] ❌ Facebook Graph DM failed:', fbError);
                   }
+                }
+              }
+                
+              // Method 4: Try with Instagram account ID instead of Page ID
+              const accountId = instagramAccount?.accountId;
+              if (accountId && accountId !== pageId) {
+                console.log('[AUTOMATION] 📋 Method 4: Trying fallback with account ID:', accountId);
+                const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${accountId}/messages`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    recipient: { id: userId },
+                    message: { text: message },
+                    access_token: accessToken
+                  })
+                });
+                
+                if (fallbackResponse.ok) {
+                  const fallbackData = await fallbackResponse.json();
+                  console.log('[AUTOMATION] ✅ DM sent via Instagram account ID:', fallbackData.message_id);
+                  return true;
+                } else {
+                  const fallbackError = await fallbackResponse.text();
+                  console.error('[AUTOMATION] ❌ Instagram account ID failed:', fallbackError);
                 }
               }
             }
