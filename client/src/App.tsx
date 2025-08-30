@@ -702,17 +702,6 @@ function App() {
         <TermsOfService />
       </Route>
       
-      {/* Catch-all route for unauthenticated users trying to access protected routes */}
-      <Route>
-        {!user ? (
-          <div className="min-h-screen">
-            <Landing onNavigate={(page: string) => setLocation(`/${page}`)} />
-          </div>
-        ) : (
-          <LoadingSpinner />
-        )}
-      </Route>
-      
     </Switch>
 
     {/* Guided Tour */}
