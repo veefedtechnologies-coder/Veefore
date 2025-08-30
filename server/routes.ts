@@ -13627,6 +13627,18 @@ Create a detailed growth strategy in JSON format:
         
         // Transform accounts to frontend format with profile pictures
         const transformedAccounts = accounts.map(account => {
+          console.log(`[BACKEND DEBUG] Raw account data for ${account.username}:`, {
+            followersCount: account.followersCount,
+            followers: account.followers,
+            subscriberCount: account.subscriberCount,
+            profilePictureUrl: account.profilePictureUrl,
+            profilePicture: account.profilePicture,
+            allFields: Object.keys(account)
+          });
+          
+          // Get followers count from any available field
+          const followersCount = account.followersCount || account.followers || account.subscriberCount || 0;
+          
           // Get the actual profile picture URL or use a fallback
           const profilePictureUrl = account.profilePictureUrl || 
                                    account.profilePicture || 
@@ -13637,8 +13649,8 @@ Create a detailed growth strategy in JSON format:
             platform: account.platform,
             username: account.username,
             displayName: account.displayName || account.username,
-            followers: account.followersCount || account.subscriberCount || account.followers || 0,
-            isConnected: account.isActive,
+            followers: followersCount,
+            isConnected: account.isActive !== false,
             isVerified: true,
             lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
             profilePictureUrl: profilePictureUrl,
@@ -13647,12 +13659,12 @@ Create a detailed growth strategy in JSON format:
             workspaceId: workspace.id
           };
           
-          console.log(`[SOCIAL ACCOUNTS TRANSFORM] Account: ${account.username}`, {
-            originalFollowers: account.followersCount || account.subscriberCount || account.followers,
-            transformedFollowers: transformedAccount.followers,
+          console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
+            originalFollowers: followersCount,
+            finalFollowers: transformedAccount.followers,
             originalProfilePic: account.profilePictureUrl || account.profilePicture,
-            transformedProfilePic: transformedAccount.profilePictureUrl,
-            fullTransformedAccount: transformedAccount
+            finalProfilePic: transformedAccount.profilePictureUrl,
+            fullResponse: transformedAccount
           });
           
           return transformedAccount;
