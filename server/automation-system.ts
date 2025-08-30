@@ -133,7 +133,6 @@ export class AutomationSystem {
       // Handle comment replies
       if ((rule.type === 'comment_dm' || rule.type === 'comment_only')) {
         const responses = (rule as any).responses;
-        console.log('[AUTOMATION DEBUG] Responses object:', JSON.stringify(responses, null, 2));
         
         // Handle both nested object format and flat array format
         let commentResponses = [];
@@ -143,7 +142,6 @@ export class AutomationSystem {
           commentResponses = responses;
         }
         
-        console.log('[AUTOMATION DEBUG] Comment responses:', commentResponses);
         
         if (Array.isArray(commentResponses) && commentResponses.length > 0) {
           const replyText = commentResponses[Math.floor(Math.random() * commentResponses.length)];
@@ -158,15 +156,9 @@ export class AutomationSystem {
         }
       }
       
-      // Handle DM - SIMPLIFIED AND FIXED
+      // Handle DM automation
       if ((rule.type === 'comment_dm' || rule.type === 'dm_only')) {
-        console.log('[DM DEBUG] Starting DM processing...');
-        console.log('[DM DEBUG] Rule type:', rule.type);
-        
-        // Get DM responses from rule object
         const dmResponses = (rule as any).dmResponses || [];
-        console.log('[DM DEBUG] Found dmResponses:', dmResponses);
-        console.log('[DM DEBUG] dmResponses length:', dmResponses.length);
         
         if (Array.isArray(dmResponses) && dmResponses.length > 0) {
           const dmMessage = dmResponses[Math.floor(Math.random() * dmResponses.length)];
