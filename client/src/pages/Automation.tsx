@@ -252,6 +252,11 @@ export default function Automation() {
     queryFn: () => apiRequest('/api/social-accounts')
   })
 
+  // Debug the social accounts data
+  console.log('[AUTOMATION DEBUG] Social accounts data:', socialAccounts)
+  const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram')
+  console.log('[AUTOMATION DEBUG] Instagram account:', instagramAccount)
+
   // Get user data for workspaceId
   const { data: userData } = useQuery({
     queryKey: ['/api/user'],
@@ -529,6 +534,10 @@ export default function Automation() {
     const selectedPost = mockPosts.find(p => p.id === formData.selectedPost)
     const connectedAccount = socialAccounts.find(acc => acc.platform === 'instagram')
     
+    console.log('[LIVE PREVIEW DEBUG] Connected account:', connectedAccount)
+    console.log('[LIVE PREVIEW DEBUG] Profile picture URL:', connectedAccount?.profilePictureUrl)
+    console.log('[LIVE PREVIEW DEBUG] Followers:', connectedAccount?.followers)
+    
     if (!selectedPost) return null
 
     return (
@@ -546,12 +555,13 @@ export default function Automation() {
         <div className="p-4 border-b border-gray-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {connectedAccount?.profilePictureUrl ? (
+              {(connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture) ? (
                 <img 
-                  src={connectedAccount.profilePictureUrl} 
+                  src={connectedAccount.profilePictureUrl || connectedAccount.profilePicture} 
                   alt={connectedAccount.username}
                   className="w-8 h-8 rounded-full object-cover"
                   onError={(e) => {
+                    console.log('[LIVE PREVIEW] Profile picture failed to load:', e.currentTarget.src)
                     e.currentTarget.style.display = 'none'
                     e.currentTarget.nextElementSibling.style.display = 'flex'
                   }}
@@ -559,7 +569,7 @@ export default function Automation() {
               ) : null}
               <div 
                 className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
-                style={{ display: connectedAccount?.profilePictureUrl ? 'none' : 'flex' }}
+                style={{ display: (connectedAccount?.profilePictureUrl || connectedAccount?.profilePicture) ? 'none' : 'flex' }}
               >
                 <span className="text-white text-xs font-bold">
                   {connectedAccount?.username?.charAt(1)?.toUpperCase() || 'U'}
