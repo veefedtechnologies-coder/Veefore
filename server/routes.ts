@@ -3649,6 +3649,55 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Refresh Instagram account to fetch missing Page ID (required for DMs)
+  app.post("/api/instagram/refresh-page-id", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { workspaceId } = req.body;
+      
+      console.log('[INSTAGRAM REFRESH] 🔄 Refreshing Instagram account to fetch Page ID...');
+      
+      // Get Instagram account for this workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find(acc => acc.platform === 'instagram');
+      
+      if (!instagramAccount) {
+        return res.status(404).json({ error: 'No Instagram account found' });
+      }
+      
+      console.log('[INSTAGRAM REFRESH] Found account:', instagramAccount.username);
+      console.log('[INSTAGRAM REFRESH] Current pageId:', instagramAccount.pageId || 'MISSING');
+      
+      // Use existing OAuth service to fetch Page ID
+      const instagramOAuth = new InstagramOAuthService(storage);
+      
+      // Fetch updated profile with Page ID (access private method)
+      const updatedProfile = await (instagramOAuth as any).fetchUserProfile(instagramAccount.accessToken);
+      
+      // Update the account with Page ID
+      await storage.updateSocialAccount(instagramAccount.id, {
+        pageId: updatedProfile.pageId,
+        updatedAt: new Date(),
+      });
+      
+      console.log('[INSTAGRAM REFRESH] ✅ Updated Page ID:', updatedProfile.pageId);
+      
+      res.json({ 
+        success: true, 
+        message: 'Instagram account refreshed successfully',
+        pageId: updatedProfile.pageId,
+        username: instagramAccount.username
+      });
+      
+    } catch (error) {
+      console.error('[INSTAGRAM REFRESH] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to refresh Instagram account',
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Admin endpoint to fix workspace ID mismatch (temporary - no auth for debugging)
   app.post("/api/admin/fix-workspace-id", async (req: any, res) => {
     const { user } = req;

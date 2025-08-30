@@ -82,6 +82,7 @@ export class InstagramOAuthService {
 
   private async fetchUserProfile(accessToken: string): Promise<any> {
     try {
+      // Step 1: Get basic Instagram profile
       const response = await fetch(
         `https://graph.instagram.com/me?fields=id,username,account_type,media_count,picture&access_token=${accessToken}`
       );
@@ -92,12 +93,46 @@ export class InstagramOAuthService {
 
       const profileData = await response.json();
       
+      // Step 2: Get connected Facebook Page ID for Business accounts (required for DMs)
+      let pageId = null;
+      if (profileData.account_type === 'BUSINESS') {
+        try {
+          console.log('[INSTAGRAM OAUTH] 🔥 Business account detected - fetching Page ID for DMs...');
+          const pageResponse = await fetch(
+            `https://graph.facebook.com/v21.0/${profileData.id}?fields=connected_instagram_account&access_token=${accessToken}`
+          );
+          
+          if (pageResponse.ok) {
+            const pageData = await pageResponse.json();
+            pageId = pageData.id; // This is the Facebook Page ID
+            console.log('[INSTAGRAM OAUTH] ✅ Found Page ID for DMs:', pageId);
+          } else {
+            // Try alternative method for Page ID
+            const pagesResponse = await fetch(
+              `https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`
+            );
+            
+            if (pagesResponse.ok) {
+              const pagesData = await pagesResponse.json();
+              const page = pagesData.data?.find((p: any) => p.instagram_business_account?.id === profileData.id);
+              if (page) {
+                pageId = page.id;
+                console.log('[INSTAGRAM OAUTH] ✅ Found Page ID via Pages API:', pageId);
+              }
+            }
+          }
+        } catch (pageError) {
+          console.log('[INSTAGRAM OAUTH] ⚠️ Could not fetch Page ID:', pageError);
+        }
+      }
+      
       return {
         accountId: profileData.id,
         username: profileData.username,
         accountType: profileData.account_type,
         mediaCount: profileData.media_count,
         profilePictureUrl: profileData.picture,
+        pageId: pageId, // 🎯 Critical for Instagram Business DMs
         platform: 'instagram',
       };
 
