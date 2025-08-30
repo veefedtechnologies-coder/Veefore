@@ -136,16 +136,21 @@ export class AutomationSystem {
       // Step 1: First reply to comment (establishes conversation context)
       let commentReplySent = false;
       if ((rule.type === 'comment_dm' || rule.type === 'comment_only')) {
-        const responses = (rule as any).responses;
-        
-        // Handle both nested object format and flat array format
+        // Handle multiple data structures for responses
         let commentResponses = [];
-        if (Array.isArray(responses)) {
-          // Direct array format: ["Message sent!", "Found it? 😊"]
-          commentResponses = responses;
-        } else if (typeof responses === 'object' && responses !== null) {
-          // Nested object format: { responses: ["Message sent!"] }
-          commentResponses = responses.responses || [];
+        
+        // Check if responses are in 'action' object (newer format)
+        if ((rule as any).action && (rule as any).action.responses) {
+          commentResponses = (rule as any).action.responses;
+        }
+        // Check if responses are at top level (older format)  
+        else if ((rule as any).responses) {
+          const responses = (rule as any).responses;
+          if (Array.isArray(responses)) {
+            commentResponses = responses;
+          } else if (typeof responses === 'object' && responses !== null) {
+            commentResponses = responses.responses || [];
+          }
         }
         
         if (Array.isArray(commentResponses) && commentResponses.length > 0) {
@@ -167,7 +172,17 @@ export class AutomationSystem {
       
       // Step 2: Send DM (now allowed because we replied to comment first)
       if ((rule.type === 'comment_dm' || rule.type === 'dm_only')) {
-        const dmResponses = (rule as any).dmResponses || [];
+        // Handle multiple data structures for DM responses
+        let dmResponses = [];
+        
+        // Check if dmResponses are in 'action' object (newer format)
+        if ((rule as any).action && (rule as any).action.dmResponses) {
+          dmResponses = (rule as any).action.dmResponses;
+        }
+        // Check if dmResponses are at top level (older format)
+        else if ((rule as any).dmResponses) {
+          dmResponses = (rule as any).dmResponses;
+        }
         
         if (Array.isArray(dmResponses) && dmResponses.length > 0) {
           // Wait 2 seconds after comment reply for Instagram to process
