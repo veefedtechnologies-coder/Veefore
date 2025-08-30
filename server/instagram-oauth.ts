@@ -81,7 +81,7 @@ export class InstagramOAuthService {
   private async fetchUserProfile(accessToken: string): Promise<any> {
     try {
       const response = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count&access_token=${accessToken}`
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,picture&access_token=${accessToken}`
       );
 
       if (!response.ok) {
@@ -95,6 +95,7 @@ export class InstagramOAuthService {
         username: profileData.username,
         accountType: profileData.account_type,
         mediaCount: profileData.media_count,
+        profilePictureUrl: profileData.picture,
         platform: 'instagram',
       };
 
