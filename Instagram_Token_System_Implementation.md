@@ -25,6 +25,14 @@ Fix and recreate VeeFore's Instagram webhook system to support comprehensive Com
 - **Challenge**: Complex token conversion process needed to be user-friendly
 - **Solution**: Created integrated UI component within VeeFore's existing interface
 
+### 4. Instagram OAuth Profile Picture Issues ⚡ FIXED
+- **Challenge**: Instagram OAuth was storing null profile pictures and redirecting to wrong page
+- **Root Causes**: 
+  - API call missing `profile_picture_url` field
+  - Redirect URL using `/integrations` instead of `/integration`
+  - Fallback logic overriding real profile pictures with placeholders
+- **Solution**: Enhanced OAuth flow to fetch and store real profile pictures
+
 ## Complete System Architecture
 
 ### Backend Implementation
@@ -42,7 +50,14 @@ Fix and recreate VeeFore's Instagram webhook system to support comprehensive Com
 - Updates Instagram account records in database
 - Handles error cases and permission validation
 
-#### 3. Database Integration
+#### 3. Instagram OAuth System ⚡ ENHANCED
+**File**: `server/routes.ts` (lines 3546-3633)
+- **Fixed Profile Picture Fetching**: Added `profile_picture_url` to Instagram API call
+- **Fixed Redirect Issue**: Changed redirect from `/integrations` to `/integration` route
+- **Enhanced Data Storage**: Now stores profile pictures, account type, and media count
+- **Smart Fallback Logic**: Prioritizes real profile pictures over placeholder avatars
+
+#### 4. Database Integration
 **File**: `server/mongodb-storage.ts`
 - Automatic Instagram account updates when saving converted tokens
 - Maintains workspace-based organization
@@ -197,3 +212,17 @@ Fix and recreate VeeFore's Instagram webhook system to support comprehensive Com
 ---
 
 This implementation provides a solid foundation for Instagram Business API integration that can be adapted for other social media management applications requiring similar token management and automation capabilities.
+
+## Final Update: OAuth Issues Resolved ✅
+**Date: August 30, 2025**
+
+### Critical Fixes Applied:
+1. **Blank Page Fix**: Corrected OAuth redirect from `/integrations` to `/integration` route
+2. **Profile Picture Fix**: Added `profile_picture_url` field to Instagram API calls  
+3. **Data Storage**: Enhanced to store real profile pictures instead of placeholders
+4. **Fallback Logic**: Smart detection of real vs placeholder profile pictures
+
+### Confirmation:
+✅ OAuth flow now redirects properly after Instagram connection  
+✅ Real Instagram profile pictures are fetched and displayed  
+✅ System working correctly for @rahulc1020 business account

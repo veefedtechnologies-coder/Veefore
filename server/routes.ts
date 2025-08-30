@@ -3660,55 +3660,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Fix Instagram profile picture by fetching real profile picture from API
-  app.post("/api/instagram/fix-profile-picture", requireAuth, async (req: any, res: Response) => {
-    try {
-      const userId = req.user.id;
-      console.log('[PROFILE FIX] Fixing Instagram profile pictures...');
-      
-      // Get user's workspaces
-      const workspaces = await storage.getWorkspacesByUserId(userId);
-      
-      for (const workspace of workspaces) {
-        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-        const instagramAccounts = accounts.filter(acc => acc.platform === 'instagram' && acc.accessToken);
-        
-        for (const account of instagramAccounts) {
-          console.log(`[PROFILE FIX] Fetching real profile picture for @${account.username}...`);
-          
-          try {
-            // Fetch real profile picture from Instagram API
-            const profileResponse = await fetch(
-              `https://graph.instagram.com/me?fields=profile_picture_url&access_token=${account.accessToken}`
-            );
-            
-            if (profileResponse.ok) {
-              const profileData = await profileResponse.json();
-              
-              if (profileData.profile_picture_url) {
-                console.log(`[PROFILE FIX] ✅ Found real profile picture for @${account.username}`);
-                
-                // Update account with real profile picture
-                await storage.updateSocialAccount(account.id, {
-                  profilePictureUrl: profileData.profile_picture_url,
-                  lastSyncAt: new Date()
-                });
-                
-                console.log(`[PROFILE FIX] ✅ Updated @${account.username} with real profile picture`);
-              }
-            }
-          } catch (error) {
-            console.error(`[PROFILE FIX] Error updating @${account.username}:`, error);
-          }
-        }
-      }
-      
-      res.json({ success: true, message: 'Profile pictures updated' });
-    } catch (error: any) {
-      console.error('[PROFILE FIX] Error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
   // PERMANENT FIX: Copy Page ID from wrong workspace to correct workspace
   app.post("/api/fix-page-id", async (req: any, res) => {
