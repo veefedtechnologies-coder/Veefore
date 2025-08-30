@@ -262,19 +262,21 @@ export class MetaCompliantWebhook {
         return;
       }
 
-      const { text, from, comment_id } = value;
+      // Extract comment ID - Instagram uses 'id' field, not 'comment_id'
+      const commentId = value.id || value.comment_id;
+      const { text, from } = value;
       
       console.log('[META COMMENT] 🎯 Real Instagram comment:', {
         user: from.username,
         text: text,
-        commentId: comment_id
+        commentId: commentId
       });
 
       // CRITICAL: Process through automation system
       const automationResult = await this.automationSystem.processComment(
         account.workspaceId,
         text,
-        comment_id || 'meta_webhook',
+        commentId || 'meta_webhook',
         from.id,
         from.username,
         account.accessToken
