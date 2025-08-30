@@ -16,9 +16,15 @@ export interface AutomationRule {
   // Keywords to trigger automation
   keywords: string[];
   
-  // Responses
-  commentReplies: string[];  // For comment automation
-  dmMessage?: string;        // For DM automation
+  // Responses (new format)
+  responses?: {
+    responses?: string[];     // Comment responses
+    dmResponses?: string[];   // DM responses
+  };
+  
+  // Legacy fields (for compatibility)
+  commentReplies?: string[];  // For comment automation
+  dmMessage?: string;         // For DM automation
   
   // Metadata
   createdAt: Date;
@@ -110,36 +116,68 @@ export class AutomationSystem {
     const triggeredActions: string[] = [];
     
     for (const rule of activeRules) {
-      const isTriggered = rule.keywords.some(keyword => 
+      console.log('[AUTOMATION DEBUG] Processing rule:', rule.name);
+      console.log('[AUTOMATION DEBUG] Rule keywords:', rule.keywords);
+      console.log('[AUTOMATION DEBUG] Rule type:', typeof rule.keywords);
+      
+      const keywords = Array.isArray(rule.keywords) ? rule.keywords : [];
+      const isTriggered = keywords.some(keyword => 
         commentText.toLowerCase().includes(keyword.toLowerCase())
       );
       
       if (!isTriggered) continue;
       
       console.log('[AUTOMATION] Rule triggered:', rule.name);
+      console.log('[AUTOMATION DEBUG] Full rule object:', JSON.stringify(rule, null, 2));
       
       // Handle comment replies
-      if ((rule.type === 'comment_dm' || rule.type === 'comment_only') && rule.commentReplies.length > 0) {
-        const replyText = rule.commentReplies[Math.floor(Math.random() * rule.commentReplies.length)];
-        const success = await this.sendCommentReply(commentId, replyText, accessToken);
+      if ((rule.type === 'comment_dm' || rule.type === 'comment_only')) {
+        const responses = (rule as any).responses;
+        console.log('[AUTOMATION DEBUG] Responses object:', JSON.stringify(responses, null, 2));
         
-        if (success) {
-          triggeredActions.push(`Replied to comment: "${replyText}"`);
-          await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'sent');
-        } else {
-          await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'failed');
+        // Handle both nested object format and flat array format
+        let commentResponses = [];
+        if (typeof responses === 'object' && responses !== null) {
+          commentResponses = responses.responses || [];
+        } else if (Array.isArray(responses)) {
+          commentResponses = responses;
+        }
+        
+        console.log('[AUTOMATION DEBUG] Comment responses:', commentResponses);
+        
+        if (Array.isArray(commentResponses) && commentResponses.length > 0) {
+          const replyText = commentResponses[Math.floor(Math.random() * commentResponses.length)];
+          const success = await this.sendCommentReply(commentId, replyText, accessToken);
+          
+          if (success) {
+            triggeredActions.push(`Replied to comment: "${replyText}"`);
+            await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'sent');
+          } else {
+            await this.logAction(rule.id!, workspaceId, 'comment', commentText, replyText, userId, username, 'failed');
+          }
         }
       }
       
-      // Handle DM
-      if ((rule.type === 'comment_dm' || rule.type === 'dm_only') && rule.dmMessage) {
-        const success = await this.sendDM(userId, rule.dmMessage, accessToken);
+      // Handle DM - SIMPLIFIED AND FIXED
+      if ((rule.type === 'comment_dm' || rule.type === 'dm_only')) {
+        console.log('[DM DEBUG] Starting DM processing...');
+        console.log('[DM DEBUG] Rule type:', rule.type);
         
-        if (success) {
-          triggeredActions.push(`Sent DM: "${rule.dmMessage}"`);
-          await this.logAction(rule.id!, workspaceId, 'dm', commentText, rule.dmMessage, userId, username, 'sent');
-        } else {
-          await this.logAction(rule.id!, workspaceId, 'dm', commentText, rule.dmMessage, userId, username, 'failed');
+        // Get DM responses from rule object
+        const dmResponses = (rule as any).dmResponses || [];
+        console.log('[DM DEBUG] Found dmResponses:', dmResponses);
+        console.log('[DM DEBUG] dmResponses length:', dmResponses.length);
+        
+        if (Array.isArray(dmResponses) && dmResponses.length > 0) {
+          const dmMessage = dmResponses[Math.floor(Math.random() * dmResponses.length)];
+          const success = await this.sendDM(userId, dmMessage, accessToken);
+          
+          if (success) {
+            triggeredActions.push(`Sent DM: "${dmMessage}"`);
+            await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'sent');
+          } else {
+            await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'failed');
+          }
         }
       }
     }
