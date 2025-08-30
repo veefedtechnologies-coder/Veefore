@@ -1239,77 +1239,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
-  // Get social accounts
-  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
-    try {
-      const { user } = req;
-      const workspaceId = req.query.workspaceId;
-      
-      if (!workspaceId) {
-        const workspaces = await storage.getWorkspacesByUserId(user.id);
-        const workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
-        if (!workspace) {
-          return res.json([]);
-        }
-        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
-        return res.json(accounts);
-      }
-      
-      // Verify user has access to the requested workspace
-      const workspace = await storage.getWorkspace(workspaceId as string);
-      if (!workspace || workspace.userId !== user.id) {
-        return res.status(403).json({ error: 'Access denied to workspace' });
-      }
-      
-      let accounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
-      
-      // Fetch live data for all platforms (integrations page)
-      for (let i = 0; i < accounts.length; i++) {
-        if (accounts[i].platform === 'youtube' && accounts[i].accessToken) {
-          console.log(`[SOCIAL ACCOUNTS API] Processing YouTube account: ${accounts[i].username}`);
-          
-          try {
-            // Fetch live data from YouTube API
-            const liveData = await youtubeService.getAuthenticatedChannelStats(accounts[i].accessToken);
-            if (liveData) {
-              console.log(`[SOCIAL ACCOUNTS API] ✓ Live API data: ${liveData.subscriberCount} subscribers, ${liveData.videoCount} videos, ${liveData.viewCount} views`);
-              
-              // Override with live API values
-              accounts[i] = {
-                ...accounts[i],
-                subscriberCount: liveData.subscriberCount,
-                followersCount: liveData.subscriberCount,
-                followers: liveData.subscriberCount,
-                videoCount: liveData.videoCount,
-                mediaCount: liveData.videoCount,
-                totalViews: liveData.viewCount,
-                isLiveData: true,
-                lastSyncAt: new Date()
-              };
-              
-              // Update database with fresh data
-              await storage.updateSocialAccount(accounts[i].id, {
-                followers: liveData.subscriberCount,
-                totalVideos: liveData.videoCount,
-                totalViews: liveData.viewCount,
-                lastSyncAt: new Date(),
-                updatedAt: new Date()
-              });
-            } else {
-              console.log(`[SOCIAL ACCOUNTS API] Live data unavailable for: ${accounts[i].username}`);
-            }
-          } catch (error) {
-            console.log(`[SOCIAL ACCOUNTS API] Error fetching live data for ${accounts[i].username}:`, error);
-          }
-        }
-      }
-      
-      res.json(accounts);
-    } catch (error: any) {
-      console.error('Error fetching social accounts:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // REMOVED DUPLICATE ROUTE - Using the comprehensive route below
 
 
 
@@ -13677,7 +13607,7 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Get social accounts for integration page
+  // Get social accounts for automation and integration pages
   app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
@@ -13695,7 +13625,7 @@ Create a detailed growth strategy in JSON format:
       for (const workspace of workspaces) {
         const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
         
-        // Transform accounts to frontend format
+        // Transform accounts to frontend format with profile pictures
         const transformedAccounts = accounts.map(account => ({
           id: account.id,
           platform: account.platform,
@@ -13705,14 +13635,21 @@ Create a detailed growth strategy in JSON format:
           isConnected: account.isActive,
           isVerified: true,
           lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
-          profilePicture: account.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.platform}`,
-          accessToken: account.accessToken ? 'present' : null
+          profilePictureUrl: account.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`,
+          profilePicture: account.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`,
+          accessToken: account.accessToken ? 'present' : null,
+          workspaceId: workspace.id
         }));
         
         allAccounts.push(...transformedAccounts);
       }
       
       console.log(`[SOCIAL ACCOUNTS] Found ${allAccounts.length} connected accounts`);
+      console.log(`[SOCIAL ACCOUNTS] Sample account:`, allAccounts[0] ? {
+        username: allAccounts[0].username,
+        platform: allAccounts[0].platform,
+        hasProfilePicture: !!allAccounts[0].profilePictureUrl
+      } : 'No accounts');
       res.json(allAccounts);
     } catch (error: any) {
       console.error('[SOCIAL ACCOUNTS] Error getting social accounts:', error);
