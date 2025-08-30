@@ -242,16 +242,16 @@ export class AutomationSystem {
           }
           
           const dmMessage = dmResponses[Math.floor(Math.random() * dmResponses.length)];
-          console.log('[AUTOMATION] 💬 Step 2: Sending DM (conversation context established)...');
-          const success = await this.sendDM(userId, dmMessage, accessToken);
+          console.log('[AUTOMATION] 💬 Step 2: Sending Private Reply (official Instagram API)...');
+          const success = await this.sendPrivateReply(commentId, dmMessage, accessToken);
           
           if (success) {
-            triggeredActions.push(`Sent DM: "${dmMessage}"`);
+            triggeredActions.push(`Sent Private Reply: "${dmMessage}"`);
             await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'sent');
-            console.log('[AUTOMATION] ✅ Comment→Reply→DM flow completed successfully!');
+            console.log('[AUTOMATION] ✅ Private Reply sent successfully! (No conversation window restrictions)');
           } else {
             await this.logAction(rule.id!, workspaceId, 'dm', commentText, dmMessage, userId, username, 'failed');
-            console.log('[AUTOMATION] ❌ DM failed even after comment reply');
+            console.log('[AUTOMATION] ❌ Private Reply failed');
           }
         }
       }
@@ -295,7 +295,73 @@ export class AutomationSystem {
   }
 
   /**
-   * Send DM via Instagram API  
+   * Send Private Reply via Instagram Private Replies API (Official)
+   * Based on Instagram documentation: https://developers.facebook.com/docs/messenger-platform/instagram/private-replies
+   */
+  private async sendPrivateReply(commentId: string, message: string, accessToken: string): Promise<boolean> {
+    try {
+      console.log('[AUTOMATION] 🎯 Sending Private Reply using official Instagram API...');
+      console.log('[AUTOMATION] Comment ID:', commentId);
+      console.log('[AUTOMATION] Message:', message);
+
+      // Get Instagram account details for Page ID
+      const storage = (global as any).storage;
+      if (storage) {
+        try {
+          const mongoose = require('mongoose');
+          if (mongoose.connection.readyState === 1) {
+            const accounts = await mongoose.connection.db.collection('socialaccounts').find({ 
+              platform: 'instagram',
+              accessToken: accessToken
+            }).toArray();
+            
+            const instagramAccount = accounts.find(acc => acc.accessToken === accessToken);
+            const pageId = instagramAccount?.pageId;
+            
+            if (!pageId) {
+              console.error('[AUTOMATION] ❌ No Page ID found for Private Reply');
+              return false;
+            }
+
+            console.log('[AUTOMATION] 📱 Using Page ID for Private Reply:', pageId);
+
+            // 🎯 OFFICIAL PRIVATE REPLIES API (from Instagram documentation)
+            const response = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                recipient: { comment_id: commentId },  // 🔑 Key difference: comment_id instead of user id
+                message: { text: message },
+                access_token: accessToken
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log('[AUTOMATION] ✅ Private Reply sent successfully!', data);
+              console.log('[AUTOMATION] 🎉 No conversation window restrictions with Private Replies API!');
+              return true;
+            } else {
+              const errorText = await response.text();
+              console.error('[AUTOMATION] ❌ Private Reply failed:', errorText);
+              return false;
+            }
+          }
+        } catch (dbError) {
+          console.error('[AUTOMATION] Database lookup error:', dbError);
+        }
+      }
+
+      console.error('[AUTOMATION] ❌ Failed to get Page ID for Private Reply');
+      return false;
+    } catch (error) {
+      console.error('[AUTOMATION] Private Reply error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Send DM via Instagram API (Legacy - keeping for fallback)
    */
   private async sendDM(userId: string, message: string, accessToken: string): Promise<boolean> {
     try {
