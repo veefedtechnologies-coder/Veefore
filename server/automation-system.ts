@@ -299,6 +299,53 @@ export class AutomationSystem {
   }
 
   /**
+   * Refresh Instagram access token when it expires
+   */
+  private async refreshInstagramToken(instagramAccount: any): Promise<{ accessToken: string } | null> {
+    try {
+      console.log('[AUTOMATION] 🔄 Attempting to refresh Instagram token...');
+      
+      // Use the environment PAGE_ACCESS_TOKEN if available (it's usually fresh)
+      const envToken = process.env.PAGE_ACCESS_TOKEN;
+      if (envToken) {
+        console.log('[AUTOMATION] ✅ Using fresh PAGE_ACCESS_TOKEN from environment');
+        return { accessToken: envToken };
+      }
+      
+      // Fallback: Try Facebook's token refresh endpoint for long-lived tokens
+      if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+        const refreshResponse = await fetch(`https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.FACEBOOK_APP_ID}&client_secret=${process.env.FACEBOOK_APP_SECRET}&fb_exchange_token=${instagramAccount.accessToken}`, {
+          method: 'GET'
+        });
+        
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          console.log('[AUTOMATION] ✅ Token refresh successful');
+          
+          // Update the stored token
+          if (this.storage) {
+            await this.storage.updateSocialAccount(instagramAccount.id, {
+              accessToken: refreshData.access_token,
+              expiresAt: new Date(Date.now() + (refreshData.expires_in * 1000)),
+              updatedAt: new Date()
+            });
+          }
+          
+          return { accessToken: refreshData.access_token };
+        } else {
+          const refreshError = await refreshResponse.text();
+          console.error('[AUTOMATION] ❌ Token refresh failed:', refreshError);
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[AUTOMATION] ❌ Token refresh error:', error);
+      return null;
+    }
+  }
+
+  /**
    * Send Private Reply via Instagram Private Replies API (Official)
    * Based on Instagram documentation: https://developers.facebook.com/docs/messenger-platform/instagram/private-replies
    */
@@ -426,6 +473,36 @@ export class AutomationSystem {
         } else {
           const errorText = await response.text();
           console.error('[AUTOMATION] ❌ Structured Private Reply failed:', errorText);
+          
+          // Handle token expiration/invalidation
+          if (errorText.includes('invalidated') || errorText.includes('OAuthException') || errorText.includes('code":190')) {
+            console.log('[AUTOMATION] 🔄 Access token expired/invalid - attempting refresh...');
+            const refreshed = await this.refreshInstagramToken(instagramAccount);
+            if (refreshed) {
+              console.log('[AUTOMATION] ✅ Token refreshed successfully - retrying Private Reply...');
+              // Retry with new token
+              const retryResponse = await fetch(`https://graph.facebook.com/${pageId}/messages`, {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                  ...requestBody,
+                  access_token: refreshed.accessToken
+                })
+              });
+              
+              if (retryResponse.ok) {
+                const retryData = await retryResponse.json();
+                console.log('[AUTOMATION] ✅ Private Reply sent after token refresh!', retryData);
+                return true;
+              } else {
+                const retryError = await retryResponse.text();
+                console.error('[AUTOMATION] ❌ Retry failed even with refreshed token:', retryError);
+              }
+            }
+          }
           
           // Try Generic Template as fallback
           if (errorText.includes('Application does not have the capability')) {
