@@ -20,10 +20,12 @@ export class InstagramOAuthService {
   }
 
   getAuthUrl(workspaceId: string): string {
-    const scopes = 'user_profile,user_media';
+    // Use Instagram Business API scopes for Comment→DM automation
+    const scopes = 'instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights';
     const state = Buffer.from(JSON.stringify({ workspaceId })).toString('base64');
     
-    return `https://api.instagram.com/oauth/authorize?client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
+    // Use Instagram Business OAuth endpoint with proper scopes for messaging
+    return `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${this.appId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=${state}`;
   }
 
   async exchangeCodeForToken(code: string, workspaceId: string): Promise<any> {

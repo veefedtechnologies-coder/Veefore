@@ -252,16 +252,65 @@ export class AutomationSystem {
       console.log('[AUTOMATION] Sending DM to user:', userId);
       console.log('[AUTOMATION] DM message:', message);
       
-      // Use Instagram Graph API for DM sending
-      const response = await fetch(`https://graph.instagram.com/v19.0/me/messages`, {
+      // Get page ID from storage for proper Instagram Business API calls
+      const storage = (global as any).storage;
+      if (storage) {
+        // Try MongoDB connection first
+        try {
+          const mongoose = require('mongoose');
+          if (mongoose.connection.readyState === 1) {
+            const accounts = await mongoose.connection.db.collection('socialaccounts').find({ 
+              platform: 'instagram',
+              accessToken: accessToken
+            }).toArray();
+            
+            const instagramAccount = accounts.find(acc => acc.accessToken === accessToken);
+            console.log('[AUTOMATION] Found Instagram account:', {
+              username: instagramAccount?.username,
+              pageId: instagramAccount?.pageId,
+              accountId: instagramAccount?.accountId,
+              isBusinessAccount: instagramAccount?.isBusinessAccount
+            });
+            
+            // Use pageId if available, otherwise try accountId for Business API
+            const businessId = instagramAccount?.pageId || instagramAccount?.accountId;
+            if (businessId && instagramAccount?.isBusinessAccount) {
+              console.log('[AUTOMATION] Using Instagram Business API with ID:', businessId);
+              const response = await fetch(`https://graph.instagram.com/v21.0/${businessId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  recipient: { id: userId },
+                  message: { text: message },
+                  access_token: accessToken
+                })
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                console.log('[AUTOMATION] ✅ DM sent successfully via Business API:', data.message_id);
+                return true;
+              } else {
+                const error = await response.text();
+                console.error('[AUTOMATION] ❌ Business API DM failed:', error);
+              }
+            }
+          }
+        } catch (dbError) {
+          console.error('[AUTOMATION] Database lookup error:', dbError);
+        }
+      }
+      
+      // Fallback to standard Instagram API
+      const response = await fetch(`https://graph.instagram.com/v21.0/me/messages`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           recipient: { id: userId },
-          message: { text: message }
+          message: { text: message },
+          access_token: accessToken
         })
       });
       
@@ -273,22 +322,23 @@ export class AutomationSystem {
         const error = await response.text();
         console.error('[AUTOMATION] ❌ DM failed:', error);
         
-        // Fallback: Try alternate API endpoint
+        // Try user-specific endpoint as final fallback
         const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${userId}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: message,
+            message: { text: message },
             access_token: accessToken
           })
         });
         
         if (fallbackResponse.ok) {
           const fallbackData = await fallbackResponse.json();
-          console.log('[AUTOMATION] ✅ DM sent via fallback:', fallbackData.id);
+          console.log('[AUTOMATION] ✅ DM sent via fallback:', fallbackData.id || fallbackData.message_id);
           return true;
         } else {
-          console.error('[AUTOMATION] ❌ Fallback DM also failed');
+          const fallbackError = await fallbackResponse.text();
+          console.error('[AUTOMATION] ❌ All DM endpoints failed. Final error:', fallbackError);
           return false;
         }
       }
