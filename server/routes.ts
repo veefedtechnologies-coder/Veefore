@@ -13677,8 +13677,13 @@ Create a detailed growth strategy in JSON format:
       console.log(`[SOCIAL ACCOUNTS] Sample account:`, allAccounts[0] ? {
         username: allAccounts[0].username,
         platform: allAccounts[0].platform,
-        hasProfilePicture: !!allAccounts[0].profilePictureUrl
+        followers: allAccounts[0].followers,
+        hasProfilePicture: !!allAccounts[0].profilePictureUrl,
+        profilePictureUrl: allAccounts[0].profilePictureUrl
       } : 'No accounts');
+      
+      // Log the complete response being sent to frontend
+      console.log(`[SOCIAL ACCOUNTS API] Complete response:`, JSON.stringify(allAccounts, null, 2));
       res.json(allAccounts);
     } catch (error: any) {
       console.error('[SOCIAL ACCOUNTS] Error getting social accounts:', error);
