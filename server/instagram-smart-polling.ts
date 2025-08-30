@@ -316,6 +316,7 @@ export class InstagramSmartPolling {
 
       const newFollowerCount = data.followers_count;
       const mediaCount = data.media_count;
+      const realAccountType = data.account_type; // Get real account type from Instagram API
       
       // Check if this is a business account to determine if we can fetch reach data
       const accounts = await this.storage.getSocialAccountsByWorkspace(config.workspaceId);
@@ -330,11 +331,12 @@ export class InstagramSmartPolling {
         hasAccessToken: !!config.accessToken
       });
       
-      const isBusinessAccount = account?.isBusinessAccount || 
+      // Use REAL account type from Instagram API, not outdated database value
+      const isBusinessAccount = realAccountType === 'BUSINESS' || 
+                               realAccountType === 'CREATOR' ||
+                               account?.isBusinessAccount || 
                                account?.accountType === 'BUSINESS' || 
-                               account?.accountType === 'CREATOR' ||
-                               account?.accountType === 'business' ||
-                               account?.accountType === 'creator';
+                               account?.accountType === 'CREATOR';
       
       console.log(`[SMART POLLING] Account @${config.username} - Business account: ${isBusinessAccount}`);
       
@@ -360,10 +362,12 @@ export class InstagramSmartPolling {
         
         console.log(`[SMART POLLING] 📊 Changes detected for @${config.username}: ${changes.join(', ')}`);
         
-        // Update database with ALL available metrics
+        // Update database with ALL available metrics INCLUDING real account type
         await this.updateAccountData(config, {
           followersCount: newFollowerCount,
           mediaCount: mediaCount,
+          accountType: realAccountType, // ⭐ FIX: Save real account type from Instagram API
+          isBusinessAccount: isBusinessAccount, // ⭐ FIX: Update business account flag
           avgLikes: engagementMetrics.avgLikes,
           avgComments: engagementMetrics.avgComments,
           avgReach: engagementMetrics.avgReach,
