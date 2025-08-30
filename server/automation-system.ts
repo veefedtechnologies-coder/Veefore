@@ -337,11 +337,21 @@ export class AutomationSystem {
           });
         });
         
+        // 🎯 CRITICAL FIX: Use environment PAGE_ACCESS_TOKEN instead of database token
+        const envToken = process.env.PAGE_ACCESS_TOKEN;
+        console.log('[AUTOMATION] 🔧 Environment token available:', envToken ? 'YES' : 'NO');
+        
         // Try to find account by accessToken first, then fallback to any account with pageId
         let instagramAccount = accounts.find(acc => acc.accessToken === accessToken);
         if (!instagramAccount && accounts.length > 0) {
           instagramAccount = accounts[0]; // Use first account with pageId as fallback
           console.log('[AUTOMATION] 🔄 Using fallback account:', instagramAccount.username);
+        }
+        
+        // Override the accessToken with the environment variable if available
+        if (envToken) {
+          console.log('[AUTOMATION] ✅ Using fresh PAGE_ACCESS_TOKEN from environment');
+          accessToken = envToken;
         }
         
         const pageId = instagramAccount?.pageId;
