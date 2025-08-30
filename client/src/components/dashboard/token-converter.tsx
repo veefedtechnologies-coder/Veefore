@@ -162,7 +162,7 @@ export function TokenConverter() {
                 >
                   Graph API Explorer
                 </a>{' '}
-                with permissions: instagram_basic, instagram_manage_comments, pages_messaging, pages_manage_metadata
+                with permissions: <strong>pages_manage_metadata, pages_read_engagement, pages_show_list, instagram_basic, instagram_manage_comments</strong>
               </p>
             </div>
 
@@ -187,6 +187,33 @@ export function TokenConverter() {
                 Found {conversionResult.pages.length} Facebook pages
               </p>
             </div>
+
+            {conversionResult.pages.length === 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h5 className="font-medium text-yellow-900">⚠️ No Facebook Pages Found</h5>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Your User Access Token doesn't have access to any Facebook pages. Here's what to do:
+                </p>
+                <ol className="text-sm text-yellow-700 mt-2 space-y-1 list-decimal list-inside">
+                  <li><strong>Check permissions:</strong> Make sure your token has pages_manage_metadata, pages_read_engagement, pages_show_list</li>
+                  <li><strong>Create/manage a page:</strong> You need to be an admin of a Facebook page</li>
+                  <li><strong>Connect Instagram:</strong> Link your Instagram Business Account to that Facebook page</li>
+                  <li><strong>Get new token:</strong> Generate a fresh token with all required permissions</li>
+                </ol>
+                <div className="mt-3 p-3 bg-white rounded border">
+                  <p className="text-xs text-gray-600 font-medium">Quick Fix:</p>
+                  <p className="text-xs text-gray-600">
+                    1. Go to{' '}
+                    <a href="https://developers.facebook.com/tools/explorer/" target="_blank" className="text-blue-600 underline">
+                      Graph API Explorer
+                    </a><br/>
+                    2. Select your app → Get User Access Token<br/>
+                    3. Add permissions: <code className="bg-gray-100 px-1">pages_manage_metadata, pages_read_engagement, pages_show_list, instagram_basic</code><br/>
+                    4. Generate token and try again
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3">
               {conversionResult.pages.map((page) => (
