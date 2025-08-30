@@ -31,63 +31,30 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
 
-// Security headers with proper CSP configuration
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "https://fonts.googleapis.com",
-        "https://www.google.com",
-        "https://www.gstatic.com",
-        "https://apis.google.com",
-        "blob:"
-      ],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com",
-        "https://fonts.gstatic.com"
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",
-        "data:"
-      ],
-      imgSrc: [
-        "'self'",
-        "https:",
-        "data:",
-        "blob:",
-        "https://scontent-sea1-1.cdninstagram.com",
-        "https://lh3.googleusercontent.com"
-      ],
-      connectSrc: [
-        "'self'",
-        "https:",
-        "wss:",
-        "ws:",
-        "https://identitytoolkit.googleapis.com",
-        "https://securetoken.googleapis.com",
-        "https://graph.instagram.com",
-        "https://api.instagram.com"
-      ],
-      frameSrc: [
-        "'self'",
-        "https://www.google.com",
-        "https://accounts.google.com"
-      ],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: []
+// Security headers - disable CSP in development for better compatibility
+if (isProduction) {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "https:", "data:", "blob:"],
+        connectSrc: ["'self'", "https:", "wss:", "ws:"],
+        fontSrc: ["'self'", "https:", "data:"],
+        frameSrc: ["'self'"],
+        objectSrc: ["'none'"]
+      }
     }
-  },
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
-}));
+  }));
+} else {
+  // Development: Use minimal security headers without CSP restrictions
+  app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+  }));
+}
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
