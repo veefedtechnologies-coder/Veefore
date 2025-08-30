@@ -46,6 +46,7 @@ app.use(helmet({
         "https://apis.google.com",
         "blob:"
       ],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
