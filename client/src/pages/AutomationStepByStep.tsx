@@ -228,7 +228,7 @@ export default function AutomationStepByStep() {
   const realAccounts = socialAccountsData ? socialAccountsData.map((account: any) => ({
     id: account.id,
     name: `@${account.username}`,
-    followers: `${account.followersCount} followers`,
+    followers: `${account.followers} followers`,
     platform: account.platform,
     avatar: account.profilePictureUrl || `https://picsum.photos/40/40?random=${account.id}`,
     workspaceId: account.workspaceId
