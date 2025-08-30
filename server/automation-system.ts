@@ -181,6 +181,8 @@ export class AutomationSystem {
       anyRuleTriggered = true;
       console.log('[AUTOMATION] Rule triggered:', rule.name);
       console.log('[AUTOMATION DEBUG] Full rule object:', JSON.stringify(rule, null, 2));
+      console.log('[AUTOMATION DEBUG] Rule type:', rule.type);
+      console.log('[AUTOMATION DEBUG] Checking rule execution path...');
       
       // 🎯 PROPER COMMENT→REPLY→DM FLOW (like ManyChat)
       // Step 1: First reply to comment (establishes conversation context)
@@ -203,6 +205,7 @@ export class AutomationSystem {
           }
         }
         
+        console.log('[AUTOMATION DEBUG] Comment responses found:', commentResponses.length);
         if (Array.isArray(commentResponses) && commentResponses.length > 0) {
           const replyText = commentResponses[Math.floor(Math.random() * commentResponses.length)];
           console.log('[AUTOMATION] 📝 Step 1: Replying to comment first...');
@@ -234,6 +237,7 @@ export class AutomationSystem {
           dmResponses = (rule as any).dmResponses;
         }
         
+        console.log('[AUTOMATION DEBUG] DM responses found:', dmResponses.length);
         if (Array.isArray(dmResponses) && dmResponses.length > 0) {
           // Wait 2 seconds after comment reply for Instagram to process
           if (commentReplySent && rule.type === 'comment_dm') {
