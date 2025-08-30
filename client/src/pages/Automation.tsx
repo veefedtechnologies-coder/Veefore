@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { queryClient } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -205,12 +206,21 @@ interface AutomationFormData {
 interface AutomationRule {
   id: string
   name: string
-  platform: string
-  contentType: string
-  automationType: string
-  status: 'active' | 'paused' | 'draft'
-  triggers: number
-  created: string
+  platform?: string
+  contentType?: string
+  automationType?: string
+  type: 'comment_dm' | 'dm_only' | 'comment_only'
+  status?: 'active' | 'paused' | 'draft'
+  isActive: boolean
+  triggers?: number
+  created?: string
+  keywords: string[]
+  responses: {
+    responses: string[]
+    dmResponses?: string[]
+  }
+  createdAt?: string
+  updatedAt?: string
 }
 
 export default function Automation() {
@@ -242,29 +252,30 @@ export default function Automation() {
     queryFn: () => apiRequest('/api/social-accounts')
   })
 
-  // Mock automation rules for demo
-  const [automationRules, setAutomationRules] = useState<AutomationRule[]>([
-    {
-      id: '1',
-      name: 'Instagram Comment to DM',
-      platform: 'instagram',
-      contentType: 'post',
-      automationType: 'comment_to_dm',
-      status: 'active',
-      triggers: 47,
-      created: '2024-01-15'
+  // Fetch automation rules from backend API
+  const { data: automationRules = [], isLoading: rulesLoading, refetch: refetchRules } = useQuery<AutomationRule[]>({
+    queryKey: ['/api/automation/rules'],
+    queryFn: () => apiRequest('/api/automation/rules')
+  })
+
+  // Create automation rule mutation
+  const createRuleMutation = useMutation({
+    mutationFn: (automationData: any) => 
+      apiRequest('/api/automation/rules', {
+        method: 'POST',
+        body: JSON.stringify(automationData),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/automation/rules'] })
+      console.log('[AUTOMATION] Rule created successfully')
     },
-    {
-      id: '2',
-      name: 'YouTube Comment Reply',
-      platform: 'youtube',
-      contentType: 'video',
-      automationType: 'comment',
-      status: 'active',
-      triggers: 23,
-      created: '2024-01-10'
+    onError: (error: any) => {
+      console.error('[AUTOMATION] Failed to create rule:', error)
     }
-  ])
+  })
 
   // Mock posts data
   const mockPosts = [
@@ -458,37 +469,48 @@ export default function Automation() {
     }
   }
 
-  const handleCreateAutomation = () => {
-    const newRule: AutomationRule = {
-      id: Date.now().toString(),
+  const handleCreateAutomation = async () => {
+    // Prepare automation rule data in expected backend format
+    const automationData = {
       name: formData.name,
-      platform: formData.platform,
-      contentType: formData.contentType,
-      automationType: formData.automationType,
-      status: 'active',
-      triggers: 0,
-      created: new Date().toISOString().split('T')[0]
+      type: formData.automationType === 'comment_to_dm' ? 'comment_dm' : 
+            formData.automationType === 'dm' ? 'dm_only' : 'comment_only',
+      isActive: true,
+      keywords: formData.keywords,
+      targetMediaIds: formData.selectedPost ? [formData.selectedPost] : [],
+      responses: {
+        responses: formData.commentReplies.length > 0 ? formData.commentReplies : [],
+        dmResponses: formData.dmMessage ? [formData.dmMessage] : []
+      }
     }
-    setAutomationRules([...automationRules, newRule])
     
-    // Reset form
-    setCurrentStep(1)
-    setFormData({
-      name: '',
-      platform: '',
-      contentType: '',
-      automationType: '',
-      selectedPost: '',
-      responseType: '',
-      keywords: [],
-      replyText: '',
-      commentReplies: [],
-      dmMessage: '',
-      buttonText: '',
-      websiteUrl: '',
-      delay: 15
-    })
-    setActiveTab('manage')
+    console.log('[AUTOMATION] Creating automation rule:', automationData)
+    
+    try {
+      await createRuleMutation.mutateAsync(automationData)
+      
+      // Reset form on success
+      setCurrentStep(1)
+      setFormData({
+        name: '',
+        platform: '',
+        contentType: '',
+        automationType: '',
+        selectedPost: '',
+        responseType: '',
+        keywords: [],
+        replyText: '',
+        commentReplies: [],
+        dmMessage: '',
+        buttonText: '',
+        websiteUrl: '',
+        delay: 15
+      })
+      setActiveTab('manage')
+      
+    } catch (error) {
+      alert('Failed to create automation rule. Please try again.')
+    }
   }
 
   const InstagramPostPreview = () => {
@@ -1422,10 +1444,20 @@ export default function Automation() {
                     {currentStep === getTotalSteps() ? (
                       <Button
                         onClick={handleCreateAutomation}
-                        className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg"
+                        disabled={createRuleMutation.isPending}
+                        className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg disabled:opacity-50"
                       >
-                        <Rocket className="w-4 h-4 mr-2" />
-                        Activate Automation
+                        {createRuleMutation.isPending ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            <Rocket className="w-4 h-4 mr-2" />
+                            Activate Automation
+                          </>
+                        )}
                       </Button>
                     ) : (
                       <Button
@@ -1524,31 +1556,55 @@ export default function Automation() {
 
         {/* Existing Automations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {automationRules.map((rule) => (
+          {rulesLoading ? (
+            <div className="col-span-full flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading automation rules...</p>
+              </div>
+            </div>
+          ) : automationRules.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No automation rules yet</h3>
+              <p className="text-gray-600 mb-6">Create your first automation to start engaging with your audience automatically.</p>
+              <Button 
+                onClick={() => setActiveTab('create')}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Automation
+              </Button>
+            </div>
+          ) : automationRules.map((rule) => (
             <Card key={rule.id} className="border-2 border-white/50 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg text-gray-900">{rule.name}</CardTitle>
                   <Badge 
-                    variant={rule.status === 'active' ? 'default' : 'secondary'}
-                    className={`${rule.status === 'active' ? 'bg-green-500' : 'bg-gray-400'} text-white`}
+                    variant={rule.isActive ? 'default' : 'secondary'}
+                    className={`${rule.isActive ? 'bg-green-500' : 'bg-gray-400'} text-white`}
                   >
-                    {rule.status}
+                    {rule.isActive ? 'active' : 'paused'}
                   </Badge>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  {rule.platform} • {rule.contentType} • {rule.automationType.replace('_', ' ')}
+                  {rule.type.replace('_', ' ').toUpperCase()} • {rule.keywords.length} keywords • Instagram
                 </p>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Triggers:</span>
-                    <span className="font-semibold text-gray-900">{rule.triggers}</span>
+                    <span className="text-gray-600">Keywords:</span>
+                    <span className="font-semibold text-gray-900">{rule.keywords.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Responses:</span>
+                    <span className="font-semibold text-gray-900">{rule.responses.responses.length + (rule.responses.dmResponses?.length || 0)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Created:</span>
-                    <span className="font-semibold text-gray-900">{rule.created}</span>
+                    <span className="font-semibold text-gray-900">{rule.createdAt ? new Date(rule.createdAt).toLocaleDateString() : 'Recently'}</span>
                   </div>
                   <div className="flex items-center space-x-2 pt-4">
                     <Button size="sm" variant="outline" className="flex-1">
@@ -1556,7 +1612,7 @@ export default function Automation() {
                       Edit
                     </Button>
                     <Button size="sm" variant="outline">
-                      {rule.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      {rule.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </Button>
                     <Button size="sm" variant="outline">
                       <Trash2 className="w-4 h-4" />
