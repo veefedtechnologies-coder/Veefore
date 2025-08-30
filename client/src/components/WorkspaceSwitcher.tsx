@@ -22,116 +22,141 @@ import {
   Sparkles
 } from 'lucide-react'
 
-// Advanced Workspace Transition Overlay with Stunning Animations
+// Ultra-Modern Workspace Transition with Spectacular Animations
 const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Animated Blurred Background */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-xl animate-in fade-in-0 duration-500" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      {/* Dynamic Animated Background with Moving Gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-purple-900/90 backdrop-blur-2xl animate-in fade-in-0 duration-1000" />
       
-      {/* Floating Particles Background */}
+      {/* Floating Geometric Shapes */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-bounce"
+            className={`absolute ${i % 3 === 0 ? 'w-3 h-3 rounded-full' : i % 3 === 1 ? 'w-2 h-8 rounded-full' : 'w-4 h-1 rounded-full'} bg-gradient-to-r from-cyan-400/40 to-blue-500/40 animate-float-advanced`}
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${4 + Math.random() * 6}s`
             }}
           />
         ))}
       </div>
 
-      {/* Main Transition Card */}
-      <div className="relative bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 max-w-md w-full mx-4 animate-in zoom-in-95 slide-in-from-bottom-5 duration-700 ease-out">
+      {/* Spectacular Main Card with Glass Morphism */}
+      <div className="relative bg-white/10 backdrop-blur-3xl rounded-[2rem] border border-white/20 shadow-[0_32px_64px_rgba(0,0,0,0.4)] p-12 max-w-lg w-full mx-6 animate-in zoom-in-90 slide-in-from-bottom-8 duration-1000 ease-out">
         
-        {/* Animated Border Glow */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 animate-pulse" />
+        {/* Animated Rainbow Border */}
+        <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-r from-cyan-500/30 via-blue-500/30 via-purple-500/30 to-pink-500/30 animate-gradient-x" />
+        <div className="absolute inset-[1px] rounded-[2rem] bg-white/10 backdrop-blur-3xl" />
         
-        {/* Content Container */}
+        {/* Content with Advanced Animations */}
         <div className="relative z-10">
           
-          {/* Workspace Icon with Pulsing Effect */}
-          <div className="flex justify-center mb-6">
+          {/* Spectacular Workspace Icon */}
+          <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} flex items-center justify-center shadow-2xl animate-pulse`}>
-                <Building2 className="w-10 h-10 text-white" />
+              {/* Multiple Rotating Rings */}
+              <div className="absolute -inset-8 rounded-full border-2 border-cyan-400/30 animate-spin-slow"></div>
+              <div className="absolute -inset-6 rounded-full border-2 border-blue-400/40 animate-spin-reverse"></div>
+              <div className="absolute -inset-4 rounded-full border border-purple-400/50 animate-spin-slow"></div>
+              
+              {/* Main Icon with Glow */}
+              <div className={`relative w-24 h-24 rounded-3xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.4)] animate-pulse-glow`}>
+                <Building2 className="w-12 h-12 text-white drop-shadow-2xl" />
+                
+                {/* Inner Glow Effect */}
+                <div className="absolute inset-0 rounded-3xl bg-white/20 animate-pulse-subtle" />
               </div>
               
-              {/* Ripple Effect */}
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} animate-ping opacity-30`} />
-              <div className={`absolute inset-2 rounded-xl bg-gradient-to-br ${getThemeGradient(workspace.theme)} animate-ping opacity-20`} style={{ animationDelay: '0.5s' }} />
+              {/* Orbiting Particles */}
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-2 h-2 bg-cyan-400/80 rounded-full animate-orbit"
+                  style={{
+                    animationDelay: `${i * 0.5}s`,
+                    transformOrigin: '0 0',
+                    left: '50%',
+                    top: '50%'
+                  }}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Advanced Spinning Loader */}
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="w-12 h-12 border-4 border-blue-200/30 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-12 h-12 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
-              <div className="absolute top-1 left-1 w-10 h-10 border-4 border-transparent border-t-purple-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-              <div className="absolute top-2 left-2 w-8 h-8 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+          {/* Futuristic Loading Spinner */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-16 h-16">
+              {/* Multiple Spinning Rings */}
+              <div className="absolute inset-0 border-4 border-cyan-200/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-transparent border-t-cyan-400 rounded-full animate-spin"></div>
+              <div className="absolute inset-2 border-4 border-transparent border-r-blue-400 rounded-full animate-spin-reverse"></div>
+              <div className="absolute inset-4 border-4 border-transparent border-b-purple-400 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
+              
+              {/* Center Dot */}
+              <div className="absolute inset-6 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full animate-pulse"></div>
             </div>
           </div>
 
-          {/* Dynamic Workspace Information */}
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2 animate-in slide-in-from-bottom-3 duration-700">
+          {/* Dynamic Text with Gradient Animation */}
+          <div className="text-center mb-8">
+            <h2 className="text-lg font-semibold text-white/80 mb-3 animate-in slide-in-from-bottom-4 duration-1000">
               Switching to
             </h2>
-            <h3 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3 animate-in slide-in-from-bottom-4 duration-700">
-              {workspace.name}
-            </h3>
-            <p className="text-gray-600 animate-in slide-in-from-bottom-5 duration-700">
-              Loading workspace environment...
+            <h1 className="text-4xl font-black mb-4 animate-in slide-in-from-bottom-5 duration-1000">
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">
+                {workspace.name}
+              </span>
+            </h1>
+            <p className="text-white/60 font-medium animate-in slide-in-from-bottom-6 duration-1000">
+              Preparing your workspace environment...
             </p>
           </div>
 
-          {/* Workspace Details with Icons */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-50/80 rounded-xl p-3 text-center animate-in slide-in-from-left duration-700">
-              <div className="text-2xl mb-1">{getPersonalityIcon(workspace.aiPersonality)}</div>
-              <div className="text-xs text-gray-600 font-medium capitalize">{workspace.aiPersonality}</div>
+          {/* Modern Stats Cards */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 text-center border border-white/20 animate-in slide-in-from-left duration-1000">
+              <div className="text-3xl mb-2 animate-bounce">{getPersonalityIcon(workspace.aiPersonality)}</div>
+              <div className="text-white/80 text-sm font-semibold capitalize">{workspace.aiPersonality}</div>
+              <div className="text-white/60 text-xs">AI Mode</div>
             </div>
-            <div className="bg-gray-50/80 rounded-xl p-3 text-center animate-in slide-in-from-right duration-700">
-              <Sparkles className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
-              <div className="text-xs text-gray-600 font-medium">{workspace.credits} Credits</div>
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 text-center border border-white/20 animate-in slide-in-from-right duration-1000">
+              <Sparkles className="w-8 h-8 text-yellow-400 mx-auto mb-2 animate-pulse" />
+              <div className="text-white/80 text-sm font-semibold">{workspace.credits}</div>
+              <div className="text-white/60 text-xs">Credits</div>
             </div>
           </div>
 
-          {/* Advanced Progress Bar */}
-          <div className="space-y-3 mb-4">
-            <div className="w-full bg-gray-200/50 rounded-full h-2 overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse transition-all duration-1000 ease-out" style={{ width: '75%' }}>
-                <div className="h-full bg-white/30 animate-pulse rounded-full"></div>
+          {/* Advanced Progress Visualization */}
+          <div className="space-y-4 mb-6">
+            <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full animate-progress-flow" style={{ width: '85%' }}>
+                <div className="h-full bg-white/30 animate-shimmer-advanced rounded-full"></div>
               </div>
             </div>
             
-            {/* Status Messages */}
             <div className="text-center">
-              <div className="text-sm text-gray-500 animate-pulse">
-                Syncing workspace data...
+              <div className="text-white/80 text-sm font-medium animate-pulse">
+                Loading workspace data...
               </div>
             </div>
           </div>
 
-          {/* Floating Action Indicators */}
-          <div className="flex justify-center space-x-4">
-            <div className="flex items-center space-x-2 text-xs text-gray-500 animate-bounce" style={{ animationDelay: '0s' }}>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Analytics</span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-500 animate-bounce" style={{ animationDelay: '0.3s' }}>
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span>Social Accounts</span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-500 animate-bounce" style={{ animationDelay: '0.6s' }}>
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-              <span>Content</span>
-            </div>
+          {/* Futuristic Status Indicators */}
+          <div className="flex justify-center space-x-6">
+            {[
+              { name: 'Analytics', color: 'bg-green-400', delay: '0s' },
+              { name: 'Social', color: 'bg-blue-400', delay: '0.2s' },
+              { name: 'Content', color: 'bg-purple-400', delay: '0.4s' }
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center space-y-2 animate-bounce" style={{ animationDelay: item.delay }}>
+                <div className={`w-3 h-3 ${item.color} rounded-full animate-pulse-glow`}></div>
+                <span className="text-white/60 text-xs font-medium">{item.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
