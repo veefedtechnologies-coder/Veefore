@@ -109,7 +109,14 @@ export class MetaCompliantWebhook {
 
       const payload = req.body as MetaWebhookPayload;
       
-      // Validate payload structure
+      // Handle different payload types from Instagram
+      console.log('[META WEBHOOK] 📋 Received object type:', payload.object);
+      
+      if (payload.object === 'permissions') {
+        console.log('[META WEBHOOK] 📋 Permissions event received - acknowledging');
+        return res.sendStatus(200) as any;
+      }
+      
       if (payload.object !== 'instagram') {
         console.log('[META WEBHOOK] ❌ Invalid object type:', payload.object);
         return res.sendStatus(400) as any;
