@@ -97,6 +97,7 @@ interface AutomationRule {
 }
 
 export default function Automation() {
+  console.log('[AUTOMATION COMPONENT] ===== COMPONENT LOADED =====');
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<AutomationFormData>({
     name: '',
