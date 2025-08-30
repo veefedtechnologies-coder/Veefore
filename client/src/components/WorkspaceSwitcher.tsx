@@ -25,7 +25,7 @@ import {
 // Modern Full-Screen Loading Experience
 const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) => {
   return (
-    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center justify-center overflow-hidden">
+    <div className="fixed top-0 left-0 w-screen h-screen z-[99999] bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col items-center justify-center overflow-hidden" style={{ position: 'fixed', inset: 0 }}>
       
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden">
@@ -76,53 +76,53 @@ const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) =>
         </div>
 
         {/* Loading Text with Animations */}
-        <div className="mb-16 space-y-4">
-          <h1 className="text-6xl font-black text-white mb-4 animate-in slide-in-from-bottom-4 duration-1000">
+        <div className="mb-16 space-y-6">
+          <h1 className="text-7xl font-black text-white mb-6 animate-in slide-in-from-bottom-4 duration-1000">
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-x">
               {workspace.name}
             </span>
           </h1>
           
-          <div className="space-y-2 animate-in slide-in-from-bottom-5 duration-1000">
-            <p className="text-xl text-white/90 font-medium">Loading workspace environment</p>
-            <div className="flex justify-center items-center space-x-1">
-              <span className="text-white/70">Please wait</span>
+          <div className="space-y-4 animate-in slide-in-from-bottom-5 duration-1000">
+            <p className="text-2xl text-white/90 font-medium">Loading workspace environment</p>
+            <div className="flex justify-center items-center space-x-2">
+              <span className="text-lg text-white/70">Please wait</span>
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-3 h-3 bg-white/70 rounded-full animate-bounce"></div>
+                <div className="w-3 h-3 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                <div className="w-3 h-3 bg-white/70 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Animated Progress Bar */}
-        <div className="w-96 mx-auto mb-12 animate-in slide-in-from-bottom-6 duration-1000">
-          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+        <div className="w-[500px] mx-auto mb-16 animate-in slide-in-from-bottom-6 duration-1000">
+          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-full animate-progress-flow" style={{ width: '80%' }}>
               <div className="h-full bg-white/30 animate-shimmer-advanced"></div>
             </div>
           </div>
-          <div className="flex justify-between text-sm text-white/60 mt-3">
+          <div className="flex justify-between text-base text-white/70 mt-4">
             <span>Initializing workspace</span>
-            <span>80%</span>
+            <span className="font-bold">80%</span>
           </div>
         </div>
 
         {/* Loading Steps */}
-        <div className="space-y-3 animate-in slide-in-from-bottom-7 duration-1000">
+        <div className="space-y-4 animate-in slide-in-from-bottom-7 duration-1000">
           {[
             { step: 'Loading workspace data', status: 'complete', delay: '0s' },
             { step: 'Syncing social accounts', status: 'active', delay: '0.2s' },
             { step: 'Preparing dashboard', status: 'pending', delay: '0.4s' }
           ].map((item, i) => (
-            <div key={i} className="flex items-center justify-center space-x-3 animate-bounce" style={{ animationDelay: item.delay }}>
-              <div className={`w-3 h-3 rounded-full ${
+            <div key={i} className="flex items-center justify-center space-x-4 animate-bounce" style={{ animationDelay: item.delay }}>
+              <div className={`w-4 h-4 rounded-full ${
                 item.status === 'complete' ? 'bg-green-400' :
                 item.status === 'active' ? 'bg-blue-400 animate-pulse' :
                 'bg-white/30'
               }`}></div>
-              <span className={`text-sm ${
+              <span className={`text-base font-medium ${
                 item.status === 'complete' ? 'text-green-400' :
                 item.status === 'active' ? 'text-blue-400' :
                 'text-white/50'
@@ -136,15 +136,15 @@ const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) =>
       </div>
 
       {/* Bottom Workspace Info */}
-      <div className="absolute bottom-8 left-8 right-8 animate-in slide-in-from-bottom-8 duration-1000">
-        <div className="flex items-center justify-between text-white/60 text-sm">
-          <div className="flex items-center space-x-3">
-            <div className="text-lg">{getPersonalityIcon(workspace.aiPersonality)}</div>
-            <span className="capitalize">{workspace.aiPersonality} Mode</span>
+      <div className="absolute bottom-12 left-12 right-12 animate-in slide-in-from-bottom-8 duration-1000">
+        <div className="flex items-center justify-between text-white/70 text-base">
+          <div className="flex items-center space-x-4">
+            <div className="text-2xl">{getPersonalityIcon(workspace.aiPersonality)}</div>
+            <span className="capitalize font-medium">{workspace.aiPersonality} Mode</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-yellow-400" />
-            <span>{workspace.credits} Credits</span>
+          <div className="flex items-center space-x-3">
+            <Sparkles className="w-5 h-5 text-yellow-400" />
+            <span className="font-medium">{workspace.credits} Credits</span>
           </div>
         </div>
       </div>
