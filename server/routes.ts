@@ -13894,27 +13894,8 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // New webhook endpoint - NEW SYSTEM
-  app.post('/webhook/instagram', async (req: any, res: Response) => {
-    try {
-      console.log('[NEW WEBHOOK] Instagram webhook received');
-      
-      // Check if this is a comment event for DM automation
-      const webhookData = req.body;
-      if (webhookData?.entry?.[0]?.changes?.[0]?.field === 'comments') {
-        console.log('[NEW WEBHOOK] Comment event detected - routing to comment webhook handler');
-        await webhookHandler.handleWebhookEvent(req, res);
-        return;
-      }
-      
-      // Handle other webhook events with the original processor
-      await newWebhookProcessor.processWebhookEvent(req.body);
-      res.json({ message: 'EVENT_RECEIVED' });
-    } catch (error: any) {
-      console.error('[NEW WEBHOOK] Processing error:', error);
-      res.status(500).json({ error: 'Failed to process webhook' });
-    }
-  });
+  // REMOVED: Conflicting webhook endpoint that was overriding the working automation
+  // The original webhook handler at line 7138 handles all Instagram webhook events correctly
 
   // VeeGPT Chat API Routes
   app.get('/api/chat/conversations', requireAuth, async (req: any, res: Response) => {
