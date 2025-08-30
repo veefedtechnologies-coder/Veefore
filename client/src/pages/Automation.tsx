@@ -20,11 +20,6 @@ import {
   Plus,
   ArrowRight,
   ArrowLeft,
-  Instagram,
-  Youtube,
-  Facebook,
-  Twitter,
-  Linkedin,
   Zap,
   Settings,
   Play,
@@ -48,135 +43,17 @@ import {
   Filter,
   Search,
   Star,
-  Layers,
-  Palette,
-  Wand2,
-  Cpu,
-  Rocket,
-  Shield,
-  Crown,
-  Gem,
-  Briefcase,
   Users,
   Activity,
-  BarChart3,
-  PieChart,
-  TrendingDown,
-  Calendar,
-  Hash,
-  AtSign,
-  Link2,
   Eye,
   RefreshCw,
   Bell,
-  Archive,
-  Folder,
-  Tag,
-  Flag,
-  Volume2,
-  Mic,
-  Headphones,
-  Monitor,
-  Smartphone,
-  Tablet,
-  Laptop,
-  Desktop,
-  Server,
-  Database,
-  Cloud,
-  Wifi,
-  Bluetooth,
-  Usb,
-  HardDrive,
-  Cpu as ProcessorIcon,
-  MemoryStick,
-  Battery,
-  Power,
-  Plug,
-  Cable,
-  Router,
-  Printer,
-  Scanner,
-  Keyboard,
-  Mouse,
-  Gamepad2,
-  Joystick,
-  Dice1,
-  Dice2,
-  Dice3,
-  Dice4,
-  Dice5,
-  Dice6,
-  Puzzle,
-  Shuffle,
-  Repeat,
-  SkipBack,
-  SkipForward,
-  Rewind,
-  FastForward,
-  PlayCircle,
-  PauseCircle,
-  StopCircle,
-  Square,
-  Circle,
-  Triangle,
-  Hexagon,
-  Pentagon,
-  Octagon,
-  Diamond,
-  Rhombus,
-  Parallelogram,
-  Trapezoid,
-  Kite,
-  Oval,
-  Rectangle,
-  RoundedRectangle,
-  Cylinder,
-  Cone,
-  Cube,
-  Sphere,
-  Pyramid,
-  Prism,
-  Tetrahedron,
-  Octahedron,
-  Dodecahedron,
-  Icosahedron,
-  Torus,
-  Mobius,
-  Klein,
-  Fractal,
-  Mandelbrot,
-  Julia,
-  Fibonacci,
-  Golden,
-  Phi,
-  Pi,
-  E,
-  Infinity,
-  Null,
-  Void,
-  Empty,
-  Full,
-  Half,
-  Quarter,
-  Third,
-  Fifth,
-  Sixth,
-  Seventh,
-  Eighth,
-  Ninth,
-  Tenth,
-  Eleventh,
-  Twelfth,
-  Thirteenth,
-  Fourteenth,
-  Fifteenth,
-  Sixteenth,
-  Seventeenth,
-  Eighteenth,
-  Nineteenth,
-  Twentieth
+  Hash,
+  Rocket
 } from 'lucide-react'
+
+// Add social media icons from react-icons
+import { FaInstagram, FaYoutube, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa'
 import { apiRequest } from '@/lib/queryClient'
 
 interface SocialAccount {
@@ -184,7 +61,14 @@ interface SocialAccount {
   username: string
   platform: string
   profilePictureUrl?: string
+  profilePicture?: string
   followers?: number
+  displayName?: string
+  isConnected?: boolean
+  isVerified?: boolean
+  lastSync?: string
+  accessToken?: string
+  workspaceId?: string
 }
 
 interface AutomationFormData {
@@ -586,7 +470,10 @@ export default function Automation() {
                     onError={(e) => {
                       console.log('[LIVE PREVIEW] Profile picture failed to load:', e.currentTarget.src)
                       e.currentTarget.style.display = 'none'
-                      e.currentTarget.nextElementSibling.style.display = 'flex'
+                      const nextElement = e.currentTarget.nextElementSibling
+                    if (nextElement && 'style' in nextElement) {
+                      (nextElement as HTMLElement).style.display = 'flex'
+                    }
                     }}
                   />
                 ) : null;
