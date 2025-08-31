@@ -108,11 +108,11 @@ public
 .pnp.*
 
 # ===== UPLOADS & MEDIA =====
-uploads/
-media/generated/
-*.mp4
-*.avi
-*.mov
+# uploads/
+# media/generated/
+# *.mp4
+# *.avi
+# *.mov
 
 # ===== IDE FILES =====
 .vscode/
