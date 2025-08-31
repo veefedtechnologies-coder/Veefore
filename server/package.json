@@ -4,7 +4,14 @@
   "type": "module",
   "license": "MIT",
   "description": "VeeFore AI-Powered Social Media Management Platform - Backend API",
-  "keywords": ["express", "nodejs", "typescript", "mongodb", "ai", "api"],
+  "keywords": [
+    "express",
+    "nodejs",
+    "typescript",
+    "mongodb",
+    "ai",
+    "api"
+  ],
   "author": "VEEFED TECHNOLOGIES PRIVATE LIMITED",
   "homepage": "https://veefore.com",
   "repository": {
@@ -76,7 +83,7 @@
     "@types/passport-local": "^1.0.38",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
-    "drizzle-kit": "^0.32.2",
+    "drizzle-kit": "^0.31.4",
     "esbuild": "^0.24.2",
     "eslint": "^9.18.0",
     "nodemon": "^3.1.9",

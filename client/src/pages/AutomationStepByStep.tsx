@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { 
   Instagram, 
   Bot, 
@@ -37,12 +37,14 @@ import {
   Check,
   Play,
   Pause,
-  Trash2
+  Trash2,
+  Reply
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { useToast } from '@/hooks/use-toast'
 import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
+import { useAuth } from '@/hooks/useAuth'
 
 // AutomationListManager component
 const AutomationListManager = ({ 
@@ -201,6 +203,526 @@ const AutomationListManager = ({
   )
 }
 
+// Add this component after the existing components but before the main AutomationStepByStep component
+// Define interfaces for comment structure
+interface CommentReply {
+  id: number;
+  username: string;
+  profilePic: string;
+  timestamp: string;
+  content: string;
+  likes: number;
+}
+
+interface Comment {
+  id: number;
+  username: string;
+  profilePic: string;
+  timestamp: string;
+  isAuthor: boolean;
+  content: string;
+  likes: number;
+  replies: CommentReply[];
+}
+
+const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, commentReplies, dmMessage, selectedAccount, realAccounts, newKeyword, commentInputText, setCommentInputText, getCurrentKeywords, getCurrentKeywordsSetter, setSelectedKeywords, updateSourceRef, currentTime }: {
+  isVisible: boolean;
+  onClose: () => void;
+  triggerKeywords: string[]
+  automationType: string
+  commentReplies: string[]
+  dmMessage: string
+  selectedAccount: string
+  realAccounts: any[]
+  newKeyword: string
+  commentInputText: string
+  setCommentInputText: (text: string) => void
+  getCurrentKeywords: () => string[]
+  getCurrentKeywordsSetter: () => React.Dispatch<React.SetStateAction<string[]>>
+  setSelectedKeywords: (keywords: string[]) => void
+  updateSourceRef: React.MutableRefObject<'trigger' | 'comment' | null>
+  currentTime: Date
+}) => {
+  const [commentText, setCommentText] = useState('');
+  const { user } = useAuth();
+
+  // Custom CSS to completely remove focus styles
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .comment-input-no-focus:focus {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        border-color: transparent !important;
+      }
+      .comment-input-no-focus:focus-visible {
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  // Bidirectional synchronization between newKeyword and commentText
+  useEffect(() => {
+    // Only sync from newKeyword to commentText when newKeyword changes from external source
+    if (newKeyword !== commentText && newKeyword !== commentInputText) {
+      setCommentText(newKeyword);
+      setCommentInputText(newKeyword);
+    }
+  }, [newKeyword]);
+
+  // Synchronize commentText changes back to parent component only when user types in comment input
+  useEffect(() => {
+    if (commentText !== commentInputText) {
+      // Set the source to indicate this update came from the comment input
+      updateSourceRef.current = 'comment';
+      setCommentInputText(commentText);
+      // Reset the source after a short delay
+      setTimeout(() => updateSourceRef.current = null, 100);
+    }
+  }, [commentText]);
+
+  // Generate realistic timestamps
+  const generateTimestamp = () => {
+    const now = new Date();
+    const hoursAgo = Math.floor(Math.random() * 24) + 1;
+    const timeAgo = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
+    
+    if (hoursAgo === 1) return '1h';
+    if (hoursAgo < 24) return `${hoursAgo}h`;
+    
+    const daysAgo = Math.floor(hoursAgo / 24);
+    if (daysAgo === 1) return '1d';
+    return `${daysAgo}d`;
+  };
+  
+  // Function to fetch real Instagram user data
+  const fetchRealInstagramUser = async () => {
+    try {
+      // Get the current workspace ID from the selected account
+      const selectedAccountData = realAccounts.find((a: any) => a.id === selectedAccount);
+      const workspaceId = selectedAccountData?.workspaceId;
+      
+      if (!workspaceId) {
+        console.warn('No workspace ID found, using fallback data');
+        return {
+          username: 'rahulc1020',
+          profilePic: 'https://picsum.photos/40/40?random=rahulc1020'
+        };
+      }
+
+      // Fetch real Instagram user data from the API
+      try {
+        // Get the user's authentication token
+        if (!user) {
+          console.error('No authenticated user found');
+          throw new Error('User not authenticated');
+        }
+        
+        const token = await user.getIdToken();
+        
+        const response = await fetch(`/api/instagram/user-profile?workspaceId=${workspaceId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include',
+          mode: 'cors'
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          
+          const result = {
+            username: userData.username || 'rahulc1020',
+            profilePic: userData.profile_picture_url || 'https://picsum.photos/40/40?random=rahulc1020'
+          };
+          return result;
+        } else {
+          const errorText = await response.text();
+          console.error('API response not ok:', errorText);
+        }
+      } catch (fetchError) {
+        console.error('Fetch error:', fetchError);
+        throw fetchError;
+      }
+    } catch (error) {
+      console.error('Failed to fetch Instagram user data:', error);
+    }
+    
+    // Fallback to default data if API fails
+    return {
+      username: 'rahulc1020',
+      profilePic: 'https://picsum.photos/40/40?random=rahulc1020'
+    };
+  };
+
+  // State for real Instagram user data
+  const [realInstagramUser, setRealInstagramUser] = useState({
+    username: 'rahulc1020',
+    profilePic: 'https://picsum.photos/40/40?random=rahulc1020'
+  });
+
+  // Fetch real Instagram user data when component mounts or dependencies change
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await fetchRealInstagramUser();
+      setRealInstagramUser(userData);
+    };
+    
+    if (selectedAccount && realAccounts.length > 0) {
+      fetchUser();
+    }
+  }, [user, selectedAccount, realAccounts]); // Dependencies for re-fetching
+
+  const [commentTimestamps, setCommentTimestamps] = useState<{ [key: string]: { main: Date; reply: Date } }>({});
+
+  // Generate timestamps for new keywords only when they're added
+  useEffect(() => {
+    const newTimestamps: { [key: string]: { main: Date; reply: Date } } = {};
+    
+    triggerKeywords.forEach((keyword, index) => {
+      if (!commentTimestamps[keyword]) {
+        const now = new Date();
+        let mainCommentTime: Date;
+        let replyTime: Date;
+        
+        if (index === 0) {
+          // First keyword: very recent (just now or few seconds ago)
+          mainCommentTime = new Date(now.getTime() - (Math.random() * 30 + 5) * 1000); // 5-35 seconds ago
+          replyTime = new Date(now.getTime() - (Math.random() * 20 + 2) * 1000); // 2-22 seconds ago
+        } else if (index === 1) {
+          // Second keyword: few minutes ago
+          mainCommentTime = new Date(now.getTime() - (Math.random() * 10 + 1) * 60 * 1000); // 1-11 minutes ago
+          replyTime = new Date(now.getTime() - (Math.random() * 5 + 1) * 60 * 1000); // 1-6 minutes ago
+        } else if (index === 2) {
+          // Third keyword: few minutes ago
+          mainCommentTime = new Date(now.getTime() - (Math.random() * 15 + 2) * 60 * 1000); // 2-17 minutes ago
+          replyTime = new Date(now.getTime() - (Math.random() * 10 + 1) * 60 * 1000); // 1-11 minutes ago
+        } else {
+          // Other keywords: still recent, under 30 minutes
+          mainCommentTime = new Date(now.getTime() - (Math.random() * 20 + 5) * 60 * 1000); // 5-25 minutes ago
+          replyTime = new Date(now.getTime() - (Math.random() * 15 + 2) * 60 * 1000); // 2-17 minutes ago
+        }
+        
+        newTimestamps[keyword] = { main: mainCommentTime, reply: replyTime };
+      }
+    });
+    
+    if (Object.keys(newTimestamps).length > 0) {
+      setCommentTimestamps(prev => ({ ...prev, ...newTimestamps }));
+    }
+  }, [triggerKeywords, commentTimestamps]);
+
+  // Function to calculate relative time like Instagram with reduced fluctuation
+  const getRelativeTime = (timestamp: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      if (diffInSeconds < 10) return 'just now';
+      // Round to nearest 5 seconds for recent timestamps to reduce fluctuation
+      const roundedSeconds = Math.floor(diffInSeconds / 5) * 5;
+      return `${roundedSeconds}s`;
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      // Round to nearest minute for recent timestamps
+      if (diffInMinutes < 5) return `${diffInMinutes}m`;
+      return `${diffInMinutes}m`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours}h`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return `${diffInDays}d`;
+    }
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+      return `${diffInWeeks}w`;
+    }
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return `${diffInMonths}mo`;
+    }
+    
+    const diffInYears = Math.floor(diffInDays / 365);
+    return `${diffInYears}y`;
+  };
+
+  // Generate test comments with stable timestamps
+  const testComments = useMemo(() => {
+    if (triggerKeywords.length === 0) {
+      return [{
+        id: 1,
+        username: 'Username',
+        profilePic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGNUY1RjUiIHN0cm9rZT0iI0Q5RDlEOSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNC41IiBmaWxsPSIjOUNBNEFCIi8+CjxwYXRoIGQ9Ik0yOCAyN0MyOCAyNC4yNjk3IDI0LjQxODMgMjIgMjAgMjJDMTUuNTgxNyAyMiAxMiAyNC4yNjk3IDEyIDI3SDI4WiIgZmlsbD0iIzlDQTRBQiIvPgo8L3N2Zz4K',
+        content: 'Please add trigger keywords to see how the automation will work.',
+        timestamp: new Date(new Date().getTime() - 5 * 60 * 1000), // 5 minutes ago
+        likes: 0,
+        replies: []
+      }];
+    }
+
+    return triggerKeywords.map((keyword, index) => {
+      // Use stable timestamps from commentTimestamps state
+      const timestamps = commentTimestamps[keyword];
+      const mainCommentTime = timestamps?.main || new Date();
+      const replyTime = timestamps?.reply || new Date();
+      
+      return {
+        id: index + 1,
+        username: `Username_${index + 1}`,
+        profilePic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNC41IiBmaWxsPSIjOUNBNEFCIi8+CjxwYXRoIGQ9Ik0yOCAyN0MyOCAyNC4yNjk3IDI0LjQxODMgMjIgMjAgMjJDMTUuNTgxNyAyMiAxMiAyNC4yNjk3IDEyIDI3SDI4WiIgZmlsbD0iIzlDQTRBQiIvPgo8L3N2Zz4K',
+        content: keyword,
+        timestamp: mainCommentTime,
+        likes: 0,
+        replies: [
+          {
+            id: index + 1,
+            username: realInstagramUser.username,
+            profilePic: realInstagramUser.profilePic,
+            content: commentReplies[index % commentReplies.length] || 'Message sent!',
+            timestamp: replyTime,
+            likes: 0
+          }
+        ]
+      };
+    });
+  }, [triggerKeywords, commentTimestamps, realInstagramUser]);
+
+  return (
+    <div 
+      className={`absolute inset-0 bg-black/50 z-40 transition-all duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      onClick={onClose}
+    >
+      <div 
+        className={`absolute left-0 right-0 bg-white rounded-t-3xl transition-transform duration-300 ${
+          isVisible ? 'translate-y-0' : 'translate-y-full'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+        style={{ 
+          height: '70%',
+          bottom: '0',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {/* Handle Bar */}
+        <div className="flex justify-center pt-3 pb-2">
+          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+        </div>
+        
+        {/* Header */}
+        <div className="px-4 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900 text-lg">Comments</h3>
+            <button 
+              className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors"
+              onClick={onClose}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+        
+        {/* Comments List */}
+        <div className="flex-1 overflow-y-auto px-4 py-3">
+          {testComments.map((comment) => (
+            <div key={comment.id} className="mb-6 pb-0">
+              {/* Main Comment */}
+              <div className="flex gap-3">
+                {/* Profile Picture - Left side */}
+                <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 flex items-start">
+                  <img 
+                    src={comment.profilePic} 
+                    alt={comment.username}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                {/* Comment Content Block - Right side */}
+                <div className="flex-1 min-w-0">
+                  {/* Username, Timestamp, Comment Text, and Like Button */}
+                  <div className="flex items-start justify-between mb-3">
+                    {/* Left side - Username, Timestamp, and Comment Text */}
+                    <div className="flex-1 min-w-0">
+                      {/* Username and Timestamp on first line */}
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-sm font-semibold text-gray-900 leading-none">{comment.username}</span>
+                        <span className="text-xs text-gray-500 flex-shrink-0 leading-none">{getRelativeTime(comment.timestamp)}</span>
+                      </div>
+                      {/* Comment text on second line */}
+                      <span className="text-sm text-gray-900 leading-none block">{comment.content}</span>
+                    </div>
+                    
+                    {/* Right side - Like Button and Count - Aligned with username */}
+                    <div className="flex flex-col items-center gap-0.5 ml-3">
+                      <button className="flex items-center justify-center hover:opacity-80 transition-opacity p-0 focus:outline-none focus:ring-0 focus:border-0">
+                        <Heart className="w-3.5 h-3.5 text-gray-400" />
+                      </button>
+                      <span className="text-xs text-gray-500 font-normal leading-none">{comment.likes}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Actions Row - Below comment text */}
+                  <div className="flex items-center gap-4">
+                    <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
+                    <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">See translation</button>
+                  </div>
+                  
+                  {/* Replies - Only show one reply per comment */}
+                  {comment.replies.length > 0 && (
+                                         <div className="mt-6 ml-0">
+                      {comment.replies.map((reply) => (
+                        <div key={reply.id} className="flex gap-3 mb-0 pb-0">
+                          {/* Reply Profile Picture - Left side */}
+                          <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 flex items-start">
+                            <img 
+                              src={reply.profilePic} 
+                              alt={reply.username}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          
+                          {/* Reply Content Block - Right side */}
+                          <div className="flex-1 min-w-0">
+                            {/* Reply Username, Timestamp, Reply Text, and Like Button */}
+                            <div className="flex items-start justify-between mb-2">
+                              {/* Left side - Username, Timestamp, and Reply Text */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start gap-1.5 mb-1">
+                                  <span className="font-semibold text-sm text-gray-900 leading-none">{reply.username}</span>
+                                  <span className="text-xs text-gray-500 flex-shrink-0 leading-none">{getRelativeTime(reply.timestamp)}</span>
+                                </div>
+                                <span className="text-sm text-gray-900 leading-none block">{reply.content}</span>
+                              </div>
+                              
+                              {/* Right side - Like Button and Count - Aligned with username */}
+                              <div className="flex flex-col items-center gap-0.5 ml-3">
+                                <button className="flex items-center justify-center hover:opacity-80 transition-opacity p-0 focus:outline-none focus:ring-0 focus:border-0">
+                                  <Heart className="w-3.5 h-3.5 text-gray-400" />
+                                </button>
+                                <span className="text-xs text-gray-500 font-normal leading-none">{reply.likes}</span>
+                              </div>
+                            </div>
+                            
+                            {/* Reply Actions Row - Below reply text */}
+                            <div className="flex items-center gap-4">
+                              <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Comment Input */}
+        <div className="px-4 py-4 border-t border-gray-200 bg-white mt-auto">
+          <div className="flex gap-3">
+            {/* User Avatar - Left side */}
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 flex items-center">
+              <img 
+                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGNUY1RjUiIHN0cm9rZT0iI0Q5RDlEOSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNC41IiBmaWxsPSIjOUNBNEFCIi8+CjxwYXRoIGQ9Ik0yOCAyN0MyOCAyNC4yNzk3IDI0LjQxODMgMjIgMjAgMjJDMTUuNTgxNyAyMiAxMiAyNC4yNzk3IDEyIDI3SDI4WiIgZmlsbD0iIzlDQTRBQiIvPgo8L3N2Zz4K" 
+                alt="Your profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+                        {/* Input Field and Actions Block - Right side */}
+            <div className="flex-1 flex items-center justify-center gap-3">
+              {/* Input Field */}
+              <div className="w-3/4 bg-gray-50 rounded-full px-4 py-2 min-h-[36px] flex items-center relative">
+                <input
+                  type="text"
+                  placeholder="Add a comment..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none resize-none pr-12 leading-none focus:outline-none focus:ring-0 focus:border-0 focus:border-transparent focus:shadow-none focus:appearance-none focus:border-none comment-input-no-focus"
+                  style={{ 
+                    minHeight: '16px',
+                    border: 'none !important',
+                    outline: 'none !important',
+                    boxShadow: 'none !important',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    borderWidth: '0 !important',
+                    borderStyle: 'none !important',
+                    borderColor: 'transparent !important'
+                  }}
+                />
+              </div>
+              
+              {/* Post Button - Always visible, disabled when no text */}
+              <button 
+                className={`w-10 h-10 flex items-center justify-center transition-colors focus:outline-none focus:ring-0 focus:border-0 ${
+                  commentText.trim() 
+                    ? 'text-blue-500 hover:text-blue-600' 
+                    : 'text-gray-400 cursor-not-allowed'
+                }`}
+                onClick={() => {
+                  if (commentText.trim()) {
+                    // Add the comment text as a keyword
+                    const currentKeywords = getCurrentKeywords();
+                    const setCurrentKeywords = getCurrentKeywordsSetter();
+                    if (!currentKeywords.includes(commentText.trim())) {
+                      const updatedKeywords = [...currentKeywords, commentText.trim()];
+                      setCurrentKeywords(updatedKeywords);
+                      setSelectedKeywords(updatedKeywords);
+                    }
+                    // Clear both input fields
+                    setCommentText('');
+                    setCommentInputText('');
+                  }
+                }}
+                disabled={!commentText.trim()}
+              >
+                <svg 
+                  className="w-5 h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" 
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AutomationStepByStep() {
   console.log('AutomationStepByStep component loaded successfully')
   
@@ -213,7 +735,8 @@ export default function AutomationStepByStep() {
   const [selectedAccount, setSelectedAccount] = useState('')
   const [contentType, setContentType] = useState('')
   const [automationType, setAutomationType] = useState('')
-  const [selectedPost, setSelectedPost] = useState('')
+  const [selectedAutomationType, setSelectedAutomationType] = useState<string>('')
+  const [selectedPost, setSelectedPost] = useState<any>(null)
   
   // Get current workspace
   const { currentWorkspace } = useCurrentWorkspace()
@@ -245,7 +768,7 @@ export default function AutomationStepByStep() {
     queryFn: async () => {
       if (!selectedAccount) return []
       // Get workspace ID from social accounts data
-      const selectedAccountData = realAccounts.find(acc => acc.id === selectedAccount)
+      const selectedAccountData = realAccounts.find((acc: any) => acc.id === selectedAccount)
       const workspaceId = selectedAccountData?.workspaceId || '6847b9cdfabaede1706f2994'
       
       const response = await apiRequest(`/api/instagram-content?workspaceId=${workspaceId}`)
@@ -282,7 +805,8 @@ export default function AutomationStepByStep() {
   })
   
   // Automation-specific states
-  const [keywords, setKeywords] = useState([])
+  const [keywords, setKeywords] = useState<string[]>([])
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([])
   const [newKeyword, setNewKeyword] = useState('')
   const [commentReply, setCommentReply] = useState('')
   const [dmMessage, setDmMessage] = useState('')
@@ -345,7 +869,7 @@ export default function AutomationStepByStep() {
     }
 
     // Get the workspace ID from selected account data
-    const selectedAccountData = realAccounts.find(acc => acc.id === selectedAccount)
+    const selectedAccountData = realAccounts.find((acc: any) => acc.id === selectedAccount)
     const workspaceId = selectedAccountData?.workspaceId
     if (!workspaceId) {
       toast({
@@ -366,7 +890,7 @@ export default function AutomationStepByStep() {
       workspaceId: workspaceId,
       type: automationType, // Use exact automation type (comment_dm, dm_only, comment_only)
       keywords: currentKeywords,
-      targetMediaIds: selectedPost ? [selectedPost] : [],
+             targetMediaIds: selectedPost ? [selectedPost.id] : [],
       responses: currentResponses,
       isActive: true
     }
@@ -374,7 +898,7 @@ export default function AutomationStepByStep() {
     try {
       console.log('Creating automation rule with data:', ruleData)
       await createAutomationMutation.mutateAsync(ruleData)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating automation rule:', error)
       console.error('Error details:', error.response?.data || error)
     }
@@ -391,19 +915,64 @@ export default function AutomationStepByStep() {
   const [dmWebsiteUrl, setDmWebsiteUrl] = useState('')
   
   // DM-only automation
-  const [dmKeywords, setDmKeywords] = useState([])
+  const [dmKeywords, setDmKeywords] = useState<string[]>([])
   const [dmAutoReply, setDmAutoReply] = useState('')
   
   // Comment-only automation
-  const [commentKeywords, setCommentKeywords] = useState([])
+  const [commentKeywords, setCommentKeywords] = useState<string[]>([])
   const [publicReply, setPublicReply] = useState('')
+  
+  // New state for comment input synchronization
+  const [commentInputText, setCommentInputText] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const updateSourceRef = useRef<'trigger' | 'comment' | null>(null);
+  
+  // Update current time every 30 seconds to prevent timestamp fluctuation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Remove focus outlines from all buttons globally
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      button:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+  
+  // Synchronize commentInputText changes back to newKeyword
+  useEffect(() => {
+    // Only update newKeyword when commentInputText changes from CommentScreen
+    // Don't update if it's the same value to prevent feedback loop
+    if (commentInputText !== newKeyword && commentInputText !== '' && updateSourceRef.current === 'comment') {
+      setNewKeyword(commentInputText);
+    }
+  }, [commentInputText]);
   
   // Additional state variables for automation settings
   const [aiPersonality, setAiPersonality] = useState('friendly')
   const [maxRepliesPerDay, setMaxRepliesPerDay] = useState(10)
   const [cooldownPeriod, setCooldownPeriod] = useState(30) // in minutes
   const [activeHours, setActiveHours] = useState({ start: '09:00', end: '17:00' })
-  const [activeDays, setActiveDays] = useState(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
+  const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false])
   
   // UI state for dropdowns
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
@@ -491,7 +1060,7 @@ export default function AutomationStepByStep() {
     { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" />, color: 'bg-blue-700' }
   ]
 
-  const getContentTypesByPlatform = (platform) => {
+  const getContentTypesByPlatform = (platform: any) => {
     switch (platform) {
       case 'instagram':
         return [
@@ -555,16 +1124,45 @@ export default function AutomationStepByStep() {
     }
   ]
 
-
+  // Test if video URL is accessible
+  const testVideoUrl = async (url: string, postId: string) => {
+    if (!url) return false;
+    try {
+      console.log(`🔍 Testing video URL accessibility for post ${postId}:`, url);
+      const response = await fetch(url, { method: 'HEAD' });
+      console.log(`✅ Video URL test result for post ${postId}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      return response.ok;
+    } catch (error) {
+      console.log(`❌ Video URL test failed for post ${postId}:`, error);
+      return false;
+    }
+  };
 
   // Transform real posts data
   const realPosts = postsData ? postsData.map((post: any) => {
     console.log('Processing post data:', post); // Debug log
+    
+    // Map Instagram content types properly
+    let mappedType = 'post';
+    if (post.type === 'reel' || post.type === 'video') {
+      mappedType = 'reel'; // Both reels and videos should show as reels for automation
+    } else if (post.type === 'carousel') {
+      mappedType = 'post'; // Carousels are treated as posts
+    } else if (post.type === 'story') {
+      mappedType = 'story';
+    }
+    
     return {
       id: post.id,
       title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
-      type: post.type === 'reel' ? 'reel' : 'post',
+      type: mappedType,
       image: post.mediaUrl || post.thumbnailUrl || 'https://picsum.photos/300/300?random=1',
+      mediaUrl: post.mediaUrl,
+      thumbnailUrl: post.thumbnailUrl,
       likes: post.engagement?.likes || 0,
       comments: post.engagement?.comments || 0,
       caption: post.caption || 'Instagram post content'
@@ -637,8 +1235,16 @@ export default function AutomationStepByStep() {
       const currentKeywords = getCurrentKeywords()
       const setCurrentKeywords = getCurrentKeywordsSetter()
       if (!currentKeywords.includes(newKeyword.trim())) {
-        setCurrentKeywords([...currentKeywords, newKeyword.trim()])
+        const updatedKeywords = [...currentKeywords, newKeyword.trim()]
+        setCurrentKeywords(updatedKeywords)
+        setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
         setNewKeyword('')
+        setCommentInputText('') // Clear comment input text as well
+        
+        // Show comment screen for comment-related automations when keywords are added
+        if ((automationType === 'comment_dm' || automationType === 'comment_only') && updatedKeywords.length === 1) {
+          setShowCommentScreen(true)
+        }
       }
     }
   }
@@ -646,16 +1252,19 @@ export default function AutomationStepByStep() {
   const removeKeyword = (keywordToRemove) => {
     const currentKeywords = getCurrentKeywords()
     const setCurrentKeywords = getCurrentKeywordsSetter()
-    setCurrentKeywords(currentKeywords.filter(k => k !== keywordToRemove))
+    const updatedKeywords = currentKeywords.filter(k => k !== keywordToRemove)
+    setCurrentKeywords(updatedKeywords)
+    setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
   }
 
 
 
-  const getCurrentKeywordsSetter = () => {
+  const getCurrentKeywordsSetter = (): React.Dispatch<React.SetStateAction<string[]>> => {
     switch (automationType) {
       case 'comment_dm':
-      case 'comment_only':
         return setKeywords
+      case 'comment_only':
+        return setCommentKeywords
       case 'dm_only':
         return setDmKeywords
       default:
@@ -666,7 +1275,7 @@ export default function AutomationStepByStep() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 1:
-        return selectedAccount && contentType && selectedPost
+        return selectedAccount && contentType && selectedPost !== null
       case 2:
         // For comment_dm automation, require keywords and at least one comment reply
         if (automationType === 'comment_dm') {
@@ -743,22 +1352,22 @@ export default function AutomationStepByStep() {
                         alt={realAccounts.find(acc => acc.id === selectedAccount)?.name}
                         className="w-6 h-6 rounded-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none'
+                          (e.currentTarget as HTMLElement).style.display = 'none'
                           const fallback = e.currentTarget.nextElementSibling
-                          if (fallback) fallback.style.display = 'flex'
+                          if (fallback) (fallback as HTMLElement).style.display = 'flex'
                         }}
                       />
                     )}
                     {selectedAccount && !accountsLoading && (
                       <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500" style={{display: 'none'}}>
                         <span className="text-white text-xs font-bold">
-                          {realAccounts.find(acc => acc.id === selectedAccount)?.name?.charAt(1).toUpperCase()}
+                          {realAccounts.find((acc: any) => acc.id === selectedAccount)?.name?.charAt(1).toUpperCase()}
                         </span>
                       </div>
                     )}
                     <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
                       {accountsLoading ? 'Loading accounts...' : selectedAccount 
-                        ? realAccounts.find(acc => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find(acc => acc.id === selectedAccount)?.platform
+                        ? realAccounts.find((acc: any) => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.platform
                         : 'Choose your social media account...'
                       }
                     </span>
@@ -782,11 +1391,11 @@ export default function AutomationStepByStep() {
                     </div>
                     <div className="py-1">
                       {realAccounts
-                        .filter(account => 
+                        .filter((account: any) => 
                           account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           account.platform.toLowerCase().includes(searchTerm.toLowerCase())
                         )
-                        .map(account => (
+                        .map((account: any) => (
                           <button
                             key={account.id}
                             onClick={() => {
@@ -802,9 +1411,9 @@ export default function AutomationStepByStep() {
                                 alt={account.name}
                                 className="w-8 h-8 rounded-full object-cover"
                                 onError={(e) => {
-                                  e.currentTarget.style.display = 'none'
+                                  (e.currentTarget as HTMLElement).style.display = 'none'
                                   const fallback = e.currentTarget.nextElementSibling
-                                  if (fallback) fallback.style.display = 'flex'
+                                  if (fallback) (fallback as HTMLElement).style.display = 'flex'
                                 }}
                               />
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${account.platform === 'instagram' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : account.platform === 'youtube' ? 'bg-red-500' : 'bg-blue-500'}`} style={{display: 'none'}}>
@@ -823,7 +1432,7 @@ export default function AutomationStepByStep() {
                           </button>
                         ))
                       }
-                      {realAccounts.filter(account => 
+                      {realAccounts.filter((account: any) => 
                         account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         account.platform.toLowerCase().includes(searchTerm.toLowerCase())
                       ).length === 0 && (
@@ -872,7 +1481,7 @@ export default function AutomationStepByStep() {
                             className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-colors duration-150 flex items-center justify-between group"
                           >
                             <div className="flex items-center space-x-3">
-                              <div className={`w-8 h-8 rounded-lg ${type.color} flex items-center justify-center text-white`}>
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white">
                                 {type.icon}
                               </div>
                               <div>
@@ -901,19 +1510,105 @@ export default function AutomationStepByStep() {
                   </div>
                   Select Post
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {(postsLoading ? [] : realPosts.filter(post => post.type === contentType)).map(post => (
-                    <button
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {/* Debug info */}
+                  {!postsLoading && (
+                    <div className="col-span-full text-xs text-gray-500 mb-2">
+                      Debug: Found {realPosts.length} total posts, {realPosts.filter((p: any) => p.type === contentType).length} of type "{contentType}"
+                    </div>
+                  )}
+                  {(postsLoading ? [] : realPosts.filter((post: any) => post.type === contentType)).map((post: any) => (
+                    <div
                       key={post.id}
-                      onClick={() => setSelectedPost(post.id)}
-                      className={`relative p-3 rounded-xl border-2 transition-all duration-200 hover:shadow-lg ${
-                        selectedPost === post.id 
-                          ? 'border-emerald-500 bg-emerald-50 shadow-lg' 
-                          : 'border-gray-200 hover:border-emerald-300 bg-white'
+                      className={`cursor-pointer rounded-lg border-2 transition-all hover:shadow-md ${
+                        selectedPost?.id === post.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
                       }`}
+                      onClick={() => setSelectedPost(post)}
                     >
+                      <div className="p-3">
                       <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 overflow-hidden">
-                        {post.image ? (
+                          {post.type === 'reel' && post.image ? (
+                            // Video player for reels
+                            <div className="relative w-full h-full group">
+                              {/* Test video URL accessibility */}
+                              {(() => {
+                                const videoUrl = post.image || post.mediaUrl || post.thumbnailUrl;
+                                if (videoUrl) {
+                                  testVideoUrl(videoUrl, post.id);
+                                }
+                                return null;
+                              })()}
+                              <video
+                                src={post.image || post.mediaUrl || post.thumbnailUrl} 
+                                className="w-full h-full object-cover"
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                poster={post.thumbnailUrl || post.image}
+                                onError={(e) => {
+                                  console.log('Live preview video error for post:', post.id, e);
+                                  console.log('Live preview video error details:', {
+                                    error: e.currentTarget.error,
+                                    networkState: e.currentTarget.networkState,
+                                    readyState: e.currentTarget.readyState,
+                                    src: e.currentTarget.src
+                                  });
+                                  // Fallback to image if video fails
+                                  const video = e.currentTarget;
+                                  const img = document.createElement('img');
+                                  img.src = post.thumbnailUrl || post.image || post.mediaUrl;
+                                  img.className = 'w-full h-full object-cover';
+                                  img.alt = post.caption || post.title;
+                                  video.parentNode?.replaceChild(img, video);
+                                }}
+                                onLoadStart={() => console.log('Live preview video loading started for post:', post.id)}
+                                onCanPlay={() => console.log('Live preview video can play for post:', post.id)}
+                                onLoadedMetadata={() => console.log('Live preview video metadata loaded for post:', post.id)}
+                                onLoadedData={() => console.log('Live preview video data loaded for post:', post.id)}
+                                onProgress={() => console.log('Live preview video progress for post:', post.id)}
+                                onStalled={() => console.log('Live preview video stalled for post:', post.id)}
+                                onSuspend={() => console.log('Live preview video suspended for post:', post.id)}
+                              />
+                              
+                              {/* Mute/Unmute button - only visible on hover */}
+                              <button
+                                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const video = e.currentTarget.parentElement?.querySelector('video');
+                                  if (video) {
+                                    video.muted = !video.muted;
+                                    // Update button icon
+                                    const icon = e.currentTarget.querySelector('svg');
+                                    if (icon) {
+                                      if (video.muted) {
+                                        icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+                                      } else {
+                                        icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><line x1="1" y1="1" x2="23" y2="23"/>';
+                                      }
+                                    }
+                                  }
+                                }}
+                                title="Toggle mute"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                  <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                              </button>
+                              
+                              <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                🎬 Reel
+                              </div>
+                            </div>
+                          ) : post.image ? (
                           <img 
                             src={post.image} 
                             alt={post.caption || post.title} 
@@ -932,7 +1627,10 @@ export default function AutomationStepByStep() {
                       <div className="space-y-1">
                         <h4 className="font-medium text-gray-900 text-sm truncate">{post.title}</h4>
                         <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span className="capitalize">{post.type}</span>
+                            <span className="capitalize flex items-center gap-1">
+                              {post.type === 'reel' && <PlayCircle className="w-3 h-3 text-purple-500" />}
+                              {post.type}
+                            </span>
                           <div className="flex items-center gap-2">
                             <span className="flex items-center gap-1">
                               <Heart className="w-3 h-3" />
@@ -945,25 +1643,24 @@ export default function AutomationStepByStep() {
                           </div>
                         </div>
                       </div>
-                      {selectedPost === post.id && (
-                        <div className="absolute top-2 right-2 p-1 bg-emerald-500 rounded-full">
-                          <Check className="w-3 h-3 text-white" />
                         </div>
-                      )}
-                    </button>
+                    </div>
                   ))}
+                </div>
                   {postsLoading && (
                     <div className="col-span-full text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
                       <p className="text-gray-500 mt-2">Loading posts...</p>
                     </div>
                   )}
-                  {!postsLoading && realPosts.filter(post => post.type === contentType).length === 0 && (
+                {!postsLoading && realPosts.filter((post: any) => post.type === contentType).length === 0 && (
                     <div className="col-span-full text-center py-8 text-gray-500">
                       No {contentType}s found for this account
+                    <div className="text-sm text-gray-400 mt-2">
+                      Available content: {[...new Set(realPosts.map((p: any) => p.type))].join(', ')}
+                    </div>
                     </div>
                   )}
-                </div>
               </div>
             )}
           </div>
@@ -1002,7 +1699,9 @@ export default function AutomationStepByStep() {
                           key={type.id}
                           onClick={() => {
                             setAutomationType(type.id)
+                            setSelectedAutomationType(type.id)
                             setAutomationTypeDropdownOpen(false)
+                            // Don't show comment screen immediately - wait for keywords to be added
                           }}
                           className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors duration-150 flex items-center justify-between group"
                         >
@@ -1061,7 +1760,7 @@ export default function AutomationStepByStep() {
                       onChange={(e) => setDmMessage(e.target.value)}
                       placeholder="Enter your DM text here"
                       className="w-full p-3 border border-gray-300 rounded-lg"
-                      rows="4"
+                      rows={4}
                     />
                   </div>
                   
@@ -1306,13 +2005,13 @@ export default function AutomationStepByStep() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <span className="text-sm font-medium text-gray-600">Account:</span>
-                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find((a: any) => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Selected Post:</span>
                     <div className="text-lg font-semibold text-gray-900">
                       {selectedPost ? (
-                        <span>{realPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {realPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                        <span>{selectedPost.type || 'Post'} - {selectedPost.caption ? selectedPost.caption.substring(0, 30) + '...' : 'No caption'}</span>
                       ) : (
                         'Not selected'
                       )}
@@ -1320,7 +2019,7 @@ export default function AutomationStepByStep() {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Automation Type:</span>
-                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find((t: any) => t.id === automationType)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Keywords:</span>
@@ -1356,13 +2055,13 @@ export default function AutomationStepByStep() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <span className="text-sm font-medium text-gray-600">Account:</span>
-                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find(a => a.id === selectedAccount)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{realAccounts.find((a: any) => a.id === selectedAccount)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Selected Post:</span>
                     <div className="text-lg font-semibold text-gray-900">
                       {selectedPost ? (
-                        <span>{realPosts.find(p => p.id === selectedPost)?.type || 'Post'} - {realPosts.find(p => p.id === selectedPost)?.caption.substring(0, 30) || 'No caption'}...</span>
+                        <span>{selectedPost.type || 'Post'} - {selectedPost.caption ? selectedPost.caption.substring(0, 30) + '...' : 'No caption'}</span>
                       ) : (
                         'Not selected'
                       )}
@@ -1370,7 +2069,7 @@ export default function AutomationStepByStep() {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Automation Type:</span>
-                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find(t => t.id === automationType)?.name || 'Not selected'}</div>
+                    <div className="text-lg font-semibold text-gray-900">{automationTypes.find((t: any) => t.id === automationType)?.name || 'Not selected'}</div>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-600">Keywords:</span>
@@ -1429,7 +2128,13 @@ export default function AutomationStepByStep() {
                   <input
                     type="text"
                     value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
+                    onChange={(e) => {
+                      updateSourceRef.current = 'trigger';
+                      setNewKeyword(e.target.value);
+                      setCommentInputText(e.target.value);
+                      // Reset the source after a short delay
+                      setTimeout(() => updateSourceRef.current = null, 100);
+                    }}
                     onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
                     placeholder="Add keyword..."
                     className="flex-1 p-3 border border-gray-300 rounded-lg"
@@ -1441,6 +2146,19 @@ export default function AutomationStepByStep() {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                
+                {/* Preview Comments Button */}
+                {keywords.length > 0 && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => setShowCommentScreen(true)}
+                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview Comments
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="mb-6">
@@ -1553,6 +2271,19 @@ export default function AutomationStepByStep() {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                
+                {/* Preview Comments Button */}
+                {dmKeywords.length > 0 && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => setShowCommentScreen(true)}
+                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview Comments
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -1562,7 +2293,7 @@ export default function AutomationStepByStep() {
                   onChange={(e) => setDmAutoReply(e.target.value)}
                   placeholder="Thanks for your comment! Here's the information you requested..."
                   className="w-full p-3 border border-gray-300 rounded-lg"
-                  rows="4"
+                  rows={4}
                 />
               </div>
             </div>
@@ -1606,6 +2337,19 @@ export default function AutomationStepByStep() {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                
+                {/* Preview Comments Button */}
+                {keywords.length > 0 && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => setShowCommentScreen(true)}
+                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview Comments
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -1615,7 +2359,7 @@ export default function AutomationStepByStep() {
                   onChange={(e) => setPublicReply(e.target.value)}
                   placeholder="Thanks for your interest! Here's the info you requested..."
                   className="w-full p-3 border border-gray-300 rounded-lg"
-                  rows="4"
+                  rows={4}
                 />
               </div>
             </div>
@@ -1634,8 +2378,8 @@ export default function AutomationStepByStep() {
   }
 
   const renderInstagramPreview = () => {
-    const selectedAccountData = realAccounts.find(a => a.id === selectedAccount)
-    const selectedPostData = realPosts.find(p => p.id === selectedPost)
+    const selectedAccountData = realAccounts.find((a: any) => a.id === selectedAccount)
+    const selectedPostData = selectedPost
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
     
@@ -1778,7 +2522,8 @@ export default function AutomationStepByStep() {
         
         {/* Instagram Post Interface - Exact replica */}
         <div className="bg-white border-l border-r border-gray-200 shadow-2xl">
-          {/* Post Header - Authentic Instagram style */}
+          {/* Post Header - Only show for non-reel posts */}
+          {selectedPostData && selectedPostData.type !== 'reel' && (
           <div className="flex items-center justify-between p-3 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -1802,10 +2547,378 @@ export default function AutomationStepByStep() {
             </div>
             <MoreHorizontal className="w-6 h-6 text-gray-700" />
           </div>
+          )}
           
-          {/* Post Image with authentic aspect ratio */}
-          <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+          {/* Instagram Reel Style Preview */}
+          <div className="relative bg-black">
             {selectedPostData ? (
+              selectedPostData.type === 'reel' ? (
+                // Instagram Reel Layout - Full Screen Vertical Video
+                <div className="relative w-full h-[600px] bg-black">
+                  {/* Video Player - Full Screen */}
+                  <video 
+                    src={selectedPostData.image || selectedPostData.mediaUrl || selectedPostData.thumbnailUrl} 
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    poster={selectedPostData.thumbnailUrl || selectedPostData.image}
+                    onPlay={(e) => {
+                      // Video started playing - show pause icon and hide button after delay
+                      const video = e.currentTarget;
+                      const button = video.parentElement?.querySelector('.play-pause-button') as HTMLElement;
+                      const playIcon = button?.querySelector('svg:first-child');
+                      const pauseIcon = button?.querySelector('svg:last-child');
+                      
+                      if (button && playIcon && pauseIcon) {
+                        // Show pause icon
+                        (playIcon as HTMLElement).style.display = 'none';
+                        (pauseIcon as HTMLElement).style.display = 'block';
+                        
+                        // Show button briefly then hide it
+                        button.style.opacity = '1';
+                        button.style.transform = 'scale(1)';
+                        
+                        setTimeout(() => {
+                          button.style.opacity = '0';
+                          button.style.transform = 'scale(0.8)';
+                        }, 2000);
+                      }
+                    }}
+                    onPause={(e) => {
+                      // Video paused - show play icon and keep button visible
+                      const video = e.currentTarget;
+                      const button = video.parentElement?.querySelector('.play-pause-button') as HTMLElement;
+                      const playIcon = button?.querySelector('svg:first-child');
+                      const pauseIcon = button?.querySelector('svg:last-child');
+                      
+                      if (button && playIcon && pauseIcon) {
+                        // Show play icon
+                        (pauseIcon as HTMLElement).style.display = 'none';
+                        (playIcon as HTMLElement).style.display = 'block';
+                        
+                        // Keep button visible when paused
+                        button.style.opacity = '1';
+                        button.style.transform = 'scale(1)';
+                      }
+                    }}
+                    onError={(e) => {
+                      console.log('Live preview video error for post:', selectedPostData.id, e);
+                      // Fallback to image if video fails
+                      const video = e.currentTarget;
+                      const img = document.createElement('img');
+                      img.src = selectedPostData.thumbnailUrl || selectedPostData.image || selectedPostData.mediaUrl;
+                      img.className = 'w-full h-full object-cover';
+                      img.alt = selectedPostData.caption || 'Post';
+                      video.parentNode?.replaceChild(img, video);
+                    }}
+                  />
+                  
+                  {/* Click Zone for Video Control - Covers video area but excludes bottom automation bar and right sidebar */}
+                  <div 
+                    className="absolute cursor-pointer pointer-events-auto"
+                    style={{ 
+                      top: '0', 
+                      left: '0', 
+                      right: '50px', // Exclude only the exact action buttons width (cut to cut)
+                      bottom: '120px' // Exclude the bottom automation bar area
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const video = e.currentTarget.parentElement?.querySelector('video');
+                      const button = e.currentTarget.parentElement?.querySelector('.play-pause-button') as HTMLElement;
+                      
+                      if (video) {
+                        if (video.paused) {
+                          video.play();
+                        } else {
+                          video.pause();
+                        }
+                      }
+                      
+                      // Show the button when user clicks
+                      if (button) {
+                        button.style.opacity = '1';
+                        button.style.transform = 'scale(1)';
+                        
+                        // Hide button after 2 seconds
+                        setTimeout(() => {
+                          if (video && !video.paused) {
+                            button.style.opacity = '0';
+                            button.style.transform = 'scale(0.8)';
+                          }
+                        }, 2000);
+                      }
+                    }}
+                  />
+                  
+                  {/* Play/Pause Button Overlay - Center of the clickable video area */}
+                  <div 
+                    className="absolute pointer-events-none flex items-center justify-center"
+                    style={{ 
+                      top: '0', 
+                      left: '0', 
+                      right: '50px', // Match the click zone exactly (cut to cut)
+                      bottom: '120px' // Exclude only the bottom automation bar area
+                    }}
+                  >
+                    <button
+                      className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto transition-all duration-300 play-pause-button focus:outline-none focus:ring-0 focus:border-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const video = e.currentTarget.parentElement?.parentElement?.querySelector('video');
+                        if (video) {
+                          if (video.paused) {
+                            video.play();
+                          } else {
+                            video.pause();
+                          }
+                        }
+                        
+                        // Hide button after click
+                        const button = e.currentTarget as HTMLElement;
+                        setTimeout(() => {
+                          if (video && !video.paused) {
+                            button.style.opacity = '0';
+                            button.style.transform = 'scale(0.8)';
+                          }
+                        }, 2000);
+                      }}
+                      style={{
+                        opacity: '0',
+                        transform: 'scale(0.8)',
+                        transition: 'all 0.3s ease-in-out',
+                        zIndex: 100
+                      }}
+
+                    >
+                      {/* Play Icon - Show when video is paused */}
+                      <svg 
+                        width="32" 
+                        height="32" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className="text-white transition-all duration-300"
+                        style={{ display: 'block' }}
+                      >
+                        <polygon points="5,3 19,12 5,21"/>
+                      </svg>
+                      
+                      {/* Pause Icon - Show when video is playing */}
+                      <svg 
+                        width="32" 
+                        height="32" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className="text-white transition-all duration-300"
+                        style={{ display: 'none' }}
+                      >
+                        <line x1="6" y1="4" x2="6" y2="20"/>
+                        <line x1="18" y1="4" x2="18" y2="20"/>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {/* Instagram Reel UI Overlay */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Top Section - Only Mute Button */}
+                    <div className="absolute top-4 right-4">
+                      {/* Mute/Unmute Button */}
+                      <button
+                        className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center pointer-events-auto hover:bg-black/50 transition-colors focus:outline-none focus:ring-0 focus:border-0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const video = e.currentTarget.parentElement?.parentElement?.parentElement?.querySelector('video');
+                          if (video) {
+                            video.muted = !video.muted;
+                            const icon = e.currentTarget.querySelector('svg');
+                            if (icon) {
+                              if (video.muted) {
+                                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+                              } else {
+                                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><line x1="1" y1="1" x2="23" y2="23"/>';
+                              }
+                            }
+                          }
+                        }}
+                        title="Toggle mute"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                          <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    {/* Bottom Section - Caption, Username, and Actions */}
+                    <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
+                      {/* Username and Follow Button Section - Above Caption */}
+                      <div className="flex items-center gap-3 mb-4">
+                        {/* Profile Picture - Left side - Use real avatar */}
+                        <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
+                          {selectedAccountData?.avatar ? (
+                            <img 
+                              src={selectedAccountData.avatar} 
+                              alt="Profile" 
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Fallback to gradient if avatar fails to load
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          {/* Fallback gradient avatar */}
+                          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center" style={{ display: selectedAccountData?.avatar ? 'none' : 'flex' }}>
+                            <User className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                        {/* Username and Follow Button - Right side - Use real username */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-semibold text-sm">
+                            {selectedAccountData?.username || selectedAccountData?.name || 'wanderwithsky'}
+                          </span>
+                          <button className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/30 pointer-events-auto hover:bg-white/30 transition-colors focus:outline-none focus:ring-0 focus:border-0">
+                            Follow
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Caption */}
+                      <div className="mb-4">
+                        <p className="text-white text-sm leading-relaxed">
+                          {selectedPostData.caption || 'Instagram reel content...'}
+                        </p>
+                      </div>
+                      
+                      {/* Audio Source - Use real username */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-4 h-4 bg-white/20 rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                        <span className="text-white/80 text-xs">
+                          {selectedAccountData?.username || selectedAccountData?.name || 'wanderwithsky'} • Original audio
+                        </span>
+                      </div>
+                      
+                      {/* Right Side Action Buttons */}
+                      <div 
+                        className={`absolute bottom-4 flex flex-col items-center gap-4 transition-opacity duration-300 ${
+                          showCommentScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                        }`}
+                        style={{ zIndex: 50, right: '0', marginRight: 0, paddingRight: 0 }}
+                      >
+                        {/* Like Button - Use real likes count */}
+                        <div className="flex flex-col items-center">
+                          <button className="w-10 h-10 flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform focus:outline-none focus:ring-0 focus:border-0">
+                            <Heart className="w-6 h-6 text-white drop-shadow-lg" />
+                          </button>
+                          <span className="text-white text-xs mt-1 font-medium drop-shadow-lg">
+                            {(selectedPostData.likes || selectedPostData.engagement?.likes || 0).toLocaleString()}
+                          </span>
+                        </div>
+                        
+                        {/* Comment Button - Use real comments count */}
+                        <div className="flex flex-col items-center">
+                          <button 
+                            className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform duration-200 pointer-events-auto focus:outline-none focus:ring-0 focus:border-0"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setShowCommentScreen(!showCommentScreen);
+                            }}
+                            style={{ zIndex: 50 }}
+                          >
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M21.99 4c0-1.1-.89-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                            </svg>
+                            <span className="text-xs font-medium">3</span>
+                          </button>
+                        </div>
+                        
+                        {/* Share Button */}
+                        <div className="flex flex-col items-center">
+                          <button className="w-10 h-10 flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform focus:outline-none focus:ring-0 focus:border-0">
+                            <Send className="w-6 h-6 text-white drop-shadow-lg" />
+                          </button>
+                        </div>
+                        
+                        {/* Save Button */}
+                        <div className="flex flex-col items-center">
+                          <button className="w-10 h-10 flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform focus:outline-none focus:ring-0 focus:border-0">
+                            <Bookmark className="w-6 h-6 text-white drop-shadow-lg" />
+                          </button>
+                        </div>
+                        
+                        {/* More Options */}
+                        <div className="flex flex-col items-center">
+                          <button className="w-10 h-10 flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform focus:outline-none focus:ring-0 focus:border-0">
+                            <MoreHorizontal className="w-6 h-6 text-white drop-shadow-lg" />
+                          </button>
+                        </div>
+                        
+                        {/* Music Icon - Replaces profile picture */}
+                        <div className="w-10 h-10 flex items-center justify-center">
+                          <svg 
+                            width="24" 
+                            height="24" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className="text-white drop-shadow-lg"
+                          >
+                            <path d="M9 18V5l12-2v13"/>
+                            <circle cx="6" cy="18" r="3"/>
+                            <circle cx="18" cy="16" r="3"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Comment Screen Overlay - Positioned within the reel layout */}
+                  <CommentScreen 
+                    isVisible={showCommentScreen} 
+                    onClose={() => setShowCommentScreen(false)}
+                    triggerKeywords={selectedKeywords || []}
+                    automationType={automationType || 'comment_only'}
+                    commentReplies={commentReplies || ['Message sent!']}
+                    dmMessage={dmMessage || ''}
+                    selectedAccount={selectedAccount || ''}
+                    realAccounts={realAccounts || []}
+                    newKeyword={newKeyword || ''}
+                    commentInputText={commentInputText || ''}
+                    setCommentInputText={setCommentInputText}
+                    getCurrentKeywords={getCurrentKeywords}
+                    getCurrentKeywordsSetter={getCurrentKeywordsSetter}
+                    setSelectedKeywords={setSelectedKeywords}
+                    updateSourceRef={updateSourceRef}
+                    currentTime={currentTime}
+                  />
+                </div>
+              ) : (
+                // Regular Post Layout
+                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
               <img 
                 src={selectedPostData.image || selectedPostData.thumbnailUrl || selectedPostData.mediaUrl} 
                 alt="Post" 
@@ -1819,17 +2932,9 @@ export default function AutomationStepByStep() {
                   }
                 }}
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center">
-                  <Camera className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">Select a post to preview</p>
-                </div>
-              </div>
-            )}
             
             {/* Multiple image indicator */}
-            {selectedPostData && selectedPostData.type === 'carousel' && (
+                  {selectedPostData.type === 'carousel' && (
               <div className="absolute top-3 right-3">
                 <div className="bg-black/20 backdrop-blur-sm rounded-full p-1">
                   <div className="flex gap-1">
@@ -1837,12 +2942,23 @@ export default function AutomationStepByStep() {
                     <div className="w-2 h-2 bg-white/50 rounded-full"></div>
                     <div className="w-2 h-2 bg-white/30 rounded-full"></div>
                   </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <Camera className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">Select a post to preview</p>
                 </div>
               </div>
             )}
           </div>
           
-          {/* Post Actions - Authentic Instagram style */}
+          {/* Post Actions - Only show for non-reel posts */}
+          {selectedPostData && selectedPostData.type !== 'reel' && (
           <div className="p-3">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-4">
@@ -1859,92 +2975,19 @@ export default function AutomationStepByStep() {
             </div>
             
             {/* Caption */}
-            <div className="text-sm text-gray-900 mb-3">
-              <span className="font-semibold">{selectedAccountData?.name || 'your_account'}</span>{' '}
-              <span className="text-gray-900">
-                {selectedPostData?.caption || 'Your amazing post caption goes here! ✨ #automation #socialmedia #growth'}
-              </span>
-            </div>
-            
-            {/* View all comments */}
-            <button className="text-sm text-gray-500 mb-3 hover:text-gray-700">
-              View all {selectedPostData ? (selectedPostData.comments || selectedPostData.engagement?.comments || 0) : 47} comments
-            </button>
-            
-            {/* Comments Section with Live Automation Preview */}
-            <div className="space-y-3">
-              {/* Sample User Comment - Only show when user has keywords */}
-              {currentKeywords.length > 0 && (
-                <div className="flex items-start gap-2">
-                  <img 
-                    src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face&auto=format" 
-                    alt="User" 
-                    className="w-6 h-6 rounded-full" 
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-900">
-                      <span className="font-semibold">username</span>{' '}
-                      <span>{currentKeywords[0]}</span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-xs text-gray-500">2m</span>
-                      <button className="text-xs text-gray-500 font-medium">Reply</button>
-                      <Heart className="w-3 h-3 text-gray-400" />
-                    </div>
-                  </div>
+              {selectedPostData?.caption && (
+                <div className="text-sm text-gray-900 mb-2">
+                  <span className="font-semibold mr-2">wanderwithsky</span>
+                  {selectedPostData.caption}
                 </div>
               )}
               
-              {/* Bot Reply Preview - Only show when user has keywords AND replies */}
-              {currentKeywords.length > 0 && automationType && getCurrentMessage() !== 'Your automated response will appear here...' && (
-                <div className="flex items-start gap-2 ml-6 animate-fadeIn">
-                  <div className="relative">
-                    <img 
-                      src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
-                      alt="Bot" 
-                      className="w-6 h-6 rounded-full border border-purple-200" 
-                    />
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border border-white flex items-center justify-center">
-                      <Bot className="w-2 h-2 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-900">
-                      <span className="font-semibold">{selectedAccountData?.name || 'your_account'}</span>{' '}
-                      <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        {getCurrentMessage()}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-xs text-gray-500">just now</span>
-                      <button className="text-xs text-gray-500 font-medium">Reply</button>
-                      <Heart className="w-3 h-3 text-gray-400" />
-                      <div className="flex items-center gap-1">
-                        <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs text-purple-600 font-medium">Auto-reply</span>
-                      </div>
-                    </div>
+              {/* Comments */}
+              <div className="text-sm text-gray-500">
+                View all {(selectedPostData.comments || selectedPostData.engagement?.comments || 0).toLocaleString()} comments
                   </div>
                 </div>
               )}
-            </div>
-            
-            {/* Add comment section */}
-            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
-              <img 
-                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format" 
-                alt="Your avatar" 
-                className="w-6 h-6 rounded-full" 
-              />
-              <div className="flex-1 text-sm text-gray-500">Add a comment...</div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">❤️</span>
-                <span className="text-lg">🙌</span>
-                <span className="text-lg">🔥</span>
-                <Plus className="w-4 h-4 text-gray-400" />
-              </div>
-            </div>
-          </div>
         </div>
         
         {/* DM Preview Section - Only show for comment to DM automation in steps 4 and 5 */}
@@ -2061,6 +3104,18 @@ export default function AutomationStepByStep() {
       </div>
     )
   }
+
+  // Add this state in the main component
+  const [showCommentScreen, setShowCommentScreen] = useState(false);
+
+  // Add this function in the main component
+  const handleAutomationTypeSelect = (type: string) => {
+    setSelectedAutomationType(type);
+    if (type === 'comment' || type === 'comment_to_dm') {
+      setShowCommentScreen(true);
+    }
+    // Continue to next step logic here
+  };
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
@@ -2216,6 +3271,9 @@ export default function AutomationStepByStep() {
         </div>
       </div>
       )}
+
+
+
     </div>
   )
 }

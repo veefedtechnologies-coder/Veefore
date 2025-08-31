@@ -1,56 +1,63 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signOut, User, setPersistence, browserLocalPersistence } from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut, User, setPersistence, browserLocalPersistence, getRedirectResult } from 'firebase/auth'
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  authDomain: 'veefore-b84c8.firebaseapp.com', // Use Firebase's default domain for OAuth
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
+console.log('🔥 Firebase Config:', {
+  apiKey: firebaseConfig.apiKey ? '✅ SET' : '❌ MISSING',
+  projectId: firebaseConfig.projectId ? '✅ SET' : '❌ MISSING',
+  appId: firebaseConfig.appId ? '✅ SET' : '❌ MISSING',
+  authDomain: firebaseConfig.authDomain
+})
 
-// Set persistence to local storage to maintain login across sessions
-// Wrapped in try-catch to handle IndexedDB issues gracefully
-try {
-  setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-      console.log('Firebase: Auth persistence set to LOCAL')
-    })
-    .catch((error) => {
-      console.warn('Firebase: Persistence setup failed, using default:', error.message)
-    })
-} catch (error) {
-  console.warn('Firebase: IndexedDB not available, using memory persistence')
+// Log the current domain for debugging
+console.log('🌐 Current domain:', window.location.hostname)
+console.log('🔧 Using authDomain:', firebaseConfig.authDomain)
+console.log('🔧 Full URL:', window.location.href)
+
+// Validate the authDomain configuration
+if (window.location.hostname === 'localhost') {
+  console.log('✅ Running on localhost - Firebase authDomain configured correctly')
+  console.log('ℹ️ Firebase will handle OAuth on firebaseapp.com, then redirect back to localhost:5000')
+} else {
+  console.warn('⚠️ Domain mismatch - Firebase may not work correctly')
+  console.warn('Expected: localhost, Got:', window.location.hostname)
 }
 
-export const googleProvider = new GoogleAuthProvider()
+// Initialize Firebase
+const app = initializeApp(firebaseConfig)
+console.log('🔥 Firebase App Initialized:', app)
 
-// Configure Google provider
-googleProvider.addScope('email')
-googleProvider.addScope('profile')
+// Initialize Auth
+export const auth = getAuth(app)
+console.log('🔥 Firebase Auth Initialized:', auth)
+
+// Set persistence
+setPersistence(auth, browserLocalPersistence)
+console.log('🔥 Firebase Persistence Set')
+
+// Create Google Provider
+export const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 })
+console.log('🔥 Google Provider Created:', googleProvider)
 
-// Auth functions
-export const signInWithEmail = (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password)
-}
-
-export const signUpWithEmail = (email: string, password: string) => {
-  return createUserWithEmailAndPassword(auth, email, password)
-}
-
-export const signInWithGoogle = () => {
-  return signInWithPopup(auth, googleProvider)
-}
-
-export const logOut = () => {
-  return signOut(auth)
+// Export all auth functions
+export { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup, 
+  signInWithRedirect,
+  signOut,
+  getRedirectResult
 }
 
 export type { User }

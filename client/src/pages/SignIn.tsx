@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, ArrowLeft, Sparkles, Brain, Play, Pause } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
-import { signInWithEmail, signInWithGoogle } from '@/lib/firebase'
+import { signInWithEmailAndPassword, signInWithPopup, auth, googleProvider } from '@/lib/firebase'
 import { useToast } from '@/hooks/use-toast'
 import veeforceLogo from '@assets/output-onlinepngtools_1754815000405.png'
 
@@ -175,7 +175,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
       setIsLoading(true)
       try {
         // Sign in with Firebase
-        await signInWithEmail(formData.email, formData.password)
+        await signInWithEmailAndPassword(formData.email, formData.password)
         
         // Send user data to backend
         await fetch('/api/auth/signin', {
@@ -209,12 +209,28 @@ const SignIn = ({ onNavigate }: SignInProps) => {
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
-      await signInWithGoogle()
+      console.log('🚀 Starting Google sign-in process...')
       
-      // Send user data to backend
-      await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      // Validate Firebase auth is available
+      if (!auth) {
+        throw new Error('Firebase authentication is not available')
+      }
+      
+      if (!googleProvider) {
+        throw new Error('Google provider is not available')
+      }
+      
+      console.log('✅ Firebase auth and Google provider are available')
+      
+      // Use popup method for better localhost compatibility
+      console.log('🔄 Starting popup authentication...')
+      const result = await signInWithPopup(auth, googleProvider)
+      
+      console.log('✅ Google sign-in successful:', result.user.email)
+      console.log('User details:', {
+        email: result.user.email,
+        displayName: result.user.displayName,
+        uid: result.user.uid
       })
       
       toast({
@@ -224,15 +240,41 @@ const SignIn = ({ onNavigate }: SignInProps) => {
       
       // Redirect to home page
       setLocation('/')
+      
     } catch (error: any) {
-      console.error('Google sign in error:', error)
+      console.error('❌ Google sign in error:', error)
+      
+      let errorMessage = "Failed to sign in with Google. Please try again."
+      
+      // Handle popup errors
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = "Sign-in popup was closed. Please try again."
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = "Popup was blocked. Please allow popups for this site."
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || "Failed to sign in with Google. Please try again.",
+        title: "Google Sign-in Failed",
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // Add a test function to check Firebase
+  const testFirebase = () => {
+    console.log('🧪 Testing Firebase...')
+    console.log('Auth object:', auth)
+    console.log('Current user:', auth.currentUser)
+    
+    if (auth) {
+      console.log('✅ Firebase Auth is working')
+    } else {
+      console.log('❌ Firebase Auth is not working')
     }
   }
 
@@ -761,6 +803,16 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       </svg>
                       <span>{isLoading ? 'Signing in...' : 'Continue with Google'}</span>
                     </div>
+                  </Button>
+
+                  {/* Test Firebase Button */}
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={testFirebase}
+                    className="w-full mt-4 bg-yellow-100/90 border-2 border-yellow-300/60 text-yellow-800 py-3 rounded-xl font-medium hover:bg-yellow-200/90 transition-all duration-200"
+                  >
+                    🧪 Test Firebase Connection
                   </Button>
                   </form>
                 </div>

@@ -68,6 +68,15 @@ app.use(helmet({
         "https://scontent-sea1-1.cdninstagram.com",
         "https://lh3.googleusercontent.com"
       ],
+      mediaSrc: [
+        "'self'",
+        "https:",
+        "blob:",
+        "https://*.fbcdn.net",
+        "https://*.cdninstagram.com",
+        "https://instagram.fixc1-*.fna.fbcdn.net",
+        "https://scontent*.cdninstagram.com"
+      ],
       connectSrc: [
         "'self'",
         "https:",
@@ -76,12 +85,18 @@ app.use(helmet({
         "https://identitytoolkit.googleapis.com",
         "https://securetoken.googleapis.com",
         "https://graph.instagram.com",
-        "https://api.instagram.com"
+        "https://api.instagram.com",
+        "https://veefore-b84c8.firebaseapp.com",
+        "https://*.firebaseapp.com",
+        "https://*.googleapis.com"
       ],
       frameSrc: [
         "'self'",
         "https://www.google.com",
-        "https://accounts.google.com"
+        "https://accounts.google.com",
+        "https://veefore-b84c8.firebaseapp.com",
+        "https://*.firebaseapp.com",
+        "https://*.googleapis.com"
       ],
       objectSrc: ["'none'"],
       // Add worker-src to allow service workers and web workers

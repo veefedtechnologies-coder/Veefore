@@ -4895,6 +4895,49 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Instagram user profile endpoint for comment replies
+  app.get('/api/instagram/user-profile', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[INSTAGRAM USER PROFILE] Request received:', req.query);
+      
+      const { user } = req;
+      const { workspaceId } = req.query;
+      
+      console.log('[INSTAGRAM USER PROFILE] User:', user?.id);
+      console.log('[INSTAGRAM USER PROFILE] Workspace ID:', workspaceId);
+      
+      if (!workspaceId) {
+        console.log('[INSTAGRAM USER PROFILE] No workspace ID provided');
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+
+      // Get the user's Instagram account
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId as string);
+      console.log('[INSTAGRAM USER PROFILE] Social accounts found:', socialAccounts.length);
+      
+      const instagramAccount = socialAccounts.find(account => account.platform === 'instagram');
+      console.log('[INSTAGRAM USER PROFILE] Instagram account:', instagramAccount ? 'Found' : 'Not found');
+      
+      if (!instagramAccount) {
+        console.log('[INSTAGRAM USER PROFILE] Instagram account not found for workspace:', workspaceId);
+        return res.status(404).json({ error: 'Instagram account not found' });
+      }
+
+      // For now, return stored data to test the endpoint
+      console.log('[INSTAGRAM USER PROFILE] Returning stored data');
+      res.json({
+        username: instagramAccount.username,
+        profile_picture_url: instagramAccount.profilePictureUrl || 'https://picsum.photos/40/40?random=instagram',
+        account_type: instagramAccount.accountType,
+        media_count: instagramAccount.mediaCount
+      });
+      
+    } catch (error) {
+      console.error('[INSTAGRAM USER PROFILE] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch Instagram user profile' });
+    }
+  });
+
   // YouTube detailed insights endpoint
   app.get('/api/youtube/detailed-insights', requireAuth, async (req: any, res: Response) => {
     try {

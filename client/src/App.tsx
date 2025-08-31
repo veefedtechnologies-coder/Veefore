@@ -37,6 +37,8 @@ import AdminLogin from './pages/AdminLogin'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
+import { getRedirectResult, auth } from './lib/firebase'
+import { useToast } from './hooks/use-toast'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -44,8 +46,12 @@ function App() {
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false)
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
+  const { toast } = useToast()
 
   console.log('App component rendering:', { location, user: !!user, loading })
+
+  // Google sign-in is now handled directly in SignIn.tsx with popup method
+  // No need for redirect result handling
 
   // Fetch user data when authenticated
   const { data: userData, isLoading: userDataLoading } = useQuery({
