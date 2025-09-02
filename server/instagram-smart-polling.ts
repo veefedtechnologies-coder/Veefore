@@ -76,32 +76,93 @@ export class InstagramSmartPolling {
       const allAccounts: any[] = [];
       console.log('[SMART POLLING] Discovering Instagram accounts across all workspaces...');
       
-      // Get Instagram accounts directly - known workspace ID for rahulc1020
-      const workspaceId = '684402c2fd2cd4eb6521b386'; // Your workspace ID from logs
-      const accounts = await this.storage.getSocialAccountsByWorkspace(workspaceId);
-      const instagramAccounts = accounts.filter(acc => 
-        acc.platform === 'instagram' && 
-        acc.accessToken && 
-        acc.username // Has basic data
-      );
+      // Get ALL workspaces by discovering from social accounts (better approach)
+      let allWorkspaces: any[] = [];
       
-      console.log(`[SMART POLLING] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspaceId}`);
-      
-      for (const account of instagramAccounts) {
-        allAccounts.push({
-          id: account.id,
-          accountId: account.accountId || account.id,
-          workspaceId: workspaceId,
-          username: account.username,
-          platform: account.platform,
-          accessToken: account.accessToken,
-          isActive: true, // Force active for polling
-          followersCount: account.followersCount || 0,
-          mediaCount: account.mediaCount || 0
-        });
-        console.log(`[SMART POLLING] Added account: @${account.username} for polling`);
+      try {
+        // First try to get all social accounts to discover workspaces
+        const allSocialAccounts = await this.storage.getAllSocialAccounts();
+        console.log(`[SMART POLLING] Found ${allSocialAccounts.length} total social accounts`);
+        
+        // Extract unique workspace IDs from social accounts
+        const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+        console.log(`[SMART POLLING] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
+        
+        // Get workspace details for each workspace ID
+        for (const workspaceId of workspaceIds) {
+          try {
+            const workspace = await this.storage.getWorkspace(workspaceId);
+            if (workspace) {
+              allWorkspaces.push(workspace);
+              console.log(`[SMART POLLING] Found workspace: ${workspace.name || workspaceId}`);
+            }
+          } catch (error) {
+            console.log(`[SMART POLLING] Could not get workspace ${workspaceId}:`, error.message);
+          }
+        }
+      } catch (error) {
+        console.log('[SMART POLLING] Fallback: trying common user IDs...');
+        // Fallback: Get ALL workspaces by trying multiple user IDs (workaround since getAllWorkspaces doesn't exist)
+        const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Try more user IDs
+        
+        for (const userId of userIds) {
+          try {
+            const userWorkspaces = await this.storage.getWorkspacesByUserId(userId);
+            if (userWorkspaces.length > 0) {
+              allWorkspaces = allWorkspaces.concat(userWorkspaces);
+              console.log(`[SMART POLLING] Found ${userWorkspaces.length} workspaces for user ${userId}`);
+            }
+          } catch (error) {
+            // Continue with other user IDs
+          }
+        }
       }
       
+      // Remove duplicates based on workspace ID
+      const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) => 
+        index === self.findIndex(w => w.id === workspace.id)
+      );
+      
+      allWorkspaces = uniqueWorkspaces;
+      console.log(`[SMART POLLING] Found ${allWorkspaces.length} total unique workspaces to scan`);
+      
+      // Scan each workspace for Instagram accounts
+      for (const workspace of allWorkspaces) {
+        try {
+          console.log(`[SMART POLLING] Scanning workspace: ${workspace.id} (${workspace.name || 'Unnamed'})`);
+          
+          const accounts = await this.storage.getSocialAccountsByWorkspace(workspace.id.toString());
+          const instagramAccounts = accounts.filter(acc => 
+            acc.platform === 'instagram' && 
+            acc.accessToken && 
+            acc.username // Has basic data
+          );
+          
+          if (instagramAccounts.length > 0) {
+            console.log(`[SMART POLLING] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspace.id}`);
+            
+            for (const account of instagramAccounts) {
+              allAccounts.push({
+                id: account.id,
+                accountId: account.accountId || account.id,
+                workspaceId: workspace.id.toString(),
+                username: account.username,
+                platform: account.platform,
+                accessToken: account.accessToken,
+                isActive: true, // Force active for polling
+                followersCount: account.followersCount || 0,
+                mediaCount: account.mediaCount || 0
+              });
+              console.log(`[SMART POLLING] Added account: @${account.username} from workspace ${workspace.id} for polling`);
+            }
+          }
+        } catch (workspaceError) {
+          console.error(`[SMART POLLING] Error scanning workspace ${workspace.id}:`, workspaceError);
+          // Continue with other workspaces
+        }
+      }
+      
+      console.log(`[SMART POLLING] Total Instagram accounts found across all workspaces: ${allAccounts.length}`);
       return allAccounts;
     } catch (error) {
       console.error('[SMART POLLING] Error getting Instagram accounts:', error);

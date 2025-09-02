@@ -62,7 +62,7 @@ export default function AutomationTest() {
   }
 
   const InstagramPostPreview = () => (
-    <div className="max-w-sm mx-auto bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-200">
+    <div className="max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       {/* Instagram Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
         <div className="flex items-center space-x-3">

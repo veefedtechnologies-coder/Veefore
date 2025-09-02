@@ -4,16 +4,16 @@ const quickActions = [
   {
     title: 'Create from scratch',
     icon: (
-      <div className="w-24 h-24 bg-red-100 rounded-2xl flex items-center justify-center relative">
+      <div className="w-24 h-24 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center relative">
         {/* Document/Paper base */}
-        <div className="w-14 h-16 bg-white border-2 border-gray-200 rounded-lg shadow-sm relative">
+        <div className="w-14 h-16 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg shadow-sm relative">
           {/* Header bar */}
           <div className="w-full h-3 bg-red-500 rounded-t-md"></div>
           {/* Content lines */}
           <div className="p-2 space-y-1">
-            <div className="w-8 h-1 bg-gray-300 rounded"></div>
-            <div className="w-6 h-1 bg-gray-300 rounded"></div>
-            <div className="w-10 h-1 bg-gray-300 rounded"></div>
+            <div className="w-8 h-1 bg-gray-300 dark:bg-gray-500 rounded"></div>
+            <div className="w-6 h-1 bg-gray-300 dark:bg-gray-500 rounded"></div>
+            <div className="w-10 h-1 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
         </div>
         {/* Pencil/Edit overlay */}
@@ -26,13 +26,13 @@ const quickActions = [
   {
     title: 'Post across networks',
     icon: (
-      <div className="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center relative">
+      <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center relative">
         {/* Main content area */}
-        <div className="w-14 h-10 bg-white border-2 border-gray-200 rounded-lg shadow-sm relative">
+        <div className="w-14 h-10 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg shadow-sm relative">
           {/* Content representation */}
           <div className="p-1.5">
             <div className="w-8 h-1 bg-blue-400 rounded mb-1"></div>
-            <div className="w-6 h-1 bg-gray-300 rounded"></div>
+            <div className="w-6 h-1 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
         </div>
         {/* Social network icons overlay */}
@@ -46,9 +46,9 @@ const quickActions = [
   {
     title: 'Post about a trend',
     icon: (
-      <div className="w-24 h-24 bg-pink-100 rounded-2xl flex items-center justify-center relative">
+      <div className="w-24 h-24 bg-pink-100 dark:bg-pink-900/30 rounded-2xl flex items-center justify-center relative">
         {/* Chart/Graph container */}
-        <div className="w-14 h-12 bg-white border-2 border-gray-200 rounded-lg shadow-sm relative p-2">
+        <div className="w-14 h-12 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg shadow-sm relative p-2">
           {/* Trending line chart */}
           <div className="w-full h-full relative">
             <div className="absolute bottom-0 left-1 w-6 h-4 bg-red-400 rounded-sm transform skew-x-12"></div>
@@ -66,13 +66,13 @@ const quickActions = [
   {
     title: 'Start with AI',
     icon: (
-      <div className="w-24 h-24 bg-purple-100 rounded-2xl flex items-center justify-center relative">
+      <div className="w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center relative">
         {/* Computer/Device */}
-        <div className="w-14 h-10 bg-white border-2 border-gray-200 rounded-lg shadow-sm relative">
+        <div className="w-14 h-10 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg shadow-sm relative">
           {/* Screen content */}
-          <div className="w-full h-6 bg-gradient-to-r from-purple-200 to-pink-200 rounded-t-md"></div>
+          <div className="w-full h-6 bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-300 dark:to-pink-300 rounded-t-md"></div>
           <div className="p-1">
-            <div className="w-8 h-1 bg-gray-300 rounded"></div>
+            <div className="w-8 h-1 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
         </div>
         {/* AI Sparkle/Magic overlay */}
@@ -94,7 +94,7 @@ export function QuickActions() {
         {quickActions.map((action, index) => (
           <button 
             key={index} 
-            className="group cursor-pointer bg-transparent hover:bg-gray-50/50 transition-all duration-200 p-8 rounded-2xl min-h-[200px] flex flex-col items-center justify-center"
+            className="group cursor-pointer bg-transparent hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-all duration-200 p-8 rounded-2xl min-h-[200px] flex flex-col items-center justify-center"
           >
             {/* Icon */}
             <div className="mb-8 flex justify-center">
@@ -103,7 +103,7 @@ export function QuickActions() {
 
             {/* Title */}
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-700 leading-tight">
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 leading-tight">
                 {action.title}
               </h3>
             </div>

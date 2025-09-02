@@ -886,7 +886,7 @@ export default function Automation() {
                         variant="ghost"
                         size="sm"
                         onClick={() => removeCommentReply(reply)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <X className="w-4 h-4" />
                       </Button>

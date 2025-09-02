@@ -279,83 +279,80 @@ const SignIn = ({ onNavigate }: SignInProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 relative overflow-hidden">
-      {/* Professional Light Background */}
-      <div className="absolute inset-0">
-        {/* Subtle gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-purple-50/30" />
-        
-        {/* Elegant floating elements */}
-        <div 
-          className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-100/40 to-purple-100/30 blur-3xl animate-pulse"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/30 relative overflow-hidden">
+      {/* Animated background gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-purple-50/30 dark:from-blue-900/20 dark:via-transparent dark:to-purple-900/20" />
+      
+      {/* Floating animated elements */}
+      <div 
+        className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-100/40 to-purple-100/30 dark:from-blue-900/20 dark:to-purple-900/20 blur-3xl animate-pulse"
+        style={{ 
+          top: `${mousePosition.y * 0.1}px`, 
+          left: `${mousePosition.x * 0.1}px`,
+          animationDelay: '0s'
+        }} 
+      />
+      <div 
+        className="absolute w-80 h-80 rounded-full bg-gradient-to-r from-violet-100/30 to-blue-100/40 dark:from-violet-900/20 dark:to-blue-900/20 blur-2xl animate-pulse delay-1000"
+        style={{ 
+          top: `${mousePosition.y * 0.2}px`, 
+          right: `${mousePosition.x * 0.15}px`,
+          animationDelay: '1s'
+        }} 
+      />
+
+      {/* Advanced animated grid pattern */}
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `
+          radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.3) 1px, transparent 0),
+          linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+          linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '60px 60px, 30px 30px, 30px 30px',
+        animation: 'gridMove 30s linear infinite'
+      }} />
+
+      {/* Interactive floating particles */}
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
           style={{
-            left: `${25 + mousePosition.x * 0.01}%`,
-            top: `${15 + mousePosition.y * 0.01}%`,
-            transform: 'translate(-50%, -50%)'
+            left: `${10 + (i * 6)}%`,
+            top: `${20 + Math.sin(i) * 30}%`,
+            animation: `particles-float ${3 + (i % 3)}s ease-in-out infinite`,
+            animationDelay: `${i * 0.5}s`
           }}
         />
-        <div 
-          className="absolute w-80 h-80 rounded-full bg-gradient-to-r from-violet-100/30 to-blue-100/40 blur-2xl animate-pulse delay-1000"
-          style={{
-            right: `${15 + mousePosition.x * 0.008}%`,
-            bottom: `${25 + mousePosition.y * 0.008}%`,
-            transform: 'translate(50%, 50%)'
-          }}
-        />
+      ))}
 
-        {/* Advanced animated grid pattern */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{
-          backgroundImage: `
-            radial-gradient(circle at 2px 2px, rgba(99, 102, 241, 0.3) 1px, transparent 0),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-            linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px, 30px 30px, 30px 30px',
-          animation: 'gridMove 30s linear infinite'
-        }} />
-
-        {/* Interactive floating particles */}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-            style={{
-              left: `${10 + (i * 6)}%`,
-              top: `${20 + Math.sin(i) * 30}%`,
-              animation: `particles-float ${3 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.5}s`
-            }}
-          />
-        ))}
-
-        {/* Dynamic mesh overlay */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            background: `
-              radial-gradient(circle at ${25 + mousePosition.x * 0.02}% ${25 + mousePosition.y * 0.02}%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
-              radial-gradient(circle at ${75 + mousePosition.x * 0.015}% ${75 + mousePosition.y * 0.015}%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)
-            `
-          }}
-        />
-      </div>
+      {/* Dynamic mesh overlay */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          background: `
+            radial-gradient(circle at ${25 + mousePosition.x * 0.02}% ${25 + mousePosition.y * 0.02}%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at ${75 + mousePosition.x * 0.015}% ${75 + mousePosition.y * 0.015}%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)
+          `
+        }}
+      />
 
       {/* Professional Navigation */}
       <nav className="relative z-50 w-full px-6 py-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button 
             onClick={handleBackToLanding}
-            className="group flex items-center space-x-3 text-gray-600 hover:text-gray-900 transition-all duration-300"
+            className="group flex items-center space-x-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-300"
           >
-            <div className="w-11 h-11 rounded-2xl bg-white/90 backdrop-blur-xl border border-gray-200/60 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+            <div className="w-11 h-11 rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/60 dark:border-gray-700/60 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
               <ArrowLeft className="w-5 h-5" />
             </div>
             <span className="font-semibold text-lg">Back to VeeFore</span>
           </button>
 
-          <div className="flex items-center space-x-4 bg-white/80 backdrop-blur-xl rounded-2xl px-6 py-3 border border-gray-200/50 shadow-lg">
+          <div className="flex items-center space-x-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl px-6 py-3 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
             <img src={veeforceLogo} alt="VeeFore" className="w-10 h-10" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
               VeeFore
             </span>
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
@@ -593,16 +590,16 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 </div>
 
                 {/* Completely New Card-Style Sign In Form */}
-                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-8 rounded-3xl border border-blue-100/50 shadow-xl backdrop-blur-sm">
+                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-900/30 dark:to-indigo-900/30 p-8 rounded-3xl border border-blue-100/50 dark:border-blue-600/50 shadow-xl backdrop-blur-sm">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Card-Style Email Field */}
                     <div className="space-y-3">
-                      <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+                      <label className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                         Email Address
                       </label>
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                           </svg>
                         </div>
@@ -613,13 +610,13 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           onFocus={() => setFocusedField('email')}
                           onBlur={() => setFocusedField('')}
-                          className={`w-full pl-12 pr-12 py-4 bg-white/90 border-2 ${
+                          className={`w-full pl-12 pr-12 py-4 bg-white/90 dark:bg-gray-800/90 border-2 ${
                             errors.email 
                               ? 'border-red-400 focus:border-red-500' 
                               : focusedField === 'email'
                                 ? 'border-blue-500 focus:border-blue-600'
-                                : 'border-transparent hover:border-blue-200'
-                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
+                                : 'border-transparent hover:border-blue-200 dark:hover:border-blue-600'
+                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 dark:text-gray-100 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
                           placeholder="Enter your email address"
                         />
                         
@@ -645,12 +642,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       
                       {/* Enhanced Error Display */}
                       {errors.email && (
-                        <div className="bg-red-100/80 border border-red-300/50 rounded-xl p-3 flex items-start space-x-3">
-                          <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="bg-red-100/80 dark:bg-red-900/30 border border-red-300/50 dark:border-red-600/50 rounded-xl p-3 flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
                           <div>
-                            <p className="text-red-800 text-sm font-medium">{errors.email}</p>
+                            <p className="text-red-800 dark:text-red-200 text-sm font-medium">{errors.email}</p>
                           </div>
                         </div>
                       )}
@@ -659,12 +656,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     {/* Card-Style Password Field */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+                        <label className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                           Password
                         </label>
                         <Link 
                           href="/forgot-password" 
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline transition-colors bg-blue-100/50 hover:bg-blue-200/50 px-3 py-1 rounded-full"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium hover:underline transition-colors bg-blue-100/50 dark:bg-blue-900/30 hover:bg-blue-200/50 dark:hover:bg-blue-800/30 px-3 py-1 rounded-full"
                         >
                           Forgot?
                         </Link>
@@ -672,7 +669,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
                         </div>
@@ -683,13 +680,13 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                           onChange={(e) => handleInputChange('password', e.target.value)}
                           onFocus={() => setFocusedField('password')}
                           onBlur={() => setFocusedField('')}
-                          className={`w-full pl-12 pr-16 py-4 bg-white/90 border-2 ${
+                          className={`w-full pl-12 pr-16 py-4 bg-white/90 dark:bg-gray-800/90 border-2 ${
                             errors.password 
                               ? 'border-red-400 focus:border-red-500' 
                               : focusedField === 'password'
                                 ? 'border-blue-500 focus:border-blue-600'
-                                : 'border-transparent hover:border-blue-200'
-                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
+                                : 'border-transparent hover:border-blue-200 dark:hover:border-blue-600'
+                          } rounded-2xl focus:outline-none transition-all duration-300 text-gray-900 dark:text-gray-100 text-base shadow-lg hover:shadow-xl focus:shadow-2xl`}
                           placeholder="Enter your password"
                         />
                         
@@ -697,7 +694,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-200/80 hover:bg-gray-300/80 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-300"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-200/80 dark:bg-gray-700/80 hover:bg-gray-300/80 dark:hover:bg-gray-600/80 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-300"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -705,17 +702,17 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       
                       {/* Enhanced Password Strength */}
                       {formData.password && (
-                        <div className="bg-white/60 rounded-xl p-3 border border-gray-200/50">
+                        <div className="bg-white/60 dark:bg-gray-700/60 rounded-xl p-3 border border-gray-200/50 dark:border-gray-600/50">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-semibold text-gray-700">Password Strength</span>
+                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Password Strength</span>
                             <span className={`text-xs font-bold ${
                               formData.password.length >= 8 
-                                ? 'text-emerald-600' 
+                                ? 'text-emerald-600 dark:text-emerald-400' 
                                 : formData.password.length >= 6 
-                                  ? 'text-amber-600'
+                                  ? 'text-amber-600 dark:text-amber-400'
                                   : formData.password.length >= 4
-                                    ? 'text-orange-600'
-                                    : 'text-red-600'
+                                    ? 'text-orange-600 dark:text-orange-400'
+                                    : 'text-red-600 dark:text-red-400'
                             }`}>
                               {formData.password.length >= 8 
                                 ? 'STRONG' 
@@ -739,7 +736,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                                         : formData.password.length >= 4
                                           ? 'bg-orange-500'
                                           : 'bg-red-500'
-                                    : 'bg-gray-200'
+                                    : 'bg-gray-200 dark:bg-gray-600'
                                 }`}
                               />
                             ))}
@@ -749,12 +746,12 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                       
                       {/* Enhanced Error Display */}
                       {errors.password && (
-                        <div className="bg-red-100/80 border border-red-300/50 rounded-xl p-3 flex items-start space-x-3">
-                          <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="bg-red-100/80 dark:bg-red-900/30 border border-red-300/50 dark:border-red-600/50 rounded-xl p-3 flex items-start space-x-3">
+                          <svg className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                           </svg>
                           <div>
-                            <p className="text-red-800 text-sm font-medium">{errors.password}</p>
+                            <p className="text-red-800 dark:text-red-200 text-sm font-medium">{errors.password}</p>
                           </div>
                         </div>
                       )}
@@ -779,10 +776,10 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                   {/* Clean Divider */}
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200" />
+                      <div className="w-full border-t border-gray-200 dark:border-gray-600" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-4 text-gray-500 font-medium bg-white">or</span>
+                      <span className="px-4 text-gray-500 dark:text-gray-400 font-medium bg-white dark:bg-gray-800">or</span>
                     </div>
                   </div>
 
@@ -792,7 +789,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     variant="outline"
                     disabled={isLoading}
                     onClick={handleGoogleSignIn}
-                    className="w-full bg-white/90 backdrop-blur-xl border-2 border-gray-200/60 text-gray-700 py-6 rounded-2xl font-bold text-xl hover:bg-gray-50/90 hover:border-gray-300/60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50"
+                    className="w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border-2 border-gray-200/60 dark:border-gray-600/60 text-gray-700 dark:text-gray-300 py-6 rounded-2xl font-bold text-xl hover:bg-gray-50/90 dark:hover:bg-gray-700/90 hover:border-gray-300/60 dark:hover:border-gray-500/60 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50"
                   >
                     <div className="flex items-center justify-center space-x-4">
                       <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -810,7 +807,7 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                     type="button" 
                     variant="outline"
                     onClick={testFirebase}
-                    className="w-full mt-4 bg-yellow-100/90 border-2 border-yellow-300/60 text-yellow-800 py-3 rounded-xl font-medium hover:bg-yellow-200/90 transition-all duration-200"
+                    className="w-full mt-4 bg-yellow-100/90 dark:bg-yellow-900/30 border-2 border-yellow-300/60 dark:border-yellow-600/60 text-yellow-800 dark:text-yellow-200 py-3 rounded-xl font-medium hover:bg-yellow-200/90 dark:hover:bg-yellow-800/30 transition-all duration-200"
                   >
                     🧪 Test Firebase Connection
                   </Button>
@@ -819,11 +816,11 @@ const SignIn = ({ onNavigate }: SignInProps) => {
 
                 {/* Sign Up Link */}
                 <div className="text-center mt-10">
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Don't have an account?{' '}
                     <button 
                       onClick={() => onNavigate('signup')}
-                      className="text-blue-600 hover:text-blue-700 font-bold hover:underline transition-colors"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold hover:underline transition-colors"
                     >
                       Get early access
                     </button>
@@ -831,11 +828,11 @@ const SignIn = ({ onNavigate }: SignInProps) => {
                 </div>
 
                 {/* Terms */}
-                <p className="text-xs text-gray-500 mt-8 text-center leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-8 text-center leading-relaxed">
                   By signing in, you agree to our{' '}
-                  <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>{' '}
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">Terms of Service</a>{' '}
                   and{' '}
-                  <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>
                 </p>
               </div>
             </div>

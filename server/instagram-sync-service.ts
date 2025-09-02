@@ -189,25 +189,163 @@ export class InstagramSyncService {
   }
 
   async syncAllInstagramAccounts() {
-    console.log('[INSTAGRAM SYNC] Starting sync for all Instagram accounts');
+    console.log('[INSTAGRAM SYNC] Starting sync for all Instagram accounts across all workspaces');
     
-    const socialAccounts = await this.storage.getAllSocialAccounts();
-    const instagramAccounts = socialAccounts.filter(acc => 
-      acc.platform === 'instagram' && acc.isActive
-    );
+    try {
+      // Get ALL workspaces by discovering from social accounts (better approach)
+      let allWorkspaces: any[] = [];
+      
+      try {
+        // First try to get all social accounts to discover workspaces
+        const allSocialAccounts = await this.storage.getAllSocialAccounts();
+        console.log(`[INSTAGRAM SYNC] Found ${allSocialAccounts.length} total social accounts`);
+        
+        // Extract unique workspace IDs from social accounts
+        const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+        console.log(`[INSTAGRAM SYNC] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
+        
+        // Get workspace details for each workspace ID
+        for (const workspaceId of workspaceIds) {
+          try {
+            const workspace = await this.storage.getWorkspace(workspaceId);
+            if (workspace) {
+              allWorkspaces.push(workspace);
+              console.log(`[INSTAGRAM SYNC] Found workspace: ${workspace.name || workspaceId}`);
+            }
+          } catch (error) {
+            console.log(`[INSTAGRAM SYNC] Could not get workspace ${workspaceId}:`, error.message);
+          }
+        }
+      } catch (error) {
+        console.log('[INSTAGRAM SYNC] Fallback: trying common user IDs...');
+        // Fallback: Get ALL workspaces by trying multiple user IDs (workaround since getAllWorkspaces doesn't exist)
+        const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Try more user IDs
+        
+        for (const userId of userIds) {
+          try {
+            const userWorkspaces = await this.storage.getWorkspacesByUserId(userId);
+            if (userWorkspaces.length > 0) {
+              allWorkspaces = allWorkspaces.concat(userWorkspaces);
+              console.log(`[INSTAGRAM SYNC] Found ${userWorkspaces.length} workspaces for user ${userId}`);
+            }
+          } catch (error) {
+            // Continue with other user IDs
+          }
+        }
+      }
+      
+      // Remove duplicates based on workspace ID
+      const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) => 
+        index === self.findIndex(w => w.id === workspace.id)
+      );
+      
+      allWorkspaces = uniqueWorkspaces;
+      console.log(`[INSTAGRAM SYNC] Found ${allWorkspaces.length} unique workspaces to scan`);
+      
+      let totalAccounts = 0;
+      let syncedAccounts = 0;
+      
+      for (const workspace of allWorkspaces) {
+        try {
+          console.log(`[INSTAGRAM SYNC] Scanning workspace: ${workspace.id} (${workspace.name || 'Unnamed'})`);
+          
+          const socialAccounts = await this.storage.getSocialAccountsByWorkspace(workspace.id.toString());
+          const instagramAccounts = socialAccounts.filter(acc => 
+            acc.platform === 'instagram' && acc.isActive && acc.accessToken
+          );
+          
+          if (instagramAccounts.length > 0) {
+            console.log(`[INSTAGRAM SYNC] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspace.id}`);
+            totalAccounts += instagramAccounts.length;
+            
+            for (const account of instagramAccounts) {
+              try {
+                console.log(`[INSTAGRAM SYNC] Syncing @${account.username} from workspace ${workspace.id}`);
+                await this.syncInstagramAccountData(account.accountId, account.accessToken);
+                syncedAccounts++;
+                
+                // Add delay to respect API rate limits
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              } catch (error) {
+                console.error(`[INSTAGRAM SYNC] Failed to sync @${account.username} from workspace ${workspace.id}:`, error);
+              }
+            }
+          }
+        } catch (workspaceError) {
+          console.error(`[INSTAGRAM SYNC] Error scanning workspace ${workspace.id}:`, workspaceError);
+          // Continue with other workspaces
+        }
+      }
+      
+      console.log(`[INSTAGRAM SYNC] Completed sync: ${syncedAccounts}/${totalAccounts} accounts synced across ${allWorkspaces.length} workspaces`);
+    } catch (error) {
+      console.error('[INSTAGRAM SYNC] Error during workspace discovery:', error);
+    }
+  }
 
-    console.log(`[INSTAGRAM SYNC] Found ${instagramAccounts.length} Instagram accounts to sync`);
+  // Sync Instagram accounts for a specific workspace
+  async syncInstagramAccountsForWorkspace(workspaceId: string) {
+    try {
+      console.log(`[INSTAGRAM SYNC] Starting sync for workspace: ${workspaceId}`);
+      
+      const socialAccounts = await this.storage.getSocialAccountsByWorkspace(workspaceId);
+    const instagramAccounts = socialAccounts.filter(acc => 
+        acc.platform === 'instagram' && acc.isActive && acc.accessToken
+      );
+      
+      if (instagramAccounts.length === 0) {
+        console.log(`[INSTAGRAM SYNC] No Instagram accounts found in workspace ${workspaceId}`);
+        return { success: false, message: 'No Instagram accounts found' };
+      }
+      
+      console.log(`[INSTAGRAM SYNC] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspaceId}`);
+      
+      let syncedAccounts = 0;
+      const results = [];
 
     for (const account of instagramAccounts) {
       try {
+          console.log(`[INSTAGRAM SYNC] Syncing @${account.username} from workspace ${workspaceId}`);
         await this.syncInstagramAccountData(account.accountId, account.accessToken);
+          syncedAccounts++;
+          
+          // Get updated account data
+          const updatedAccount = await this.storage.getSocialAccount(account.id);
+          results.push({
+            username: updatedAccount.username,
+            followers: updatedAccount.followersCount,
+            engagement: updatedAccount.avgEngagement,
+            reach: updatedAccount.totalReach,
+            posts: updatedAccount.mediaCount
+          });
+          
         // Add delay to respect API rate limits
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`[INSTAGRAM SYNC] Failed to sync ${account.username}:`, error);
+          console.error(`[INSTAGRAM SYNC] Failed to sync @${account.username} from workspace ${workspaceId}:`, error);
+          results.push({
+            username: account.username,
+            error: error.message
+          });
+        }
       }
+      
+      console.log(`[INSTAGRAM SYNC] Completed sync for workspace ${workspaceId}: ${syncedAccounts}/${instagramAccounts.length} accounts synced`);
+      
+      return {
+        success: true,
+        message: `Synced ${syncedAccounts} Instagram accounts`,
+        syncedAccounts,
+        totalAccounts: instagramAccounts.length,
+        results
+      };
+    } catch (error) {
+      console.error(`[INSTAGRAM SYNC] Error syncing workspace ${workspaceId}:`, error);
+      return {
+        success: false,
+        message: error.message,
+        error: error.message
+      };
     }
-
-    console.log('[INSTAGRAM SYNC] Completed sync for all accounts');
   }
 }

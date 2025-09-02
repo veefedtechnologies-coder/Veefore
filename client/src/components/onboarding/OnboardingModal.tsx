@@ -16,43 +16,17 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   console.log('✅ SIMPLE MODAL - rendering now!')
   
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 99999
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        maxWidth: '400px',
-        width: '90%'
-      }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[99999]">
+      <div className="bg-white dark:bg-gray-800 p-5 rounded-lg max-w-md w-[90%] shadow-xl">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           🎉 Onboarding Test Works!
         </h2>
-        <p style={{ marginBottom: '16px', color: '#666' }}>
+        <p className="mb-4 text-gray-600 dark:text-gray-400">
           The strict signup flow is working correctly.
         </p>
         <button 
           onClick={onClose}
-          style={{
-            backgroundColor: '#059669',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer',
-            width: '100%',
-            fontSize: '16px'
-          }}
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded text-base font-medium transition-colors duration-200"
         >
           Complete Onboarding
         </button>

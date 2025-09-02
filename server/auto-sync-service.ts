@@ -18,14 +18,16 @@ class AutoSyncService {
   }
 
   start() {
-    console.log('[AUTO SYNC] ❌ AUTO-SYNC DISABLED - Using webhook-based real-time updates instead');
-    console.log('[AUTO SYNC] Webhooks provide efficient data syncing only when Instagram sends notifications');
+    console.log('[AUTO SYNC] ✅ Starting automatic Instagram data synchronization service...');
+    console.log('[AUTO SYNC] Will sync data every 1 minute to ensure fresh metrics');
     
-    // Do not start interval-based syncing - webhooks handle real-time updates
-    // this.performAutoSync();
-    // this.syncInterval = setInterval(() => {
-    //   this.performAutoSync();
-    // }, this.SYNC_INTERVAL_MS);
+    // Start interval-based syncing for immediate data updates
+    this.performAutoSync(); // Run immediately on startup
+    this.syncInterval = setInterval(() => {
+      this.performAutoSync();
+    }, this.SYNC_INTERVAL_MS);
+    
+    console.log('[AUTO SYNC] ✅ Auto-sync service started successfully');
   }
 
   stop() {
@@ -38,21 +40,94 @@ class AutoSyncService {
 
   private async performAutoSync() {
     try {
-      console.log('[AUTO SYNC] Performing automatic Instagram data sync...');
+      console.log('[AUTO SYNC] Performing automatic Instagram data sync across all workspaces...');
       
-      // Get all active Instagram accounts
-      const allSocialAccounts = await this.storage.getAllSocialAccounts();
-      const instagramAccounts = allSocialAccounts.filter(
-        (acc: any) => acc.platform === 'instagram' && acc.isActive && acc.accessToken
-      );
-
-      console.log(`[AUTO SYNC] Found ${instagramAccounts.length} active Instagram accounts to sync`);
-
-      for (const account of instagramAccounts) {
-        await this.syncInstagramAccount(account);
+      // Get ALL workspaces by discovering from social accounts (better approach)
+      let allWorkspaces: any[] = [];
+      
+      try {
+        // First try to get all social accounts to discover workspaces
+        const allSocialAccounts = await this.storage.getAllSocialAccounts();
+        console.log(`[AUTO SYNC] Found ${allSocialAccounts.length} total social accounts`);
+        
+        // Extract unique workspace IDs from social accounts
+        const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+        console.log(`[AUTO SYNC] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
+        
+        // Get workspace details for each workspace ID
+        for (const workspaceId of workspaceIds) {
+          try {
+            const workspace = await this.storage.getWorkspace(workspaceId);
+            if (workspace) {
+              allWorkspaces.push(workspace);
+              console.log(`[AUTO SYNC] Found workspace: ${workspace.name || workspaceId}`);
+            }
+          } catch (error) {
+            console.log(`[AUTO SYNC] Could not get workspace ${workspaceId}:`, error.message);
+          }
+        }
+      } catch (error) {
+        console.log('[AUTO SYNC] Fallback: trying common user IDs...');
+        // Fallback: Get ALL workspaces by trying multiple user IDs (workaround since getAllWorkspaces doesn't exist)
+        const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Try more user IDs
+        
+        for (const userId of userIds) {
+          try {
+            const userWorkspaces = await this.storage.getWorkspacesByUserId(userId);
+            if (userWorkspaces.length > 0) {
+              allWorkspaces = allWorkspaces.concat(userWorkspaces);
+              console.log(`[AUTO SYNC] Found ${userWorkspaces.length} workspaces for user ${userId}`);
+            }
+          } catch (error) {
+            // Continue with other user IDs
+          }
+        }
       }
-
-      console.log('[AUTO SYNC] Completed automatic sync cycle');
+      
+      // Remove duplicates based on workspace ID
+      const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) => 
+        index === self.findIndex(w => w.id === workspace.id)
+      );
+      
+      allWorkspaces = uniqueWorkspaces;
+      console.log(`[AUTO SYNC] Found ${allWorkspaces.length} unique workspaces to scan`);
+      
+      let totalAccounts = 0;
+      let syncedAccounts = 0;
+      
+      for (const workspace of allWorkspaces) {
+        try {
+          console.log(`[AUTO SYNC] Scanning workspace: ${workspace.id} (${workspace.name || 'Unnamed'})`);
+          
+          const socialAccounts = await this.storage.getSocialAccountsByWorkspace(workspace.id.toString());
+          const instagramAccounts = socialAccounts.filter(
+            (acc: any) => acc.platform === 'instagram' && acc.isActive && acc.accessToken
+          );
+          
+          if (instagramAccounts.length > 0) {
+            console.log(`[AUTO SYNC] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspace.id}`);
+            totalAccounts += instagramAccounts.length;
+            
+            for (const account of instagramAccounts) {
+              try {
+                console.log(`[AUTO SYNC] Syncing @${account.username} from workspace ${workspace.id}`);
+                await this.syncInstagramAccount(account);
+                syncedAccounts++;
+                
+                // Add delay to respect API rate limits
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              } catch (error) {
+                console.error(`[AUTO SYNC] Failed to sync @${account.username} from workspace ${workspace.id}:`, error);
+              }
+            }
+          }
+        } catch (workspaceError) {
+          console.error(`[AUTO SYNC] Error scanning workspace ${workspace.id}:`, workspaceError);
+          // Continue with other workspaces
+        }
+      }
+      
+      console.log(`[AUTO SYNC] Completed automatic sync cycle: ${syncedAccounts}/${totalAccounts} accounts synced across ${allWorkspaces.length} workspaces`);
     } catch (error: any) {
       console.error('[AUTO SYNC] Error during automatic sync:', error.message);
     }

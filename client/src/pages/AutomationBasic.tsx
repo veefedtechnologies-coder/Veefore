@@ -177,7 +177,7 @@ export default function AutomationBasic() {
                   onChange(option.value)
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors"
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {option.icon && <span className="text-gray-500">{option.icon}</span>}

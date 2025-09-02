@@ -57,23 +57,23 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex items-center space-x-4 cursor-pointer hover:bg-gray-50/80 rounded-2xl px-4 py-3 transition-all duration-300 group shadow-sm hover:shadow-md">
+        <div className="flex items-center space-x-4 cursor-pointer hover:bg-gray-50/80 dark:hover:bg-gray-800/80 rounded-2xl px-4 py-3 transition-all duration-300 group shadow-sm hover:shadow-md">
           <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-700 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 flex items-center justify-center">
             <span className="text-white font-bold text-lg">{initials}</span>
           </div>
-          <ChevronDown className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors duration-300" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300" />
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 bg-white" align="end" forceMount>
+      <DropdownMenuContent className="w-64 bg-white dark:bg-gray-800" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{displayName}</p>
+            <p className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">{userData?.email}</p>
             <div className="flex items-center space-x-2 mt-2">
-              <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+              <div className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded-full font-medium">
                 {userData?.plan || 'Free'} Plan
               </div>
-              <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+              <div className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded-full font-medium">
                 {userData?.credits || 0} Credits
               </div>
             </div>

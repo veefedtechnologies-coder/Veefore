@@ -36,9 +36,12 @@ import AdminPanel from './pages/AdminPanel'
 import AdminLogin from './pages/AdminLogin'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
+import Settings from './pages/Settings'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 import { getRedirectResult, auth } from './lib/firebase'
 import { useToast } from './hooks/use-toast'
+import { initializeTheme } from './lib/theme'
+import { useTheme } from './hooks/useTheme'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -47,6 +50,12 @@ function App() {
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
   const { toast } = useToast()
+  const { mounted } = useTheme()
+
+  // Initialize theme system
+  useEffect(() => {
+    initializeTheme()
+  }, [])
 
   console.log('App component rendering:', { location, user: !!user, loading })
 
@@ -195,11 +204,11 @@ function App() {
           <LoadingSpinner />
         ) : user && userData ? (
           // ONBOARDED users see dashboard
-          <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
             {/* Sidebar - Fixed height with independent scrolling */}
-            <div className="h-screen overflow-y-auto bg-white">
+            <div className="h-screen overflow-y-auto bg-white dark:bg-gray-800 transition-colors duration-300">
               <Sidebar 
-                className="w-24 bg-white h-full"
+                className="w-24 bg-white dark:bg-gray-800 h-full transition-colors duration-300"
                 isCreateDropdownOpen={isCreateDropdownOpen}
                 setIsCreateDropdownOpen={setIsCreateDropdownOpen}
               />
@@ -222,7 +231,7 @@ function App() {
               )}
 
               {/* Main Content - Scrollable */}
-              <main className="flex-1 overflow-y-auto p-6">
+              <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <>
                   {/* Quick Actions - Top Section */}
                   <div className="mb-8">
@@ -297,16 +306,16 @@ function App() {
       {/* Protected routes with sidebar layout - STRICT: only accessible when authenticated AND onboarded */}
       {user && userData && userData.isOnboarded && (
         <>
-          <Route path="/plan">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/plan">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
               {/* Main Content Area - Independent scrolling */}
               <div className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -324,16 +333,16 @@ function App() {
                   />
                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-6">
-                    <Tabs defaultValue="calendar" className="w-full">
-                      <TabsList className="bg-white border border-gray-200">
-                        <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                        <TabsTrigger value="drafts">Drafts</TabsTrigger>
-                        <TabsTrigger value="content">Content</TabsTrigger>
-                        <TabsTrigger value="dm-automation">DM automation</TabsTrigger>
-                      </TabsList>
+                                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <div className="space-y-6">
+                     <Tabs defaultValue="calendar" className="w-full">
+                       <TabsList className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                         <TabsTrigger value="calendar">Calendar</TabsTrigger>
+                         <TabsTrigger value="drafts">Drafts</TabsTrigger>
+                         <TabsTrigger value="content">Content</TabsTrigger>
+                         <TabsTrigger value="dm-automation">DM automation</TabsTrigger>
+                       </TabsList>
                       <TabsContent value="calendar" className="mt-6">
                         <CalendarView />
                       </TabsContent>
@@ -343,18 +352,18 @@ function App() {
                           <Drafts />
                         </div>
                       </TabsContent>
-                      <TabsContent value="content" className="mt-6">
-                        <div className="text-center py-12">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Library</h3>
-                          <p className="text-gray-600">Manage your content library and templates here.</p>
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="dm-automation" className="mt-6">
-                        <div className="text-center py-12">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">DM Automation</h3>
-                          <p className="text-gray-600">Set up automated direct message responses.</p>
-                        </div>
-                      </TabsContent>
+                                             <TabsContent value="content" className="mt-6">
+                         <div className="text-center py-12">
+                           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Content Library</h3>
+                           <p className="text-gray-600 dark:text-gray-400">Manage your content library and templates here.</p>
+                         </div>
+                       </TabsContent>
+                       <TabsContent value="dm-automation" className="mt-6">
+                         <div className="text-center py-12">
+                           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">DM Automation</h3>
+                           <p className="text-gray-600 dark:text-gray-400">Set up automated direct message responses.</p>
+                         </div>
+                       </TabsContent>
                     </Tabs>
                   </div>
                 </main>
@@ -362,126 +371,126 @@ function App() {
             </div>
           </Route>
           
-          <Route path="/create">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/create">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <CreatePost />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <CreatePost />
+                 </main>
+               </div>
+             </div>
+           </Route>
           
-          <Route path="/analytics">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/analytics">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <AnalyticsDashboard />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <AnalyticsDashboard />
+                 </main>
+               </div>
+             </div>
+           </Route>
           
-          <Route path="/inbox">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/inbox">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <div className="text-center py-12">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Inbox 2.0</h3>
-                    <p className="text-gray-600">Manage your social media conversations here.</p>
-                  </div>
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <div className="text-center py-12">
+                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Inbox 2.0</h3>
+                     <p className="text-gray-600 dark:text-gray-400">Manage your social media conversations here.</p>
+                   </div>
+                 </main>
+               </div>
+             </div>
+           </Route>
           
 
           
-          <Route path="/video-generator">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/video-generator">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
               {/* Main Content Area - Cosmos Studio interface without VeeFore header */}
               <div className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -502,196 +511,237 @@ function App() {
             </div>
           </Route>
           
-          <Route path="/workspaces">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/workspaces">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <Workspaces />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <Workspaces />
+                 </main>
+               </div>
+             </div>
+           </Route>
 
 
 
-          <Route path="/profile">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/profile">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <Profile />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <Profile />
+                 </main>
+               </div>
+             </div>
+           </Route>
 
-          <Route path="/integration">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/integration">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <Integration />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <Integration />
+                 </main>
+               </div>
+             </div>
+           </Route>
 
-          <Route path="/automation">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/automation">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto">
-                  <AutomationStepByStep />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <AutomationStepByStep />
+                 </main>
+               </div>
+             </div>
+           </Route>
 
-          {/* VeeGPT Route - with main sidebar */}
-          <Route path="/veegpt">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     {/* VeeGPT Route - with main sidebar */}
+           <Route path="/veegpt">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - VeeGPT takes full remaining space */}
-              <div className="flex-1 h-screen overflow-hidden">
-                <VeeGPT />
-              </div>
-            </div>
-          </Route>
+               {/* Main Content Area - VeeGPT takes full remaining space */}
+               <div className="flex-1 h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                 <VeeGPT />
+               </div>
+             </div>
+           </Route>
 
-          <Route path="/integrations">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden relative">
-              {/* Sidebar - Fixed height with independent scrolling */}
-              <div className="h-screen overflow-y-auto">
-                <Sidebar 
-                  className="w-24 bg-white border-r border-gray-200 h-full shadow-sm"
-                  isCreateDropdownOpen={isCreateDropdownOpen}
-                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
-                />
-              </div>
+                     <Route path="/integrations">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
 
-              {/* Main Content Area - Independent scrolling */}
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header */}
-                <Header 
-                  onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-                />
-                
-                {/* Create Dropdown */}
-                {isCreateDropdownOpen && (
-                  <CreateDropdown
-                    isOpen={isCreateDropdownOpen}
-                    onClose={() => setIsCreateDropdownOpen(false)}
-                    onOptionSelect={handleCreateOptionSelect}
-                  />
-                )}
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={handleCreateOptionSelect}
+                   />
+                 )}
 
-                {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6">
-                  <Integration />
-                </main>
-              </div>
-            </div>
-          </Route>
+                 {/* Main Content - Scrollable */}
+                 <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   <Integration />
+                 </main>
+               </div>
+             </div>
+           </Route>
+
+                     <Route path="/settings">
+             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+               {/* Sidebar - Fixed height with independent scrolling */}
+               <div className="h-screen overflow-y-auto">
+                 <Sidebar 
+                   className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                   isCreateDropdownOpen={isCreateDropdownOpen}
+                   setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                 />
+               </div>
+
+               {/* Main Content Area - Independent scrolling */}
+               <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                 {/* Header */}
+                 <Header 
+                   onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
+                 />
+                 
+                 {/* Create Dropdown */}
+                 {isCreateDropdownOpen && (
+                   <CreateDropdown
+                     isOpen={isCreateDropdownOpen}
+                     onClose={() => setIsCreateDropdownOpen(false)}
+                     onOptionSelect={(option) => {
+                       setIsCreateDropdownOpen(false)
+                       // Handle navigation based on option
+                       if (option === 'post') setLocation('/create')
+                       if (option === 'automation') setLocation('/automation')
+                       if (option === 'video') setLocation('/video-generator')
+                     }}
+                   />
+                 )}
+                 
+                 {/* Page Content */}
+                 <div className="flex-1 overflow-y-auto">
+                   <Settings />
+                 </div>
+               </div>
+             </div>
+           </Route>
 
           {/* Privacy Policy Route - Public access */}
           <Route path="/privacy-policy">

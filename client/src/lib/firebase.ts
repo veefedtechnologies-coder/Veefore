@@ -26,9 +26,12 @@ console.log('🔧 Full URL:', window.location.href)
 if (window.location.hostname === 'localhost') {
   console.log('✅ Running on localhost - Firebase authDomain configured correctly')
   console.log('ℹ️ Firebase will handle OAuth on firebaseapp.com, then redirect back to localhost:5000')
+} else if (window.location.hostname === 'veefore-webhook.veefore.com') {
+  console.log('✅ Running on Cloudflare tunnel - Firebase authDomain configured correctly')
+  console.log('ℹ️ Firebase will handle OAuth on firebaseapp.com, then redirect back to veefore-webhook.veefore.com')
 } else {
-  console.warn('⚠️ Domain mismatch - Firebase may not work correctly')
-  console.warn('Expected: localhost, Got:', window.location.hostname)
+  console.log('ℹ️ Running on custom domain:', window.location.hostname)
+  console.log('ℹ️ Firebase authDomain is always firebaseapp.com for OAuth flows')
 }
 
 // Initialize Firebase

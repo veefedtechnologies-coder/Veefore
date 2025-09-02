@@ -16,10 +16,7 @@ import {
   Edit,
   Search,
   MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Zap,
-  BarChart3,
+
   Share,
   Archive,
   Trash2,
@@ -121,33 +118,7 @@ type ChatMessage = {
   createdAt: Date
 }
 
-// Helper function to format last interaction date
-const formatLastInteractionDate = (dateString: string | Date | null) => {
-  if (!dateString) return 'No activity'
-  
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMinutes = diffMs / (1000 * 60)
-  const diffHours = diffMs / (1000 * 60 * 60)
-  const diffDays = diffMs / (1000 * 60 * 60 * 24)
-  
-  if (diffMinutes < 1) {
-    return 'Just now'
-  } else if (diffMinutes < 60) {
-    return `${Math.floor(diffMinutes)}m ago`
-  } else if (diffHours < 24) {
-    return `${Math.floor(diffHours)}h ago`
-  } else if (diffDays < 7) {
-    return `${Math.floor(diffDays)}d ago`
-  } else {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-    })
-  }
-}
+
 
 // Function to get immediate real AI analysis status based on user message content
 const getImmediateAnalysisStatus = (messageContent: string): string => {
@@ -179,7 +150,42 @@ const getImmediateAnalysisStatus = (messageContent: string): string => {
 }
 
 export default function VeeGPT() {
-  const { userData } = useUser()
+  const { userData, loading: userLoading, user: firebaseUser } = useUser()
+  
+  // Debug user data
+  console.log('VeeGPT - User data:', userData)
+  console.log('VeeGPT - User loading:', userLoading)
+  console.log('VeeGPT - Firebase user:', firebaseUser)
+  
+  // Use Firebase user data as fallback if API user data is not available
+  const displayUserData = userData || (firebaseUser ? {
+    displayName: firebaseUser.displayName,
+    email: firebaseUser.email,
+    avatar: firebaseUser.photoURL,
+    plan: 'Free'
+  } : null)
+  
+  // Ensure we have the right field names for display
+  const finalUserData = displayUserData ? {
+    displayName: displayUserData.displayName || displayUserData.username,
+    email: displayUserData.email,
+    avatar: displayUserData.avatar || displayUserData.photoURL,
+    plan: displayUserData.plan || 'Free'
+  } : null
+  
+  console.log('VeeGPT - Display user data:', displayUserData)
+  console.log('VeeGPT - Final user data:', finalUserData)
+  console.log('VeeGPT - Avatar URL:', finalUserData?.avatar)
+  console.log('VeeGPT - Display Name:', finalUserData?.displayName)
+  console.log('VeeGPT - Plan:', finalUserData?.plan)
+  
+  // Force re-render when user data changes
+  const [refreshKey, setRefreshKey] = useState(0)
+  useEffect(() => {
+    if (finalUserData) {
+      setRefreshKey(prev => prev + 1)
+    }
+  }, [finalUserData])
   const [inputText, setInputText] = useState('')
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
   const [hasSentFirstMessage, setHasSentFirstMessage] = useState(false)
@@ -191,6 +197,8 @@ export default function VeeGPT() {
   const [renamingChatId, setRenamingChatId] = useState<number | null>(null)
   const [newChatTitle, setNewChatTitle] = useState('')
   const [hasUserStartedNewChat, setHasUserStartedNewChat] = useState(false)
+  // Add loading state to prevent flash of welcome screen
+  const [isInitializing, setIsInitializing] = useState(true)
   // Removed typewriter animation for real streaming
   const [isGenerating, setIsGenerating] = useState(false)
   const [aiStatus, setAiStatus] = useState<string | null>(null)
@@ -317,7 +325,7 @@ export default function VeeGPT() {
   ]
 
   // Fetch conversations - only if authenticated
-  const { data: conversations = [] } = useQuery<ChatConversation[]>({
+  const { data: conversations = [], isLoading: conversationsLoading } = useQuery<ChatConversation[]>({
     queryKey: ['/api/chat/conversations'],
     queryFn: () => apiRequest('/api/chat/conversations'),
     enabled: true // Enable to load conversation history
@@ -943,10 +951,13 @@ export default function VeeGPT() {
     // Clear streaming content and optimistic messages when starting new chat
     setStreamingContent({})
     setOptimisticMessages([])
+    // Clear cache when starting new chat
+    clearCachedVeeGPTState()
   }
 
   const selectConversation = (conversationId: number) => {
     setCurrentConversationId(conversationId)
+    setHasSentFirstMessage(true) // User has interacted with VeeGPT
     // Clear streaming content and optimistic messages when switching conversations
     setStreamingContent({})
     setOptimisticMessages([])
@@ -964,11 +975,81 @@ export default function VeeGPT() {
   // Initialize with first conversation if user has existing chats (but only on first load)
   // This ensures consistent behavior between refresh and new chat
   useEffect(() => {
+    // Only auto-select first conversation if no cache exists and user hasn't started new chat
     if (conversations.length > 0 && !currentConversationId && !hasUserStartedNewChat && !hasSentFirstMessage) {
-      setHasSentFirstMessage(true)
-      setCurrentConversationId(conversations[0].id)
+      const cachedState = getCachedVeeGPTState()
+      // If no cache exists, use first conversation
+      if (!cachedState) {
+        setHasSentFirstMessage(true)
+        setCurrentConversationId(conversations[0].id)
+      }
     }
   }, [conversations, currentConversationId, hasUserStartedNewChat, hasSentFirstMessage])
+
+  // Update cache whenever conversation state changes
+  useEffect(() => {
+    if (!isInitializing) {
+      setCachedVeeGPTState(currentConversationId, hasSentFirstMessage)
+    }
+  }, [currentConversationId, hasSentFirstMessage, isInitializing])
+
+  // Cache system for user's last VeeGPT interaction
+  const getCachedVeeGPTState = () => {
+    try {
+      const cached = localStorage.getItem('veegpt-state')
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        // Check if cache is recent (within 24 hours)
+        const cacheAge = Date.now() - parsed.timestamp
+        if (cacheAge < 24 * 60 * 60 * 1000) {
+          return parsed
+        }
+      }
+    } catch (error) {
+      console.error('Error reading VeeGPT cache:', error)
+    }
+    return null
+  }
+
+  const setCachedVeeGPTState = (conversationId: number | null, hasSentFirstMessage: boolean) => {
+    try {
+      const state = {
+        conversationId,
+        hasSentFirstMessage,
+        timestamp: Date.now()
+      }
+      localStorage.setItem('veegpt-state', JSON.stringify(state))
+    } catch (error) {
+      console.error('Error saving VeeGPT cache:', error)
+    }
+  }
+
+  const clearCachedVeeGPTState = () => {
+    try {
+      localStorage.removeItem('veegpt-state')
+    } catch (error) {
+      console.error('Error clearing VeeGPT cache:', error)
+    }
+  }
+
+  // Initialize from cache on component mount
+  useEffect(() => {
+    const cachedState = getCachedVeeGPTState()
+    if (cachedState) {
+      setCurrentConversationId(cachedState.conversationId)
+      setHasSentFirstMessage(cachedState.hasSentFirstMessage)
+      // If we have cached state, we can initialize faster
+      setIsInitializing(false)
+    } else {
+      // Only show loading if no cache exists
+      const timer = setTimeout(() => {
+        setIsInitializing(false)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+
 
 
 
@@ -978,22 +1059,35 @@ export default function VeeGPT() {
   // Show welcome screen when starting a new chat or when no conversation is selected
   // Always show sidebar if conversations exist, regardless of new chat state
   // Don't show welcome screen if we have optimistic messages (instant UI transition)
-  const showWelcomeScreen = !currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0
+  // Don't show welcome screen during initialization to prevent flash
+  const showWelcomeScreen = !isInitializing && !conversationsLoading && !currentConversationId && (!hasSentFirstMessage || hasUserStartedNewChat) && optimisticMessages.length === 0
+  
+  // Show loading state during initialization to prevent flash
+  if (isInitializing || conversationsLoading) {
+    return (
+      <div className="h-full w-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-8 h-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">Loading VeeGPT...</p>
+        </div>
+      </div>
+    )
+  }
   
   if (showWelcomeScreen) {
     return (
-      <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
+      <div className="h-full w-full bg-gray-50 dark:bg-gray-900 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
         {/* Static Background - No Scroll Animations */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {/* Static background elements - no scroll interaction */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900"></div>
           
           {/* Static stars - slow automatic animation only */}
           <div className="absolute inset-0 opacity-20">
             {[...Array(15)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-blue-400 rounded-full animate-slow-float"
+                className="absolute w-1 h-1 bg-blue-400 dark:bg-blue-300 rounded-full animate-slow-float"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
@@ -1009,7 +1103,7 @@ export default function VeeGPT() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bottom-0 bg-gradient-to-t from-blue-500/40 to-purple-500/20 rounded-t-lg animate-slow-pulse"
+                className="absolute bottom-0 bg-gradient-to-t from-blue-500/40 to-purple-500/20 dark:from-blue-400/30 dark:to-purple-400/15 rounded-t-lg animate-slow-pulse"
                 style={{
                   left: `${10 + i * 10}%`,
                   width: '6%',
@@ -1025,59 +1119,100 @@ export default function VeeGPT() {
         <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-900 dark:bg-gray-900 flex flex-col transition-all duration-500 ease-out`}>
             {/* Scrollable Content Area - Everything scrolls except user profile */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
               {/* Top Header with Logo */}
-              <div className="p-3 flex items-center justify-between">
-                <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+              <div className={`p-3 flex items-center transition-all duration-300 ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+                {sidebarCollapsed ? (
+                  <div className="relative group w-10 h-10 flex items-center justify-center">
+                    {/* VeeFore Logo Button - disappears on hover */}
+                    <button 
+                      onClick={() => setSidebarCollapsed(false)}
+                      className="absolute inset-0 flex items-center justify-center hover:bg-gray-800 rounded transition-all duration-200 opacity-100 group-hover:opacity-0"
+                      title="Open sidebar"
+                    >
+                      <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+                    </button>
+                    
+                    {/* Close Button - appears on hover in same position */}
+                    <button 
+                      onClick={() => setSidebarCollapsed(false)}
+                      className="absolute inset-0 flex items-center justify-center hover:bg-gray-800 rounded transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      title="Open sidebar"
+                    >
+                      <div className="border-2 border-white rounded flex items-center justify-end pr-1.5" style={{width: '17.284608px', height: '15.36px'}}>
+                        <div className="w-0.5 h-full bg-white"></div>
+                      </div>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+                    <button 
+                      onClick={() => setSidebarCollapsed(true)}
+                      className="p-1 hover:bg-gray-800 rounded transition-colors"
+                    >
+                      <div className="w-5.5 h-5.5 border-2 border-white rounded flex items-center justify-start pl-1.5" style={{width: '17.284608px', height: '15.36px'}}>
+                        <div className="w-0.5 h-full bg-white"></div>
+                      </div>
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* New Chat Button */}
+              <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-4 transition-all duration-300`}>
                 <button
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  onClick={startNewChat}
+                  className="w-full flex items-center px-3 py-2.5 text-sm text-white hover:bg-gray-800 rounded-lg transition-all duration-500 font-medium"
+                  title={sidebarCollapsed ? "New chat" : ""}
                 >
-                  {sidebarCollapsed ? (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <ChevronLeft className="w-4 h-4 text-gray-500" />
-                  )}
+                  <Edit className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>New chat</span>
                 </button>
               </div>
 
               {/* Navigation Menu */}
-              <div className="px-3 pb-6 pt-4 space-y-3">
-                <button
-                  onClick={startNewChat}
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "New chat" : ""}
-                >
-                  <Edit className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>New chat</span>}
-                </button>
-                
+              <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-6 space-y-1 transition-all duration-300`}>
                 <button 
                   onClick={() => setShowSearchInput(!showSearchInput)}
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
+                  className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
                   title={sidebarCollapsed ? "Search chats" : ""}
                 >
-                  <Search className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Search chats</span>}
+                  <Search className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>Search chats</span>
                 </button>
                 
                 <button 
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "Content Assistant" : ""}
+                  className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                  title={sidebarCollapsed ? "Content Studio" : ""}
                 >
-                  <Zap className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Content Assistant</span>}
+                  <Edit3 className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>Content Studio</span>
                 </button>
                 
-                <button 
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "Analytics" : ""}
-                >
-                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Analytics</span>}
-                </button>
+                {!sidebarCollapsed && (
+                  <button 
+                    className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                    title="Auto Pilot"
+                  >
+                    <Rocket className="w-4 h-4 flex-shrink-0 transition-all duration-500" />
+                    <span className="transition-all duration-500 opacity-100 w-auto ml-3">Auto Pilot</span>
+                  </button>
+                )}
+                
+                {!sidebarCollapsed && (
+                  <button 
+                    className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                    title="AI Models"
+                  >
+                    <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center transition-all duration-500">
+                      <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                    </div>
+                    <span className="transition-all duration-500 opacity-100 w-auto ml-3">AI Models</span>
+                  </button>
+                )}
               </div>
 
               {/* Search Input */}
@@ -1088,20 +1223,19 @@ export default function VeeGPT() {
                     placeholder="Search conversations..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-gray-100 placeholder-gray-400"
                     autoFocus
                   />
                 </div>
               )}
 
               {/* Conversations Section */}
-              <div className="px-3">
-                {!sidebarCollapsed && (
-                  <div className="text-sm font-bold text-gray-500 mb-3 px-2">
+              {!sidebarCollapsed && (
+                <div className="px-3">
+                  <div className={`text-sm font-semibold text-gray-400 mb-3 px-2 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
                     Chats
                   </div>
-                )}
-                <div className="space-y-2">
+                  <div className="space-y-1">
                   {filteredConversations.map((conversation) => (
                     <div
                       key={conversation.id}
@@ -1116,17 +1250,17 @@ export default function VeeGPT() {
                     >
                       <button
                         onClick={() => selectConversation(conversation.id)}
-                        className={`w-full text-left px-3 py-3 text-sm rounded-lg transition-colors group ${
+                        className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors group ${
                           currentConversationId === conversation.id
-                            ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm font-medium'
-                            : 'text-gray-700 hover:bg-gray-100'
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-300 hover:bg-gray-800'
                         }`}
                         title={sidebarCollapsed ? conversation.title : ""}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
                             {!sidebarCollapsed && (
-                              <div className="truncate text-base font-medium">
+                              <div className="truncate text-sm">
                                 {renamingChatId === conversation.id ? (
                                   <input
                                     type="text"
@@ -1154,7 +1288,7 @@ export default function VeeGPT() {
                                         setNewChatTitle('')
                                       }
                                     }}
-                                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm"
+                                    className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white"
                                     autoFocus
                                     onClick={(e) => e.stopPropagation()}
                                   />
@@ -1171,13 +1305,13 @@ export default function VeeGPT() {
                                   e.stopPropagation()
                                   setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
                                 }}
-                                className="p-1 hover:bg-gray-200 rounded"
+                                className="p-1 hover:bg-gray-700 rounded"
                               >
-                                <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                                <MoreHorizontal className="w-4 h-4 text-gray-400" />
                               </button>
                               
                               {dropdownOpen === conversation.id && (
-                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
+                                <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
@@ -1185,7 +1319,7 @@ export default function VeeGPT() {
                                       setNewChatTitle(conversation.title)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                                   >
                                     <Edit2 className="w-4 h-4" />
                                     <span>Rename</span>
@@ -1197,7 +1331,7 @@ export default function VeeGPT() {
                                       archiveConversationMutation.mutate(conversation.id)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                                   >
                                     <Archive className="w-4 h-4" />
                                     <span>Archive</span>
@@ -1211,7 +1345,7 @@ export default function VeeGPT() {
                                       }
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 flex items-center space-x-3"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                     <span>Delete</span>
@@ -1224,40 +1358,56 @@ export default function VeeGPT() {
                       </button>
                     </div>
                   ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Bottom User Section - Fixed */}
-            <div className="p-2 border-t border-gray-200">
-              <div className="flex items-center space-x-3 px-2 py-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  {userData?.avatar ? (
-                    <img 
-                      src={userData.avatar} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <span className="text-white text-xs font-bold">
-                      {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                    </span>
+            <div key={refreshKey} className="p-3 border-t border-gray-800">
+              {userLoading && !firebaseUser ? (
+                <div className="flex items-center space-x-3 px-2 py-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-700 animate-pulse"></div>
+                  {!sidebarCollapsed && (
+                    <>
+                      <div className="flex-1 min-w-0">
+                        <div className="h-4 bg-gray-700 rounded animate-pulse mb-1"></div>
+                        <div className="h-3 bg-gray-700 rounded animate-pulse w-12"></div>
+                      </div>
+                    </>
                   )}
                 </div>
-                {!sidebarCollapsed && (
-                  <>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {userData?.plan || 'Free'}
-                      </div>
+              ) : (
+                <div className="flex items-center space-x-3 px-2 py-2 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                    {finalUserData?.avatar ? (
+                      <img 
+                        src={finalUserData.avatar} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="text-white text-sm font-bold">
+                        {finalUserData?.displayName?.charAt(0)?.toUpperCase() || 
+                         finalUserData?.email?.charAt(0)?.toUpperCase() || 
+                         'U'}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`flex-1 min-w-0 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
+                    <div className="text-sm font-medium text-white truncate">
+                      {finalUserData?.displayName || 
+                       finalUserData?.email?.split('@')[0] || 
+                       'User'}
+                      {finalUserData && ' ✅'}
                     </div>
-                    <MoreHorizontal className="w-4 h-4 text-gray-400" />
-                  </>
-                )}
-              </div>
+                    <div className="text-xs text-gray-400">
+                      {finalUserData?.plan || 'Free'}
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`} />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1267,9 +1417,9 @@ export default function VeeGPT() {
           <div className="w-full max-w-4xl">
             {/* Header */}
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-semibold text-gray-900 mb-3">
+              <h1 className="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 How can VeeGPT help?
-                <span className="ml-3 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded">
+                <span className="ml-3 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium rounded">
                   Beta
                 </span>
               </h1>
@@ -1277,7 +1427,7 @@ export default function VeeGPT() {
 
             {/* Main Input */}
             <div 
-              className="owlygpt-chatbox bg-white rounded-2xl shadow-sm mb-8"
+              className="owlygpt-chatbox bg-white dark:bg-gray-800 rounded-2xl shadow-sm mb-8"
               style={{
                 border: '1px solid #d1d5db',
                 borderRadius: '16px',
@@ -1296,7 +1446,7 @@ export default function VeeGPT() {
                 }}
                 onKeyDown={handleKeyPress}
                 placeholder="Ask VeeGPT a question"
-                className="w-full px-5 py-3 text-gray-900 placeholder-gray-500 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 focus:border-0 outline-none overflow-hidden"
+                className="w-full px-5 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-transparent border-0 resize-none focus:outline-none focus:ring-0 focus:border-0 outline-none overflow-hidden"
                 style={{ 
                   fontSize: '16px',
                   height: '48px',
@@ -1316,14 +1466,14 @@ export default function VeeGPT() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   >
                     <Mic className="w-4 h-4" />
                   </Button>
                   
                   <div className="flex items-center space-x-3">
                     <button 
-                      className="flex items-center space-x-2 px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-2 px-5 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                       onClick={() => {/* Handle brand voice dropdown */}}
                     >
                       <span className="text-base font-semibold">Brand voice</span>
@@ -1331,7 +1481,7 @@ export default function VeeGPT() {
                     </button>
                     
                     <button 
-                      className="flex items-center px-5 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors"
+                      className="flex items-center px-5 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                     >
                       <span className="text-base font-semibold">Image generation</span>
                     </button>
@@ -1360,7 +1510,7 @@ export default function VeeGPT() {
                   <button
                     key={index}
                     onClick={() => handleQuickPrompt(prompt.text)}
-                    className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                    className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors whitespace-nowrap"
                   >
                     <prompt.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-base font-semibold">
@@ -1376,7 +1526,7 @@ export default function VeeGPT() {
                   <button
                     key={index + 4}
                     onClick={() => handleQuickPrompt(prompt.text)}
-                    className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                    className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors whitespace-nowrap"
                   >
                     <prompt.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-base font-semibold">
@@ -1393,7 +1543,7 @@ export default function VeeGPT() {
                   return (
                     <button
                       onClick={() => handleQuickPrompt(quickPrompts[7].text)}
-                      className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors whitespace-nowrap"
                     >
                       <IconComponent className="w-4 h-4 flex-shrink-0" />
                       <span className="text-base font-semibold">
@@ -1407,7 +1557,7 @@ export default function VeeGPT() {
 
             {/* Footer */}
             <div className="text-center mt-10">
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 VeeGPT can make mistakes. Check important info.
               </p>
             </div>
@@ -1420,11 +1570,11 @@ export default function VeeGPT() {
 
   // Chat interface layout (after first message)
   return (
-    <div className="h-full w-full bg-gray-50 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
+    <div className="h-full w-full bg-gray-50 dark:bg-gray-900 flex relative overflow-hidden" style={{ height: '100%', display: 'flex' }}>
       {/* Static Background - No Scroll Animations */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Static background elements - no scroll interaction */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900"></div>
         
         {/* Static stars - slow automatic animation only */}
         <div className="absolute inset-0 opacity-20">
@@ -1463,59 +1613,100 @@ export default function VeeGPT() {
       <div className="relative z-10 w-full h-full flex">
         {/* Sidebar - show if conversations exist */}
         {shouldShowSidebar && (
-          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300`}>
+          <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-900 dark:bg-gray-900 flex flex-col transition-all duration-500 ease-out`}>
             {/* Scrollable Content Area - Everything scrolls except user profile */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
               {/* Top Header with Logo */}
-              <div className="p-3 flex items-center justify-between">
-                <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+              <div className={`p-3 flex items-center transition-all duration-300 ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+                {sidebarCollapsed ? (
+                  <div className="relative group w-10 h-10 flex items-center justify-center">
+                    {/* VeeFore Logo Button - disappears on hover */}
+                    <button 
+                      onClick={() => setSidebarCollapsed(false)}
+                      className="absolute inset-0 flex items-center justify-center hover:bg-gray-800 rounded transition-all duration-200 opacity-100 group-hover:opacity-0"
+                      title="Open sidebar"
+                    >
+                      <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+                    </button>
+                    
+                    {/* Close Button - appears on hover in same position */}
+                    <button 
+                      onClick={() => setSidebarCollapsed(false)}
+                      className="absolute inset-0 flex items-center justify-center hover:bg-gray-800 rounded transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      title="Open sidebar"
+                    >
+                      <div className="border-2 border-white rounded flex items-center justify-end pr-1.5" style={{width: '17.284608px', height: '15.36px'}}>
+                        <div className="w-0.5 h-full bg-white"></div>
+                      </div>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
+                    <button 
+                      onClick={() => setSidebarCollapsed(true)}
+                      className="p-1 hover:bg-gray-800 rounded transition-colors"
+                    >
+                      <div className="w-5.5 h-5.5 border-2 border-white rounded flex items-center justify-start pl-1.5" style={{width: '17.284608px', height: '15.36px'}}>
+                        <div className="w-0.5 h-full bg-white"></div>
+                      </div>
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* New Chat Button */}
+              <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-4 transition-all duration-300`}>
                 <button
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  onClick={startNewChat}
+                  className="w-full flex items-center px-3 py-2.5 text-sm text-white hover:bg-gray-800 rounded-lg transition-all duration-500 font-medium"
+                  title={sidebarCollapsed ? "New chat" : ""}
                 >
-                  {sidebarCollapsed ? (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <ChevronLeft className="w-4 h-4 text-gray-500" />
-                  )}
+                  <Edit className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>New chat</span>
                 </button>
               </div>
 
               {/* Navigation Menu */}
-              <div className="px-3 pb-6 pt-4 space-y-3">
-                <button
-                  onClick={startNewChat}
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "New chat" : ""}
-                >
-                  <Edit className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>New chat</span>}
-                </button>
-                
+              <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-6 space-y-1 transition-all duration-300`}>
                 <button 
                   onClick={() => setShowSearchInput(!showSearchInput)}
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
+                  className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
                   title={sidebarCollapsed ? "Search chats" : ""}
                 >
-                  <Search className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Search chats</span>}
+                  <Search className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>Search chats</span>
                 </button>
                 
                 <button 
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "Content Assistant" : ""}
+                  className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                  title={sidebarCollapsed ? "Content Studio" : ""}
                 >
-                  <Zap className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Content Assistant</span>}
+                  <Edit3 className={`w-4 h-4 flex-shrink-0 transition-all duration-500 ${sidebarCollapsed ? 'stroke-[2.5]' : ''}`} />
+                  <span className={`transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 w-auto ml-3'}`}>Content Studio</span>
                 </button>
                 
-                <button 
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
-                  title={sidebarCollapsed ? "Analytics" : ""}
-                >
-                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Analytics</span>}
-                </button>
+                {!sidebarCollapsed && (
+                  <button 
+                    className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                    title="Auto Pilot"
+                  >
+                    <Rocket className="w-4 h-4 flex-shrink-0 transition-all duration-500" />
+                    <span className="transition-all duration-500 opacity-100 w-auto ml-3">Auto Pilot</span>
+                  </button>
+                )}
+                
+                {!sidebarCollapsed && (
+                  <button 
+                    className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-all duration-500"
+                    title="AI Models"
+                  >
+                    <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center transition-all duration-500">
+                      <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                    </div>
+                    <span className="transition-all duration-500 opacity-100 w-auto ml-3">AI Models</span>
+                  </button>
+                )}
               </div>
 
               {/* Search Input */}
@@ -1526,20 +1717,19 @@ export default function VeeGPT() {
                     placeholder="Search conversations..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-gray-100 placeholder-gray-400"
                     autoFocus
                   />
                 </div>
               )}
 
               {/* Conversations Section */}
-              <div className="px-3">
-                {!sidebarCollapsed && (
-                  <div className="text-sm font-bold text-gray-500 mb-3 px-2">
+              {!sidebarCollapsed && (
+                <div className="px-3">
+                  <div className={`text-sm font-semibold text-gray-400 mb-3 px-2 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
                     Chats
                   </div>
-                )}
-                <div className="space-y-1">
+                  <div className="space-y-1">
                   {filteredConversations.map((conversation) => (
                     <div
                       key={conversation.id}
@@ -1554,90 +1744,68 @@ export default function VeeGPT() {
                     >
                       <button
                         onClick={() => selectConversation(conversation.id)}
-                        className={`w-full text-left px-4 py-3 text-sm rounded-xl transition-all duration-200 group ${
+                        className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors group ${
                           currentConversationId === conversation.id
-                            ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-sm font-medium'
-                            : 'text-gray-700 hover:bg-gray-100 border border-transparent'
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-300 hover:bg-gray-800'
                         }`}
                         title={sidebarCollapsed ? conversation.title : ""}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3 flex-1 min-w-0">
                             {!sidebarCollapsed && (
-                              <div className="flex-1 min-w-0">
-                                <div className="truncate text-sm font-medium">
-                                  {renamingChatId === conversation.id ? (
-                                    <input
-                                      type="text"
-                                      value={newChatTitle}
-                                      onChange={(e) => setNewChatTitle(e.target.value)}
-                                      onBlur={() => {
+                              <div className="truncate text-sm">
+                                {renamingChatId === conversation.id ? (
+                                  <input
+                                    type="text"
+                                    value={newChatTitle}
+                                    onChange={(e) => setNewChatTitle(e.target.value)}
+                                    onBlur={() => {
+                                      if (newChatTitle.trim()) {
+                                        renameConversationMutation.mutate({
+                                          conversationId: conversation.id,
+                                          newTitle: newChatTitle.trim()
+                                        })
+                                      }
+                                      setRenamingChatId(null)
+                                      setNewChatTitle('')
+                                    }}
+                                    onKeyPress={(e) => {
+                                      if (e.key === 'Enter') {
                                         if (newChatTitle.trim()) {
                                           renameConversationMutation.mutate({
                                             conversationId: conversation.id,
                                             newTitle: newChatTitle.trim()
                                           })
-                                        } else {
-                                          setRenamingChatId(null)
-                                          setNewChatTitle('')
                                         }
-                                      }}
-                                      onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                          if (newChatTitle.trim()) {
-                                            renameConversationMutation.mutate({
-                                              conversationId: conversation.id,
-                                              newTitle: newChatTitle.trim()
-                                            })
-                                          } else {
-                                            setRenamingChatId(null)
-                                            setNewChatTitle('')
-                                          }
-                                        } else if (e.key === 'Escape') {
-                                          setRenamingChatId(null)
-                                          setNewChatTitle('')
-                                        }
-                                      }}
-                                      className="w-full text-sm bg-slate-700/50 border border-slate-500/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    conversation.title
-                                  )}
-                                </div>
-                                <div className="text-xs text-slate-400 mt-1">
-                                  {formatLastInteractionDate(conversation.lastMessageAt || conversation.updatedAt)}
-                                </div>
+                                        setRenamingChatId(null)
+                                        setNewChatTitle('')
+                                      }
+                                    }}
+                                    className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white"
+                                    autoFocus
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                ) : (
+                                  conversation.title
+                                )}
                               </div>
                             )}
                           </div>
-                          
-                          {!sidebarCollapsed && (hoveredChatId === conversation.id || dropdownOpen === conversation.id) && (
-                            <div className="relative">
-                              <div
+                          {(hoveredChatId === conversation.id || dropdownOpen === conversation.id) && !sidebarCollapsed && renamingChatId !== conversation.id && (
+                            <div className="relative ml-2">
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   setDropdownOpen(dropdownOpen === conversation.id ? null : conversation.id)
                                 }}
-                                className="p-1 hover:bg-slate-600/50 rounded transition-colors cursor-pointer"
+                                className="p-1 hover:bg-gray-700 rounded"
                               >
-                                <MoreHorizontal className="w-4 h-4 text-slate-400" />
-                              </div>
+                                <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                              </button>
                               
                               {dropdownOpen === conversation.id && (
-                                <div className="absolute right-0 top-8 w-48 bg-slate-800 rounded-lg shadow-lg border border-slate-600 py-2 z-50">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      console.log('Share conversation:', conversation.id)
-                                      setDropdownOpen(null)
-                                    }}
-                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
-                                  >
-                                    <Share className="w-4 h-4" />
-                                    <span>Share</span>
-                                  </button>
-                                  
+                                <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
@@ -1645,9 +1813,9 @@ export default function VeeGPT() {
                                       setNewChatTitle(conversation.title)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                                   >
-                                    <Edit className="w-4 h-4" />
+                                    <Edit2 className="w-4 h-4" />
                                     <span>Rename</span>
                                   </button>
                                   
@@ -1657,7 +1825,7 @@ export default function VeeGPT() {
                                       archiveConversationMutation.mutate(conversation.id)
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 flex items-center space-x-3"
                                   >
                                     <Archive className="w-4 h-4" />
                                     <span>Archive</span>
@@ -1671,7 +1839,7 @@ export default function VeeGPT() {
                                       }
                                       setDropdownOpen(null)
                                     }}
-                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 flex items-center space-x-3"
+                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 flex items-center space-x-3"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                     <span>Delete</span>
@@ -1684,70 +1852,86 @@ export default function VeeGPT() {
                       </button>
                     </div>
                   ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Bottom User Section - Fixed */}
-            <div className="p-2 border-t border-gray-200">
-              <div className="flex items-center space-x-3 px-2 py-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  {userData?.avatar ? (
-                    <img 
-                      src={userData.avatar} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <span className="text-white text-xs font-bold">
-                      {userData?.displayName?.charAt(0)?.toUpperCase() || userData?.email?.charAt(0)?.toUpperCase() || 'U'}
-                    </span>
+            <div key={refreshKey} className="p-3 border-t border-gray-800">
+              {userLoading && !firebaseUser ? (
+                <div className="flex items-center space-x-3 px-2 py-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-700 animate-pulse"></div>
+                  {!sidebarCollapsed && (
+                    <>
+                      <div className="flex-1 min-w-0">
+                        <div className="h-4 bg-gray-700 rounded animate-pulse mb-1"></div>
+                        <div className="h-3 bg-gray-700 rounded animate-pulse w-12"></div>
+                      </div>
+                    </>
                   )}
                 </div>
-                {!sidebarCollapsed && (
-                  <>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {userData?.displayName || userData?.email?.split('@')[0] || 'User'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {userData?.plan || 'Free'}
-                      </div>
+              ) : (
+                <div className="flex items-center space-x-3 px-2 py-2 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                    {finalUserData?.avatar ? (
+                      <img 
+                        src={finalUserData.avatar} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="text-white text-sm font-bold">
+                        {finalUserData?.displayName?.charAt(0)?.toUpperCase() || 
+                         finalUserData?.email?.charAt(0)?.toUpperCase() || 
+                         'U'}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`flex-1 min-w-0 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
+                    <div className="text-sm font-medium text-white truncate">
+                      {finalUserData?.displayName || 
+                       finalUserData?.email?.split('@')[0] || 
+                       'User'}
+                      {finalUserData && ' ✅'}
                     </div>
-                    <MoreHorizontal className="w-4 h-4 text-gray-400" />
-                  </>
-                )}
-              </div>
+                    <div className="text-xs text-gray-400">
+                      {finalUserData?.plan || 'Free'}
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-all duration-500 ${sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`} />
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-white relative">
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 relative">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             {/* Centered Logo + GPT */}
             <div className="flex items-center justify-center w-full">
               <div className="flex items-center space-x-2">
                 <img src="/veefore-logo.png" alt="VeeFore" className="w-8 h-8" />
-                <span className="text-lg font-bold text-gray-900">eeGPT</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <span className="text-lg font-bold text-gray-900 dark:text-gray-100">eeGPT</span>
+                <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </div>
             </div>
             
             <div className="flex items-center space-x-3">
-              <button className="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <button className="flex items-center space-x-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 <Share className="w-4 h-4" />
                 <span>Share</span>
               </button>
-              <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+              <button className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
                 <MoreHorizontal className="w-4 h-4" />
               </button>
             </div>
           </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white" style={{ paddingBottom: '140px' }}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gradient-to-b from-gray-50/30 to-white dark:from-gray-800/30 dark:to-gray-900" style={{ paddingBottom: '140px' }}>
           <div className="max-w-4xl mx-auto space-y-8 overflow-x-hidden">
             {displayMessages.map((message) => (
               <div
@@ -1765,13 +1949,13 @@ export default function VeeGPT() {
                   overflow: 'hidden'
                 }}>
                   {message.role === 'user' && (
-                    <div className="text-xs font-medium text-gray-600 mb-2 flex items-center">
+                    <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 flex items-center">
                       <User className="w-3 h-3 mr-1" />
                       You
                     </div>
                   )}
                   {message.role === 'assistant' && (
-                    <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
+                    <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-2 flex items-center">
                       <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4" />
                       <span className="ml-0.25">
                         {isGenerating ? "eegpt • Analyzing..." : "eegpt • Response Ready"}
@@ -1780,8 +1964,8 @@ export default function VeeGPT() {
                   )}
                   <div className={`px-4 py-3 rounded-2xl ${
                     message.role === 'user'
-                      ? 'bg-gray-200 text-gray-900 inline-block'
-                      : 'bg-transparent text-gray-900'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 inline-block'
+                      : 'bg-transparent text-gray-900 dark:text-gray-100'
                   }`} style={{
                     wordWrap: 'break-word',
                     wordBreak: 'break-word',
@@ -1806,17 +1990,17 @@ export default function VeeGPT() {
                             <ReactMarkdown 
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
-                                h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                                h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
-                                h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
-                                p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
-                                strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                                h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                                h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                                h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
+                                p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900 dark:text-gray-100" style={{fontSize: '1rem'}}>{children}</p>,
+                                strong: ({children}) => <strong className="font-black text-gray-900 dark:text-gray-100">{children}</strong>,
                                 ul: ({children}) => <ul>{children}</ul>,
                                 ol: ({children}) => <ol>{children}</ol>,
                                 li: ({children}) => <li>{children}</li>,
-                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
-                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
+                                code: ({children}) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded font-mono font-semibold text-gray-900 dark:text-gray-100" style={{fontSize: '0.875rem'}}>{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto mb-3 font-semibold text-gray-900 dark:text-gray-100">{children}</pre>
                               }}
                             >
                               {convertToMarkdown(streamingContent[message.id] || '')}
@@ -1828,17 +2012,17 @@ export default function VeeGPT() {
                             <ReactMarkdown 
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
-                                h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
-                                h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
-                                h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
-                                p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900" style={{fontSize: '1rem'}}>{children}</p>,
-                                strong: ({children}) => <strong className="font-black text-gray-900">{children}</strong>,
+                                h1: ({children}) => <h1 className="font-black mb-6 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '2.5rem'}}>{children}</h1>,
+                                h2: ({children}) => <h2 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '2rem'}}>{children}</h2>,
+                                h3: ({children}) => <h3 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '1.5rem'}}>{children}</h3>,
+                                h4: ({children}) => <h4 className="font-black mb-1 text-gray-900 dark:text-gray-100 leading-tight" style={{fontSize: '1.25rem'}}>{children}</h4>,
+                                p: ({children}) => <p className="mb-1 leading-relaxed font-semibold text-gray-900 dark:text-gray-100" style={{fontSize: '1rem'}}>{children}</p>,
+                                strong: ({children}) => <strong className="font-black text-gray-900 dark:text-gray-100">{children}</strong>,
                                 ul: ({children}) => <ul>{children}</ul>,
                                 ol: ({children}) => <ol>{children}</ol>,
                                 li: ({children}) => <li>{children}</li>,
-                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded font-mono font-semibold" style={{fontSize: '0.875rem'}}>{children}</code>,
-                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-3 font-semibold">{children}</pre>
+                                code: ({children}) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded font-mono font-semibold text-gray-900 dark:text-gray-100" style={{fontSize: '0.875rem'}}>{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto mb-3 font-semibold text-gray-900 dark:text-gray-100">{children}</pre>
                               }}
                             >
                               {convertToMarkdown(message.content)}
@@ -1859,13 +2043,13 @@ export default function VeeGPT() {
                           width: '100%'
                         }}
                       >
-                        <div className="font-semibold text-gray-900">{message.content}</div>
+                        <div className="font-semibold text-gray-900 dark:text-gray-100">{message.content}</div>
                       </div>
                     )}
                   </div>
                   {/* Show timestamp for all messages */}
                   {(
-                    <div className={`mt-2 text-xs text-gray-500 ${
+                    <div className={`mt-2 text-xs text-gray-500 dark:text-gray-400 ${
                       message.role === 'user' ? 'text-right' : 'text-left'
                     }`}>
                       {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { 
@@ -1885,16 +2069,16 @@ export default function VeeGPT() {
             {aiStatus && (
               <div className="flex flex-col space-y-2 items-start">
                 <div className="max-w-4xl w-full">
-                  <div className="text-xs font-medium text-blue-600 mb-2 flex items-center">
+                  <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-2 flex items-center">
                     <img src="/veefore-logo.png" alt="VeeFore" className="w-4 h-4" />
                     <span className="ml-0.25">
                       {isGenerating ? "eegpt • Analyzing..." : "eegpt • Response Ready"}
                     </span>
                   </div>
                   <div className="bg-transparent px-4 py-3 rounded-2xl">
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <span 
-                        className="text-sm font-medium text-gray-500"
+                        className="text-sm font-medium text-gray-500 dark:text-gray-400"
                         style={{
                           background: 'linear-gradient(90deg, #9CA3AF 25%, #D1D5DB 50%, #9CA3AF 75%)',
                           backgroundSize: '200% 100%',
@@ -2097,19 +2281,10 @@ export default function VeeGPT() {
           pointerEvents: 'none',
           zIndex: 999
         }}>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#9ca3af',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(229, 231, 235, 0.3)'
-          }}>
+          <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-1">
             VeeGPT can make mistakes. Check important info.
           </div>
-          </div>
+        </div>
         </div>
       </div>
     </div>

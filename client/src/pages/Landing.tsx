@@ -537,7 +537,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 text-gray-900 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 text-gray-900 dark:text-gray-100 overflow-x-hidden">
       {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Animated gradient mesh */}
@@ -587,7 +587,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
 
       {/* Navigation - Professional Light Design */}
       <nav className="fixed top-0 w-full z-50">
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/50 shadow-sm" />
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm" />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
@@ -611,7 +611,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                 <a 
                   key={item}
                   href={`#${item.toLowerCase()}`} 
-                  className="relative text-gray-600 hover:text-gray-900 transition-all duration-300 group text-sm font-medium"
+                  className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-300 group text-sm font-medium"
                 >
                   {item}
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-blue-500 group-hover:w-full transition-all duration-300" />
@@ -623,7 +623,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
               {deviceStatus.loading ? (
                 // Loading state
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-10 bg-gray-200 animate-pulse rounded-xl"></div>
+                  <div className="w-20 h-10 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl"></div>
                   <div className="w-28 h-10 bg-gray-300 animate-pulse rounded-xl"></div>
                 </div>
               ) : deviceStatus.isOnWaitlist && (deviceStatus.user?.status === 'approved' || deviceStatus.user?.status === 'early_access') ? (
@@ -760,7 +760,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
               
               {/* Subtitle with Premium Styling */}
               <div className="mt-12 max-w-5xl mx-auto">
-                <p className="text-2xl lg:text-3xl text-gray-600 leading-relaxed font-light tracking-wide">
+                <div className="text-2xl lg:text-3xl text-gray-600 leading-relaxed font-light tracking-wide">
                   Experience the next generation of 
                   <span className="relative mx-2">
                     <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent font-semibold">
@@ -769,7 +769,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
                     <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-violet-600 to-blue-600 opacity-30" />
                   </span>
                   From intelligent chat assistance to professional video generation, VeeFore transforms how you create, manage, and grow your digital presence.
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -815,7 +815,7 @@ const Landing = ({ onNavigate }: LandingProps) => {
             
             <Button 
               variant="outline"
-              className="group border-2 border-gray-300 bg-white/80 backdrop-blur-3xl text-gray-800 hover:bg-white hover:border-gray-400 px-16 py-6 text-xl font-bold rounded-3xl transition-all duration-700 shadow-xl hover:shadow-2xl"
+              className="group border-2 border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-3xl text-gray-800 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 px-16 py-6 text-xl font-bold rounded-3xl transition-all duration-700 shadow-xl hover:shadow-2xl"
             >
               <div className="flex items-center space-x-4">
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
@@ -1047,8 +1047,8 @@ const Landing = ({ onNavigate }: LandingProps) => {
                       {deviceStatus.loading ? (
                         // Loading state
                         <div className="flex space-x-4">
-                          <div className="w-48 h-14 bg-gray-200 animate-pulse rounded-2xl"></div>
-                          <div className="w-48 h-14 bg-gray-200 animate-pulse rounded-2xl"></div>
+                                                  <div className="w-48 h-14 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-2xl"></div>
+                        <div className="w-48 h-14 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-2xl"></div>
                         </div>
                       ) : deviceStatus.isOnWaitlist ? (
                         // User is on waitlist - check their status

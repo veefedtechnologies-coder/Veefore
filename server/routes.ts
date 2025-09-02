@@ -3758,6 +3758,25 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       console.log(`[INSTAGRAM CALLBACK] Social account saved successfully`);
       
+      // IMMEDIATE SYNC: Fetch Instagram data right after account connection
+      console.log(`[INSTAGRAM CALLBACK] 🚀 Triggering immediate Instagram data sync for new account...`);
+      try {
+        // Import the Instagram sync service for immediate data fetch
+        const { InstagramSyncService } = await import('./instagram-sync-service');
+        const instagramSync = new InstagramSyncService(storage);
+        
+        // Sync the specific workspace where the account was added
+        await instagramSync.syncInstagramAccountsForWorkspace(workspaceId.toString());
+        console.log(`[INSTAGRAM CALLBACK] ✅ Immediate Instagram sync completed successfully`);
+        
+        // Clear dashboard cache for this workspace to show fresh data
+        dashboardCache.clearCache();
+        console.log(`[INSTAGRAM CALLBACK] ✅ Dashboard cache cleared for fresh data display`);
+        
+      } catch (syncError) {
+        console.error(`[INSTAGRAM CALLBACK] ⚠️ Immediate sync failed, but account was connected:`, syncError);
+      }
+      
       // If this is during onboarding, also create default workspace if needed
       if (stateData.source === 'onboarding' && stateData.userId) {
         console.log(`[INSTAGRAM CALLBACK] Creating default workspace for onboarding user ${stateData.userId}`);
@@ -7424,6 +7443,348 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // Instagram Data Sync Test Endpoint (Public for testing)
+  app.post('/api/instagram/sync-test', async (req: any, res: any) => {
+    try {
+      console.log('[INSTAGRAM SYNC TEST] Starting Instagram data sync test...');
+      
+      // Get the first workspace (for testing purposes)
+      const workspaces = await storage.getWorkspacesByUserId(1); // Use user ID 1 for testing
+      if (workspaces.length === 0) {
+        return res.status(400).json({ error: 'No workspaces found' });
+      }
+      
+      const workspaceId = workspaces[0].id.toString();
+      console.log('[INSTAGRAM SYNC TEST] Using workspace ID:', workspaceId);
+      
+      // Trigger Instagram sync
+      await instagramDirectSync.updateAccountWithRealData(workspaceId);
+      
+      // Get updated social accounts
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      res.json({
+        success: true,
+        message: 'Instagram sync completed',
+        workspaceId,
+        instagramAccount: instagramAccount ? {
+          username: instagramAccount.username,
+          followers: instagramAccount.followersCount,
+          engagement: instagramAccount.avgEngagement,
+          reach: instagramAccount.totalReach,
+          posts: instagramAccount.mediaCount,
+          lastSync: instagramAccount.lastSyncAt
+        } : null
+      });
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM SYNC TEST] Error:', error);
+      res.status(500).json({ 
+        error: 'Instagram sync failed', 
+        message: error.message,
+        stack: error.stack
+      });
+    }
+  });
+
+  // Manual Instagram sync endpoint for immediate data refresh
+  app.post('/api/instagram/manual-sync', async (req: any, res: any) => {
+    try {
+      const { workspaceId } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+      
+      console.log(`[INSTAGRAM MANUAL SYNC] 🚀 Manual sync requested for workspace: ${workspaceId}`);
+      
+      // Import and use the Instagram sync service
+      const { InstagramSyncService } = await import('./instagram-sync-service');
+      const instagramSync = new InstagramSyncService(storage);
+      
+      // Perform immediate sync
+      const result = await instagramSync.syncInstagramAccountsForWorkspace(workspaceId);
+      
+      // Clear dashboard cache to show fresh data
+      dashboardCache.clearCache();
+      
+      console.log(`[INSTAGRAM MANUAL SYNC] ✅ Manual sync completed for workspace: ${workspaceId}`);
+      
+      res.json({
+        success: true,
+        message: 'Instagram data synced successfully',
+        result,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('[INSTAGRAM MANUAL SYNC] Error:', error);
+      res.status(500).json({
+        error: 'Manual Instagram sync failed',
+        details: error.message
+      });
+    }
+  });
+
+    // Force Dashboard Cache Refresh Endpoint for ALL Workspaces
+  app.post('/api/dashboard/refresh-cache', async (req: any, res: any) => {
+    try {
+      console.log('[DASHBOARD CACHE] Force refreshing dashboard cache for ALL workspaces...');
+      
+      // Clear all dashboard cache
+      dashboardCache.clearCache();
+      
+      // Get ALL workspaces by discovering from social accounts (better approach)
+      let allWorkspaces: any[] = [];
+      
+      try {
+        // Get all social accounts first
+        const allSocialAccounts = await storage.getAllSocialAccounts();
+        console.log(`[DASHBOARD CACHE] Found ${allSocialAccounts.length} total social accounts`);
+        
+        // Extract unique workspace IDs from social accounts
+        const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+        console.log(`[DASHBOARD CACHE] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
+        
+        // Get workspace details for each ID
+        for (const workspaceId of workspaceIds) {
+          try {
+            const workspace = await storage.getWorkspace(workspaceId);
+            if (workspace) {
+              allWorkspaces.push(workspace);
+            }
+          } catch (workspaceError) {
+            console.error(`[DASHBOARD CACHE] Error getting workspace ${workspaceId}:`, workspaceError);
+          }
+        }
+      } catch (error) {
+        console.error('[DASHBOARD CACHE] Error discovering workspaces:', error);
+        return res.status(500).json({ error: 'Failed to discover workspaces' });
+      }
+      
+      if (allWorkspaces.length === 0) {
+        return res.status(400).json({ error: 'No workspaces found' });
+      }
+      
+      console.log(`[DASHBOARD CACHE] Found ${allWorkspaces.length} unique workspaces to refresh`);
+      
+      const results = [];
+      
+      // Refresh cache for each workspace
+      for (const workspace of allWorkspaces) {
+        try {
+          console.log(`[DASHBOARD CACHE] Refreshing cache for workspace: ${workspace.id} (${workspace.name || 'Unnamed'})`);
+          
+          const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id.toString());
+          
+          // Clear cache for this workspace to force refresh
+          dashboardCache.clearCache();
+          
+          results.push({
+            workspaceId: workspace.id,
+            workspaceName: workspace.name || 'Unnamed',
+            socialAccounts: socialAccounts.map(acc => ({
+              id: acc.id,
+              username: acc.username,
+              platform: acc.platform,
+              followers: acc.followersCount,
+              engagement: acc.avgEngagement,
+              reach: acc.totalReach,
+              posts: acc.mediaCount,
+              lastSync: acc.lastSyncAt
+            }))
+          });
+          
+        } catch (workspaceError) {
+          console.error(`[DASHBOARD CACHE] Error refreshing workspace ${workspace.id}:`, workspaceError);
+          results.push({
+            workspaceId: workspace.id,
+            workspaceName: workspace.name || 'Unnamed',
+            error: workspaceError.message
+          });
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `Dashboard cache refreshed for all workspaces`,
+        summary: {
+          totalWorkspaces: allWorkspaces.length,
+          successfulRefreshes: results.filter(r => !r.error).length,
+          failedRefreshes: results.filter(r => r.error).length
+        },
+        results
+      });
+      
+    } catch (error: any) {
+      console.error('[DASHBOARD CACHE] Error:', error);
+      res.status(500).json({ 
+        error: 'Cache refresh failed', 
+        message: error.message
+      });
+    }
+  });
+
+  // Get All Workspaces and Instagram Accounts
+  app.get('/api/workspaces/instagram-accounts', async (req: any, res: any) => {
+    try {
+      console.log('[WORKSPACES] Getting all workspaces and Instagram accounts...');
+      
+      // Get ALL workspaces by trying multiple user IDs (workaround since getAllWorkspaces doesn't exist)
+      let allWorkspaces: any[] = [];
+      const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Try more user IDs
+      
+      for (const userId of userIds) {
+        try {
+          const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+          if (userWorkspaces.length > 0) {
+            allWorkspaces = allWorkspaces.concat(userWorkspaces);
+            console.log(`[WORKSPACES] Found ${userWorkspaces.length} workspaces for user ${userId}`);
+          }
+        } catch (error) {
+          // Continue with other user IDs
+        }
+      }
+      
+      // Remove duplicates based on workspace ID
+      const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) => 
+        index === self.findIndex(w => w.id === workspace.id)
+      );
+      
+      allWorkspaces = uniqueWorkspaces;
+      
+      const workspaceData = [];
+      
+      for (const workspace of allWorkspaces) {
+        const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id.toString());
+        const instagramAccounts = socialAccounts.filter(acc => acc.platform === 'instagram');
+        
+        workspaceData.push({
+          workspaceId: workspace.id,
+          workspaceName: workspace.name || 'Unnamed Workspace',
+          instagramAccounts: instagramAccounts.map(acc => ({
+            username: acc.username,
+            followers: acc.followersCount,
+            posts: acc.mediaCount,
+            engagement: acc.avgEngagement,
+            reach: acc.totalReach,
+            lastSync: acc.lastSyncAt,
+            isActive: acc.isActive,
+            hasAccessToken: !!acc.accessToken
+          }))
+        });
+      }
+      
+      res.json({
+        success: true,
+        totalWorkspaces: allWorkspaces.length,
+        workspaces: workspaceData
+      });
+      
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get workspaces', 
+        message: error.message
+      });
+    }
+  });
+
+  // Alternative: Get All Workspaces by Discovering from Social Accounts
+  app.get('/api/workspaces/discover-all', async (req: any, res: any) => {
+    try {
+      console.log('[WORKSPACES] Discovering all workspaces from social accounts...');
+      
+      // Get all social accounts first
+      const allSocialAccounts = await storage.getAllSocialAccounts();
+      console.log(`[WORKSPACES] Found ${allSocialAccounts.length} total social accounts`);
+      
+      // Extract unique workspace IDs from social accounts
+      const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+      console.log(`[WORKSPACES] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
+      
+      const workspaceData = [];
+      
+      for (const workspaceId of workspaceIds) {
+        try {
+          // Try to get workspace details
+          const workspace = await storage.getWorkspace(workspaceId);
+          if (workspace) {
+            const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+            const instagramAccounts = socialAccounts.filter(acc => acc.platform === 'instagram');
+            
+            workspaceData.push({
+              workspaceId: workspace.id,
+              workspaceName: workspace.name || 'Unnamed Workspace',
+              userId: workspace.userId,
+              instagramAccounts: instagramAccounts.map(acc => ({
+                username: acc.username,
+                followers: acc.followersCount,
+                posts: acc.mediaCount,
+                engagement: acc.avgEngagement,
+                reach: acc.totalReach,
+                lastSync: acc.lastSyncAt,
+                isActive: acc.isActive,
+                hasAccessToken: !!acc.accessToken
+              }))
+            });
+          }
+        } catch (workspaceError) {
+          console.error(`[WORKSPACES] Error getting workspace ${workspaceId}:`, workspaceError);
+        }
+      }
+      
+      res.json({
+        success: true,
+        totalWorkspaces: workspaceData.length,
+        workspaces: workspaceData
+      });
+      
+    } catch (error: any) {
+      console.error('[WORKSPACES] Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to discover workspaces', 
+        message: error.message
+      });
+    }
+  });
+
+  // Sync Instagram Account for Specific Workspace
+  app.post('/api/workspaces/:workspaceId/sync-instagram', async (req: any, res: any) => {
+    try {
+      const { workspaceId } = req.params;
+      console.log(`[WORKSPACE SYNC] Syncing Instagram for workspace: ${workspaceId}`);
+      
+      // Trigger Instagram sync for specific workspace
+      await instagramDirectSync.updateAccountWithRealData(workspaceId);
+      
+      // Get updated social accounts
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = socialAccounts.find(acc => acc.platform === 'instagram');
+      
+      res.json({
+        success: true,
+        message: 'Instagram sync completed for workspace',
+        workspaceId,
+        instagramAccount: instagramAccount ? {
+          username: instagramAccount.username,
+          followers: instagramAccount.followersCount,
+          engagement: instagramAccount.avgEngagement,
+          reach: instagramAccount.totalReach,
+          posts: instagramAccount.mediaCount,
+          lastSync: instagramAccount.lastSyncAt
+        } : null
+      });
+      
+    } catch (error: any) {
+      console.error('[WORKSPACE SYNC] Error:', error);
+      res.status(500).json({ 
+        error: 'Instagram sync failed', 
+        message: error.message
+      });
+    }
+  });
+
   // Force Instagram analytics sync endpoint
   app.post('/api/instagram/force-analytics-sync', requireAuth, async (req: any, res: Response) => {
     try {
@@ -7515,6 +7876,133 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     } catch (error: any) {
       console.error('[COMPLETE SYNC] Error:', error);
       res.status(500).json({ error: 'Failed to sync Instagram analytics: ' + error.message });
+    }
+  });
+
+  // Force Instagram analytics sync endpoint for ALL workspaces
+  app.post('/api/instagram/sync-all-workspaces', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      console.log('[INSTAGRAM SYNC] Force syncing Instagram analytics for ALL workspaces...');
+      
+      // Get ALL workspaces by trying multiple user IDs (workaround since getAllWorkspaces doesn't exist)
+      let allWorkspaces: any[] = [];
+      const userIds = [1, 2, 3, 4, 5]; // Try common user IDs
+      
+      for (const userId of userIds) {
+        try {
+          const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+          if (userWorkspaces.length > 0) {
+            allWorkspaces = allWorkspaces.concat(userWorkspaces);
+            console.log(`[INSTAGRAM SYNC] Found ${userWorkspaces.length} workspaces for user ${userId}`);
+          }
+        } catch (error) {
+          // Continue with other user IDs
+        }
+      }
+      
+      // Remove duplicates based on workspace ID
+      const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) => 
+        index === self.findIndex(w => w.id === workspace.id)
+      );
+      
+      allWorkspaces = uniqueWorkspaces;
+      
+      if (allWorkspaces.length === 0) {
+        return res.status(400).json({ error: 'No workspaces found' });
+      }
+      
+      console.log(`[INSTAGRAM SYNC] Found ${allWorkspaces.length} unique workspaces to sync`);
+      
+      const results = [];
+      let totalAccounts = 0;
+      let syncedAccounts = 0;
+      
+      // Sync each workspace
+      for (const workspace of allWorkspaces) {
+        try {
+          console.log(`[INSTAGRAM SYNC] Syncing workspace: ${workspace.id} (${workspace.name || 'Unnamed'})`);
+          
+          // Get social accounts for this workspace
+          const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id.toString());
+          const instagramAccounts = socialAccounts.filter(acc => acc.platform === 'instagram' && acc.isActive);
+          
+          if (instagramAccounts.length > 0) {
+            console.log(`[INSTAGRAM SYNC] Found ${instagramAccounts.length} Instagram accounts in workspace ${workspace.id}`);
+            totalAccounts += instagramAccounts.length;
+            
+            // Sync each Instagram account in this workspace
+            for (const account of instagramAccounts) {
+              try {
+                console.log(`[INSTAGRAM SYNC] Syncing @${account.username} from workspace ${workspace.id}`);
+                
+                // Trigger Instagram sync for this specific workspace
+                await instagramDirectSync.updateAccountWithRealData(workspace.id.toString());
+                
+                // Get updated data
+                const updatedAccounts = await storage.getSocialAccountsByWorkspace(workspace.id.toString());
+                const updatedAccount = updatedAccounts.find(acc => acc.id === account.id);
+                
+                if (updatedAccount) {
+                  results.push({
+                    workspaceId: workspace.id,
+                    workspaceName: workspace.name || 'Unnamed',
+                    username: updatedAccount.username,
+                    followers: updatedAccount.followersCount,
+                    engagement: updatedAccount.avgEngagement,
+                    reach: updatedAccount.totalReach,
+                    posts: updatedAccount.mediaCount,
+                    lastSync: updatedAccount.lastSyncAt
+                  });
+                  syncedAccounts++;
+                }
+                
+                // Add delay to respect API rate limits
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+              } catch (accountError) {
+                console.error(`[INSTAGRAM SYNC] Failed to sync @${account.username} from workspace ${workspace.id}:`, accountError);
+                results.push({
+                  workspaceId: workspace.id,
+                  workspaceName: workspace.name || 'Unnamed',
+                  username: account.username,
+                  error: accountError.message
+                });
+              }
+            }
+          } else {
+            console.log(`[INSTAGRAM SYNC] No Instagram accounts found in workspace ${workspace.id}`);
+          }
+        } catch (workspaceError) {
+          console.error(`[INSTAGRAM SYNC] Error syncing workspace ${workspace.id}:`, workspaceError);
+          results.push({
+            workspaceId: workspace.id,
+            workspaceName: workspace.name || 'Unnamed',
+            error: workspaceError.message
+          });
+        }
+      }
+      
+      console.log(`[INSTAGRAM SYNC] Completed sync: ${syncedAccounts}/${totalAccounts} accounts synced across ${allWorkspaces.length} workspaces`);
+      
+      res.json({
+        success: true,
+        message: `Instagram analytics sync completed for all workspaces`,
+        summary: {
+          totalWorkspaces: allWorkspaces.length,
+          totalAccounts,
+          syncedAccounts,
+          failedAccounts: totalAccounts - syncedAccounts
+        },
+        results
+      });
+      
+    } catch (error: any) {
+      console.error('[INSTAGRAM SYNC] Error:', error);
+      res.status(500).json({ 
+        error: 'Instagram sync failed', 
+        message: error.message
+      });
     }
   });
 
@@ -14263,7 +14751,7 @@ Create a detailed growth strategy in JSON format:
         console.log(`[SOCIAL ACCOUNTS] Getting accounts for specific workspace: ${workspaceId}`);
         const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
         
-        // Transform accounts to frontend format with profile pictures
+        // Transform accounts to frontend format with FULL Instagram metrics data
         const transformedAccounts = accounts.map(account => {
           console.log(`[BACKEND DEBUG] Raw account data for ${account.username}:`, {
             followersCount: account.followersCount,
@@ -14271,6 +14759,9 @@ Create a detailed growth strategy in JSON format:
             subscriberCount: account.subscriberCount,
             profilePictureUrl: account.profilePictureUrl,
             profilePicture: account.profilePicture,
+            totalReach: account.totalReach,
+            avgEngagement: account.avgEngagement,
+            mediaCount: account.mediaCount,
             allFields: Object.keys(account)
           });
           
@@ -14290,6 +14781,14 @@ Create a detailed growth strategy in JSON format:
             username: account.username,
             displayName: account.displayName || account.username,
             followers: followersCount,
+            // Add full Instagram metrics data
+            followersCount: account.followersCount || account.followers || account.subscriberCount || 0,
+            totalReach: account.totalReach || 0,
+            avgEngagement: account.avgEngagement || 0,
+            mediaCount: account.mediaCount || 0,
+            totalLikes: account.totalLikes || 0,
+            totalComments: account.totalComments || 0,
+            avgComments: account.avgComments || 0,
             isConnected: account.isActive !== false,
             isVerified: true,
             lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
@@ -14302,6 +14801,10 @@ Create a detailed growth strategy in JSON format:
           console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
             originalFollowers: followersCount,
             finalFollowers: transformedAccount.followers,
+            followersCount: transformedAccount.followersCount,
+            totalReach: transformedAccount.totalReach,
+            avgEngagement: transformedAccount.avgEngagement,
+            mediaCount: transformedAccount.mediaCount,
             originalProfilePic: account.profilePictureUrl || account.profilePicture,
             finalProfilePic: transformedAccount.profilePictureUrl,
             fullResponse: transformedAccount
@@ -14322,7 +14825,7 @@ Create a detailed growth strategy in JSON format:
         for (const workspace of workspaces) {
           const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
           
-          // Transform accounts to frontend format with profile pictures
+          // Transform accounts to frontend format with FULL Instagram metrics data
           const transformedAccounts = accounts.map(account => {
             console.log(`[BACKEND DEBUG] Raw account data for ${account.username}:`, {
               followersCount: account.followersCount,
@@ -14330,6 +14833,9 @@ Create a detailed growth strategy in JSON format:
               subscriberCount: account.subscriberCount,
               profilePictureUrl: account.profilePictureUrl,
               profilePicture: account.profilePicture,
+            totalReach: account.totalReach,
+            avgEngagement: account.avgEngagement,
+            mediaCount: account.mediaCount,
               allFields: Object.keys(account)
             });
             
@@ -14349,6 +14855,14 @@ Create a detailed growth strategy in JSON format:
               username: account.username,
               displayName: account.displayName || account.username,
               followers: followersCount,
+            // Add full Instagram metrics data
+            followersCount: account.followersCount || account.followers || account.subscriberCount || 0,
+            totalReach: account.totalReach || 0,
+            avgEngagement: account.avgEngagement || 0,
+            mediaCount: account.mediaCount || 0,
+            totalLikes: account.totalLikes || 0,
+            totalComments: account.totalComments || 0,
+            avgComments: account.avgComments || 0,
               isConnected: account.isActive !== false,
               isVerified: true,
               lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
@@ -14361,6 +14875,10 @@ Create a detailed growth strategy in JSON format:
             console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
               originalFollowers: followersCount,
               finalFollowers: transformedAccount.followers,
+            followersCount: transformedAccount.followersCount,
+            totalReach: transformedAccount.totalReach,
+            avgEngagement: transformedAccount.avgEngagement,
+            mediaCount: transformedAccount.mediaCount,
               originalProfilePic: account.profilePictureUrl || account.profilePicture,
               finalProfilePic: transformedAccount.profilePictureUrl,
               fullResponse: transformedAccount

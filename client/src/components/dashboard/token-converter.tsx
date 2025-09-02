@@ -200,7 +200,7 @@ export function TokenConverter() {
                   <li><strong>Connect Instagram:</strong> Link your Instagram Business Account to that Facebook page</li>
                   <li><strong>Get new token:</strong> Generate a fresh token with all required permissions</li>
                 </ol>
-                <div className="mt-3 p-3 bg-white rounded border">
+                <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border dark:border-gray-600">
                   <p className="text-xs text-gray-600 font-medium">Quick Fix:</p>
                   <p className="text-xs text-gray-600">
                     1. Go to{' '}
@@ -219,7 +219,7 @@ export function TokenConverter() {
               {conversionResult.pages.map((page) => (
                 <div 
                   key={page.id} 
-                  className={`border rounded-lg p-4 ${page.hasInstagram ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}
+                  className={`border rounded-lg p-4 ${page.hasInstagram ? 'border-green-200 bg-green-50 dark:border-green-600 dark:bg-green-900/30' : 'border-gray-200 dark:border-gray-600'}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">

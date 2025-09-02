@@ -212,10 +212,26 @@ export default function Workspaces() {
     { value: 'friendly', label: 'Friendly', icon: '🤝' }
   ]
 
+  const getThemeGradient = (theme: string) => {
+    switch (theme) {
+      case 'space':
+        return 'from-purple-500 to-indigo-600'
+      case 'ocean':
+        return 'from-blue-500 to-cyan-600'
+      case 'forest':
+        return 'from-green-500 to-emerald-600'
+      case 'sunset':
+        return 'from-orange-500 to-red-600'
+      default:
+        return 'from-gray-500 to-gray-600'
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Loading workspaces...</p>
       </div>
     )
   }
@@ -224,8 +240,8 @@ export default function Workspaces() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Workspaces</h1>
-          <p className="text-gray-600 mt-1">Manage your team workspaces and collaborate with others</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Workspaces</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your team workspaces and collaborate with others</p>
         </div>
         
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -324,28 +340,24 @@ export default function Workspaces() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {workspaces.map((workspace: Workspace) => (
-          <Card key={workspace.id} className="border-gray-200 hover:shadow-lg transition-shadow duration-200">
+          <Card key={workspace.id} className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${
-                    workspace.theme === 'space' ? 'from-purple-500 to-indigo-600' :
-                    workspace.theme === 'ocean' ? 'from-blue-500 to-cyan-600' :
-                    workspace.theme === 'forest' ? 'from-green-500 to-emerald-600' :
-                    workspace.theme === 'sunset' ? 'from-orange-500 to-red-600' :
-                    'from-gray-500 to-gray-600'
-                  } flex items-center justify-center text-white shadow-lg`}>
+                    getThemeGradient(workspace.theme)
+                  } flex items-center justify-center text-white shadow-sm flex-shrink-0`}>
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                      <span>{workspace.name}</span>
+                    <CardTitle className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center space-x-2">
+                      <span className="truncate">{workspace.name}</span>
                       {workspace.isDefault && (
                         <Crown className="w-4 h-4 text-yellow-500" title="Default workspace" />
                       )}
                     </CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {workspace.description || 'No description'}
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {workspace.description || 'No description provided'}
                     </p>
                   </div>
                 </div>
@@ -376,30 +388,30 @@ export default function Workspaces() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">Max {workspace.maxTeamMembers} members</span>
+                  <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-gray-600 dark:text-gray-400">Max {workspace.maxTeamMembers} members</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{workspace.credits} credits</span>
+                  <BarChart3 className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-gray-600 dark:text-gray-400">{workspace.credits} credits</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-2">
-                  <Palette className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 capitalize">{workspace.theme}</span>
+                  <Palette className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-gray-600 dark:text-gray-400 capitalize">{workspace.theme}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Bot className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 capitalize">{workspace.aiPersonality}</span>
+                  <Bot className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-gray-600 dark:text-gray-400 capitalize">{workspace.aiPersonality}</span>
                 </div>
               </div>
 
               {workspace.inviteCode && (
-                <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-mono text-gray-700">{workspace.inviteCode}</span>
+                    <span className="text-sm font-mono text-gray-700 dark:text-gray-300">{workspace.inviteCode}</span>
                   </div>
                   <Button
                     variant="ghost"
@@ -412,7 +424,7 @@ export default function Workspaces() {
                 </div>
               )}
 
-              <div className="text-xs text-gray-400 pt-2 border-t">
+              <div className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-200 dark:border-gray-700">
                 Created {new Date(workspace.createdAt).toLocaleDateString()}
               </div>
             </CardContent>

@@ -45,7 +45,7 @@ export default function Profile() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
         <div className="flex items-center space-x-6">
           <div className="relative">
             <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-700 rounded-full shadow-lg flex items-center justify-center">
@@ -67,13 +67,13 @@ export default function Profile() {
             </Button>
           </div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900">{displayName}</h1>
-            <p className="text-gray-600">{userData?.email}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{displayName}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{userData?.email}</p>
             <div className="flex items-center space-x-4 mt-2">
-              <div className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+              <div className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-3 py-1 rounded-full font-medium">
                 {userData?.plan || 'Free'} Plan
               </div>
-              <div className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+              <div className="text-sm bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-3 py-1 rounded-full font-medium">
                 {userData?.credits || 0} Credits
               </div>
             </div>
@@ -88,8 +88,8 @@ export default function Profile() {
       </div>
 
       {/* Profile Information */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Profile Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="displayName" className="flex items-center space-x-2">
@@ -114,7 +114,7 @@ export default function Profile() {
               id="email"
               value={userData?.email || ''}
               disabled
-              className="w-full bg-gray-50"
+              className="w-full bg-gray-50 dark:bg-gray-700"
             />
           </div>
 
@@ -127,7 +127,7 @@ export default function Profile() {
               id="username"
               value={userData?.username || ''}
               disabled
-              className="w-full bg-gray-50"
+              className="w-full bg-gray-50 dark:bg-gray-700"
             />
           </div>
 
@@ -140,7 +140,7 @@ export default function Profile() {
               id="created"
               value={userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : ''}
               disabled
-              className="w-full bg-gray-50"
+              className="w-full bg-gray-50 dark:bg-gray-700"
             />
           </div>
         </div>
@@ -158,16 +158,16 @@ export default function Profile() {
       </div>
 
       {/* Account Details */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Details</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Account Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center space-x-3">
-                <CreditCard className="w-5 h-5 text-blue-600" />
+                <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 <div>
-                  <div className="font-medium">Subscription Plan</div>
-                  <div className="text-sm text-gray-600">{userData?.plan || 'Free'} Plan</div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">Subscription Plan</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{userData?.plan || 'Free'} Plan</div>
                 </div>
               </div>
               <Button variant="outline" size="sm">
@@ -175,12 +175,12 @@ export default function Profile() {
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center space-x-3">
-                <Shield className="w-5 h-5 text-green-600" />
+                <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
                 <div>
-                  <div className="font-medium">Account Security</div>
-                  <div className="text-sm text-gray-600">Email verified</div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">Account Security</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Email verified</div>
                 </div>
               </div>
               <Button variant="outline" size="sm">
@@ -190,18 +190,18 @@ export default function Profile() {
           </div>
 
           <div className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="font-medium text-blue-900">Available Credits</div>
-              <div className="text-2xl font-bold text-blue-600">{userData?.credits || 0}</div>
-              <div className="text-sm text-blue-700 mt-2">
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-600">
+              <div className="font-medium text-blue-900 dark:text-blue-100">Available Credits</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{userData?.credits || 0}</div>
+              <div className="text-sm text-blue-700 dark:text-blue-300 mt-2">
                 Credits are used for AI content generation and analytics
               </div>
             </div>
 
-            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="font-medium text-purple-900">Referral Code</div>
-              <div className="text-lg font-bold text-purple-600">{userData?.referralCode}</div>
-              <div className="text-sm text-purple-700 mt-2">
+            <div className="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple-200 dark:border-purple-600">
+              <div className="font-medium text-purple-900 dark:text-purple-100">Referral Code</div>
+              <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{userData?.referralCode}</div>
+              <div className="text-sm text-purple-700 dark:text-purple-300 mt-2">
                 Share this code to earn referral bonuses
               </div>
             </div>

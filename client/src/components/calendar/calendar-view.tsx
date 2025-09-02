@@ -339,41 +339,41 @@ export function CalendarView() {
   return (
     <div className="w-full h-full">
       {/* Full Width Calendar Container */}
-      <div className="bg-white min-h-screen">
+      <div className="bg-white dark:bg-gray-900 min-h-screen">
         {/* Simple Calendar Header matching reference */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="icon" onClick={() => navigateWeek('prev')}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="font-semibold text-lg">Today</span>
+              <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">Today</span>
               <Button variant="ghost" size="icon" onClick={() => navigateWeek('next')}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
-            <span className="text-gray-600">{weekData.weekRange}</span>
+            <span className="text-gray-600 dark:text-gray-400">{weekData.weekRange}</span>
           </div>
           
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
               <Settings className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
               <Share2 className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
               Filters
               <Filter className="w-4 h-4 ml-2" />
             </Button>
-            <div className="flex border rounded-md">
-              <Button variant="ghost" size="sm">
+            <div className="flex border border-gray-300 dark:border-gray-600 rounded-md">
+              <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300">
                 <List className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300">
                 <Calendar className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="bg-gray-100">
+              <Button variant="ghost" size="sm" className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                 <Grid3X3 className="w-4 h-4" />
               </Button>
             </div>
@@ -383,17 +383,17 @@ export function CalendarView() {
         {/* Full Width Calendar Grid */}
         <div className="w-full">
           {/* Calendar Header */}
-          <div className="border-b border-gray-200 bg-gray-50">
+          <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <div className="grid grid-cols-7">
               {weekDays.map((day, index) => {
                 const currentDate = weekData.dates[index]
                 const isToday = currentDate.toDateString() === new Date().toDateString()
                 
                 return (
-                  <div key={day} className="text-center p-4 border-r border-gray-200 last:border-r-0">
-                    <div className="text-sm font-medium text-gray-600 mb-2">{day}</div>
+                  <div key={day} className="text-center p-4 border-r border-gray-200 dark:border-gray-700 last:border-r-0">
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{day}</div>
                     <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-sm font-medium ${
-                      isToday ? 'bg-slate-700 text-white' : 'text-gray-900'
+                      isToday ? 'bg-slate-700 text-white' : 'text-gray-900 dark:text-gray-100'
                     }`}>
                       {weekData.formattedDates[index]}
                     </div>
@@ -411,7 +411,7 @@ export function CalendarView() {
               const posts = getPostsForDate(date)
               
               return (
-                <div key={index} className={`p-4 space-y-3 min-h-[600px] bg-white ${index < 6 ? 'border-r border-gray-200' : ''}`}>
+                <div key={index} className={`p-4 space-y-3 min-h-[600px] bg-white dark:bg-gray-900 ${index < 6 ? 'border-r border-gray-200 dark:border-gray-700' : ''}`}>
                   
                   {/* Real Social Events - Compact blue badges */}
                   {event && (
@@ -423,7 +423,7 @@ export function CalendarView() {
 
                   {/* Scheduled Posts - Cards with thumbnails matching reference */}
                   {posts.map((post) => (
-                    <div key={post.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                    <div key={post.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
                       {/* Post image */}
                       <div className="relative">
                         <img 
@@ -441,27 +441,27 @@ export function CalendarView() {
                       
                       {/* Post details */}
                       <div className="p-3">
-                        <div className="text-xs font-medium text-gray-900 mb-1">{post.username}</div>
-                        <div className="text-xs text-gray-500 mb-1">{post.handle}</div>
-                        <div className="text-xs text-gray-500 mb-2">{post.time}</div>
+                        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-1">{post.username}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{post.handle}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{post.time}</div>
                         
                         <div className="flex items-center space-x-1">
                           {post.status === 'published' && (
                             <>
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-xs text-green-600 font-medium">Published</span>
+                              <span className="text-xs text-green-600 dark:text-green-400 font-medium">Published</span>
                             </>
                           )}
                           {post.status === 'scheduled' && (
                             <>
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              <span className="text-xs text-blue-600 font-medium">Scheduled</span>
+                              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Scheduled</span>
                             </>
                           )}
                           {post.status === 'draft' && (
                             <>
                               <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                              <span className="text-xs text-gray-600 font-medium">Draft</span>
+                              <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">Draft</span>
                             </>
                           )}
                         </div>
@@ -471,10 +471,10 @@ export function CalendarView() {
 
                   {/* Recommended Times - Simple purple cards */}
                   {recommendedTime && (
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                      <div className="text-xs text-purple-600 font-medium mb-1">Recommended time</div>
-                      <div className="text-sm font-bold text-purple-700">{recommendedTime.time}</div>
-                      <div className="text-xs text-gray-500">{recommendedTime.reason}</div>
+                    <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+                      <div className="text-xs text-purple-600 dark:text-purple-400 font-medium mb-1">Recommended time</div>
+                      <div className="text-sm font-bold text-purple-700 dark:text-purple-300">{recommendedTime.time}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{recommendedTime.reason}</div>
                     </div>
                   )}
                 </div>

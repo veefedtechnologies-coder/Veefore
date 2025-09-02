@@ -157,40 +157,46 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center space-x-3 h-auto p-2 hover:bg-gray-100 rounded-xl">
+        <Button variant="ghost" className="flex items-center space-x-3 h-auto p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">
           <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getThemeGradient(currentWorkspace.theme)} flex items-center justify-center text-white shadow-sm`}>
             <Building2 className="w-4 h-4" />
           </div>
           <div className="flex items-center space-x-2">
             <div className="text-left">
               <div className="flex items-center space-x-1">
-                <span className="font-medium text-gray-900 text-sm">{currentWorkspace.name}</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{currentWorkspace.name}</span>
                 {currentWorkspace.isDefault && (
                   <Crown className="w-3 h-3 text-yellow-500" />
                 )}
               </div>
-              <div className="text-xs text-gray-500 flex items-center space-x-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-1">
                 <span>{getPersonalityIcon(currentWorkspace.aiPersonality)}</span>
                 <span>{currentWorkspace.credits} credits</span>
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           </div>
         </Button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="start" className="w-80 p-2">
-        <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Switch Workspace</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onNavigateToWorkspaces}
-            className="h-6 text-xs"
-          >
-            <Settings className="w-3 h-3 mr-1" />
-            Manage
-          </Button>
+      <DropdownMenuContent className="w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal p-4">
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Switch Workspace</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onNavigateToWorkspaces}
+                className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''} available
+            </div>
+          </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
@@ -199,7 +205,7 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
             <DropdownMenuItem
               key={workspace.id}
               onClick={() => handleWorkspaceSwitch(workspace.id)}
-              className="flex items-center space-x-3 p-3 cursor-pointer hover:bg-gray-50 rounded-lg"
+              className="flex items-center space-x-3 p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
             >
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getThemeGradient(workspace.theme)} flex items-center justify-center text-white shadow-sm flex-shrink-0`}>
                 <Building2 className="w-5 h-5" />
@@ -207,16 +213,16 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2">
-                  <span className="font-medium text-gray-900 text-sm truncate">{workspace.name}</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">{workspace.name}</span>
                   {workspace.isDefault && (
                     <Crown className="w-3 h-3 text-yellow-500 flex-shrink-0" />
                   )}
                   {workspace.id === currentWorkspace.id && (
-                    <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
                   )}
                 </div>
                 
-                <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+                <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-1">
                     <span>{getPersonalityIcon(workspace.aiPersonality)}</span>
                     <span className="capitalize">{workspace.aiPersonality}</span>
@@ -232,7 +238,7 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
                 </div>
                 
                 {workspace.description && (
-                  <p className="text-xs text-gray-400 mt-1 truncate">{workspace.description}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">{workspace.description}</p>
                 )}
               </div>
             </DropdownMenuItem>

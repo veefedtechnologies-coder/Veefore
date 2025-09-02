@@ -311,7 +311,7 @@ export default function AutomationAdvanced() {
   const renderSetupTab = () => (
     <div className="space-y-4">
       {/* Platform Selection */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Globe className="w-4 h-4" />
           Platform & Account
@@ -338,7 +338,7 @@ export default function AutomationAdvanced() {
         <select
           value={selectedAccount}
           onChange={(e) => setSelectedAccount(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg bg-white"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
         >
           <option value="">Select Account</option>
           {mockAccounts.map((account) => (
@@ -350,7 +350,7 @@ export default function AutomationAdvanced() {
       </div>
 
       {/* Automation Type */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Zap className="w-4 h-4" />
           Automation Type
@@ -377,7 +377,7 @@ export default function AutomationAdvanced() {
       </div>
 
       {/* Keywords & Triggers */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Hash className="w-4 h-4" />
           Keywords & Triggers
@@ -422,7 +422,7 @@ export default function AutomationAdvanced() {
       </div>
 
       {/* Response Messages */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <MessageCircle className="w-4 h-4" />
           Response Messages
@@ -464,7 +464,7 @@ export default function AutomationAdvanced() {
 
   const renderTargetingTab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Target className="w-4 h-4" />
           Audience Targeting
@@ -548,7 +548,7 @@ export default function AutomationAdvanced() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <UserPlus className="w-4 h-4" />
           Auto-Follow Settings
@@ -614,7 +614,7 @@ export default function AutomationAdvanced() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Heart className="w-4 h-4" />
           Auto-Like Settings
@@ -678,7 +678,7 @@ export default function AutomationAdvanced() {
 
   const renderTimingTab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Clock className="w-4 h-4" />
           Active Hours
@@ -769,7 +769,7 @@ export default function AutomationAdvanced() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Timer className="w-4 h-4" />
           Rate Limits
@@ -808,7 +808,7 @@ export default function AutomationAdvanced() {
 
   const renderAITab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Brain className="w-4 h-4" />
           AI Personality
@@ -902,7 +902,7 @@ export default function AutomationAdvanced() {
 
   const renderSafetyTab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Shield className="w-4 h-4" />
           Account Safety
@@ -950,7 +950,7 @@ export default function AutomationAdvanced() {
 
   const renderAnalyticsTab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <BarChart3 className="w-4 h-4" />
           Analytics & Reporting
@@ -1031,7 +1031,7 @@ export default function AutomationAdvanced() {
 
   const renderIntegrationsTab = () => (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Globe className="w-4 h-4" />
           External Integrations
@@ -1129,7 +1129,7 @@ export default function AutomationAdvanced() {
           {/* Form Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Status Toggle */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-400'}`} />

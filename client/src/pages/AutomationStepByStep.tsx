@@ -45,6 +45,7 @@ import { apiRequest } from '@/lib/queryClient'
 import { useToast } from '@/hooks/use-toast'
 import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 import { useAuth } from '@/hooks/useAuth'
+import { saveAutomationState, loadAutomationState, clearAutomationCache, clearUserAutomationCache } from '@/lib/cache'
 
 // AutomationListManager component
 const AutomationListManager = ({ 
@@ -66,8 +67,18 @@ const AutomationListManager = ({
         ruleId,
         updates: { isActive: !isActive }
       })
+      toast({
+        title: isActive ? "Automation Paused" : "Automation Resumed",
+        description: isActive ? "Your automation has been paused" : "Your automation is now active",
+        variant: "default",
+      })
     } catch (error) {
       console.error('Error toggling automation:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update automation status",
+        variant: "destructive",
+      })
     }
   }
 
@@ -75,8 +86,18 @@ const AutomationListManager = ({
     if (window.confirm('Are you sure you want to delete this automation rule?')) {
       try {
         await deleteAutomationMutation.mutateAsync(ruleId)
+        toast({
+          title: "Automation Deleted",
+          description: "Your automation rule has been successfully deleted",
+          variant: "default",
+        })
       } catch (error) {
         console.error('Error deleting automation:', error)
+        toast({
+          title: "Error",
+          description: "Failed to delete automation rule",
+          variant: "destructive",
+        })
       }
     }
   }
@@ -84,11 +105,28 @@ const AutomationListManager = ({
   if (rulesLoading) {
     return (
       <div className="p-8">
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-100 rounded-lg p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+        <div className="mb-8">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-64 mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96 animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 animate-pulse border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                  <div>
+                    <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  </div>
+                </div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </div>
             </div>
           ))}
         </div>
@@ -98,87 +136,167 @@ const AutomationListManager = ({
 
   return (
     <div className="p-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Automation Rules</h2>
-        <p className="text-gray-600">Manage your active automation rules</p>
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Automation Rules
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Manage and monitor your active automation rules
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {automationRules?.length || 0}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Total Rules
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-green-600">
+                {automationRules?.filter(rule => rule.isActive).length || 0}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Active
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {automationRules?.length === 0 ? (
-        <div className="text-center py-12">
-          <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No automation rules yet</h3>
-          <p className="text-gray-600 mb-4">Create your first automation rule to get started</p>
+        <div className="text-center py-16">
+          <div className="relative">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <Bot className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">!</span>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            No automation rules yet
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+            Create your first automation rule to start engaging with your audience automatically
+          </p>
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
+            <Bot className="w-5 h-5" />
+            Create Your First Rule
+          </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {automationRules?.map((rule) => (
-            <div key={rule.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <div className="flex items-start justify-between">
+            <div key={rule.id} className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              {/* Status Indicator */}
+              <div className="absolute top-4 right-4">
+                <div className={`w-3 h-3 rounded-full ${
+                  rule.isActive 
+                    ? 'bg-green-500 animate-pulse' 
+                    : 'bg-gray-400'
+                }`}></div>
+              </div>
+
+              {/* Header */}
+              <div className="flex items-start gap-4 mb-6">
+                <div className={`p-3 rounded-2xl ${
+                  rule.isActive 
+                    ? 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30' 
+                    : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800'
+                }`}>
+                  <Bot className={`w-6 h-6 ${
+                    rule.isActive 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`} />
+                </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`p-2 rounded-lg ${rule.isActive ? 'bg-green-100' : 'bg-gray-100'}`}>
-                      <Bot className={`w-5 h-5 ${rule.isActive ? 'text-green-600' : 'text-gray-400'}`} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{rule.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize">{rule.type} automation</p>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      rule.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {rule.isActive ? 'Active' : 'Paused'}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <span className="text-sm text-gray-500">Keywords:</span>
-                      <div className="mt-1">
-                        {rule.keywords?.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {rule.keywords.slice(0, 3).map((keyword: string, index: number) => (
-                              <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                {keyword}
-                              </span>
-                            ))}
-                            {rule.keywords.length > 3 && (
-                              <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                                +{rule.keywords.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">No keywords</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-sm text-gray-500">Target Posts:</span>
-                      <p className="text-sm text-gray-900">{rule.targetMediaIds?.length || 0} posts</p>
-                    </div>
-
-                    <div>
-                      <span className="text-sm text-gray-500">Responses:</span>
-                      <p className="text-sm text-gray-900">{rule.responses?.length || 0} comment + {rule.dmResponses?.length || 0} DM</p>
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-gray-500">
-                    Created: {new Date(rule.createdAt).toLocaleDateString()}
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    {rule.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 capitalize mb-3">
+                    {rule.type} automation
+                  </p>
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                    rule.isActive 
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${
+                      rule.isActive ? 'bg-green-500' : 'bg-gray-400'
+                    }`}></div>
+                    {rule.isActive ? 'Active' : 'Paused'}
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center gap-2 ml-4">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                  <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                    {rule.keywords?.length || 0}
+                  </div>
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    Keywords
+                  </div>
+                </div>
+                <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+                  <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                    {rule.targetMediaIds?.length || 0}
+                  </div>
+                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                    Target Posts
+                  </div>
+                </div>
+                <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl">
+                  <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                    {(rule.responses?.length || 0) + (rule.dmResponses?.length || 0)}
+                  </div>
+                  <div className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                    Responses
+                  </div>
+                </div>
+              </div>
+
+              {/* Keywords Preview */}
+              {rule.keywords?.length > 0 && (
+                <div className="mb-6">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Trigger Keywords:
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {rule.keywords.slice(0, 4).map((keyword: string, index: number) => (
+                      <span key={index} className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-800 dark:text-blue-300 rounded-lg text-xs font-medium">
+                        {keyword}
+                      </span>
+                    ))}
+                    {rule.keywords.length > 4 && (
+                      <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg text-xs font-medium">
+                        +{rule.keywords.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Created {new Date(rule.createdAt).toLocaleDateString()}
+                </div>
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleToggleActive(rule.id, rule.isActive)}
                     disabled={updateAutomationMutation.isPending}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-2 rounded-xl transition-all duration-200 ${
                       rule.isActive 
-                        ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' 
-                        : 'bg-green-100 text-green-600 hover:bg-green-200'
+                        ? 'bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 text-yellow-600 dark:text-yellow-400 hover:from-yellow-200 hover:to-orange-200 dark:hover:from-yellow-900/50 dark:hover:to-orange-900/50' 
+                        : 'bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-600 dark:text-green-400 hover:from-green-200 hover:to-emerald-200 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50'
                     }`}
                     title={rule.isActive ? 'Pause automation' : 'Resume automation'}
                   >
@@ -188,7 +306,7 @@ const AutomationListManager = ({
                   <button
                     onClick={() => handleDelete(rule.id)}
                     disabled={deleteAutomationMutation.isPending}
-                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                    className="p-2 bg-gradient-to-r from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 text-red-600 dark:text-red-400 rounded-xl hover:from-red-200 hover:to-pink-200 dark:hover:from-red-900/50 dark:hover:to-pink-900/50 transition-all duration-200"
                     title="Delete automation"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -225,7 +343,7 @@ interface Comment {
   replies: CommentReply[];
 }
 
-const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, commentReplies, dmMessage, selectedAccount, realAccounts, newKeyword, commentInputText, setCommentInputText, getCurrentKeywords, getCurrentKeywordsSetter, setSelectedKeywords, updateSourceRef, currentTime }: {
+const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, commentReplies, dmMessage, selectedAccount, realAccounts, newKeyword, commentInputText, setCommentInputText, getCurrentKeywords, setSelectedKeywords, updateSourceRef, currentTime }: {
   isVisible: boolean;
   onClose: () => void;
   triggerKeywords: string[]
@@ -238,7 +356,6 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
   commentInputText: string
   setCommentInputText: (text: string) => void
   getCurrentKeywords: () => string[]
-  getCurrentKeywordsSetter: () => React.Dispatch<React.SetStateAction<string[]>>
   setSelectedKeywords: (keywords: string[]) => void
   updateSourceRef: React.MutableRefObject<'trigger' | 'comment' | null>
   currentTime: Date
@@ -516,12 +633,12 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
       onClick={onClose}
     >
       <div 
-        className={`absolute left-0 right-0 bg-white rounded-t-3xl transition-transform duration-300 ${
+        className={`absolute left-0 right-0 bg-white dark:bg-gray-800 rounded-t-3xl transition-transform duration-300 ${
           isVisible ? 'translate-y-0' : 'translate-y-full'
         }`}
         onClick={(e) => e.stopPropagation()}
         style={{ 
-          height: '70%',
+          height: '80%',
           bottom: '0',
           display: 'flex',
           flexDirection: 'column'
@@ -533,21 +650,77 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
         </div>
         
         {/* Header */}
-        <div className="px-4 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 text-lg">Comments</h3>
-            <button 
-              className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors"
-              onClick={onClose}
-            >
-              Close
-            </button>
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+          <div className="flex items-center justify-center">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-xl">Comments</h3>
           </div>
         </div>
         
         {/* Comments List */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
-          {testComments.map((comment) => (
+          {/* Show message when automation type is not properly configured */}
+          {(!automationType || automationType === 'comment_only' || automationType === '') && (
+            <div className="flex-1 flex items-center justify-center py-20">
+              <div className="text-center max-w-sm mx-auto">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed">
+                  Please configure your automation type first to see comment previews
+                </p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                  Go back and select an automation type to continue
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Show keyword guidance message when no trigger keywords */}
+          {automationType && automationType !== 'comment_only' && automationType !== '' && triggerKeywords.length === 0 && (
+            <div className="flex-1 flex items-center justify-center py-20">
+              <div className="text-center max-w-sm mx-auto">
+                {automationType === 'comment_dm' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-blue-100 to-indigo-200 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full flex items-center justify-center">
+                      <Hash className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">🚀 Ready to Automate!</h4>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed">
+                      Add trigger keywords to see how your automation will work. When someone comments with these words, 
+                      your bot will automatically respond with your configured message!
+                    </p>
+                  </>
+                )}
+                {automationType === 'dm_only' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-100 to-pink-200 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full flex items-center justify-center">
+                      <MessageSquare className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">💬 Start the Conversation!</h4>
+                    <p className="text-purple-700 dark:text-purple-300 text-sm leading-relaxed">
+                      Add trigger keywords to see how your automation will work. When someone comments with these words, 
+                      your bot will automatically send them a direct message!
+                    </p>
+                  </>
+                )}
+                {automationType === 'comment_only' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-100 to-emerald-200 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full flex items-center justify-center">
+                      <MessageCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">✨ Engage Your Audience!</h4>
+                    <p className="text-green-700 dark:text-green-300 text-sm leading-relaxed">
+                      Add trigger keywords to see how your automation will work. When someone comments with these words, 
+                      your bot will automatically respond with your configured comment!
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Show comments when automation type is properly selected and keywords exist */}
+          {automationType && automationType !== 'comment_only' && automationType !== '' && triggerKeywords.length > 0 && testComments.map((comment) => (
             <div key={comment.id} className="mb-6 pb-0">
               {/* Main Comment */}
               <div className="flex gap-3">
@@ -568,11 +741,11 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                     <div className="flex-1 min-w-0">
                       {/* Username and Timestamp on first line */}
                       <div className="flex items-baseline gap-2 mb-1">
-                        <span className="text-sm font-semibold text-gray-900 leading-none">{comment.username}</span>
-                        <span className="text-xs text-gray-500 flex-shrink-0 leading-none">{getRelativeTime(comment.timestamp)}</span>
+                                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-none">{comment.username}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 leading-none">{getRelativeTime(comment.timestamp)}</span>
                       </div>
                       {/* Comment text on second line */}
-                      <span className="text-sm text-gray-900 leading-none block">{comment.content}</span>
+                      <span className="text-sm text-gray-900 dark:text-gray-100 leading-none block">{comment.content}</span>
                     </div>
                     
                     {/* Right side - Like Button and Count - Aligned with username */}
@@ -586,8 +759,8 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                   
                   {/* Actions Row - Below comment text */}
                   <div className="flex items-center gap-4">
-                    <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
-                    <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">See translation</button>
+                    <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
+                    <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">See translation</button>
                   </div>
                   
                   {/* Replies - Only show one reply per comment */}
@@ -611,10 +784,10 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                               {/* Left side - Username, Timestamp, and Reply Text */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start gap-1.5 mb-1">
-                                  <span className="font-semibold text-sm text-gray-900 leading-none">{reply.username}</span>
-                                  <span className="text-xs text-gray-500 flex-shrink-0 leading-none">{getRelativeTime(reply.timestamp)}</span>
+                                  <span className="font-semibold text-sm text-gray-900 dark:text-gray-100 leading-none">{reply.username}</span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 leading-none">{getRelativeTime(reply.timestamp)}</span>
                                 </div>
-                                <span className="text-sm text-gray-900 leading-none block">{reply.content}</span>
+                                <span className="text-sm text-gray-900 dark:text-gray-100 leading-none block">{reply.content}</span>
                               </div>
                               
                               {/* Right side - Like Button and Count - Aligned with username */}
@@ -628,7 +801,7 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                             
                             {/* Reply Actions Row - Below reply text */}
                             <div className="flex items-center gap-4">
-                              <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
+                              <button className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors leading-none focus:outline-none focus:ring-0 focus:border-0">Reply</button>
                             </div>
                           </div>
                         </div>
@@ -642,7 +815,7 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
         </div>
         
         {/* Comment Input */}
-        <div className="px-4 py-4 border-t border-gray-200 bg-white mt-auto">
+        <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mt-auto transition-colors duration-300">
           <div className="flex gap-3">
             {/* User Avatar - Left side */}
             <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 flex items-center">
@@ -656,13 +829,13 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                         {/* Input Field and Actions Block - Right side */}
             <div className="flex-1 flex items-center justify-center gap-3">
               {/* Input Field */}
-              <div className="w-3/4 bg-gray-50 rounded-full px-4 py-2 min-h-[36px] flex items-center relative">
+              <div className="w-3/4 bg-gray-50 dark:bg-gray-700 rounded-full px-4 py-2 min-h-[36px] flex items-center relative">
                 <input
                   type="text"
                   placeholder="Add a comment..."
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none resize-none pr-12 leading-none focus:outline-none focus:ring-0 focus:border-0 focus:border-transparent focus:shadow-none focus:appearance-none focus:border-none comment-input-no-focus"
+                  className="w-full bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none resize-none pr-12 leading-none focus:outline-none focus:ring-0 focus:border-0 focus:border-transparent focus:shadow-none focus:appearance-none focus:border-none comment-input-no-focus"
                   style={{ 
                     minHeight: '16px',
                     border: 'none !important',
@@ -686,13 +859,25 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
                 }`}
                 onClick={() => {
                   if (commentText.trim()) {
-                    // Add the comment text as a keyword
-                    const currentKeywords = getCurrentKeywords();
-                    const setCurrentKeywords = getCurrentKeywordsSetter();
-                    if (!currentKeywords.includes(commentText.trim())) {
-                      const updatedKeywords = [...currentKeywords, commentText.trim()];
-                      setCurrentKeywords(updatedKeywords);
+                    // Add the comment text as a keyword based on automation type
+                    if (automationType === 'comment_dm') {
+                      if (!keywords.includes(commentText.trim())) {
+                        const updatedKeywords = [...keywords, commentText.trim()];
+                        setKeywords(updatedKeywords);
                       setSelectedKeywords(updatedKeywords);
+                      }
+                    } else if (automationType === 'dm_only') {
+                      if (!dmKeywords.includes(commentText.trim())) {
+                        const updatedKeywords = [...dmKeywords, commentText.trim()];
+                        setDmKeywords(updatedKeywords);
+                        setSelectedKeywords(updatedKeywords);
+                      }
+                    } else if (automationType === 'comment_only') {
+                      if (!commentKeywords.includes(commentText.trim())) {
+                        const updatedKeywords = [...commentKeywords, commentText.trim()];
+                        setCommentKeywords(updatedKeywords);
+                        setSelectedKeywords(updatedKeywords);
+                      }
                     }
                     // Clear both input fields
                     setCommentText('');
@@ -726,6 +911,8 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
 export default function AutomationStepByStep() {
   console.log('AutomationStepByStep component loaded successfully')
   
+  // Cache is now persistent and won't interfere with auth
+  
   const queryClient = useQueryClient()
   const { toast } = useToast()
   
@@ -738,8 +925,11 @@ export default function AutomationStepByStep() {
   const [selectedAutomationType, setSelectedAutomationType] = useState<string>('')
   const [selectedPost, setSelectedPost] = useState<any>(null)
   
-  // Get current workspace
+  // Get current workspace and user
   const { currentWorkspace } = useCurrentWorkspace()
+  const { user } = useAuth()
+
+
 
   // Fetch real Instagram accounts for current workspace
   const { data: socialAccountsData, isLoading: accountsLoading } = useQuery({
@@ -1031,6 +1221,57 @@ export default function AutomationStepByStep() {
   // Refs for dropdown management
   const automationTypeDropdownRef = useRef<HTMLDivElement>(null)
   
+  // Load cached state on component mount - with validation
+  useEffect(() => {
+    if (!user?.uid) return; // Wait for user to be available
+    
+    const cachedState = loadAutomationState(user.uid)
+    if (cachedState) {
+      console.log('Loading cached automation state for user:', user.uid, cachedState)
+      
+      // Validate cached account against current user's accounts
+      if (cachedState.selectedAccount && realAccounts.length > 0) {
+        const isValidAccount = realAccounts.some((account: any) => account.id === cachedState.selectedAccount)
+        if (isValidAccount) {
+          setSelectedAccount(cachedState.selectedAccount)
+        } else {
+          console.log('Cached account is no longer valid, clearing cache')
+          clearUserAutomationCache(user.uid)
+        }
+      } else if (cachedState.selectedAccount && realAccounts.length === 0) {
+        console.log('No social accounts found, clearing cache')
+        clearUserAutomationCache(user.uid)
+      }
+      
+      // Always restore content type if valid
+      if (cachedState.contentType) setContentType(cachedState.contentType)
+    } else {
+      console.log('No cached automation state found for user:', user.uid)
+    }
+  }, [user?.uid, realAccounts]) // Depend on user ID and realAccounts to re-validate when accounts load
+
+  // Save state to cache whenever important values change
+  useEffect(() => {
+    if (!user?.uid) return; // Wait for user to be available
+    
+    // Only save to cache if we have meaningful data
+    if (selectedAccount || contentType) {
+      const stateToCache = {
+        selectedAccount,
+        contentType
+      }
+      
+      saveAutomationState(stateToCache, user.uid)
+      console.log('Automation state saved to cache for user:', user.uid, stateToCache)
+    }
+  }, [
+    user?.uid,
+    selectedAccount,
+    contentType
+  ])
+
+  // Cache is now persistent - no monitoring needed
+  
   // Handle click outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1204,73 +1445,214 @@ export default function AutomationStepByStep() {
     switch (account.platform.toLowerCase()) {
       case 'instagram':
         return [
-          { id: 'post', name: 'Post', description: 'Regular feed posts', icon: '📷' },
-          { id: 'reel', name: 'Reel', description: 'Short video content', icon: '🎬' },
-          { id: 'story', name: 'Story', description: '24h disappearing content', icon: '⭕' }
+          { 
+            id: 'post', 
+            name: 'Post', 
+            description: 'Regular feed posts', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                <polyline points="21,15 16,10 5,21" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            )
+          },
+          { 
+            id: 'reel', 
+            name: 'Reel', 
+            description: 'Short video content', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
+              </svg>
+            )
+          },
+          { 
+            id: 'story', 
+            name: 'Story', 
+            description: '24h disappearing content', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              </svg>
+            )
+          }
         ]
       case 'youtube':
         return [
-          { id: 'video', name: 'Video', description: 'Long-form videos', icon: '📹' },
-          { id: 'short', name: 'Short', description: 'Vertical short videos', icon: '⚡' }
+          { 
+            id: 'video', 
+            name: 'Video', 
+            description: 'Long-form videos', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+              </svg>
+            )
+          },
+          { 
+            id: 'short', 
+            name: 'Short', 
+            description: 'Vertical short videos', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="2" width="18" height="20" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <polygon points="8,6 14,12 8,18" fill="currentColor"/>
+              </svg>
+            )
+          }
         ]
       case 'linkedin':
         return [
-          { id: 'post', name: 'Post', description: 'Professional updates', icon: '💼' },
-          { id: 'article', name: 'Article', description: 'Long-form content', icon: '📄' }
+          { 
+            id: 'post', 
+            name: 'Post', 
+            description: 'Professional updates', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <path d="M9 9h6v6H9z" fill="currentColor"/>
+                <path d="M21 15l-3-3-3 3" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            )
+          },
+          { 
+            id: 'article', 
+            name: 'Article', 
+            description: 'Long-form content', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2"/>
+                <polyline points="10,9 9,9 8,9" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            )
+          }
         ]
       case 'twitter':
         return [
-          { id: 'tweet', name: 'Tweet', description: 'Short messages', icon: '🐦' },
-          { id: 'thread', name: 'Thread', description: 'Connected tweets', icon: '🧵' }
+          { 
+            id: 'tweet', 
+            name: 'Tweet', 
+            description: 'Short messages', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            )
+          },
+          { 
+            id: 'thread', 
+            name: 'Thread', 
+            description: 'Connected tweets', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <path d="M13 8H7" stroke="currentColor" strokeWidth="2"/>
+                <path d="M17 12H7" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            )
+          }
         ]
       default:
         return [
-          { id: 'post', name: 'Post', description: 'General content', icon: '📝' }
+          { 
+            id: 'post', 
+            name: 'Post', 
+            description: 'General content', 
+            icon: (
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2"/>
+                <polyline points="10,9 9,9 8,9" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            )
+          }
         ]
     }
   }
 
   const addKeyword = () => {
     if (newKeyword.trim()) {
-      const currentKeywords = getCurrentKeywords()
-      const setCurrentKeywords = getCurrentKeywordsSetter()
-      if (!currentKeywords.includes(newKeyword.trim())) {
-        const updatedKeywords = [...currentKeywords, newKeyword.trim()]
-        setCurrentKeywords(updatedKeywords)
+      if (!keywords.includes(newKeyword.trim())) {
+        const updatedKeywords = [...keywords, newKeyword.trim()]
+        setKeywords(updatedKeywords)
         setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
         setNewKeyword('')
         setCommentInputText('') // Clear comment input text as well
         
-        // Show comment screen for comment-related automations when keywords are added
-        if ((automationType === 'comment_dm' || automationType === 'comment_only') && updatedKeywords.length === 1) {
+        // Show comment screen for comment_dm automation when keywords are added AND automation type is selected
+        if (automationType && automationType === 'comment_dm' && updatedKeywords.length === 1) {
           setShowCommentScreen(true)
         }
       }
     }
   }
 
-  const removeKeyword = (keywordToRemove) => {
-    const currentKeywords = getCurrentKeywords()
-    const setCurrentKeywords = getCurrentKeywordsSetter()
-    const updatedKeywords = currentKeywords.filter(k => k !== keywordToRemove)
-    setCurrentKeywords(updatedKeywords)
+  const removeKeyword = (index) => {
+    const updatedKeywords = keywords.filter((_, i) => i !== index)
+    setKeywords(updatedKeywords)
+    setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
+  }
+
+  const addDmKeyword = () => {
+    if (newKeyword.trim()) {
+      if (!dmKeywords.includes(newKeyword.trim())) {
+        const updatedKeywords = [...dmKeywords, newKeyword.trim()]
+        setDmKeywords(updatedKeywords)
+        setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
+        setNewKeyword('')
+        setCommentInputText('') // Clear comment input text as well
+        
+        // Show comment screen for dm_only automation when keywords are added
+        if (automationType === 'dm_only' && updatedKeywords.length === 1) {
+          setShowCommentScreen(true)
+        }
+      }
+    }
+  }
+
+  const removeDmKeyword = (index) => {
+    const updatedKeywords = dmKeywords.filter((_, i) => i !== index)
+    setDmKeywords(updatedKeywords)
+    setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
+  }
+
+  const addCommentKeyword = () => {
+    if (newKeyword.trim()) {
+      if (!commentKeywords.includes(newKeyword.trim())) {
+        const updatedKeywords = [...commentKeywords, newKeyword.trim()]
+        setCommentKeywords(updatedKeywords)
+        setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
+        setNewKeyword('')
+        setCommentInputText('') // Clear comment input text as well
+        
+        // Show comment screen for comment_only automation when keywords are added
+        if (automationType === 'comment_only' && updatedKeywords.length === 1) {
+          setShowCommentScreen(true)
+        }
+      }
+    }
+  }
+
+  const removeCommentKeyword = (index) => {
+    const updatedKeywords = commentKeywords.filter((_, i) => i !== index)
+    setCommentKeywords(updatedKeywords)
     setSelectedKeywords(updatedKeywords) // Update selected keywords for comment screen
   }
 
 
 
-  const getCurrentKeywordsSetter = (): React.Dispatch<React.SetStateAction<string[]>> => {
-    switch (automationType) {
-      case 'comment_dm':
-        return setKeywords
-      case 'comment_only':
-        return setCommentKeywords
-      case 'dm_only':
-        return setDmKeywords
-      default:
-        return setKeywords
-    }
-  }
+
 
   const canProceedToNext = () => {
     switch (currentStep) {
@@ -1325,6 +1707,10 @@ export default function AutomationStepByStep() {
   const handleFinish = async () => {
     // Create the automation rule with real API call
     await createAutomationRule()
+    
+    // Clear the cache after successful automation creation
+    clearAutomationCache()
+    console.log('Automation cache cleared after successful creation')
   }
 
   const renderStepContent = () => {
@@ -1334,8 +1720,8 @@ export default function AutomationStepByStep() {
           <div className="space-y-8">
             {/* Step 1: Select Account */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md dark:shadow-blue-500/30">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 Select Account
@@ -1343,7 +1729,7 @@ export default function AutomationStepByStep() {
               <div className="relative" ref={accountDropdownRef}>
                 <button
                   onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
+                  className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-all duration-200 text-gray-800 dark:text-gray-200 font-medium text-left flex items-center justify-between group"
                 >
                   <div className="flex items-center space-x-3">
                     {selectedAccount && !accountsLoading && (
@@ -1365,7 +1751,7 @@ export default function AutomationStepByStep() {
                         </span>
                       </div>
                     )}
-                    <span className={selectedAccount ? 'text-gray-900' : 'text-gray-500'}>
+                    <span className={selectedAccount ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
                       {accountsLoading ? 'Loading accounts...' : selectedAccount 
                         ? realAccounts.find((acc: any) => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.platform
                         : 'Choose your social media account...'
@@ -1376,8 +1762,8 @@ export default function AutomationStepByStep() {
                 </button>
                 
                 {accountDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
-                    <div className="p-3 border-b border-gray-100">
+                  <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                    <div className="p-3 border-b border-gray-100 dark:border-gray-700">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
@@ -1385,7 +1771,7 @@ export default function AutomationStepByStep() {
                           placeholder="Search accounts..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         />
                       </div>
                     </div>
@@ -1403,7 +1789,7 @@ export default function AutomationStepByStep() {
                               setAccountDropdownOpen(false)
                               setSearchTerm('')
                             }}
-                            className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors duration-150 flex items-center justify-between group"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center justify-between group"
                           >
                             <div className="flex items-center space-x-3">
                               <img 
@@ -1422,8 +1808,8 @@ export default function AutomationStepByStep() {
                                 </span>
                               </div>
                               <div>
-                                <div className="font-medium text-gray-900">{account.name}</div>
-                                <div className="text-sm text-gray-500">{account.followers} • {account.platform}</div>
+                                <div className="font-medium text-gray-900 dark:text-gray-100">{account.name}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{account.followers} • {account.platform}</div>
                               </div>
                             </div>
                             {selectedAccount === account.id && (
@@ -1447,8 +1833,8 @@ export default function AutomationStepByStep() {
             {/* Step 2: Select Content Type (only shown when account is selected) */}
             {selectedAccount && (
               <div className="animate-fadeIn">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg shadow-md dark:shadow-purple-500/30">
                     <FileText className="w-4 h-4 text-white" />
                   </div>
                   Select Content Type
@@ -1456,10 +1842,10 @@ export default function AutomationStepByStep() {
                 <div className="relative" ref={contentTypeDropdownRef}>
                   <button
                     onClick={() => setContentTypeDropdownOpen(!contentTypeDropdownOpen)}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-purple-300 focus:border-purple-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
+                    className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 hover:border-purple-300 dark:hover:border-purple-400 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-all duration-200 text-gray-800 dark:text-gray-200 font-medium text-left flex items-center justify-between group"
                     disabled={!selectedAccount}
                   >
-                    <span className={contentType ? 'text-gray-900' : 'text-gray-500'}>
+                    <span className={contentType ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
                       {contentType 
                         ? getContentTypesForPlatform(selectedAccount).find(type => type.id === contentType)?.name + ' - ' + getContentTypesForPlatform(selectedAccount).find(type => type.id === contentType)?.description
                         : 'Choose content type for your automation...'
@@ -1469,7 +1855,7 @@ export default function AutomationStepByStep() {
                   </button>
                   
                   {contentTypeDropdownOpen && selectedAccount && (
-                    <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                    <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
                       <div className="py-1">
                         {getContentTypesForPlatform(selectedAccount).map(type => (
                           <button
@@ -1478,15 +1864,15 @@ export default function AutomationStepByStep() {
                               setContentType(type.id)
                               setContentTypeDropdownOpen(false)
                             }}
-                            className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-colors duration-150 flex items-center justify-between group"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center justify-between group"
                           >
                             <div className="flex items-center space-x-3">
                               <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white">
                                 {type.icon}
                               </div>
                               <div>
-                                <div className="font-medium text-gray-900">{type.name}</div>
-                                <div className="text-sm text-gray-500">{type.description}</div>
+                                <div className="font-medium text-gray-900 dark:text-gray-100">{type.name}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{type.description}</div>
                               </div>
                             </div>
                             {contentType === type.id && (
@@ -1504,8 +1890,8 @@ export default function AutomationStepByStep() {
             {/* Step 3: Select Post (only shown when content type is selected) */}
             {selectedAccount && contentType && (
               <div className="animate-fadeIn">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg shadow-md dark:shadow-emerald-500/30">
                     <Eye className="w-4 h-4 text-white" />
                   </div>
                   Select Post
@@ -1522,13 +1908,13 @@ export default function AutomationStepByStep() {
                       key={post.id}
                       className={`cursor-pointer rounded-lg border-2 transition-all hover:shadow-md ${
                         selectedPost?.id === post.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                       }`}
                       onClick={() => setSelectedPost(post)}
                     >
                       <div className="p-3">
-                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg mb-2 overflow-hidden">
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg mb-2 overflow-hidden">
                           {post.type === 'reel' && post.image ? (
                             // Video player for reels
                             <div className="relative w-full h-full group">
@@ -1620,13 +2006,13 @@ export default function AutomationStepByStep() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Camera className="w-8 h-8 text-gray-400" />
+                            <Camera className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                           </div>
                         )}
                       </div>
                       <div className="space-y-1">
-                        <h4 className="font-medium text-gray-900 text-sm truncate">{post.title}</h4>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">{post.title}</h4>
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                             <span className="capitalize flex items-center gap-1">
                               {post.type === 'reel' && <PlayCircle className="w-3 h-3 text-purple-500" />}
                               {post.type}
@@ -1671,8 +2057,8 @@ export default function AutomationStepByStep() {
           <div className="space-y-8">
             {/* Step 1: Choose Automation Type */}
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg dark:shadow-emerald-500/30">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
                 Choose Automation Type
@@ -1680,9 +2066,9 @@ export default function AutomationStepByStep() {
               <div className="relative" ref={automationTypeDropdownRef}>
                 <button
                   onClick={() => setAutomationTypeDropdownOpen(!automationTypeDropdownOpen)}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-emerald-300 focus:border-emerald-500 focus:outline-none transition-all duration-200 text-gray-800 font-medium text-left flex items-center justify-between group"
+                  className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 hover:border-emerald-300 dark:hover:border-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 focus:outline-none transition-all duration-200 text-gray-800 dark:text-gray-200 font-medium text-left flex items-center justify-between group"
                 >
-                  <span className={automationType ? 'text-gray-900' : 'text-gray-500'}>
+                  <span className={automationType ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
                     {automationType 
                       ? automationTypes.find(type => type.id === automationType)?.name + ' - ' + automationTypes.find(type => type.id === automationType)?.description
                       : 'Select automation type...'
@@ -1692,7 +2078,7 @@ export default function AutomationStepByStep() {
                 </button>
                 
                 {automationTypeDropdownOpen && (
-                  <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
+                  <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl max-h-60 overflow-y-auto dropdown-enter">
                     <div className="py-1">
                       {automationTypes.map(type => (
                         <button
@@ -1703,15 +2089,15 @@ export default function AutomationStepByStep() {
                             setAutomationTypeDropdownOpen(false)
                             // Don't show comment screen immediately - wait for keywords to be added
                           }}
-                          className="w-full px-4 py-3 text-left hover:bg-emerald-50 transition-colors duration-150 flex items-center justify-between group"
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center justify-between group"
                         >
                           <div className="flex items-center space-x-3">
                             <div className={`w-8 h-8 rounded-lg ${type.color} flex items-center justify-center text-white`}>
                               {type.icon}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">{type.name}</div>
-                              <div className="text-sm text-gray-500">{type.description}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{type.name}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{type.description}</div>
                             </div>
                           </div>
                           {automationType === type.id && (
@@ -1728,9 +2114,9 @@ export default function AutomationStepByStep() {
             {/* Step 2: Configuration (appears after automation type selection) */}
             {automationType && (
               <div className="animate-fadeIn">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-600">
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-md dark:shadow-blue-500/30">
                       <Settings className="w-4 h-4 text-white" />
                     </div>
                     Configuration
@@ -1795,8 +2181,8 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg dark:shadow-purple-500/30">
                   <Settings className="w-6 h-6 text-white" />
                 </div>
                 Advanced Settings
@@ -1877,7 +2263,7 @@ export default function AutomationStepByStep() {
                       className={`p-2 rounded-lg text-sm font-medium transition-all ${
                         activeDays[index]
                           ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {day}
@@ -1895,8 +2281,8 @@ export default function AutomationStepByStep() {
           return (
             <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg dark:shadow-purple-500/30">
                     <Settings className="w-6 h-6 text-white" />
                   </div>
                   Advanced Settings
@@ -1977,7 +2363,7 @@ export default function AutomationStepByStep() {
                         className={`p-2 rounded-lg text-sm font-medium transition-all ${
                           activeDays[index]
                             ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         {day}
@@ -1994,8 +2380,8 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg dark:shadow-amber-500/30">
                   <CheckCircle className="w-6 h-6 text-white" />
                 </div>
                 Review & Activate
@@ -2044,8 +2430,8 @@ export default function AutomationStepByStep() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl shadow-lg dark:shadow-amber-500/30">
                   <CheckCircle className="w-6 h-6 text-white" />
                 </div>
                 Review & Activate
@@ -2106,68 +2492,51 @@ export default function AutomationStepByStep() {
         return (
           <>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Comment Reply Configuration</h3>
-              <p className="text-sm text-gray-600 mb-6">Configure the public comment that will be posted when keywords are detected. DM settings will be configured in the next step.</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Comment Reply Configuration</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Configure the public comment that will be posted when keywords are detected. DM settings will be configured in the next step.</p>
               
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Trigger Keywords</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {keywords.map((keyword, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(keyword)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trigger Keywords</label>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
                     value={newKeyword}
-                    onChange={(e) => {
-                      updateSourceRef.current = 'trigger';
-                      setNewKeyword(e.target.value);
-                      setCommentInputText(e.target.value);
-                      // Reset the source after a short delay
-                      setTimeout(() => updateSourceRef.current = null, 100);
-                    }}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    placeholder="Add keyword..."
-                    className="flex-1 p-3 border border-gray-300 rounded-lg"
+                    onChange={(e) => setNewKeyword(e.target.value)}
+                    placeholder="Enter keyword"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <button
                     onClick={addKeyword}
-                    className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <Plus className="w-4 h-4" />
+                    Add
                   </button>
                 </div>
-                
-                {/* Preview Comments Button */}
-                {keywords.length > 0 && (
-                  <div className="mt-3">
-                    <button
-                      onClick={() => setShowCommentScreen(true)}
-                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                <div className="flex flex-wrap gap-2">
+                  {keywords.map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2"
                     >
-                      <Eye className="w-4 h-4" />
-                      Preview Comments
+                      {keyword}
+                    <button
+                        onClick={() => removeKeyword(index)}
+                        className="text-blue-600 hover:text-blue-800"
+                    >
+                        ×
                     </button>
+                    </span>
+                  ))}
                   </div>
-                )}
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Comment replies</label>
-                <p className="text-sm text-gray-600 mb-4">Write a few different possible responses, and we'll cycle through them so your responses seem more genuine and varied.</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comment replies</label>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Write a few different possible responses, and we'll cycle through them so your responses seem more genuine and varied.</p>
                 
                 <div className="space-y-3 mb-4">
                   {commentReplies.map((reply, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-white">
+                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
                       <input
                         type="text"
                         value={reply}
@@ -2177,7 +2546,7 @@ export default function AutomationStepByStep() {
                           setCommentReplies(newReplies)
                         }}
                         placeholder="Enter comment reply..."
-                        className="flex-1 p-2 border-0 focus:outline-none bg-white"
+                        className="flex-1 p-2 border-0 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       />
                       <button
                         onClick={() => {
@@ -2194,7 +2563,7 @@ export default function AutomationStepByStep() {
                 
                 <button
                   onClick={() => setCommentReplies([...commentReplies, ''])}
-                  className="w-full p-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                  className="w-full p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   Add another reply
@@ -2202,8 +2571,8 @@ export default function AutomationStepByStep() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Delay before comment</label>
-                <p className="text-sm text-gray-600 mb-4">Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.</p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Delay before comment</label>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Adding a short delay before responding to comments helps your replies seem more thoughtful and authentic.</p>
                 
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -2213,7 +2582,7 @@ export default function AutomationStepByStep() {
                       onChange={(e) => setCommentDelay(Number(e.target.value))}
                       min="1"
                       max="60"
-                      className="w-20 p-2 border border-gray-300 rounded-lg text-center"
+                      className="w-20 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-center bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     />
                     <X className="w-4 h-4 text-gray-400" />
                   </div>
@@ -2221,7 +2590,7 @@ export default function AutomationStepByStep() {
                   <select
                     value={commentDelayUnit}
                     onChange={(e) => setCommentDelayUnit(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-lg bg-white"
+                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   >
                     <option value="minutes">Minutes</option>
                     <option value="seconds">Seconds</option>
@@ -2238,52 +2607,41 @@ export default function AutomationStepByStep() {
         return (
           <>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">DM Only Configuration</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">DM Only Configuration</h3>
               
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Trigger Keywords</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {dmKeywords.map((keyword, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(keyword)}
-                        className="text-purple-600 hover:text-purple-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trigger Keywords</label>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    placeholder="Add keyword..."
-                    className="flex-1 p-3 border border-gray-300 rounded-lg"
+                    placeholder="Enter keyword"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                   <button
-                    onClick={addKeyword}
-                    className="px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+                    onClick={addDmKeyword}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
-                    <Plus className="w-4 h-4" />
+                    Add
                   </button>
                 </div>
-                
-                {/* Preview Comments Button */}
-                {dmKeywords.length > 0 && (
-                  <div className="mt-3">
-                    <button
-                      onClick={() => setShowCommentScreen(true)}
-                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                <div className="flex flex-wrap gap-2">
+                  {dmKeywords.map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center gap-2"
                     >
-                      <Eye className="w-4 h-4" />
-                      Preview Comments
+                      {keyword}
+                    <button
+                        onClick={() => removeDmKeyword(index)}
+                        className="text-purple-600 hover:text-purple-800"
+                    >
+                        ×
                     </button>
+                    </span>
+                  ))}
                   </div>
-                )}
               </div>
 
               <div>
@@ -2304,52 +2662,41 @@ export default function AutomationStepByStep() {
         return (
           <>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Comment Only Configuration</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Comment Only Configuration</h3>
               
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Trigger Keywords</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {keywords.map((keyword, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(keyword)}
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trigger Keywords</label>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    placeholder="Add keyword..."
-                    className="flex-1 p-3 border border-gray-300 rounded-lg"
+                    placeholder="Enter keyword"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <button
-                    onClick={addKeyword}
-                    className="px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    onClick={addCommentKeyword}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <Plus className="w-4 h-4" />
+                    Add
                   </button>
                 </div>
-                
-                {/* Preview Comments Button */}
-                {keywords.length > 0 && (
-                  <div className="mt-3">
-                    <button
-                      onClick={() => setShowCommentScreen(true)}
-                      className="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                <div className="flex flex-wrap gap-2">
+                  {commentKeywords.map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center gap-2"
                     >
-                      <Eye className="w-4 h-4" />
-                      Preview Comments
+                      {keyword}
+                    <button
+                        onClick={() => removeCommentKeyword(index)}
+                        className="text-green-600 hover:text-green-800"
+                    >
+                        ×
                     </button>
+                    </span>
+                  ))}
                   </div>
-                )}
               </div>
 
               <div>
@@ -2371,7 +2718,15 @@ export default function AutomationStepByStep() {
       default:
         return (
           <div className="text-center py-8">
-            <p className="text-gray-600">Please select an automation type first.</p>
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                <Bot className="w-8 h-8 text-gray-400" />
+              </div>
+              <h4 className="text-lg font-semibold text-gray-700 mb-2">Choose Your Automation</h4>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Select an automation type above to get started with configuring your social media automation strategy.
+              </p>
+            </div>
           </div>
         )
     }
@@ -2406,24 +2761,24 @@ export default function AutomationStepByStep() {
           </div>
           
           {/* Instagram DM Preview - Exact match to reference image */}
-          <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm max-w-sm mx-auto">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-3xl shadow-sm max-w-sm mx-auto">
             <div className="p-4">
               {/* Message timestamp */}
-              <div className="text-xs text-gray-500 text-center mb-4">
+              <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
                 JUL 15, 08:31 PM
               </div>
               
               {/* Message bubble with profile picture at bottom-left corner */}
               <div className="relative mb-4">
-                <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
-                  <div className="text-sm text-gray-400">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
+                  <div className="text-sm text-gray-400 dark:text-gray-300">
                     {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                   </div>
                   
                   {/* Button inside message bubble - white background */}
                   {dmButtonText && (
-                    <div className="bg-white rounded-lg p-3 text-center mt-3">
-                      <div className="text-sm font-medium text-gray-800">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center mt-3">
+                      <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                         {dmButtonText}
                       </div>
                     </div>
@@ -2521,16 +2876,16 @@ export default function AutomationStepByStep() {
         </div>
         
         {/* Instagram Post Interface - Exact replica */}
-        <div className="bg-white border-l border-r border-gray-200 shadow-2xl">
+        <div className="bg-white dark:bg-gray-800 border-l border-r border-gray-200 dark:border-gray-700 shadow-2xl dark:shadow-gray-900/50">
           {/* Post Header - Only show for non-reel posts */}
           {selectedPostData && selectedPostData.type !== 'reel' && (
-          <div className="flex items-center justify-between p-3 border-b border-gray-100">
+          <div className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img 
                   src={selectedAccountData?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face&auto=format'} 
                   alt="Profile" 
-                  className="w-8 h-8 rounded-full border border-gray-200" 
+                  className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600" 
                 />
                 {selectedAccount && (
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -2910,7 +3265,6 @@ export default function AutomationStepByStep() {
                     commentInputText={commentInputText || ''}
                     setCommentInputText={setCommentInputText}
                     getCurrentKeywords={getCurrentKeywords}
-                    getCurrentKeywordsSetter={getCurrentKeywordsSetter}
                     setSelectedKeywords={setSelectedKeywords}
                     updateSourceRef={updateSourceRef}
                     currentTime={currentTime}
@@ -2948,10 +3302,10 @@ export default function AutomationStepByStep() {
                 </div>
               )
             ) : (
-              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center border border-gray-600 dark:border-gray-600">
                 <div className="text-center">
-                  <Camera className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">Select a post to preview</p>
+                  <Camera className="w-16 h-16 text-gray-300 dark:text-gray-200 mx-auto mb-2" />
+                  <p className="text-gray-200 dark:text-gray-100 text-sm">Select a post to preview</p>
                 </div>
               </div>
             )}
@@ -3010,24 +3364,24 @@ export default function AutomationStepByStep() {
             </div>
             
             {/* Instagram DM Preview - Exact match to reference image */}
-            <div className="bg-white border border-gray-200 rounded-b-3xl shadow-sm max-w-sm mx-auto">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-b-3xl shadow-sm max-w-sm mx-auto">
               <div className="p-4">
                 {/* Message timestamp */}
-                <div className="text-xs text-gray-500 text-center mb-4">
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
                   JUL 15, 08:31 PM
                 </div>
                 
                 {/* Message bubble with profile picture at bottom-left corner */}
                 <div className="relative mb-4">
-                  <div className="bg-gray-100 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
-                    <div className="text-sm text-gray-400">
+                  <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-sm p-4 max-w-[280px] ml-6">
+                    <div className="text-sm text-gray-400 dark:text-gray-300">
                       {dmMessage || "I'm so excited you'd like to see what I've got on offer!"}
                     </div>
                     
                     {/* Button inside message bubble - white background */}
                     {dmButtonText && (
-                      <div className="bg-white rounded-lg p-3 text-center mt-3">
-                        <div className="text-sm font-medium text-gray-800">
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center mt-3">
+                        <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                           {dmButtonText}
                         </div>
                       </div>
@@ -3043,11 +3397,11 @@ export default function AutomationStepByStep() {
                 </div>
                 
                 {/* Message input area */}
-                <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <Camera className="w-4 h-4 text-white" />
                   </div>
-                  <div className="flex-1 text-sm text-gray-500 bg-gray-100 rounded-full px-4 py-2">
+                  <div className="flex-1 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2">
                     Message...
                   </div>
                   <div className="flex items-center gap-2">
@@ -3111,16 +3465,14 @@ export default function AutomationStepByStep() {
   // Add this function in the main component
   const handleAutomationTypeSelect = (type: string) => {
     setSelectedAutomationType(type);
-    if (type === 'comment' || type === 'comment_to_dm') {
-      setShowCommentScreen(true);
-    }
+    // Don't show comment screen immediately - wait for keywords to be added
     // Continue to next step logic here
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-full transition-colors duration-300">
       {/* Sleek Management Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 w-full shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 w-full shadow-sm transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
@@ -3131,15 +3483,21 @@ export default function AutomationStepByStep() {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   Automation Studio
                 </h1>
-                <p className="text-sm text-gray-600">Smart social media automation</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Smart social media automation</p>
               </div>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Cache Status Indicator */}
+                    <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span>Auto-saved (persistent)</span>
+        </div>
+            
             <button
               onClick={() => setShowAutomationList(!showAutomationList)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
               <Settings className="w-4 h-4" />
               Manage Automations
@@ -3149,7 +3507,7 @@ export default function AutomationStepByStep() {
                 setCurrentStep(1)
                 setShowAutomationList(false)
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md dark:shadow-blue-500/30"
             >
               <Plus className="w-4 h-4" />
               New Automation
@@ -3160,7 +3518,7 @@ export default function AutomationStepByStep() {
 
       {/* Show automation list or step-by-step flow */}
       {showAutomationList ? (
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-gray-900/50 overflow-hidden transition-colors duration-300">
           <AutomationListManager 
             automationRules={automationRules}
             rulesLoading={rulesLoading}
@@ -3179,10 +3537,10 @@ export default function AutomationStepByStep() {
                   <div className="flex flex-col items-center group">
                     <div className={`flex items-center justify-center w-14 h-14 rounded-full border-3 transition-all duration-300 shadow-lg ${
                       currentStep >= step.id 
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200' 
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200 dark:shadow-blue-500/30' 
                         : currentStep === step.id
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200'
-                        : 'border-gray-300 text-gray-400 bg-white hover:border-gray-400 hover:shadow-md'
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 border-blue-500 text-white transform scale-110 shadow-blue-200 dark:shadow-blue-500/30'
+                        : 'border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md'
                     }`}>
                       {currentStep > step.id ? (
                         <CheckCircle className="w-7 h-7" />
@@ -3192,10 +3550,10 @@ export default function AutomationStepByStep() {
                     </div>
                     <div className="mt-3 text-center transition-all duration-300">
                       <div className={`text-sm font-semibold ${
-                        currentStep >= step.id ? 'text-blue-700' : 'text-gray-700'
+                        currentStep >= step.id ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'
                       }`}>{step.title}</div>
                       <div className={`text-xs mt-1 ${
-                        currentStep >= step.id ? 'text-blue-600' : 'text-gray-500'
+                        currentStep >= step.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
                       }`}>{step.description}</div>
                     </div>
                   </div>
@@ -3203,7 +3561,7 @@ export default function AutomationStepByStep() {
                     <div className={`flex-1 h-1 mx-6 mt-[-25px] rounded-full transition-all duration-500 ${
                       currentStep > step.id 
                         ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-sm' 
-                        : 'bg-gray-200'
+                        : 'bg-gray-200 dark:bg-gray-600'
                     }`} />
                   )}
                 </div>
@@ -3214,21 +3572,21 @@ export default function AutomationStepByStep() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl dark:shadow-gray-900/50 border border-white/20 dark:border-gray-700/20 p-8 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300">
               {renderStepContent()}
               
               {/* Navigation Buttons */}
-              <div className="flex justify-between items-center mt-10 pt-8 border-t border-gray-200">
+              <div className="flex justify-between items-center mt-10 pt-8 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={handlePrevious}
                   disabled={currentStep === 1}
-                  className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  className="flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Previous
                 </button>
                 
-                <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-full text-sm font-semibold border border-blue-200">
+                <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold border border-blue-200 dark:border-blue-600">
                   Step {currentStep} of {steps.length}
                 </div>
                 
@@ -3236,7 +3594,7 @@ export default function AutomationStepByStep() {
                   <button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
-                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg dark:shadow-blue-500/30 hover:shadow-xl dark:hover:shadow-blue-500/40 transition-all duration-300 transform hover:scale-105"
                   >
                     Next
                     <ArrowRight className="w-4 h-4" />
@@ -3245,7 +3603,7 @@ export default function AutomationStepByStep() {
                   <button
                     onClick={handleFinish}
                     disabled={createAutomationMutation.isPending}
-                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 font-semibold shadow-lg dark:shadow-green-500/30 hover:shadow-xl dark:hover:shadow-green-500/40 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {createAutomationMutation.isPending ? (
                       <>
