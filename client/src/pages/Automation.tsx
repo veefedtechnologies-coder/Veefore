@@ -123,14 +123,11 @@ export default function Automation() {
   // Get current workspace using the proper hook
   const { currentWorkspace } = useCurrentWorkspace()
 
-  // Fetch social accounts with better error handling for current workspace - HYBRID: Webhooks + Smart Polling
+  // Fetch social accounts with better error handling for current workspace - NO automatic refresh
   const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
-    enabled: !!currentWorkspace?.id,
-    staleTime: 30 * 1000, // Cache for 30 seconds - automation page needs frequent updates
-    refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchInterval: 2 * 60 * 1000 // Automatic refresh every 2 minutes for real-time social account status
+    enabled: !!currentWorkspace?.id
   })
 
   // Social accounts loaded successfully
@@ -144,14 +141,11 @@ export default function Automation() {
     profilePicture: instagramAccount.profilePicture
   } : 'No Instagram account found')
 
-  // Fetch automation rules from backend API with automatic refresh
+  // Fetch automation rules from backend API
   const { data: automationRulesResponse, isLoading: rulesLoading } = useQuery<{ rules: AutomationRule[] }>({
     queryKey: ['/api/automation/rules', currentWorkspace?.id],
     queryFn: () => apiRequest(`/api/automation/rules?workspaceId=${currentWorkspace?.id}`),
-    enabled: !!currentWorkspace?.id,
-    staleTime: 30 * 1000, // Cache for 30 seconds - automation rules need frequent updates
-    refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchInterval: 2 * 60 * 1000 // Automatic refresh every 2 minutes for real-time automation status
+    enabled: !!currentWorkspace?.id
   })
 
   const automationRules = automationRulesResponse?.rules || []
