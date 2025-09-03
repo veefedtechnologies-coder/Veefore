@@ -643,13 +643,7 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
-// Export types for all schemas
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
-export type Workspace = typeof workspaces.$inferSelect;
-export type InsertWorkspace = typeof workspaces.$inferInsert;
-export type SocialAccount = typeof socialAccounts.$inferSelect;
-export type InsertSocialAccount = typeof socialAccounts.$inferInsert;
+// Export types for additional schemas (main types defined at end of file)
 export type CreativeBrief = typeof creativeBriefs.$inferSelect;
 export type InsertCreativeBrief = typeof creativeBriefs.$inferInsert;
 export type ContentRepurpose = typeof contentRepurposes.$inferSelect;
