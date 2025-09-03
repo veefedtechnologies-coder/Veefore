@@ -138,59 +138,10 @@ export class AccessibilityManager {
    * P6-2.3d: Setup skip links
    */
   private setupSkipLinks(): void {
-    if (!this.config.showSkipLinks) return;
-
-    // Check if skip links already exist to prevent duplicates
-    if (document.querySelector('#skip-links')) return;
-
-    const skipLinks = document.createElement('div');
-    skipLinks.id = 'skip-links';
-    skipLinks.className = 'skip-links';
-    // Create skip links with onclick handlers to prevent URL fragments
-    const mainContentLink = document.createElement('a');
-    mainContentLink.className = 'skip-link';
-    mainContentLink.tabIndex = 1;
-    mainContentLink.textContent = 'Skip to main content';
-    mainContentLink.onclick = (e) => {
-      e.preventDefault();
-      const target = document.getElementById('main-content') || document.querySelector('main');
-      if (target) {
-        target.focus();
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-
-    const navigationLink = document.createElement('a');
-    navigationLink.className = 'skip-link';
-    navigationLink.tabIndex = 2;
-    navigationLink.textContent = 'Skip to navigation';
-    navigationLink.onclick = (e) => {
-      e.preventDefault();
-      const target = document.getElementById('navigation') || document.querySelector('nav');
-      if (target) {
-        target.focus();
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-
-    const searchLink = document.createElement('a');
-    searchLink.className = 'skip-link';
-    searchLink.tabIndex = 3;
-    searchLink.textContent = 'Skip to search';
-    searchLink.onclick = (e) => {
-      e.preventDefault();
-      const target = document.getElementById('search') || document.querySelector('[type="search"]');
-      if (target) {
-        target.focus();
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-
-    skipLinks.appendChild(mainContentLink);
-    skipLinks.appendChild(navigationLink);
-    skipLinks.appendChild(searchLink);
-    
-    document.body.insertBefore(skipLinks, document.body.firstChild);
+    // Skip links disabled for clean UI in this implementation
+    // They can be re-enabled by setting config.showSkipLinks = true
+    // and updating CSS in p6-integration.tsx
+    return;
   }
 
   /**

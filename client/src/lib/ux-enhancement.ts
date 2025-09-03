@@ -91,15 +91,18 @@ export class UXManager {
   private setupErrorBoundaries(): void {
     if (!this.config.enableErrorBoundaries) return;
 
-    // Global error handler
-    window.addEventListener('error', (event) => {
-      this.handleGlobalError(event.error, 'JavaScript Error');
-    });
+    // Only enable error popups in production to avoid development noise
+    if (process.env.NODE_ENV === 'production') {
+      // Global error handler
+      window.addEventListener('error', (event) => {
+        this.handleGlobalError(event.error, 'JavaScript Error');
+      });
 
-    // Promise rejection handler
-    window.addEventListener('unhandledrejection', (event) => {
-      this.handleGlobalError(event.reason, 'Unhandled Promise Rejection');
-    });
+      // Promise rejection handler
+      window.addEventListener('unhandledrejection', (event) => {
+        this.handleGlobalError(event.reason, 'Unhandled Promise Rejection');
+      });
+    }
   }
 
   /**
