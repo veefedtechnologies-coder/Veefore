@@ -23,7 +23,11 @@ import {
   RefreshCw,
   AlertCircle,
   Shield,
-  Sparkles
+  Sparkles,
+  Key,
+  CheckCircle,
+  Lock,
+  ArrowUpDown
 } from 'lucide-react'
 import { TokenConverter } from '../components/dashboard/token-converter'
 import { useCurrentWorkspace } from '../components/WorkspaceSwitcher'
