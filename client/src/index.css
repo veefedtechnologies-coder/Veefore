@@ -18,6 +18,17 @@
     color-scheme: light;
   }
   
+  /* Prevent black flash by ensuring body always has background */
+  body {
+    background-color: rgb(249 250 251); /* gray-50 */
+    color: rgb(17 24 39); /* gray-900 */
+  }
+  
+  html.dark body {
+    background-color: rgb(17 24 39); /* gray-900 */
+    color: rgb(249 250 251); /* gray-50 */
+  }
+  
   /* Smooth transitions for all color changes */
   * {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
