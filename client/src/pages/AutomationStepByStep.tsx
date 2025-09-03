@@ -1102,7 +1102,21 @@ export default function AutomationStepByStep() {
       const response = await apiRequest(`/api/automation/rules?workspaceId=${workspaceId}`)
       return response.rules || []
     },
-    enabled: !!realAccounts?.[0]?.workspaceId
+    enabled: !!realAccounts?.[0]?.workspaceId,
+    staleTime: Infinity, // Never consider data stale - only fetch when explicitly invalidated
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    placeholderData: (previousData) => previousData, // Keep showing old data while new data loads
+    notifyOnChangeProps: ['data'], // Only notify when data changes, not loading states
+    // Hide loading states completely and prevent UI disruption
+    keepPreviousData: true,
+    retry: false, // Don't retry on failure to avoid loading states
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnMount: false, // Don't refetch on mount to prevent flickering
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    // Silent background updates
+    refetchInterval: false, // Disable automatic polling (we handle it manually)
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
   // Mutation for updating automation rules
