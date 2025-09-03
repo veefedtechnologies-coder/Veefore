@@ -551,10 +551,11 @@ export default function Integration() {
 
   console.log('Integration - rendering main content')
 
-  return (
+  // CRITICAL: Always render page structure immediately - no conditional returns
+  const pageStructure = (
     <div className="p-8 bg-white dark:bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header - Always visible immediately */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
             <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 shadow-xl">
@@ -651,44 +652,193 @@ export default function Integration() {
           </div>
         </div>
 
+        {/* Connected Accounts Section */}
+        {connectedAccounts && connectedAccounts.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center">
+              <CheckCircle className="w-6 h-6 mr-3 text-green-600" />
+              Connected Accounts
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {connectedAccounts.map((account) => (
+                <Card key={account.id} className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-600">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                          {platformConfig[account.platform as keyof typeof platformConfig]?.icon}
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 capitalize">
+                          {account.platform}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">@{account.username}</p>
+                      </div>
+                    </div>
+                    
+                    {account.profilePictureUrl && (
+                      <div className="flex items-center space-x-3 mb-4">
+                        <img 
+                          src={account.profilePictureUrl} 
+                          alt={`${account.username} profile`}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {account.displayName || account.username}
+                          </p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {formatFollowersCount(account.followers)} followers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Status:</span>
+                        <span className="text-green-600 dark:text-green-400 font-medium">Connected</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Last Sync:</span>
+                        <span className="text-gray-900 dark:text-gray-100">
+                          {account.lastSync ? new Date(account.lastSync).toLocaleDateString() : 'Never'}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Instagram Token Converter */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center">
-            <Settings className="w-6 h-6 mr-3 text-pink-600" />
-            Instagram Token Management
+            <Key className="w-6 h-6 mr-3 text-blue-600" />
+            Instagram Token Converter
           </h2>
-          <TokenConverter />
-        </div>
-
-        {/* Help Section */}
-        <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 border-amber-200 dark:border-amber-600">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <div className="p-3 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Need Help Connecting?</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Follow our step-by-step guides to connect your social accounts securely. All connections use OAuth 2.0 for maximum security.
-                </p>
-                <div className="flex space-x-4">
-                  <Button variant="outline" size="sm">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Documentation
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Contact Support
+          <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 border-orange-200 dark:border-orange-600">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                  <RefreshCw className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    Convert Personal to Business Token
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    If you have a personal Instagram account connected, convert it to a business account 
+                    to unlock advanced features like analytics and scheduling.
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Advanced Analytics</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Scheduled Publishing</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Story Insights</span>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={handleTokenConversion}
+                    disabled={tokenConversionMutation.isPending}
+                    className="mt-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                  >
+                    {tokenConversionMutation.isPending ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <ArrowUpDown className="w-4 h-4 mr-2" />
+                    )}
+                    Convert to Business
                   </Button>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Advanced Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 border-purple-200 dark:border-purple-600">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                  <Zap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Real-time Sync
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Automatic data synchronization every 30 seconds
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Live metrics updates</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Instant notifications</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Background refresh</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-emerald-200 dark:border-emerald-600">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                  <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Secure & Private
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Enterprise-grade security and privacy protection
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-4 h-4 text-emerald-500" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">OAuth 2.0 authentication</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-4 h-4 text-emerald-500" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Encrypted data storage</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-4 h-4 text-emerald-500" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">No password storage</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Error Modal */}
-      <ErrorModal
+      <ErrorModal 
         isOpen={errorModal.isOpen}
         onClose={() => setErrorModal(prev => ({ ...prev, isOpen: false }))}
         title={errorModal.title}
@@ -697,4 +847,6 @@ export default function Integration() {
       />
     </div>
   )
+
+  return pageStructure
 }
