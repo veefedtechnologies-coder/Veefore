@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCurrentWorkspace } from '@/hooks/useCurrentWorkspace'
+import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 
 /**
  * Instagram Webhook Listener Component
