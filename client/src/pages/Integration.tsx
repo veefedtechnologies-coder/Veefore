@@ -122,6 +122,7 @@ export default function Integration() {
     const urlParams = new URLSearchParams(window.location.search)
     const success = urlParams.get('success')
     const connected = urlParams.get('connected')
+    const error = urlParams.get('error')
     
     if (success === 'true' || connected === 'instagram' || connected === 'youtube') {
       console.log('OAuth callback success detected, refreshing data...')
@@ -136,6 +137,37 @@ export default function Integration() {
         title: "Account connected successfully!",
         description: "Your social media account has been connected.",
         variant: "default"
+      })
+    } else if (error) {
+      console.log('OAuth callback error detected:', error)
+      
+      // Clean up URL parameters
+      const cleanUrl = window.location.pathname
+      window.history.replaceState({}, '', cleanUrl)
+      
+      // Handle specific error messages
+      let errorTitle = "Connection failed"
+      let errorDescription = "Failed to connect your social media account."
+      
+      if (error.includes('already connected') || error.includes('another workspace')) {
+        errorTitle = "Account already connected"
+        errorDescription = decodeURIComponent(error)
+      } else if (error === 'token_exchange_failed') {
+        errorDescription = "Authentication failed. Please try again."
+      } else if (error === 'profile_fetch_failed') {
+        errorDescription = "Could not fetch your profile information. Please try again."
+      } else if (error === 'missing_code_or_state') {
+        errorDescription = "Authentication flow was interrupted. Please try again."
+      } else if (error === 'invalid_state') {
+        errorDescription = "Invalid authentication state. Please try again."
+      } else {
+        errorDescription = decodeURIComponent(error)
+      }
+      
+      toast({
+        title: errorTitle,
+        description: errorDescription,
+        variant: "destructive"
       })
     }
   }, [])

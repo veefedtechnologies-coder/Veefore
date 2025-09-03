@@ -3713,6 +3713,18 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       const profile = await profileResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
       
+      // UNIQUE CONSTRAINT: Check if Instagram account is already connected elsewhere
+      const { checkInstagramAccountExists, validateInstagramConnection } = await import('./utils/instagram-validation');
+      const existingConnection = await checkInstagramAccountExists(profile.id);
+      const validation = validateInstagramConnection(existingConnection);
+      
+      if (!validation.isValid) {
+        console.log(`🚨 [INSTAGRAM CALLBACK] Account @${profile.username} already connected to workspace ${existingConnection.workspaceId}`);
+        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent('This Instagram account is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.')}`);
+      }
+
+      console.log(`✅ [INSTAGRAM CALLBACK] Instagram account @${profile.username} is available for connection`);
+      
       // Save the social account
       const expiresAt = new Date(Date.now() + (longLivedToken.expires_in * 1000));
       

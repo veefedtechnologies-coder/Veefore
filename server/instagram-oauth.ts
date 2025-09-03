@@ -65,6 +65,18 @@ export class InstagramOAuthService {
       // Fetch user profile data
       const userProfile = await this.fetchUserProfile(longLivedData.access_token);
 
+      // UNIQUE CONSTRAINT: Check if Instagram account is already connected elsewhere
+      const { checkInstagramAccountExists, validateInstagramConnection } = await import('./utils/instagram-validation');
+      const existingConnection = await checkInstagramAccountExists(userProfile.id);
+      const validation = validateInstagramConnection(existingConnection);
+      
+      if (!validation.isValid) {
+        console.log(`🚨 Instagram account @${userProfile.username} already connected to workspace ${existingConnection.workspaceId}`);
+        throw new Error(validation.errorMessage);
+      }
+
+      console.log(`✅ Instagram account @${userProfile.username} is available for connection`);
+
       // Store or update social account
       await this.storeSocialAccount(workspaceId, {
         ...userProfile,
