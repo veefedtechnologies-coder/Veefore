@@ -29,7 +29,7 @@ import {
   Lock,
   ArrowUpDown
 } from 'lucide-react'
-import { TokenConverter } from '../components/dashboard/token-converter'
+// import { TokenConverter } from '../components/dashboard/token-converter' // Commented out for now
 import { useCurrentWorkspace } from '../components/WorkspaceSwitcher'
 
 interface SocialAccount {
@@ -380,6 +380,36 @@ export default function Integration() {
       })
     }
   })
+
+  // Token conversion mutation
+  const tokenConversionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/instagram/convert-tokens', {
+        method: 'POST'
+      })
+    },
+    onSuccess: () => {
+      setErrorModal({
+        isOpen: true,
+        title: "Token Conversion Initiated",
+        message: "Personal tokens are being converted to business tokens. This may take a few moments.",
+        type: "success"
+      })
+    },
+    onError: (error: any) => {
+      setErrorModal({
+        isOpen: true,
+        title: "Token Conversion Failed",
+        message: error.message || "Failed to convert tokens. Please try again.",
+        type: "error"
+      })
+    }
+  })
+
+  // Handle token conversion
+  const handleTokenConversion = () => {
+    tokenConversionMutation.mutate()
+  }
 
   const isAccountConnected = (platform: string) => {
     return connectedAccounts?.some((account: SocialAccount) => account.platform === platform) || false
