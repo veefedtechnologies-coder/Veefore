@@ -127,23 +127,30 @@ export default function Integration() {
 
   console.log('Integration component rendering...')
 
-  // Check for OAuth callback success and refresh data
+  // Check for OAuth callback success and refresh data (only once)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const success = urlParams.get('success')
     const connected = urlParams.get('connected')
     const error = urlParams.get('error')
     
+    // Only process if there are OAuth parameters
+    if (!success && !connected && !error) return
+    
     if (success === 'true' || connected === 'instagram' || connected === 'youtube') {
       console.log('OAuth callback success detected, refreshing data...')
-      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
-      queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] })
       
-      // Clean up URL parameters
+      // Clean up URL parameters first to prevent double execution
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Success - no modal needed, just refresh data
+      // Batch query invalidations to prevent multiple re-renders
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] })
+      ]).then(() => {
+        console.log('✅ OAuth success: Data refreshed')
+      })
     } else if (error) {
       console.log('OAuth callback error detected:', error)
       
