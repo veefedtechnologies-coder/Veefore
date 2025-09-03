@@ -156,7 +156,7 @@ export function xssProtectionMiddleware(options: {
     // Add XSS protection headers - allow Replit iframe in development
     const isDevelopment = process.env.NODE_ENV !== 'production';
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', isDevelopment ? 'SAMEORIGIN' : 'DENY');
+    // X-Frame-Options removed for iframe embedding support
     res.setHeader('X-XSS-Protection', '0'); // Disable legacy XSS filter (CSP is better)
 
     next();
@@ -264,7 +264,7 @@ export function enhancedXssHeaders() {
     // Enhanced security headers for XSS protection
     res.setHeader('X-Content-Type-Options', 'nosniff');
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    res.setHeader('X-Frame-Options', isDevelopment ? 'SAMEORIGIN' : 'DENY');
+    // X-Frame-Options removed for iframe embedding support
     res.setHeader('X-XSS-Protection', '0'); // CSP is better than legacy XSS filter
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     

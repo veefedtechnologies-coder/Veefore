@@ -213,13 +213,21 @@ app.use(helmet({
   xssFilter: false
 }));
 
-// IFRAME FIX: Add explicit iframe-friendly headers for all responses
+// IFRAME FIX: Official Replit iframe embedding support
 app.use((req: any, res, next) => {
-  // Completely remove any frame-blocking headers
+  // Remove X-Frame-Options to allow iframe embedding
   res.removeHeader('X-Frame-Options');
+  
+  // Set iframe-friendly headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', '*');
+  
+  // Support for Replit ?embed=true parameter
+  if (req.query.embed === 'true') {
+    res.setHeader('Content-Security-Policy', 'frame-ancestors *');
+  }
+  
   next();
 });
 
