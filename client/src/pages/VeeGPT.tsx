@@ -179,11 +179,16 @@ export default function VeeGPT() {
   console.log('VeeGPT - Display Name:', finalUserData?.displayName)
   console.log('VeeGPT - Plan:', finalUserData?.plan)
   
-  // Force re-render when user data changes
+  // Force re-render when user data changes (with debouncing to prevent excessive refreshes)
   const [refreshKey, setRefreshKey] = useState(0)
   useEffect(() => {
     if (finalUserData) {
-      setRefreshKey(prev => prev + 1)
+      // Debounce the refresh key update to prevent excessive re-renders
+      const timeoutId = setTimeout(() => {
+        setRefreshKey(prev => prev + 1)
+      }, 100)
+      
+      return () => clearTimeout(timeoutId)
     }
   }, [finalUserData])
   const [inputText, setInputText] = useState('')
@@ -227,6 +232,14 @@ export default function VeeGPT() {
     console.log('[WebSocket] Connecting to:', wsUrl)
     const ws = new WebSocket(wsUrl)
     
+    // Add connection timeout to prevent hanging connections
+    const connectionTimeout = setTimeout(() => {
+      if (ws.readyState === WebSocket.CONNECTING) {
+        console.log('[WebSocket] Connection timeout, closing...')
+        ws.close()
+      }
+    }, 10000) // 10 second timeout
+    
     ws.onopen = () => {
       console.log('[WebSocket] Connected successfully for streaming')
       wsRef.current = ws
@@ -257,15 +270,16 @@ export default function VeeGPT() {
       console.log('[WebSocket] Connection closed:', event.code, event.reason)
       wsRef.current = null
       
-      // Auto-reconnect after 2 seconds if not a normal closure
+      // Auto-reconnect after 5 seconds if not a normal closure, but don't trigger app refresh
       if (event.code !== 1000 && event.code !== 1001) {
-        console.log('[WebSocket] Attempting to reconnect in 2 seconds...')
+        console.log('[WebSocket] Attempting to reconnect in 5 seconds...')
         setTimeout(() => {
           if (!wsRef.current) {
-            // This will trigger a re-render and reconnection
-            setStreamingContent({})
+            // Reconnect without triggering app refresh
+            console.log('[WebSocket] Reconnecting...')
+            // The useEffect will handle reconnection naturally
           }
-        }, 2000)
+        }, 5000) // Increased delay to reduce frequency
       }
     }
     
@@ -280,6 +294,7 @@ export default function VeeGPT() {
     }
     
     return () => {
+      clearTimeout(connectionTimeout)
       if (ws.readyState === WebSocket.OPEN) {
         ws.close()
       }

@@ -19,7 +19,7 @@ export const useFirebaseAuth = () => {
     const loadingTimeout = setTimeout(() => {
       console.log('useFirebaseAuth: Timeout reached, stopping loading state')
       setLoading(false)
-    }, 1000) // 1 second timeout for faster auth
+    }, 2000) // 2 second timeout to prevent rapid auth state changes
     
     // If user is already available, clear loading immediately
     if (auth.currentUser) {

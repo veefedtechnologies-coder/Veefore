@@ -49,18 +49,32 @@ export function SocialAccounts() {
     }
   })
 
-  // Auto-refresh when user returns to page for immediate fresh data
+  // Auto-refresh when user returns to page for immediate fresh data (with debouncing)
   React.useEffect(() => {
+    let refreshTimeout: NodeJS.Timeout | null = null
+    
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // User returned to page - immediately refresh data
-        refetchAccounts()
-        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+        // Debounce the refresh to prevent excessive API calls
+        if (refreshTimeout) {
+          clearTimeout(refreshTimeout)
+        }
+        
+        refreshTimeout = setTimeout(() => {
+          // User returned to page - refresh data with delay
+          refetchAccounts()
+          queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+        }, 1000) // 1 second delay to prevent rapid refreshes
       }
     }
     
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout)
+      }
+    }
   }, [])
 
   // Auto-start polling mutation
