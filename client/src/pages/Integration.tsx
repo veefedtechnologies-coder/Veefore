@@ -128,6 +128,31 @@ export default function Integration() {
 
   console.log('Integration component rendering...')
 
+  // Real-time WebSocket listener for instant social account updates
+  useEffect(() => {
+    if (!currentWorkspace?.id) return
+
+    const handleSocialAccountUpdate = (data) => {
+      console.log('🔄 Real-time social account update received:', data)
+      // Instantly update React Query cache without loading state
+      queryClient.setQueryData(['/api/social-accounts', currentWorkspace.id], (oldData) => {
+        if (!oldData) return oldData
+        if (data.type === 'connected') {
+          return [...oldData, data.account]
+        } else if (data.type === 'disconnected') {
+          return oldData.filter(acc => acc.id !== data.accountId)
+        }
+        return oldData
+      })
+    }
+
+    // Listen for real-time updates (assuming WebSocket is available)
+    if (window.socket) {
+      window.socket.on('social-account-update', handleSocialAccountUpdate)
+      return () => window.socket.off('social-account-update', handleSocialAccountUpdate)
+    }
+  }, [currentWorkspace?.id, queryClient])
+
   // Check for OAuth callback success and refresh data (only once)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -147,12 +172,12 @@ export default function Integration() {
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Batch query invalidations to prevent multiple re-renders (only for success)
+      // Background refresh without loading state - data will update silently
       Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] }),
-        queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] })
+        queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] }),
+        queryClient.refetchQueries({ queryKey: ['/api/workspaces'] })
       ]).then(() => {
-        console.log('✅ OAuth success: Data refreshed')
+        console.log('✅ OAuth success: Background refresh complete')
         setIsProcessingOAuth(false)
       })
     } else if (error) {
@@ -198,14 +223,18 @@ export default function Integration() {
   // Get current workspace (reactive to workspace switching)
   const { currentWorkspace, workspaces } = useCurrentWorkspace();
 
-  // Fetch connected social accounts for current workspace (use cached data for instant loading)
+  // Advanced: Stale-While-Revalidate strategy - show cached data instantly, update silently in background
   const { data: connectedAccounts = [], isLoading, refetch } = useQuery({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    staleTime: 10 * 60 * 1000, // Longer cache for better UX
-    refetchOnMount: false, // Use cached data for instant loading
-    refetchOnWindowFocus: false // Prevent unnecessary refetches
+    staleTime: 0, // Always consider data stale for background updates
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnMount: 'always', // Always get fresh data, but don't show loading
+    refetchOnWindowFocus: true, // Background refresh on focus
+    refetchInterval: 30 * 1000, // Background refresh every 30 seconds
+    notifyOnChangeProps: ['data'], // Only notify UI when data actually changes
+    placeholderData: (previousData) => previousData // Keep showing old data while new data loads
   })
 
   console.log('Integration state:', { 
@@ -214,6 +243,25 @@ export default function Integration() {
     workspaces: workspaces?.length || 0,
     currentWorkspace: currentWorkspace?.id || 'none'
   });
+
+  // Advanced: Optimistic updates - immediately show "connecting" state without waiting
+  const handleOptimisticConnect = (platform: string) => {
+    if (!currentWorkspace) return
+
+    // Optimistically add "connecting" account to UI
+    const optimisticAccount = {
+      id: `temp-${Date.now()}`,
+      platform,
+      username: 'Connecting...',
+      isConnecting: true,
+      profilePictureUrl: null
+    }
+
+    queryClient.setQueryData(['/api/social-accounts', currentWorkspace.id], (oldData = []) => [
+      ...oldData,
+      optimisticAccount
+    ])
+  }
 
   // Handle real OAuth connection for Instagram and YouTube
   const handleOAuthConnect = async (platform: string) => {
@@ -229,6 +277,7 @@ export default function Integration() {
 
     try {
       setConnectingPlatform(platform)
+      handleOptimisticConnect(platform) // Show immediate feedback
       
       if (platform === 'instagram') {
         // Get Instagram OAuth URL
