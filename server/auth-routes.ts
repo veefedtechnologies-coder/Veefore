@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { firebaseAdmin, admin } from './firebase-admin'
 import { storage } from './mongodb-storage'
+import { validateRequest, safeJsonParse } from './middleware/validation'
+import { z } from 'zod'
 
 const router = Router()
 
@@ -28,9 +30,12 @@ const verifyFirebaseToken = async (req: any, res: any, next: any) => {
 }
 
 // Register or login user
-// Send email verification code
+// Send email verification code with validation
 router.post('/send-verification', verifyFirebaseToken, async (req, res) => {
   try {
+    if (!req.user?.uid) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
     const firebaseUid = req.user.uid
     
     // Get user from database
@@ -51,7 +56,7 @@ router.post('/send-verification', verifyFirebaseToken, async (req, res) => {
 
     // Send email using emailService
     const { emailService } = await import('./email-service')
-    await emailService.sendVerificationCode(user.email, verificationCode)
+    await emailService.sendVerificationEmail(user.email, verificationCode)
 
     console.log(`[EMAIL VERIFICATION] Code sent to ${user.email} (${verificationCode})`)
     
@@ -65,9 +70,18 @@ router.post('/send-verification', verifyFirebaseToken, async (req, res) => {
   }
 })
 
-// Verify email with code
-router.post('/verify-email', verifyFirebaseToken, async (req, res) => {
+// Verify email with code and validation
+const verifyEmailValidation = validateRequest({
+  body: z.object({
+    code: z.string().length(6, 'Verification code must be 6 digits').regex(/^\d{6}$/, 'Invalid code format')
+  })
+});
+
+router.post('/verify-email', verifyFirebaseToken, verifyEmailValidation, async (req, res) => {
   try {
+    if (!req.user?.uid) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
     const firebaseUid = req.user.uid
     const { code } = req.body
 

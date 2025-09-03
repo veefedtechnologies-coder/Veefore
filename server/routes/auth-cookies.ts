@@ -6,14 +6,19 @@ import {
   generateCSRFToken,
   CookieAuthRequest 
 } from '../middleware/cookie-auth';
+import { validateRequest } from '../middleware/validation';
+import { tokenExchangeSchema } from '../middleware/auth-validation-schemas';
 
 const router = Router();
 
 /**
- * P1 SECURITY: Exchange Bearer token for HTTP-only cookies
+ * P1-4.1 SECURITY: Exchange Bearer token for HTTP-only cookies with validation
  * This endpoint allows the frontend to migrate from localStorage to secure cookies
  */
-router.post('/exchange-token', exchangeTokenForCookies);
+router.post('/exchange-token', 
+  validateRequest({ body: tokenExchangeSchema }), 
+  exchangeTokenForCookies
+);
 
 /**
  * P1 SECURITY: Get CSRF token for authenticated users

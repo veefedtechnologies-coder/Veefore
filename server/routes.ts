@@ -46,6 +46,21 @@ import {
   passwordResetRateLimiter,
   socialMediaRateLimiter
 } from './middleware/rate-limiting-working';
+import { 
+  validateRequest,
+  validateWorkspaceAccess,
+  validatePagination,
+  validateAnalyticsQuery,
+  validateContentCreation,
+  validateAIGeneration
+} from './middleware/validation';
+import { safeParseOAuthState, safeParseInstagramState } from './middleware/unsafe-json-replacements';
+import { 
+  userOnboardingSchema, 
+  completeOnboardingSchema, 
+  userCleanupSchema, 
+  testUserCreationSchema 
+} from './middleware/user-validation-schemas';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Configure multer for file uploads
@@ -385,7 +400,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Update onboarding data
-  app.post('/api/user/onboarding', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/user/onboarding', requireAuth, validateRequest({ body: userOnboardingSchema }), async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const onboardingData = req.body;
@@ -477,7 +492,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   }
 
   // Complete onboarding with preferences
-  app.post('/api/user/complete-onboarding', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/user/complete-onboarding', requireAuth, validateRequest({ body: completeOnboardingSchema }), async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const { preferences } = req.body;
@@ -1898,7 +1913,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
 
 
-  app.get('/api/dashboard/analytics', requireAuth, validateWorkspaceFromQuery(), async (req: any, res: Response) => {
+  app.get('/api/dashboard/analytics', requireAuth, validateWorkspaceFromQuery(), validateAnalyticsQuery, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.workspaceId; // Now validated by middleware
@@ -2483,7 +2498,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // HISTORICAL ANALYTICS ENDPOINT - Fetch real historical data for trend analysis
-  app.get('/api/analytics/historical', requireAuth, validateWorkspaceFromQuery(), async (req: any, res: Response) => {
+  app.get('/api/analytics/historical', requireAuth, validateWorkspaceFromQuery(), validateAnalyticsQuery, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { period = 'month', days = 30 } = req.query;
@@ -2537,7 +2552,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Real-time analytics endpoint with authentic Instagram data analysis
-  app.get('/api/analytics/realtime', requireAuth, async (req: any, res: Response) => {
+  app.get('/api/analytics/realtime', requireAuth, validateWorkspaceAccess, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.query.workspaceId;
@@ -4555,7 +4570,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Cleanup all user data (addons and invitations)
-  app.post('/api/cleanup-user-data', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/cleanup-user-data', requireAuth, validateRequest({ body: userCleanupSchema }), async (req: any, res: Response) => {
     try {
       const { user } = req;
       console.log('[CLEANUP] Starting cleanup for user:', user.id);
