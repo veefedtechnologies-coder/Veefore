@@ -150,7 +150,7 @@ export default function Integration() {
       let errorDescription = "Failed to connect your social media account."
       
       if (error.includes('already connected') || error.includes('another workspace')) {
-        errorTitle = "Account already connected"
+        errorTitle = "🔒 Account Already Connected"
         errorDescription = decodeURIComponent(error)
       } else if (error === 'token_exchange_failed') {
         errorDescription = "Authentication failed. Please try again."

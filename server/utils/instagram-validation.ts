@@ -196,7 +196,7 @@ export function validateInstagramConnection(
   
   const existingUser = existingConnection.user;
   const username = existingUser.username || existingUser.instagramUsername || 'Unknown';
-  const errorMessage = `This Instagram account (@${username}) is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.`;
+  const errorMessage = `🔒 Instagram account @${username} is already connected to another workspace. Each Instagram account can only be linked to one workspace at a time. Please disconnect it from the other workspace first, or use a different Instagram account.`;
   
   return {
     isValid: false,

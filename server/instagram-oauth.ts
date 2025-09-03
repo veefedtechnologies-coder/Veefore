@@ -68,7 +68,7 @@ export class InstagramOAuthService {
       // UNIQUE CONSTRAINT: Check if Instagram account is already connected elsewhere
       const { checkInstagramAccountExists, validateInstagramConnection } = await import('./utils/instagram-validation');
       const existingConnection = await checkInstagramAccountExists(userProfile.id);
-      const validation = validateInstagramConnection(existingConnection);
+      const validation = validateInstagramConnection(existingConnection, workspaceId);
       
       if (!validation.isValid) {
         console.log(`🚨 Instagram account @${userProfile.username} already connected to workspace ${existingConnection.workspaceId}`);
