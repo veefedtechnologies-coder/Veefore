@@ -113,6 +113,7 @@ const platformConfig = {
 export default function Integration() {
   const queryClient = useQueryClient()
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null)
+  const [isProcessingOAuth, setIsProcessingOAuth] = useState(false)
   const [errorModal, setErrorModal] = useState<{
     isOpen: boolean
     title: string
@@ -137,6 +138,8 @@ export default function Integration() {
     // Only process if there are OAuth parameters
     if (!success && !connected && !error) return
     
+    setIsProcessingOAuth(true)
+    
     if (success === 'true' || connected === 'instagram' || connected === 'youtube') {
       console.log('OAuth callback success detected, refreshing data...')
       
@@ -144,17 +147,18 @@ export default function Integration() {
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Batch query invalidations to prevent multiple re-renders
+      // Batch query invalidations to prevent multiple re-renders (only for success)
       Promise.all([
         queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] }),
         queryClient.invalidateQueries({ queryKey: ['/api/workspaces'] })
       ]).then(() => {
         console.log('✅ OAuth success: Data refreshed')
+        setIsProcessingOAuth(false)
       })
     } else if (error) {
       console.log('OAuth callback error detected:', error)
       
-      // Clean up URL parameters
+      // Clean up URL parameters first (don't invalidate queries for errors)
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
@@ -185,6 +189,9 @@ export default function Integration() {
         message: errorDescription,
         type: errorType
       })
+      
+      // Don't trigger loading state for errors
+      setIsProcessingOAuth(false)
     }
   }, [])
 
@@ -454,7 +461,7 @@ export default function Integration() {
     )
   }
 
-  if (isLoading) {
+  if (isLoading && !isProcessingOAuth) {
     console.log('Integration - showing loading state')
     return (
       <div className="p-8 bg-white dark:bg-gray-900 min-h-screen">
