@@ -466,7 +466,7 @@ export class AccessibilityManager {
 /**
  * P6-2.13: React hooks for accessibility
  */
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 export function useAccessibility() {
   const a11yManager = AccessibilityManager.getInstance();

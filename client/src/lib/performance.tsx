@@ -28,8 +28,8 @@ export const useImageOptimization = () => {
   return { optimizeImage, imageRef }
 }
 
-// P7-5.2: Critical Resource Preloading
-export const preloadCriticalResources = () => {
+// P7-5.2: Critical Resource Preloading Hook
+export const usePreloadCriticalResources = () => {
   useEffect(() => {
     // Preload critical fonts
     const criticalFonts = [
