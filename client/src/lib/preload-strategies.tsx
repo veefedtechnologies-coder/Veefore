@@ -61,6 +61,8 @@ export class CriticalResourcePreloader {
 
     this.priorityQueue.push({ url, priority, type: as });
     this.priorityQueue.sort((a, b) => b.priority - a.priority);
+    
+    console.log(`[P7-6.4] Preloading resource: ${url} (priority: ${priority})`);
 
     const link = document.createElement('link');
     link.rel = 'preload';
@@ -274,7 +276,7 @@ export const usePreloadStrategies = () => {
   useEffect(() => {
     const preloader = CriticalResourcePreloader.getInstance();
     const behaviorPreloader = new UserBehaviorPreloader();
-    const networkPreloader = new NetworkAwarePreloader();
+    new NetworkAwarePreloader(); // Initialize but don't store reference
 
     // Initialize preloading
     preloader.preloadCriticalResources();

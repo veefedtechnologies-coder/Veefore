@@ -92,10 +92,13 @@ export class LighthouseMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const fid = entry.processingStart - entry.startTime;
-          this.metrics.FID = fid;
-          this.logMetric('FID', fid);
-          this.evaluateMetric('FID', fid, 100); // Target: <100ms
+          const perfEntry = entry as any; // Type assertion for first-input entries
+          if (perfEntry.processingStart && perfEntry.startTime) {
+            const fid = perfEntry.processingStart - perfEntry.startTime;
+            this.metrics.FID = fid;
+            this.logMetric('FID', fid);
+            this.evaluateMetric('FID', fid, 100); // Target: <100ms
+          }
         }
       });
       observer.observe({ type: 'first-input', buffered: true });

@@ -305,7 +305,7 @@ export const useBundleOptimization = () => {
 
 export default {
   useImageOptimization,
-  preloadCriticalResources,
+  usePreloadCriticalResources,
   useLayoutStabilization,
   useLazyLoading,
   ResourceOptimizer,
