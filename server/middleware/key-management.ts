@@ -52,7 +52,7 @@ export const SECRETS_INVENTORY: SecretConfig[] = [
   { name: 'SENDGRID_API_KEY', required: true, encrypted: true, rotatable: true, category: 'email', description: 'SendGrid email delivery API key' },
   
   // Encryption & Security
-  { name: 'TOKEN_ENCRYPTION_KEY', required: true, encrypted: true, rotatable: true, category: 'encryption', description: 'AES-256-GCM key for token encryption' },
+  { name: 'TOKEN_ENCRYPTION_KEY', required: process.env.NODE_ENV === 'production', encrypted: true, rotatable: true, category: 'encryption', description: 'AES-256-GCM key for token encryption' },
   { name: 'JWT_SECRET', required: false, encrypted: true, rotatable: true, category: 'encryption', description: 'JWT signing secret' },
   
   // Application Configuration

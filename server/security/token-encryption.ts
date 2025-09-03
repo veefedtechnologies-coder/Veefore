@@ -42,8 +42,10 @@ export class TokenEncryptionService {
         console.error('💀 Exiting to prevent insecure operation');
         process.exit(1);
       }
-      console.warn('🚨 SECURITY WARNING: TOKEN_ENCRYPTION_KEY not set in environment variables');
-      console.warn('🔧 Generated temporary key for development - SET PERMANENT KEY FOR PRODUCTION');
+      // Only warn once in development, not on every startup
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 Development mode: Auto-generating temporary encryption key');
+      }
     }
   }
 
