@@ -47,26 +47,37 @@ export function InstagramWebhookListener() {
             const data = JSON.parse(event.data)
             console.log('[Instagram Webhook] Received update:', data)
             
-            // Handle different types of Instagram updates
+            // Handle different types of Instagram updates with immediate refresh
             switch (data.type) {
               case 'instagram_metrics_update':
-                console.log('[Instagram Webhook] Instagram metrics updated, refreshing data')
-                // Invalidate and refetch Instagram-related queries
+                console.log('[Instagram Webhook] Instagram metrics updated, refreshing data immediately')
+                // Immediate invalidation and refetch for real-time updates
                 queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
                 queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
                 queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
+                // Force immediate refetch for critical updates
+                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
                 break
                 
               case 'instagram_post_update':
-                console.log('[Instagram Webhook] Instagram post updated')
+                console.log('[Instagram Webhook] Instagram post updated, refreshing immediately')
                 queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
                 queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
                 break
                 
               case 'instagram_follower_update':
-                console.log('[Instagram Webhook] Instagram followers updated')
+                console.log('[Instagram Webhook] Instagram followers updated, refreshing immediately')
                 queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
                 queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+                break
+                
+              case 'instagram_engagement_update':
+                console.log('[Instagram Webhook] Instagram engagement updated, refreshing immediately')
+                queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+                queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
                 break
                 
               default:

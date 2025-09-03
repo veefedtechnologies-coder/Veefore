@@ -69,9 +69,10 @@ export function PerformanceScore() {
     queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/dashboard/analytics?workspaceId=${currentWorkspace.id}`) : Promise.resolve({}),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 20 * 60 * 1000, // Smart polling every 20 minutes (Meta-friendly)
-    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
     refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnReconnect: true, // Refresh when network reconnects
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
@@ -80,9 +81,10 @@ export function PerformanceScore() {
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 20 * 60 * 1000, // Smart polling every 20 minutes (Meta-friendly)
-    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
     refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnReconnect: true, // Refresh when network reconnects
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
@@ -91,9 +93,10 @@ export function PerformanceScore() {
     queryKey: ['/api/analytics/historical', selectedPeriod, currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}&workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 20 * 60 * 1000, // Smart polling every 20 minutes (Meta-friendly)
-    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
     refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnReconnect: true, // Refresh when network reconnects
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 

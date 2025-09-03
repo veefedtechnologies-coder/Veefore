@@ -14,49 +14,59 @@ export function SocialAccounts() {
   const { toast } = useToast()
   const { currentWorkspace } = useCurrentWorkspace()
   
-  // Fetch social accounts data for current workspace - SMART rate limit protection
+  // Fetch social accounts data for current workspace - SMART real-time with rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 15 * 60 * 1000, // Smart polling every 15 minutes (Meta-friendly)
-    refetchIntervalInBackground: false, // Don't poll when tab is not active
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes for faster updates
+    refetchInterval: 5 * 60 * 1000, // Smart polling every 5 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes for faster updates
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchOnMount: true, // Always fetch fresh data on mount
+    refetchOnReconnect: true, // Refresh when network reconnects
   })
 
-  // Smart Instagram sync mutation - respects rate limits while providing immediate updates
+  // Smart Instagram sync mutation with rate limit protection and immediate updates
   const syncMutation = useMutation({
     mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/smart-sync', { 
       method: 'POST',
       body: JSON.stringify({ 
         workspaceId: currentWorkspace.id,
         forceRefresh: true,
-        respectRateLimit: true
+        respectRateLimit: true,
+        immediateUpdate: true
       })
     }) : Promise.reject(new Error('No workspace selected')),
     onSuccess: (data) => {
       console.log('Smart Instagram sync completed:', data)
       
-      // Immediately trigger a refresh of all data
+      // Immediately trigger a refresh of all data for real-time updates
       refetchAccounts()
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
       queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
+      // Force immediate refetch for instant updates
+      queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
       
       toast({
-        title: "🚀 Smart sync complete!",
-        description: `Instagram data refreshed successfully! ${data.newDataCount || 0} new updates fetched.`,
+        title: "🚀 Real-time sync complete!",
+        description: `Instagram data refreshed instantly! ${data.newDataCount || 0} new updates fetched.`,
       })
     },
     onError: (error: any) => {
       console.error('Smart Instagram sync failed:', error)
       
-      // Check if it's a rate limit error
-      if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+      // Enhanced rate limit error handling
+      if (error.message?.includes('rate limit') || error.message?.includes('429') || error.status === 429) {
         toast({
-          title: "⏳ Rate limit reached", 
-          description: "Instagram API rate limit reached. Will retry automatically in a few minutes.",
+          title: "⏳ Rate limit protection active", 
+          description: "Instagram API rate limit reached. Smart sync will retry automatically in 2-3 minutes.",
+          variant: "destructive"
+        })
+      } else if (error.message?.includes('timeout') || error.message?.includes('network')) {
+        toast({
+          title: "🔄 Network timeout", 
+          description: "Connection timeout. Will retry automatically.",
           variant: "destructive"
         })
       } else {
@@ -69,20 +79,22 @@ export function SocialAccounts() {
     }
   })
 
-  // Smart refresh system - detects user activity and provides real-time updates
+  // Smart refresh system with rate limit protection - provides immediate updates when needed
   React.useEffect(() => {
     let refreshTimeout: NodeJS.Timeout | null = null
+    let lastRefreshTime = 0
     let lastActivityTime = Date.now()
-    let isUserActive = true
+    const MIN_REFRESH_INTERVAL = 30 * 1000 // Minimum 30 seconds between refreshes to respect rate limits
     
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // User returned to page - check if we need fresh data
         const timeSinceLastActivity = Date.now() - lastActivityTime
-        const shouldRefresh = timeSinceLastActivity > 5 * 60 * 1000 // 5 minutes
+        const timeSinceLastRefresh = Date.now() - lastRefreshTime
+        const shouldRefresh = timeSinceLastActivity > 3 * 60 * 1000 && timeSinceLastRefresh > MIN_REFRESH_INTERVAL // 3 minutes
         
         if (shouldRefresh) {
-          console.log('User returned after', Math.round(timeSinceLastActivity / 1000), 'seconds - refreshing data')
+          console.log('User returned after', Math.round(timeSinceLastActivity / 1000), 'seconds - refreshing data (rate limit protected)')
           // Debounce the refresh to prevent excessive API calls
           if (refreshTimeout) {
             clearTimeout(refreshTimeout)
@@ -93,17 +105,15 @@ export function SocialAccounts() {
             refetchAccounts()
             queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
             lastActivityTime = Date.now()
-          }, 2000) // 2 second delay to prevent rapid refreshes
+            lastRefreshTime = Date.now()
+          }, 1000) // 1 second delay to prevent rapid refreshes
         }
-      } else {
-        isUserActive = false
       }
     }
     
     // Track user activity for smart refreshing
     const handleUserActivity = () => {
       lastActivityTime = Date.now()
-      isUserActive = true
     }
     
     // Listen for user activity
@@ -140,14 +150,15 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - SMART rate limit protection
+  // Polling status query - SMART real-time with rate limit protection
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes (Meta-friendly)
-    refetchIntervalInBackground: false, // Don't poll when tab is not active
-    staleTime: 3 * 60 * 1000, // Cache for 3 minutes for faster updates
+    refetchInterval: 3 * 60 * 1000, // Smart polling every 3 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
+    staleTime: 1 * 60 * 1000, // Cache for 1 minute for faster updates
     refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnReconnect: true, // Refresh when network reconnects
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 
