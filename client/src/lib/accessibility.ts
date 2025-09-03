@@ -146,11 +146,49 @@ export class AccessibilityManager {
     const skipLinks = document.createElement('div');
     skipLinks.id = 'skip-links';
     skipLinks.className = 'skip-links';
-    skipLinks.innerHTML = `
-      <a href="#main-content" class="skip-link">Skip to main content</a>
-      <a href="#navigation" class="skip-link">Skip to navigation</a>
-      <a href="#search" class="skip-link">Skip to search</a>
-    `;
+    // Create skip links with onclick handlers to prevent URL fragments
+    const mainContentLink = document.createElement('a');
+    mainContentLink.className = 'skip-link';
+    mainContentLink.tabIndex = 1;
+    mainContentLink.textContent = 'Skip to main content';
+    mainContentLink.onclick = (e) => {
+      e.preventDefault();
+      const target = document.getElementById('main-content') || document.querySelector('main');
+      if (target) {
+        target.focus();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    const navigationLink = document.createElement('a');
+    navigationLink.className = 'skip-link';
+    navigationLink.tabIndex = 2;
+    navigationLink.textContent = 'Skip to navigation';
+    navigationLink.onclick = (e) => {
+      e.preventDefault();
+      const target = document.getElementById('navigation') || document.querySelector('nav');
+      if (target) {
+        target.focus();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    const searchLink = document.createElement('a');
+    searchLink.className = 'skip-link';
+    searchLink.tabIndex = 3;
+    searchLink.textContent = 'Skip to search';
+    searchLink.onclick = (e) => {
+      e.preventDefault();
+      const target = document.getElementById('search') || document.querySelector('[type="search"]');
+      if (target) {
+        target.focus();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    skipLinks.appendChild(mainContentLink);
+    skipLinks.appendChild(navigationLink);
+    skipLinks.appendChild(searchLink);
     
     document.body.insertBefore(skipLinks, document.body.firstChild);
   }

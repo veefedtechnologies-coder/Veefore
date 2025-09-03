@@ -108,17 +108,17 @@ export class UXManager {
   private setupNavigationFeedback(): void {
     if (!this.config.enableNavigationFeedback) return;
 
-    // Track navigation performance
-    if ('navigation' in performance) {
+    // Track navigation performance (disabled in development to prevent spam)
+    if (process.env.NODE_ENV === 'production' && 'navigation' in performance) {
       const navTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (navTiming) {
         const loadTime = navTiming.loadEventEnd - navTiming.fetchStart;
-        if (loadTime > 3000) { // Slow load
+        if (loadTime > 5000) { // Only show for very slow loads
           this.showToast({
             type: 'info',
             title: 'Slow Connection Detected',
             message: 'We\'re optimizing your experience for slower connections.',
-            duration: 5000
+            duration: 3000
           });
         }
       }
