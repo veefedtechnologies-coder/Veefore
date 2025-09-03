@@ -995,8 +995,6 @@ export default function AutomationStepByStep() {
     keepPreviousData: true,
     retry: false, // Don't retry on failure to avoid loading states
     refetchOnReconnect: false, // Don't refetch on reconnect
-    refetchOnMount: false, // Don't refetch on mount to prevent flickering
-    refetchOnWindowFocus: false, // Don't refetch on window focus
     // Silent background updates
     refetchInterval: false, // Disable automatic polling (we handle it manually)
     refetchIntervalInBackground: false // Don't refetch when tab is not active
@@ -1035,8 +1033,6 @@ export default function AutomationStepByStep() {
     keepPreviousData: true,
     retry: false, // Don't retry on failure to avoid loading states
     refetchOnReconnect: false, // Don't refetch on reconnect
-    refetchOnMount: false, // Don't refetch on mount to prevent flickering
-    refetchOnWindowFocus: false, // Don't refetch on window focus
     // Silent background updates
     refetchInterval: false, // Disable automatic polling (we handle it manually)
     refetchIntervalInBackground: false // Don't refetch when tab is not active
@@ -1112,8 +1108,6 @@ export default function AutomationStepByStep() {
     keepPreviousData: true,
     retry: false, // Don't retry on failure to avoid loading states
     refetchOnReconnect: false, // Don't refetch on reconnect
-    refetchOnMount: false, // Don't refetch on mount to prevent flickering
-    refetchOnWindowFocus: false, // Don't refetch on window focus
     // Silent background updates
     refetchInterval: false, // Disable automatic polling (we handle it manually)
     refetchIntervalInBackground: false // Don't refetch when tab is not active
