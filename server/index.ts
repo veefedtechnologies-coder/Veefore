@@ -39,6 +39,13 @@ import {
   secretsValidationMiddleware, 
   keyManagementHeaders 
 } from "./middleware/key-management";
+import { 
+  initializeSecurityMonitoring,
+  correlationIdMiddleware,
+  securityLoggingMiddleware,
+  attackDetectionMiddleware,
+  auditTrailMiddleware
+} from "./middleware/security-monitoring";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -64,10 +71,19 @@ const isDevelopment = process.env.NODE_ENV === "development";
 // P1-6 SECURITY: Initialize comprehensive key management system
 const keyManagementSystem = initializeKeyManagement();
 
+// P1-7 SECURITY: Initialize comprehensive security monitoring system
+const securityMonitoring = initializeSecurityMonitoring();
+
 const app = express();
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
 app.set('trust proxy', 1);
+
+// P1-7 SECURITY: Correlation ID tracking (highest priority for logging)
+app.use(correlationIdMiddleware);
+
+// P1-7 SECURITY: Security monitoring and logging
+app.use(securityLoggingMiddleware);
 
 // P1-5 SECURITY: Emergency CORS lockdown check (highest priority)
 app.use(emergencyCorsLockdown);
@@ -288,6 +304,9 @@ app.use('/api', globalRateLimiter);
 
 // P1-5 SECURITY: API-specific CORS protection with enhanced validation
 app.use('/api', apiCorsMiddleware);
+
+// P1-7 SECURITY: Attack detection and blocking
+app.use('/api', attackDetectionMiddleware);
 
 // P1-6 SECURITY: Key management and secrets validation
 app.use('/api', secretsValidationMiddleware());

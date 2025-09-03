@@ -55,6 +55,7 @@ import {
   validateAIGeneration
 } from './middleware/validation';
 import { strictCorsMiddleware, corsHealthCheck } from './middleware/cors-security';
+import { securityMetricsHandler, auditTrailMiddleware } from './middleware/security-monitoring';
 import { safeParseOAuthState, safeParseInstagramState, safeParseJWTPayload, safeParseAIResponse, safeParseAccountsData } from './middleware/unsafe-json-replacements';
 import { 
   userOnboardingSchema, 
@@ -13454,6 +13455,9 @@ Create a detailed growth strategy in JSON format:
   // P1-5 SECURITY: Strict CORS for admin endpoints
   app.use('/api/admin/*', strictCorsMiddleware);
   
+  // P1-7 SECURITY: Audit trail for admin operations
+  app.use('/api/admin/*', auditTrailMiddleware('admin_operation'));
+  
   app.use('/api/admin/*', (req, res, next) => {
     // This middleware ensures admin routes are handled first
     next();
@@ -14185,6 +14189,9 @@ Create a detailed growth strategy in JSON format:
   // Health check endpoint for deployment
   // P1-5 SECURITY: CORS health check endpoint
   app.get('/api/cors-health', corsHealthCheck);
+
+  // P1-7 SECURITY: Security metrics endpoint
+  app.get('/api/security/metrics', securityMetricsHandler);
 
   app.get('/api/health', async (req: any, res: Response) => {
     try {
