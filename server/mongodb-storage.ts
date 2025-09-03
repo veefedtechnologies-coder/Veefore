@@ -15,6 +15,7 @@ import {
   InsertCreativeBrief, InsertContentRepurpose, InsertCompetitorAnalysis,
   WaitlistUser, InsertWaitlistUser
 } from "@shared/schema";
+import { tokenEncryption, EncryptedToken } from './security/token-encryption';
 
 // MongoDB Schemas
 const UserSchema = new mongoose.Schema({
@@ -112,8 +113,12 @@ const SocialAccountSchema = new mongoose.Schema({
   username: { type: String, required: true },
   accountId: String,
   pageId: String,
-  accessToken: String,
-  refreshToken: String,
+  // SECURITY: Store tokens in encrypted format
+  accessToken: String, // Legacy: plain text tokens (being migrated)
+  refreshToken: String, // Legacy: plain text tokens (being migrated)
+  // New encrypted token storage
+  encryptedAccessToken: { type: mongoose.Schema.Types.Mixed, default: null },
+  encryptedRefreshToken: { type: mongoose.Schema.Types.Mixed, default: null },
   expiresAt: Date,
   isActive: { type: Boolean, default: true },
   // Instagram sync data fields
@@ -601,6 +606,75 @@ const ChatMessageModel = mongoose.model('ChatMessage', ChatMessageSchema);
 export class MongoStorage implements IStorage {
   private isConnected = false;
 
+  // SECURITY: Token encryption helper methods
+  /**
+   * Securely store a social media token by encrypting it
+   */
+  private encryptAndStoreToken(plainToken: string | null): EncryptedToken | null {
+    if (!plainToken || typeof plainToken !== 'string') {
+      return null;
+    }
+    
+    try {
+      return tokenEncryption.encryptToken(plainToken);
+    } catch (error) {
+      console.error('🚨 SECURITY: Failed to encrypt token:', error);
+      throw new Error('Token encryption failed');
+    }
+  }
+
+  /**
+   * Securely retrieve and decrypt a social media token
+   */
+  private decryptStoredToken(encryptedToken: EncryptedToken | null): string | null {
+    if (!encryptedToken) {
+      return null;
+    }
+    
+    try {
+      return tokenEncryption.decryptToken(encryptedToken);
+    } catch (error) {
+      console.error('🚨 SECURITY: Failed to decrypt token:', error);
+      throw new Error('Token decryption failed - token may be corrupted');
+    }
+  }
+
+  /**
+   * Get access token from social account with automatic migration from plain text
+   */
+  private getAccessTokenFromAccount(account: any): string | null {
+    // First try encrypted token
+    if (account.encryptedAccessToken) {
+      return this.decryptStoredToken(account.encryptedAccessToken);
+    }
+    
+    // Fallback to legacy plain text token
+    if (account.accessToken) {
+      console.log('📊 SECURITY: Found legacy plain text token, should migrate to encrypted storage');
+      return account.accessToken;
+    }
+    
+    return null;
+  }
+
+  /**
+   * Get refresh token from social account with automatic migration from plain text
+   */
+  private getRefreshTokenFromAccount(account: any): string | null {
+    // First try encrypted token  
+    if (account.encryptedRefreshToken) {
+      return this.decryptStoredToken(account.encryptedRefreshToken);
+    }
+    
+    // Fallback to legacy plain text token
+    if (account.refreshToken) {
+      console.log('📊 SECURITY: Found legacy plain text refresh token, should migrate to encrypted storage');
+      return account.refreshToken;
+    }
+    
+    return null;
+  }
+
   async connect() {
     if (this.isConnected && mongoose.connection.readyState === 1) return;
     
@@ -1028,8 +1102,9 @@ export class MongoStorage implements IStorage {
       username: mongoAccount.username,
       accountId: mongoAccount.accountId || null,
       pageId: mongoAccount.pageId || null,
-      accessToken: mongoAccount.accessToken || null,
-      refreshToken: mongoAccount.refreshToken || null,
+      // SECURITY: Never expose actual tokens in API responses - return boolean flags only
+      hasAccessToken: this.getAccessTokenFromAccount(mongoAccount) !== null,
+      hasRefreshToken: this.getRefreshTokenFromAccount(mongoAccount) !== null,
       expiresAt: mongoAccount.expiresAt || null,
       isActive: mongoAccount.isActive !== false,
       // Platform-specific sync data fields
@@ -1301,13 +1376,28 @@ export class MongoStorage implements IStorage {
   async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
     await this.connect();
     
-    const socialAccountData = {
+    // SECURITY: Encrypt tokens before storing in database
+    const socialAccountData: any = {
       ...account,
       id: Date.now(),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    // Encrypt access token if provided
+    if (account.accessToken) {
+      socialAccountData.encryptedAccessToken = this.encryptAndStoreToken(account.accessToken);
+      delete socialAccountData.accessToken; // Remove plain text token
+      console.log('🔒 SECURITY: Access token encrypted and stored securely');
+    }
+
+    // Encrypt refresh token if provided  
+    if (account.refreshToken) {
+      socialAccountData.encryptedRefreshToken = this.encryptAndStoreToken(account.refreshToken);
+      delete socialAccountData.refreshToken; // Remove plain text token
+      console.log('🔒 SECURITY: Refresh token encrypted and stored securely');
+    }
 
     const newAccount = new SocialAccountModel(socialAccountData);
     await newAccount.save();
@@ -1319,7 +1409,28 @@ export class MongoStorage implements IStorage {
     await this.connect();
     
     console.log(`[MONGODB DEBUG] Updating social account with ID: ${id} (type: ${typeof id})`);
-    console.log(`[MONGODB DEBUG] Updates:`, updates);
+    // SECURITY: Redact sensitive token data from logs
+    const logSafeUpdates = { ...updates };
+    if (logSafeUpdates.accessToken) logSafeUpdates.accessToken = '[REDACTED]';
+    if (logSafeUpdates.refreshToken) logSafeUpdates.refreshToken = '[REDACTED]';
+    console.log(`[MONGODB DEBUG] Updates:`, logSafeUpdates);
+    
+    // SECURITY: Prepare encrypted updates for tokens
+    const encryptedUpdates: any = { ...updates };
+
+    // Encrypt access token if being updated
+    if (updates.accessToken) {
+      encryptedUpdates.encryptedAccessToken = this.encryptAndStoreToken(updates.accessToken);
+      delete encryptedUpdates.accessToken; // Remove plain text token
+      console.log('🔒 SECURITY: Access token encrypted for update');
+    }
+
+    // Encrypt refresh token if being updated
+    if (updates.refreshToken) {
+      encryptedUpdates.encryptedRefreshToken = this.encryptAndStoreToken(updates.refreshToken);
+      delete encryptedUpdates.refreshToken; // Remove plain text token  
+      console.log('🔒 SECURITY: Refresh token encrypted for update');
+    }
     
     // Try to find by MongoDB _id first (if it's a valid ObjectId)
     let updatedAccount;
@@ -1328,7 +1439,7 @@ export class MongoStorage implements IStorage {
         console.log(`[MONGODB DEBUG] Attempting update by MongoDB _id: ${id}`);
         updatedAccount = await SocialAccountModel.findByIdAndUpdate(
           id.toString(),
-          { ...updates, updatedAt: new Date() },
+          { ...encryptedUpdates, updatedAt: new Date() },
           { new: true }
         );
         console.log(`[MONGODB DEBUG] Update by _id result: ${updatedAccount ? 'Found' : 'Not found'}`);
@@ -1342,7 +1453,7 @@ export class MongoStorage implements IStorage {
       console.log(`[MONGODB DEBUG] Attempting update by custom id field: ${id}`);
       updatedAccount = await SocialAccountModel.findOneAndUpdate(
         { id: id.toString() },
-        { ...updates, updatedAt: new Date() },
+        { ...encryptedUpdates, updatedAt: new Date() },
         { new: true }
       );
       console.log(`[MONGODB DEBUG] Update by custom id result: ${updatedAccount ? 'Found' : 'Not found'}`);

@@ -14458,7 +14458,8 @@ Create a detailed growth strategy in JSON format:
             lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
             profilePictureUrl: profilePictureUrl,
             profilePicture: profilePictureUrl,
-            accessToken: account.accessToken ? 'present' : null,
+            // SECURITY: Never expose tokens in API responses  
+            hasAccessToken: account.hasAccessToken || false,
             workspaceId: account.workspaceId
           };
           
@@ -14532,7 +14533,8 @@ Create a detailed growth strategy in JSON format:
               lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
               profilePictureUrl: profilePictureUrl,
               profilePicture: profilePictureUrl,
-              accessToken: account.accessToken ? 'present' : null,
+              // SECURITY: Never expose tokens in API responses  
+            hasAccessToken: account.hasAccessToken || false,
               workspaceId: account.workspaceId
             };
             
