@@ -24,6 +24,7 @@ import {
   passwordResetRateLimiter,
   socialMediaRateLimiter
 } from "./middleware/rate-limiting-working";
+import { xssProtectionMiddleware, enhancedXssHeaders } from "./middleware/xss-protection";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -64,19 +65,25 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       
-      // P1-2: Strict script execution policy
+      // P1-4.3: Enhanced script execution policy for XSS protection
       scriptSrc: [
         "'self'",
-        // SECURITY IMPROVEMENT: Remove unsafe-inline in favor of nonce/hash
+        // SECURITY: Development only unsafe directives
         ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
-        // Allow specific trusted domains for Firebase/Google services
+        // Trusted Firebase/Google services
         "https://fonts.googleapis.com",
         "https://www.google.com", 
         "https://www.gstatic.com",
         "https://apis.google.com",
         "https://identitytoolkit.googleapis.com",
         "https://securetoken.googleapis.com",
-        // Allow blob: for dynamic imports
+        "https://accounts.google.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
+        // Payment services
+        "https://js.stripe.com",
+        "https://checkout.stripe.com",
+        // Dynamic imports
         "blob:"
       ],
       styleSrc: [
@@ -243,6 +250,10 @@ app.use((req: any, res, next) => {
 // P1-3 SECURITY: Apply global rate limiting to all requests
 // P1-3 SECURITY: Apply global rate limiting only to API routes, not static assets
 app.use('/api', globalRateLimiter);
+
+// P1-4.3 SECURITY: XSS Protection middleware
+app.use(enhancedXssHeaders());
+app.use('/api', xssProtectionMiddleware({ sanitizeBody: true, sanitizeQuery: true, sanitizeParams: true }));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));

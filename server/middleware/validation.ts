@@ -7,6 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { z, ZodSchema, ZodError } from 'zod';
+import { sanitizeHtml, sanitizeText, sanitizeRichText } from './xss-protection';
 
 // Type for validation targets
 type ValidationTarget = 'body' | 'query' | 'params' | 'headers';
@@ -149,6 +150,55 @@ export const instagramAccountSchema = z.object({
   accountId: z.string().min(1, 'Instagram account ID is required'),
   username: z.string().min(1).max(30).regex(/^[a-zA-Z0-9._]+$/, 'Invalid username format'),
   workspaceId: workspaceIdSchema.shape.workspaceId
+});
+
+/**
+ * P1-4.3: XSS-safe validation helpers with automatic sanitization
+ */
+
+// XSS-safe string validation with automatic sanitization
+export const xssSafeString = (options: { minLength?: number; maxLength?: number; allowHtml?: boolean } = {}) => {
+  const { minLength = 0, maxLength = 1000, allowHtml = false } = options;
+  
+  return z.string()
+    .min(minLength)
+    .max(maxLength)
+    .transform((val) => {
+      if (allowHtml) {
+        return sanitizeRichText(val);
+      }
+      return sanitizeText(val);
+    });
+};
+
+// URL validation with XSS protection
+export const xssSafeUrl = z.string()
+  .url()
+  .transform((val) => {
+    // Remove any potential XSS from URLs
+    return val.replace(/[<>'"]/g, '');
+  });
+
+// Email validation with sanitization
+export const xssSafeEmail = z.string()
+  .email()
+  .transform((val) => sanitizeText(val));
+
+// Social media content validation with XSS protection
+export const socialContentSchema = z.object({
+  content: xssSafeString({ maxLength: 2200, allowHtml: false }),
+  platform: z.enum(['instagram', 'facebook', 'twitter', 'linkedin']),
+  mediaUrls: z.array(xssSafeUrl).optional(),
+  hashtags: z.array(xssSafeString({ maxLength: 100 })).optional(),
+  mentions: z.array(xssSafeString({ maxLength: 50 })).optional()
+});
+
+// User profile validation with XSS protection
+export const userProfileSchema = z.object({
+  displayName: xssSafeString({ minLength: 1, maxLength: 100 }),
+  bio: xssSafeString({ maxLength: 500, allowHtml: true }),
+  website: xssSafeUrl.optional(),
+  location: xssSafeString({ maxLength: 100 }).optional()
 });
 
 // Authentication schemas
