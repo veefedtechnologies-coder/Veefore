@@ -4,7 +4,7 @@ import { apiRequest } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/hooks/use-toast'
+import { ErrorModal } from '@/components/ui/error-modal'
 import { 
   Instagram, 
   Facebook, 
@@ -111,9 +111,19 @@ const platformConfig = {
 }
 
 export default function Integration() {
-  const { toast } = useToast()
   const queryClient = useQueryClient()
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null)
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    type: 'error' | 'warning' | 'constraint'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'error'
+  })
 
   console.log('Integration component rendering...')
 
@@ -133,11 +143,7 @@ export default function Integration() {
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      toast({
-        title: "Account connected successfully!",
-        description: "Your social media account has been connected.",
-        variant: "default"
-      })
+      // Success - no modal needed, just refresh data
     } else if (error) {
       console.log('OAuth callback error detected:', error)
       
@@ -145,13 +151,15 @@ export default function Integration() {
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Handle specific error messages
-      let errorTitle = "Connection failed"
+      // Handle specific error messages with modal
+      let errorTitle = "Connection Failed"
       let errorDescription = "Failed to connect your social media account."
+      let errorType: 'error' | 'warning' | 'constraint' = 'error'
       
       if (error.includes('already connected') || error.includes('another workspace')) {
-        errorTitle = "🔒 Account Already Connected"
+        errorTitle = "Account Already Connected"
         errorDescription = decodeURIComponent(error)
+        errorType = 'constraint'
       } else if (error === 'token_exchange_failed') {
         errorDescription = "Authentication failed. Please try again."
       } else if (error === 'profile_fetch_failed') {
@@ -164,10 +172,11 @@ export default function Integration() {
         errorDescription = decodeURIComponent(error)
       }
       
-      toast({
+      setErrorModal({
+        isOpen: true,
         title: errorTitle,
-        description: errorDescription,
-        variant: "destructive"
+        message: errorDescription,
+        type: errorType
       })
     }
   }, [])
@@ -195,10 +204,11 @@ export default function Integration() {
   // Handle real OAuth connection for Instagram and YouTube
   const handleOAuthConnect = async (platform: string) => {
     if (!currentWorkspace) {
-      toast({
-        title: "No workspace found",
-        description: "Please create a workspace first to connect social accounts.",
-        variant: "destructive"
+      setErrorModal({
+        isOpen: true,
+        title: "No Workspace Found",
+        message: "Please create a workspace first to connect social accounts.",
+        type: "error"
       })
       return
     }
@@ -225,18 +235,16 @@ export default function Integration() {
           method: 'POST'
         })
         
-        toast({
-          title: "Account connected successfully",
-          description: `Your ${platformConfig[platform as keyof typeof platformConfig].name} account has been connected.`
-        })
+        // Success - no modal needed for success messages
         queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
         setConnectingPlatform(null)
       }
     } catch (error: any) {
-      toast({
-        title: "Connection failed",
-        description: `Failed to connect ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
-        variant: "destructive"
+      setErrorModal({
+        isOpen: true,
+        title: "Connection Failed",
+        message: `Failed to connect ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
+        type: "error"
       })
       setConnectingPlatform(null)
     }
@@ -246,10 +254,11 @@ export default function Integration() {
   const connectMutation = useMutation({
     mutationFn: handleOAuthConnect,
     onError: (error: any, platform) => {
-      toast({
-        title: "Connection failed",
-        description: `Failed to connect ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
-        variant: "destructive"
+      setErrorModal({
+        isOpen: true,
+        title: "Connection Failed",
+        message: `Failed to connect ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
+        type: "error"
       })
       setConnectingPlatform(null)
     }
@@ -263,17 +272,15 @@ export default function Integration() {
       })
     },
     onSuccess: () => {
-      toast({
-        title: "Account disconnected",
-        description: "Your social account has been disconnected successfully."
-      })
+      // Success - no modal needed for success messages
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
     },
     onError: (error: any) => {
-      toast({
-        title: "Disconnect failed",
-        description: `Failed to disconnect account: ${error.message}`,
-        variant: "destructive"
+      setErrorModal({
+        isOpen: true,
+        title: "Disconnect Failed",
+        message: `Failed to disconnect account: ${error.message}`,
+        type: "error"
       })
     }
   })
@@ -290,17 +297,15 @@ export default function Integration() {
       throw new Error('Platform not supported for refresh')
     },
     onSuccess: (data: any, platform: string) => {
-      toast({
-        title: "Data refreshed successfully",
-        description: `${platformConfig[platform as keyof typeof platformConfig].name} data has been updated with latest information.`
-      })
+      // Success - no modal needed for success messages
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
     },
     onError: (error: any, platform: string) => {
-      toast({
-        title: "Refresh failed",
-        description: `Failed to refresh ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
-        variant: "destructive"
+      setErrorModal({
+        isOpen: true,
+        title: "Refresh Failed",
+        message: `Failed to refresh ${platformConfig[platform as keyof typeof platformConfig].name}: ${error.message}`,
+        type: "error"
       })
     }
   })
@@ -571,6 +576,15 @@ export default function Integration() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal(prev => ({ ...prev, isOpen: false }))}
+        title={errorModal.title}
+        message={errorModal.message}
+        type={errorModal.type}
+      />
     </div>
   )
 }
