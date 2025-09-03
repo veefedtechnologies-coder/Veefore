@@ -30,9 +30,9 @@ export const SECRETS_INVENTORY: SecretConfig[] = [
   { name: 'REDIS_URL', required: true, category: 'database', description: 'Redis connection for rate limiting and caching' },
   
   // Authentication & OAuth
-  { name: 'FIREBASE_SERVICE_ACCOUNT', required: true, category: 'oauth', description: 'Firebase admin service account JSON' },
-  { name: 'INSTAGRAM_CLIENT_ID', required: true, category: 'oauth', description: 'Instagram OAuth client ID' },
-  { name: 'INSTAGRAM_CLIENT_SECRET', required: true, encrypted: true, rotatable: true, category: 'oauth', description: 'Instagram OAuth client secret' },
+  { name: 'FIREBASE_SERVICE_ACCOUNT', required: process.env.NODE_ENV === 'production', category: 'oauth', description: 'Firebase admin service account JSON' },
+  { name: 'INSTAGRAM_CLIENT_ID', required: process.env.NODE_ENV === 'production', category: 'oauth', description: 'Instagram OAuth client ID' },
+  { name: 'INSTAGRAM_CLIENT_SECRET', required: process.env.NODE_ENV === 'production', encrypted: true, rotatable: true, category: 'oauth', description: 'Instagram OAuth client secret' },
   { name: 'YOUTUBE_API_KEY', required: false, encrypted: true, rotatable: true, category: 'api', description: 'YouTube Data API key' },
   
   // AI Services
