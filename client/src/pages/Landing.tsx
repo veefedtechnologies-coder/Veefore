@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { enhancedAriaHelpers, componentA11y, announceToScreenReader } from '@/lib/accessibility'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
@@ -53,6 +54,11 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [selectedFeature, setSelectedFeature] = useState<number | null>(null)
   const heroRef = useRef<HTMLDivElement>(null)
+  
+  // P7-3: Accessibility enhancement refs
+  const liveStatsRef = useRef<HTMLDivElement>(null)
+  const navigationRef = useRef<HTMLElement>(null)
+  const demoButtonRef = useRef<HTMLButtonElement>(null)
   
   // Device fingerprinting state
   const [deviceStatus, setDeviceStatus] = useState<{
@@ -620,11 +626,21 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
             </div>
             
             <div className="hidden lg:flex items-center space-x-10">
-              {['Features', 'Platform', 'Pricing', 'Solutions'].map((item) => (
+              {['Features', 'Platform', 'Pricing', 'Solutions'].map((item, index) => (
                 <a 
                   key={item}
                   href={`#${item.toLowerCase()}`} 
-                  className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-300 group text-sm font-medium"
+                  className="relative text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-300 group text-sm font-medium a11y-focus-indicator"
+                  role="button"
+                  aria-label={`Navigate to ${item} section`}
+                  data-testid={`nav-${item.toLowerCase()}`}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
                 >
                   {item}
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-blue-500 group-hover:w-full transition-all duration-300" />
@@ -1110,11 +1126,20 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
                             </button>
                             
                             <button 
-                              onClick={() => setIsInteractionActive(!isInteractionActive)}
-                              className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                              ref={demoButtonRef}
+                              onClick={() => {
+                                setIsInteractionActive(!isInteractionActive)
+                                announceToScreenReader(
+                                  isInteractionActive ? 'Demo mode disabled' : 'Demo mode enabled'
+                                )
+                              }}
+                              className="group border-2 border-gray-300 bg-white/80 backdrop-blur-xl text-gray-800 hover:bg-white hover:border-gray-400 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl a11y-focus-indicator"
+                              aria-pressed={isInteractionActive}
+                              aria-label={isInteractionActive ? 'Exit interactive demo mode' : 'Enter interactive demo mode'}
+                              data-testid="demo-toggle-button"
                             >
                               <div className="flex items-center space-x-3">
-                                <MousePointer2 className="w-5 h-5" />
+                                <MousePointer2 className="w-5 h-5" aria-hidden="true" />
                                 <span>{isInteractionActive ? 'Exit Demo Mode' : 'Interactive Demo'}</span>
                               </div>
                             </button>

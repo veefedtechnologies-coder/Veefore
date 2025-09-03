@@ -309,6 +309,151 @@ export function respectMotionPreferences() {
   document.head.appendChild(style);
 }
 
+// Enhanced ARIA management
+export const enhancedAriaHelpers = {
+  // Live region management
+  createLiveRegion: (id: string, level: 'polite' | 'assertive' = 'polite') => {
+    const existing = document.getElementById(id);
+    if (existing) return existing;
+    
+    const region = document.createElement('div');
+    region.id = id;
+    region.setAttribute('aria-live', level);
+    region.setAttribute('aria-atomic', 'true');
+    region.className = 'sr-only';
+    document.body.appendChild(region);
+    return region;
+  },
+  
+  // Button state management
+  enhanceButton: (button: HTMLElement, options: {
+    expanded?: boolean;
+    controls?: string;
+    pressed?: boolean;
+    disabled?: boolean;
+  } = {}) => {
+    if (options.expanded !== undefined) {
+      button.setAttribute('aria-expanded', options.expanded.toString());
+    }
+    if (options.controls) {
+      button.setAttribute('aria-controls', options.controls);
+    }
+    if (options.pressed !== undefined) {
+      button.setAttribute('aria-pressed', options.pressed.toString());
+    }
+    if (options.disabled) {
+      button.setAttribute('aria-disabled', 'true');
+      button.setAttribute('tabindex', '-1');
+    }
+  },
+  
+  // Form field enhancement
+  enhanceFormField: (field: HTMLElement, options: {
+    label?: string;
+    description?: string;
+    error?: string;
+    required?: boolean;
+  } = {}) => {
+    const fieldId = field.id || `field-${Math.random().toString(36).substr(2, 9)}`;
+    field.id = fieldId;
+    
+    if (options.label) {
+      field.setAttribute('aria-label', options.label);
+    }
+    
+    if (options.description) {
+      const descId = ariaHelpers.describeElement(fieldId, options.description);
+      field.setAttribute('aria-describedby', descId);
+    }
+    
+    if (options.required) {
+      field.setAttribute('aria-required', 'true');
+      field.setAttribute('required', '');
+    }
+    
+    if (options.error) {
+      formAccessibility.setFieldError(fieldId, options.error);
+    }
+  }
+};
+
+// Component accessibility enhancers
+export const componentA11y = {
+  // Card/Article accessibility
+  enhanceCard: (card: HTMLElement, options: {
+    title?: string;
+    description?: string;
+    interactive?: boolean;
+  } = {}) => {
+    card.setAttribute('role', options.interactive ? 'button' : 'article');
+    
+    if (options.interactive) {
+      card.setAttribute('tabindex', '0');
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    }
+    
+    if (options.title) {
+      card.setAttribute('aria-label', options.title);
+    }
+    
+    if (options.description) {
+      const descId = ariaHelpers.describeElement(card.id || 'card', options.description);
+      card.setAttribute('aria-describedby', descId);
+    }
+  },
+  
+  // Navigation accessibility
+  enhanceNavigation: (nav: HTMLElement) => {
+    nav.setAttribute('role', 'navigation');
+    nav.setAttribute('aria-label', 'Main navigation');
+    
+    // Enhance nav links
+    const links = nav.querySelectorAll('a, button');
+    links.forEach((link, index) => {
+      if (link.getAttribute('aria-current') === 'page') {
+        announceToScreenReader(`Current page: ${link.textContent}`);
+      }
+      
+      // Add position information for screen readers
+      link.setAttribute('aria-setsize', links.length.toString());
+      link.setAttribute('aria-posinset', (index + 1).toString());
+    });
+  },
+  
+  // Modal/Dialog accessibility
+  enhanceDialog: (dialog: HTMLElement, options: {
+    title?: string;
+    modal?: boolean;
+  } = {}) => {
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', options.modal ? 'true' : 'false');
+    
+    if (options.title) {
+      const titleId = `${dialog.id}-title`;
+      dialog.setAttribute('aria-labelledby', titleId);
+      
+      const titleEl = dialog.querySelector('h1, h2, h3, .dialog-title');
+      if (titleEl) {
+        titleEl.id = titleId;
+      }
+    }
+    
+    // Focus management for dialogs
+    const focusableElements = dialog.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    
+    if (focusableElements.length > 0) {
+      (focusableElements[0] as HTMLElement).focus();
+    }
+  }
+};
+
 // Initialize all accessibility features
 export function initializeAccessibility() {
   enhanceKeyboardNavigation();
@@ -318,5 +463,38 @@ export function initializeAccessibility() {
   // Add basic ARIA attributes to the root
   document.body.setAttribute('role', 'application');
   
-  console.log('P7-3: Accessibility system initialized');
+  // Create global live regions
+  enhancedAriaHelpers.createLiveRegion('global-announcements', 'polite');
+  enhancedAriaHelpers.createLiveRegion('global-alerts', 'assertive');
+  
+  // Enhanced focus indicators
+  const focusStyle = document.createElement('style');
+  focusStyle.textContent = `
+    .a11y-focus-indicator:focus,
+    .a11y-focus-indicator:focus-visible {
+      outline: 3px solid #2563eb !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2) !important;
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .a11y-focus-indicator:focus {
+        outline: 3px solid currentColor !important;
+        outline-offset: 2px !important;
+      }
+    }
+    
+    /* Ensure text is readable */
+    .a11y-text-contrast {
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    
+    .dark .a11y-text-contrast {
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    }
+  `;
+  document.head.appendChild(focusStyle);
+  
+  console.log('P7-3: Enhanced accessibility system initialized');
 }
