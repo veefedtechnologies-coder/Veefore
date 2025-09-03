@@ -461,7 +461,8 @@ export default function Integration() {
     )
   }
 
-  if (isLoading && !isProcessingOAuth) {
+  // Don't show loading if error modal is open or processing OAuth errors
+  if (isLoading && !isProcessingOAuth && !errorModal.isOpen) {
     console.log('Integration - showing loading state')
     return (
       <div className="p-8 bg-white dark:bg-gray-900 min-h-screen">
