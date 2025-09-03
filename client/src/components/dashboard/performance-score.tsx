@@ -69,7 +69,7 @@ export function PerformanceScore() {
     queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/dashboard/analytics?workspaceId=${currentWorkspace.id}`) : Promise.resolve({}),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
+    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
@@ -78,7 +78,7 @@ export function PerformanceScore() {
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
+    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
     staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   })
 
@@ -87,7 +87,7 @@ export function PerformanceScore() {
     queryKey: ['/api/analytics/historical', selectedPeriod, currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}&workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 10 * 60 * 1000, // Refresh every 10 minutes - SAFE for production
+    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 

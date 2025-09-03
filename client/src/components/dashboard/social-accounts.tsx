@@ -19,8 +19,8 @@ export function SocialAccounts() {
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes - SAFE for production
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes to prevent excessive calls
+    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes to prevent excessive calls
   })
 
   // Manual sync mutation for Instagram data - IMMEDIATE mode
@@ -98,8 +98,8 @@ export function SocialAccounts() {
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 5 * 60 * 1000, // 5 minutes - SAFE for production
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
+    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 

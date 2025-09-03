@@ -211,7 +211,7 @@ const VideoGeneratorAdvanced = () => {
     queryKey: ['/api/video/job', currentJobId],
     queryFn: () => apiRequest(`/api/video/job/${currentJobId}`),
     enabled: !!currentJobId,
-    refetchInterval: 30 * 1000 // Poll every 30 seconds - PRODUCTION-SAFE
+    refetchInterval: false // Disable automatic refetching to prevent app refreshes
   });
 
   // WebSocket connection for real-time updates

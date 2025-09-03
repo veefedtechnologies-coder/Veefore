@@ -223,13 +223,22 @@ export default function VeeGPT() {
   
   // console.log('VeeGPT state:', { hasSentFirstMessage, currentConversationId })
 
-  // WebSocket connection management
+  // WebSocket connection management with reconnection prevention
+  const [wsReconnectAttempts, setWsReconnectAttempts] = useState(0)
+  const maxReconnectAttempts = 3
+  
   useEffect(() => {
+    // Prevent excessive reconnections
+    if (wsReconnectAttempts >= maxReconnectAttempts) {
+      console.log('[WebSocket] Max reconnection attempts reached, stopping reconnections')
+      return
+    }
+    
     // Connect to WebSocket server (same port as HTTP server with WebSocket upgrade)
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const wsUrl = `${protocol}//${window.location.host}`
     
-    console.log('[WebSocket] Connecting to:', wsUrl)
+    console.log('[WebSocket] Connecting to:', wsUrl, 'Attempt:', wsReconnectAttempts + 1)
     const ws = new WebSocket(wsUrl)
     
     // Add connection timeout to prevent hanging connections
@@ -243,6 +252,9 @@ export default function VeeGPT() {
     ws.onopen = () => {
       console.log('[WebSocket] Connected successfully for streaming')
       wsRef.current = ws
+      
+      // Reset reconnection attempts on successful connection
+      setWsReconnectAttempts(0)
       
       // Subscribe to current conversation if we have one
       if (currentConversationId) {
@@ -270,16 +282,19 @@ export default function VeeGPT() {
       console.log('[WebSocket] Connection closed:', event.code, event.reason)
       wsRef.current = null
       
-      // Auto-reconnect after 5 seconds if not a normal closure, but don't trigger app refresh
-      if (event.code !== 1000 && event.code !== 1001) {
-        console.log('[WebSocket] Attempting to reconnect in 5 seconds...')
+      // Auto-reconnect after 5 seconds if not a normal closure and under max attempts
+      if (event.code !== 1000 && event.code !== 1001 && wsReconnectAttempts < maxReconnectAttempts) {
+        console.log('[WebSocket] Attempting to reconnect in 5 seconds... (Attempt', wsReconnectAttempts + 1, 'of', maxReconnectAttempts, ')')
         setTimeout(() => {
-          if (!wsRef.current) {
-            // Reconnect without triggering app refresh
+          if (!wsRef.current && wsReconnectAttempts < maxReconnectAttempts) {
+            // Increment reconnection attempts
+            setWsReconnectAttempts(prev => prev + 1)
             console.log('[WebSocket] Reconnecting...')
             // The useEffect will handle reconnection naturally
           }
         }, 5000) // Increased delay to reduce frequency
+      } else if (wsReconnectAttempts >= maxReconnectAttempts) {
+        console.log('[WebSocket] Max reconnection attempts reached, giving up')
       }
     }
     
@@ -299,7 +314,7 @@ export default function VeeGPT() {
         ws.close()
       }
     }
-  }, [queryClient])
+  }, [queryClient, wsReconnectAttempts])
 
   // Subscribe to conversation when it changes or WebSocket connects
   useEffect(() => {
