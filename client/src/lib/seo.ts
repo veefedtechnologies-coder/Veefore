@@ -254,7 +254,10 @@ export class SEOManager {
     this.updateMetaTag('description', this.currentConfig.description);
     
     if (this.currentConfig.keywords) {
-      this.updateMetaTag('keywords', this.currentConfig.keywords.join(', '));
+      const keywordsStr = Array.isArray(this.currentConfig.keywords) 
+        ? this.currentConfig.keywords.join(', ')
+        : this.currentConfig.keywords;
+      this.updateMetaTag('keywords', keywordsStr);
     }
 
     // Update robots meta tag
@@ -516,3 +519,49 @@ export function initializeSEO(): void {
   
   console.log('🔍 P6-1: SEO optimization system initialized');
 }
+// Export seoConfig for component compatibility
+export const seoConfig = {
+  landing: {
+    title: "VeeFore - AI-Powered Social Media Management Platform",
+    description: "Transform your social media presence with VeeFore's AI-powered content creation, automated scheduling, comprehensive analytics, and intelligent automation tools.",
+    keywords: ["social media management", "AI automation", "content creation", "social media scheduling", "Instagram automation", "social media analytics", "AI social media tools"],
+    ogTitle: "VeeFore - AI-Powered Social Media Management",
+    ogDescription: "Join thousands of creators and businesses using VeeFore to automate their social media success with AI-powered tools.",
+    canonicalUrl: "https://veefore.com/"
+  },
+  analytics: {
+    title: "Analytics Dashboard - VeeFore Social Media Insights",
+    description: "Comprehensive social media analytics and insights dashboard. Track performance, engagement, and growth across all your social media platforms.",
+    keywords: ["social media analytics", "performance tracking", "engagement metrics", "social media insights", "analytics dashboard"],
+    ogTitle: "Analytics Dashboard - VeeFore",
+    ogDescription: "Get deep insights into your social media performance with VeeFore's comprehensive analytics dashboard.",
+    canonicalUrl: "https://veefore.com/analytics"
+  }
+};
+
+// Structured Data Generator for JSON-LD
+export const generateStructuredData = {
+  website: () => ({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "VeeFore",
+    "description": "AI-powered social media management platform for businesses and creators.",
+    "url": "https://veefore.com"
+  }),
+  softwareApplication: () => ({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "VeeFore",
+    "applicationCategory": "BusinessApplication",
+    "description": "Professional social media management platform with AI-powered automation, analytics, and content creation tools.",
+    "operatingSystem": "Web Browser"
+  }),
+  organization: () => ({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "VeeFore",
+    "description": "Leading provider of AI-powered social media management solutions.",
+    "url": "https://veefore.com",
+    "logo": "https://veefore.com/logo.png"
+  })
+};

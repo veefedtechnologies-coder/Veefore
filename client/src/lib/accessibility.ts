@@ -574,3 +574,24 @@ export const A11yTestUtils = {
     return violations;
   }
 };
+// Screen reader announcement function
+export function announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite') {
+  const announcement = document.createElement('div');
+  announcement.setAttribute('aria-live', priority);
+  announcement.setAttribute('aria-atomic', 'true');
+  announcement.className = 'sr-only';
+  announcement.textContent = message;
+  
+  document.body.appendChild(announcement);
+  
+  // Remove after announcement
+  setTimeout(() => {
+    document.body.removeChild(announcement);
+  }, 1000);
+}
+
+// Route announcements hook for accessibility
+export function useRouteAnnouncements() {
+  // This function will announce route changes to screen readers
+  return null; // Basic implementation for now
+}

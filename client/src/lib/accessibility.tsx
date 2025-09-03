@@ -183,6 +183,22 @@ export function useRouteAnnouncements() {
   }, []);
 }
 
+// Screen reader announcement function
+export function announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite') {
+  const announcement = document.createElement('div');
+  announcement.setAttribute('aria-live', priority);
+  announcement.setAttribute('aria-atomic', 'true');
+  announcement.className = 'sr-only';
+  announcement.textContent = message;
+  
+  document.body.appendChild(announcement);
+  
+  // Remove after announcement
+  setTimeout(() => {
+    document.body.removeChild(announcement);
+  }, 1000);
+}
+
 // Error announcements
 export function announceError(message: string) {
   announceToScreenReader(`Error: ${message}`, 'assertive');

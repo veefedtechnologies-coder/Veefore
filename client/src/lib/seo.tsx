@@ -209,6 +209,54 @@ export const seoConfig = {
   }
 };
 
+// Export seoConfig for component compatibility
+export const seoConfig = {
+  landing: {
+    title: "VeeFore - AI-Powered Social Media Management Platform",
+    description: "Transform your social media presence with VeeFore's AI-powered content creation, automated scheduling, comprehensive analytics, and intelligent automation tools.",
+    keywords: "social media management, AI automation, content creation, social media scheduling, Instagram automation, social media analytics, AI social media tools",
+    ogTitle: "VeeFore - AI-Powered Social Media Management",
+    ogDescription: "Join thousands of creators and businesses using VeeFore to automate their social media success with AI-powered tools.",
+    canonicalUrl: "https://veefore.com/"
+  },
+
+  veeGPT: {
+    title: "VeeGPT - AI Assistant for Social Media Content",
+    description: "Intelligent AI assistant for creating engaging social media content, captions, hashtags, and content strategies. Powered by advanced AI technology.",
+    keywords: "AI assistant, social media content, AI writing, content creation, social media captions, hashtag generator, AI copywriting",
+    ogTitle: "VeeGPT - AI Content Assistant",
+    ogDescription: "Create compelling social media content with VeeGPT, your intelligent AI assistant for captions, hashtags, and content strategy.",
+    canonicalUrl: "https://veefore.com/veegpt"
+  },
+
+  profile: {
+    title: "Profile Settings - VeeFore Account Management",
+    description: "Manage your VeeFore account settings, profile information, billing details, and preferences for your social media management platform.",
+    keywords: "account settings, profile management, user preferences, billing settings, account configuration",
+    ogTitle: "Profile Settings - VeeFore",
+    ogDescription: "Customize your VeeFore experience with comprehensive account and profile management options.",
+    canonicalUrl: "https://veefore.com/profile"
+  },
+
+  settings: {
+    title: "Settings - VeeFore Configuration & Preferences",
+    description: "Configure your VeeFore workspace settings, notifications, integrations, and platform preferences for optimal social media management.",
+    keywords: "settings, configuration, preferences, notifications, workspace settings, platform configuration",
+    ogTitle: "Settings - VeeFore",
+    ogDescription: "Optimize your VeeFore experience with comprehensive settings and configuration options.",
+    canonicalUrl: "https://veefore.com/settings"
+  },
+
+  analytics: {
+    title: "Analytics Dashboard - VeeFore Social Media Insights",
+    description: "Comprehensive social media analytics and insights dashboard. Track performance, engagement, and growth across all your social media platforms.",
+    keywords: "social media analytics, performance tracking, engagement metrics, social media insights, analytics dashboard",
+    ogTitle: "Analytics Dashboard - VeeFore",
+    ogDescription: "Get deep insights into your social media performance with VeeFore's comprehensive analytics dashboard.",
+    canonicalUrl: "https://veefore.com/analytics"
+  }
+};
+
 /**
  * P7-2: Structured Data Generator for JSON-LD
  */
