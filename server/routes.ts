@@ -3209,7 +3209,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         console.log('[YOUTUBE CALLBACK] Raw state parameter:', state);
         const decodedState = Buffer.from(state as string, 'base64').toString();
         console.log('[YOUTUBE CALLBACK] Decoded state string:', decodedState);
-        stateData = JSON.parse(decodedState);
+        const stateResult = safeParseOAuthState(decodedState);
+        if (!stateResult.success) {
+          console.error('[OAUTH SECURITY] Invalid state format:', stateResult.error);
+          return res.status(400).json({ error: 'Invalid OAuth state format' });
+        }
+        stateData = stateResult.data;
         console.log('[YOUTUBE CALLBACK] Parsed state data:', stateData);
       } catch (e) {
         console.error('[YOUTUBE CALLBACK] Invalid state parameter:', state);
@@ -3620,7 +3625,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Decode state
       let stateData;
       try {
-        stateData = JSON.parse(Buffer.from(state as string, 'base64').toString());
+        const stateResult = safeParseInstagramState(state as string);
+        if (!stateResult.success) {
+          console.error('[INSTAGRAM OAUTH SECURITY] Invalid state format:', stateResult.error);
+          return res.status(400).json({ error: 'Invalid Instagram OAuth state format' });
+        }
+        stateData = stateResult.data;
       } catch (decodeError) {
         console.error('[INSTAGRAM CALLBACK] Failed to decode state:', decodeError);
         return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state`);

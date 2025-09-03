@@ -241,7 +241,8 @@ app.use((req: any, res, next) => {
 });
 
 // P1-3 SECURITY: Apply global rate limiting to all requests
-app.use(globalRateLimiter);
+// P1-3 SECURITY: Apply global rate limiting only to API routes, not static assets
+app.use('/api', globalRateLimiter);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
