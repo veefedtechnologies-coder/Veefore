@@ -74,6 +74,25 @@ const keyManagementSystem = initializeKeyManagement();
 // P1-7 SECURITY: Initialize comprehensive security monitoring system
 const securityMonitoring = initializeSecurityMonitoring();
 
+// P2-1 SECURITY: Initialize OAuth 2.0 PKCE system
+import { initializeOAuthPKCE } from './security/oauth-pkce';
+initializeOAuthPKCE();
+
+// P2-2 SECURITY: Initialize enhanced token encryption
+import { initializeTokenEncryption, tokenEncryptionMiddleware, scheduleTokenReEncryption } from './security/token-migration';
+(async () => {
+  await initializeTokenEncryption();
+  scheduleTokenReEncryption();
+})();
+
+// P2-3 SECURITY: Initialize webhook signature verification
+import { initializeWebhookSecurity } from './security/webhook-verification';
+initializeWebhookSecurity();
+
+// P2-5 SECURITY: Initialize workspace isolation system
+import { initializeWorkspaceIsolation } from './security/workspace-isolation';
+initializeWorkspaceIsolation();
+
 const app = express();
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
@@ -316,6 +335,9 @@ app.use('/api/admin', keyManagementHeaders());
 // P1-4.3 SECURITY: XSS Protection middleware
 app.use(enhancedXssHeaders());
 app.use('/api', xssProtectionMiddleware({ sanitizeBody: true, sanitizeQuery: true, sanitizeParams: true }));
+
+// P2-2 SECURITY: Token encryption response filtering
+app.use('/api', tokenEncryptionMiddleware());
 
 // P1-4.4 SECURITY: File upload cleanup service
 setInterval(() => {
