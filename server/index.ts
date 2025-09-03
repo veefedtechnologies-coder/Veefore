@@ -14,6 +14,16 @@ import webhooksRoutes from "./routes/webhooks";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { 
+  initializeRateLimiting, 
+  globalRateLimiter, 
+  authRateLimiter,
+  apiRateLimiter,
+  uploadRateLimiter,
+  bruteForceMiddleware,
+  passwordResetRateLimiter,
+  socialMediaRateLimiter
+} from "./middleware/rate-limiting-working";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -37,6 +47,9 @@ const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
 
 const app = express();
+
+// P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
+app.set('trust proxy', 1);
 
 app.use(helmet({
   // P1-2: HTTP Strict Transport Security (HSTS) - Production only
@@ -226,6 +239,9 @@ app.use((req: any, res, next) => {
   }
   next();
 });
+
+// P1-3 SECURITY: Apply global rate limiting to all requests
+app.use(globalRateLimiter);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
@@ -526,11 +542,22 @@ app.use((req, res, next) => {
   // Test Redis connection and start MetricsWorker if available
   console.log('🔍 Testing Redis connection for advanced queue system...');
   try {
+    // P1-3 SECURITY: Initialize rate limiting with Redis connection
+    const { redisConnection, redisAvailable } = await import('./queues/metricsQueue');
+    
+    if (redisConnection && redisAvailable) {
+      initializeRateLimiting(redisConnection);
+      console.log('🔒 P1-3 SECURITY: Rate limiting system initialized with Redis persistence');
+    } else {
+      console.log('⚠️ Rate Limiting: Redis not available, using memory-based fallbacks');
+    }
+    
     await MetricsWorker.start();
     console.log('✅ MetricsWorker started with Redis queue system');
   } catch (error) {
     console.log('⚠️  MetricsWorker: Redis unavailable, using smart polling fallback');
     console.log('📊 Instagram metrics continue via existing polling system');
+    console.log('⚠️ Rate Limiting: Using memory-based fallbacks without Redis persistence');
   }
   
   const wss = new WebSocketServer({ server: httpServer });

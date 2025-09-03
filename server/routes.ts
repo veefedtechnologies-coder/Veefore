@@ -38,6 +38,14 @@ import videoRoutes, { setupVideoWebSocket } from './video-routes';
 import authRoutes from './auth-routes';
 import authCookiesRouter from './routes/auth-cookies';
 import { validateWorkspace, validateWorkspaceFromParams, validateWorkspaceFromQuery } from './middleware/workspace-validation';
+import { 
+  authRateLimiter,
+  apiRateLimiter,
+  uploadRateLimiter,
+  bruteForceMiddleware,
+  passwordResetRateLimiter,
+  socialMediaRateLimiter
+} from './middleware/rate-limiting-working';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Configure multer for file uploads
@@ -14682,11 +14690,11 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Authentication routes
-  app.use('/api/auth', authRoutes);
+  // P1-3 SECURITY: Authentication routes with rate limiting and brute-force protection
+  app.use('/api/auth', authRateLimiter, bruteForceMiddleware, authRoutes);
   
-  // P1 SECURITY: HTTP-only cookie authentication routes
-  app.use('/api/auth-cookies', authCookiesRouter);
+  // P1 SECURITY: HTTP-only cookie authentication routes with rate limiting
+  app.use('/api/auth-cookies', authRateLimiter, bruteForceMiddleware, authCookiesRouter);
 
   // ====== NEW AUTOMATION API ENDPOINTS ======
   
