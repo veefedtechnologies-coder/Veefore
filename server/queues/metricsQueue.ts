@@ -1,7 +1,7 @@
 import { Queue, QueueOptions, RepeatOptions } from 'bullmq';
 import IORedis from 'ioredis';
 
-// Redis connection configuration
+// Redis connection configuration (disabled in sandbox environments)
 const redisConnection = new IORedis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -9,7 +9,10 @@ const redisConnection = new IORedis({
   maxRetriesPerRequest: null, // Required for BullMQ
   connectTimeout: 10000,
   commandTimeout: 5000,
-  lazyConnect: true
+  lazyConnect: true,
+  retryDelayOnFailover: 500,
+  maxRetriesPerRequest: null,
+  enableOfflineQueue: false, // Prevent connection attempts when Redis is unavailable
 });
 
 // Queue configuration with rate limiting
