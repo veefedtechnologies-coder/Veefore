@@ -19,13 +19,19 @@ const verifyWebhookSignature = (req: express.Request, res: express.Response, nex
       return res.status(401).json({ error: 'Missing signature' });
     }
 
-    // Verify signature
+    // Verify signature with proper buffer length handling
     const expectedSignature = crypto
       .createHmac('sha256', webhookSecret)
       .update(payload)
       .digest('hex');
     
     const receivedSignature = signature.replace('sha256=', '');
+
+    // Ensure both signatures are the same length before comparison
+    if (expectedSignature.length !== receivedSignature.length) {
+      console.error('🚨 Webhook signature length mismatch');
+      return res.status(401).json({ error: 'Invalid signature length' });
+    }
 
     if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(receivedSignature))) {
       console.error('🚨 Webhook signature verification failed');
@@ -54,14 +60,18 @@ router.get('/instagram', (req, res) => {
 
     console.log('🔔 Instagram webhook verification request received');
     console.log('Mode:', mode);
-    console.log('Token:', token);
+    console.log('Token received:', token);
+    console.log('Expected token:', verifyToken);
+    console.log('Challenge:', challenge);
 
-    // Verify the webhook
-    if (mode === 'subscribe' && token === verifyToken) {
+    // Verify the webhook - be more flexible with token comparison
+    if (mode === 'subscribe' && token && token.toString() === verifyToken) {
       console.log('✅ Instagram webhook verified successfully');
-      res.status(200).send(challenge);
+      res.status(200).send(challenge?.toString() || 'OK');
     } else {
       console.error('❌ Instagram webhook verification failed');
+      console.error(`Expected: mode='subscribe' && token='${verifyToken}'`);
+      console.error(`Received: mode='${mode}' && token='${token}'`);
       res.status(403).json({ error: 'Webhook verification failed' });
     }
   } catch (error) {
