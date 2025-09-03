@@ -831,22 +831,28 @@ export class FrontendPerformanceOptimizer {
    * P6-5.3s3: Setup dynamic imports for heavy components
    */
   private setupDynamicImports(): void {
+    // Avoid duplicate script injection
+    if ((window as any)._vitePreloadOptimized) return;
+    (window as any)._vitePreloadOptimized = true;
+
     // Create a script to handle dynamic imports more efficiently
     const dynamicImportOptimizer = `
-      // Override dynamic imports to preload more efficiently
-      const originalImport = window.__vitePreload || (() => {});
-      window.__vitePreload = (url, deps = []) => {
-        // Preload dependencies in parallel
-        if (deps.length > 0) {
-          deps.forEach(dep => {
-            const link = document.createElement('link');
-            link.rel = 'modulepreload';
-            link.href = dep;
-            document.head.appendChild(link);
-          });
-        }
-        return originalImport(url, deps);
-      };
+      (function() {
+        // Override dynamic imports to preload more efficiently
+        const originalImport = window.__vitePreload || (() => {});
+        window.__vitePreload = (url, deps = []) => {
+          // Preload dependencies in parallel
+          if (deps && deps.length > 0) {
+            deps.forEach(dep => {
+              const link = document.createElement('link');
+              link.rel = 'modulepreload';
+              link.href = dep;
+              document.head.appendChild(link);
+            });
+          }
+          return originalImport(url, deps);
+        };
+      })();
     `;
 
     const script = document.createElement('script');
