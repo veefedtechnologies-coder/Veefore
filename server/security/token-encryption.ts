@@ -106,7 +106,7 @@ export class TokenEncryptionService {
   }
 
   /**
-   * Decrypt a social media access token
+   * Decrypt a social media access token with robust error handling
    * @param encryptedToken - Encrypted token data with metadata
    * @returns Plain text access token
    */
@@ -118,26 +118,66 @@ export class TokenEncryptionService {
 
       const { encryptedData, iv, salt, tag } = encryptedToken;
 
-      // Convert base64 strings back to buffers
-      const ivBuffer = Buffer.from(iv, 'base64');
-      const saltBuffer = Buffer.from(salt, 'base64');
-      const tagBuffer = Buffer.from(tag, 'base64');
+      // Validate all required fields exist
+      if (!encryptedData || !iv || !salt || !tag) {
+        throw new Error('Missing encryption metadata fields');
+      }
+
+      // Convert base64 strings back to buffers with validation
+      let ivBuffer: Buffer, saltBuffer: Buffer, tagBuffer: Buffer;
+      
+      try {
+        ivBuffer = Buffer.from(iv, 'base64');
+        saltBuffer = Buffer.from(salt, 'base64');
+        tagBuffer = Buffer.from(tag, 'base64');
+      } catch (parseError) {
+        throw new Error('Invalid base64 encoding in token metadata');
+      }
+
+      // Validate buffer lengths
+      if (ivBuffer.length !== IV_LENGTH) {
+        throw new Error(`Invalid IV length: expected ${IV_LENGTH}, got ${ivBuffer.length}`);
+      }
+      if (saltBuffer.length !== SALT_LENGTH) {
+        throw new Error(`Invalid salt length: expected ${SALT_LENGTH}, got ${saltBuffer.length}`);
+      }
+      if (tagBuffer.length !== TAG_LENGTH) {
+        throw new Error(`Invalid tag length: expected ${TAG_LENGTH}, got ${tagBuffer.length}`);
+      }
       
       // Derive the same encryption key
       const key = this.deriveKey(saltBuffer);
       
-      // SECURITY FIX: Create decipher with proper AES-256-GCM using IV
+      // Create decipher with proper AES-256-GCM
       const decipher = crypto.createDecipheriv(ALGORITHM, key, ivBuffer);
       decipher.setAuthTag(tagBuffer);
       
       // Decrypt the token
-      let decryptedData = decipher.update(encryptedData, 'base64', 'utf8');
-      decryptedData += decipher.final('utf8');
+      let decryptedData: string;
+      try {
+        decryptedData = decipher.update(encryptedData, 'base64', 'utf8');
+        decryptedData += decipher.final('utf8');
+      } catch (cryptoError) {
+        // Handle specific GCM authentication failures
+        if (cryptoError.message.includes('Unsupported state') || 
+            cryptoError.message.includes('unable to authenticate')) {
+          throw new Error('Token authentication failed - key mismatch or corrupted data');
+        }
+        throw cryptoError;
+      }
       
       return decryptedData;
     } catch (error) {
-      console.error('🚨 TOKEN DECRYPTION ERROR:', error);
-      throw new Error('Failed to decrypt token - token may be corrupted or key changed');
+      // Provide detailed error information for debugging
+      console.warn('🚨 P2-FIX: Token decryption failed with detailed error:', {
+        error: error.message,
+        hasEncryptedData: !!encryptedToken?.encryptedData,
+        hasIV: !!encryptedToken?.iv,
+        hasSalt: !!encryptedToken?.salt,
+        hasTag: !!encryptedToken?.tag,
+        algorithmUsed: ALGORITHM
+      });
+      throw new Error(`Token decryption failed: ${error.message}`);
     }
   }
 

@@ -624,7 +624,7 @@ export class MongoStorage implements IStorage {
   }
 
   /**
-   * Securely retrieve and decrypt a social media token
+   * Securely retrieve and decrypt a social media token with comprehensive error handling
    */
   private decryptStoredToken(encryptedToken: any): string | null {
     if (!encryptedToken) {
@@ -636,26 +636,49 @@ export class MongoStorage implements IStorage {
       let tokenData: EncryptedToken;
       
       if (typeof encryptedToken === 'string') {
-        // Parse JSON string from database
-        tokenData = JSON.parse(encryptedToken);
+        try {
+          // Parse JSON string from database
+          tokenData = JSON.parse(encryptedToken);
+        } catch (parseError) {
+          console.warn('🚨 P2-FIX: Failed to parse JSON token data, invalid format');
+          return null;
+        }
       } else if (typeof encryptedToken === 'object') {
         // Already an object
         tokenData = encryptedToken;
       } else {
-        console.warn('🚨 P2-FIX: Invalid encrypted token format, skipping decryption');
+        console.warn('🚨 P2-FIX: Invalid encrypted token format, expected string or object');
         return null;
       }
       
-      // Validate required fields
+      // Validate required fields exist
       if (!tokenData.encryptedData || !tokenData.iv || !tokenData.salt || !tokenData.tag) {
-        console.warn('🚨 P2-FIX: Incomplete encrypted token data, skipping decryption');
+        console.warn('🚨 P2-FIX: Incomplete encrypted token data, missing required fields:', {
+          hasEncryptedData: !!tokenData.encryptedData,
+          hasIV: !!tokenData.iv,
+          hasSalt: !!tokenData.salt,
+          hasTag: !!tokenData.tag
+        });
         return null;
       }
       
-      return tokenEncryption.decryptToken(tokenData);
+      // Attempt decryption with detailed error handling
+      const decryptedToken = tokenEncryption.decryptToken(tokenData);
+      
+      if (!decryptedToken || decryptedToken.trim().length === 0) {
+        console.warn('🚨 P2-FIX: Decryption returned empty token');
+        return null;
+      }
+      
+      return decryptedToken;
     } catch (error) {
-      // Log but don't crash - allow graceful degradation
-      console.warn('🚨 P2-FIX: Token decryption failed, token may be corrupted:', error.message);
+      // Enhanced error logging for debugging
+      console.warn('🚨 P2-FIX: Token decryption failed:', {
+        error: error.message,
+        tokenType: typeof encryptedToken,
+        tokenLength: typeof encryptedToken === 'string' ? encryptedToken.length : 'N/A',
+        hasBasicStructure: !!(encryptedToken && typeof encryptedToken === 'object')
+      });
       return null;
     }
   }

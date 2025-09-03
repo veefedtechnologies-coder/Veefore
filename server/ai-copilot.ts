@@ -247,6 +247,17 @@ async function processMessage(req: CopilotRequest): Promise<CopilotResponse> {
 
 // Create copilot routes
 export function createCopilotRoutes(app: Express, storage: IStorage) {
+  // P3 SECURITY: Register Privacy & GDPR Routes
+  const registerPrivacyRoutes = async () => {
+    try {
+      const privacyModule = await import('./routes/privacy');
+      app.use('/api/privacy', privacyModule.default);
+      console.log('✅ P3: Privacy & GDPR API routes registered');
+    } catch (error) {
+      console.error('❌ P3: Failed to register privacy routes:', error);
+    }
+  };
+  registerPrivacyRoutes();
   // Chat endpoint
   app.post('/api/copilot/chat', async (req: any, res: Response) => {
     try {

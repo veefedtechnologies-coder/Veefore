@@ -101,6 +101,10 @@ initializeTokenHygiene();
 import { initializeResourceNamespacing } from './security/resource-namespacing';
 initializeResourceNamespacing();
 
+// P3 SECURITY: Initialize GDPR & Data Protection Compliance
+import { initializeGDPRCompliance } from './security/gdpr-compliance';
+initializeGDPRCompliance();
+
 const app = express();
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
