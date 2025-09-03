@@ -70,6 +70,25 @@ function App() {
     enabled: !!user && !loading,
     retry: false
   })
+
+  // Pre-fetch workspaces data for faster navigation
+  const { data: workspaces } = useQuery({
+    queryKey: ['/api/workspaces'],
+    queryFn: () => apiRequest('/api/workspaces'),
+    enabled: !!user && !loading && !!userData,
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+    retry: false
+  })
+
+  // Pre-fetch social accounts for current workspace to eliminate loading on Integration page
+  const currentWorkspaceId = workspaces?.find(w => w.isActive)?.id
+  const { data: socialAccounts } = useQuery({
+    queryKey: ['/api/social-accounts', currentWorkspaceId],
+    queryFn: () => currentWorkspaceId ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspaceId}`) : Promise.resolve([]),
+    enabled: !!user && !loading && !!currentWorkspaceId,
+    staleTime: 10 * 60 * 1000, // 10 minutes cache for smooth navigation
+    retry: false
+  })
   
   // Authentication and onboarding guard logic - STRICT ENFORCEMENT
   useEffect(() => {
