@@ -40,22 +40,95 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://veefore.com/" />
     
-    <!-- Font Optimization -->
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <!-- P7-5: Critical Performance Optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//api.openai.com">
+    <link rel="dns-prefetch" href="//api.anthropic.com">
+    
+    <!-- Font Optimization with Critical Rendering -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
+      crossorigin
+    />
     <link
       rel="stylesheet"
-      as="style"
-      onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&family=Space+Grotesk%3Awght%40400%3B500%3B700"
+      href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700"
+      media="print"
+      onload="this.media='all'"
     />
     <style>
-      /* Prevent black flash by setting immediate background */
+      /* P7-5: Critical above-the-fold styles for instant LCP */
       html, body {
         background-color: #f9fafb; /* gray-50 */
         color: #111827; /* gray-900 */
         margin: 0;
         padding: 0;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+        font-display: swap;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      
+      /* P7-5: Hero section critical styles */
+      .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      /* P7-5: Navigation critical styles */
+      .nav-header {
+        height: 80px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      
+      /* P7-5: Layout stability for images */
+      img {
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: attr(width) / attr(height);
+      }
+      
+      /* P7-5: Prevent layout shifts */
+      .async-content {
+        min-height: 200px;
+        contain: layout style paint;
+      }
+      
+      /* P7-5: Loading skeleton */
+      .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+      
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      /* P7-5: Accessibility focus indicators */
+      .a11y-focus-indicator:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      
+      /* P7-5: Performance optimizations */
+      .will-change-transform {
+        will-change: transform;
+      }
+      
+      .contain-layout {
+        contain: layout style paint;
       }
       
       /* Dark mode support */
@@ -63,6 +136,10 @@
         html, body {
           background-color: #111827; /* gray-900 */
           color: #f9fafb; /* gray-50 */
+        }
+        .nav-header {
+          background: rgba(17, 24, 39, 0.95);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
       }
       
