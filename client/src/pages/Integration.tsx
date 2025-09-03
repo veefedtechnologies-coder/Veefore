@@ -510,20 +510,8 @@ export default function Integration() {
     )
   }
 
-  // Don't show loading if error modal is open or processing OAuth errors
-  if (isLoading && !isProcessingOAuth && !errorModal.isOpen) {
-    console.log('Integration - showing loading state')
-    return (
-      <div className="p-8 bg-white dark:bg-gray-900 min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600 dark:text-gray-400">Loading your social accounts...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Never show full-page loading - always show page structure immediately
+  // This eliminates the "refresh flash" issue
 
   console.log('Integration - rendering main content')
 
