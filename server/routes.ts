@@ -14498,9 +14498,7 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Get social accounts for automation and integration pages
-  app.get('/api/social-accounts', requireAuth, 
-    validateWorkspaceAccess({ required: false }),
-    async (req: any, res: Response) => {
+  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const workspaceId = req.query.workspaceId as string || req.workspace?.id;

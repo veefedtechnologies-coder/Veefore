@@ -884,11 +884,23 @@ app.use((req, res, next) => {
   //   process.exit(0);
   // });
 
+  // Add error handling for HTTP server
+  httpServer.on('error', (err) => {
+    console.error('❌ HTTP Server Error:', err);
+    process.exit(1);
+  });
+
   // Use HTTP server with WebSocket support instead of Express server directly
   // Bind to all interfaces for Replit external access
+  console.log(`🚀 Attempting to bind HTTP server to port ${port}...`);
   httpServer.listen(port, "0.0.0.0", () => {
+    console.log(`✅ HTTP Server successfully bound to port ${port}`);
     log(`serving on port ${port} with WebSocket support`);
     log(`External URL: https://${process.env.REPL_SLUG || 'app'}.${process.env.REPL_OWNER || 'user'}.repl.co`);
     Logger.info('Server', `Instagram metrics system initialized and ready`);
   });
-})();
+})().catch((error) => {
+  console.error('❌ Server startup failed:', error);
+  console.error('Stack trace:', error.stack);
+  process.exit(1);
+});
