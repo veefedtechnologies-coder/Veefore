@@ -89,23 +89,6 @@
 - [x] **P1-7.3** Security metrics and dashboards → **Real-time metrics collection with hourly reporting**
 - [x] **P1-7.4** Audit trail for privileged operations → **Comprehensive admin operation logging with metadata**
 
-**P1-5: CORS & Origins Security**
-- [ ] **P1-5.1** Explicit origin allowlist (no wildcards)
-- [ ] **P1-5.2** Credentials handling security
-- [ ] **P1-5.3** Preflight request optimization
-
-**P1-6: Key Management & Encryption**
-- [ ] **P1-6.1** Environment variable security audit
-- [ ] **P1-6.2** Token encryption at rest for social integrations
-- [ ] **P1-6.3** Key rotation automation
-- [ ] **P1-6.4** Secrets management (remove hardcoded values)
-
-**P1-7: Security Monitoring & Logging**
-- [ ] **P1-7.1** Structured security logging with correlation IDs
-- [ ] **P1-7.2** Attack detection and alerting
-- [ ] **P1-7.3** Security metrics and dashboards
-- [ ] **P1-7.4** Audit trail for privileged operations
-
 ---
 
 ### **3. Advanced Security & Multi-Tenancy** ⏳ **PENDING**

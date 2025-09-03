@@ -205,8 +205,11 @@ export function securityLoggingMiddleware(req: any, res: Response, next: NextFun
   const userAgent = req.headers['user-agent'] || 'unknown';
   const correlationId = req.correlationId || randomUUID();
   
-  // Log request start
-  console.log(`🔍 REQUEST START: ${req.method} ${req.path} [${correlationId}] from ${ip}`);
+  // Only log security-relevant requests to reduce noise
+  const isSecurityRelevant = req.path.includes('/admin') || req.path.includes('/oauth') || req.path.includes('/auth');
+  if (isSecurityRelevant) {
+    console.log(`🔍 SECURITY REQUEST: ${req.method} ${req.path} [${correlationId}] from ${ip}`);
+  }
   
   // Capture response
   res.on('finish', () => {
@@ -243,7 +246,10 @@ export function securityLoggingMiddleware(req: any, res: Response, next: NextFun
       securityEventStore.addEvent(event);
     }
     
-    console.log(`🔍 REQUEST END: ${req.method} ${req.path} [${correlationId}] ${statusCode} (${responseTime}ms)`);
+    // Only log security-relevant request endings
+    if (isSecurityRelevant || statusCode >= 400) {
+      console.log(`🔍 SECURITY RESPONSE: ${req.method} ${req.path} [${correlationId}] ${statusCode} (${responseTime}ms)`);
+    }
   });
   
   next();

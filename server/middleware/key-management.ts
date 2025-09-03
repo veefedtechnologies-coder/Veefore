@@ -6,6 +6,9 @@
 
 import { createHash, randomBytes } from 'crypto';
 
+// Rate limiting for audit logging to prevent console spam
+let lastAuditLog = 0;
+
 /**
  * P1-6.1: Environment variable security audit and validation
  */
@@ -80,10 +83,12 @@ export function auditEnvironmentVariables(): {
     
     if (secret.required && !value) {
       missing.push(secret.name);
-      console.error(`❌ MISSING REQUIRED SECRET: ${secret.name} - ${secret.description}`);
+      // Only log missing secrets on first audit or every 5 minutes
+      if (Date.now() - lastAuditLog > 300000) {
+        console.error(`❌ MISSING REQUIRED SECRET: ${secret.name} - ${secret.description}`);
+      }
     } else if (value) {
       present.push(secret.name);
-      console.log(`✅ SECRET PRESENT: ${secret.name} (${secret.category})`);
       
       // Security validation
       if (secret.encrypted && secret.name.includes('SECRET') && value.length < 32) {
@@ -94,7 +99,10 @@ export function auditEnvironmentVariables(): {
         recommendations.push(`${secret.name}: Consider implementing automatic rotation`);
       }
     } else {
-      console.log(`ℹ️ OPTIONAL SECRET MISSING: ${secret.name} - ${secret.description}`);
+      // Only log optional missing secrets on startup
+      if (Date.now() - lastAuditLog > 300000) {
+        console.log(`ℹ️ OPTIONAL SECRET MISSING: ${secret.name} - ${secret.description}`);
+      }
     }
   }
   
@@ -109,7 +117,24 @@ export function auditEnvironmentVariables(): {
     warnings.push(`Unknown secret-like environment variables detected: ${suspiciousEnvVars.join(', ')}`);
   }
   
-  console.log(`🔍 AUDIT COMPLETE: ${present.length} present, ${missing.length} missing, ${warnings.length} warnings`);
+  // Rate limited audit logging to prevent console spam
+  if (Date.now() - lastAuditLog > 300000) { // Only log every 5 minutes
+    console.log(`🔍 SECRETS AUDIT: ${present.length} present, ${missing.length} missing`);
+    
+    if (missing.length > 0) {
+      console.warn(`🚨 MISSING SECRETS: ${missing.join(', ')}`);
+    }
+    
+    if (warnings.length > 0) {
+      console.warn(`🚨 KEY MANAGEMENT WARNINGS:\n  - ${warnings.join('\n  - ')}`);
+    }
+    
+    if (recommendations.length > 0) {
+      console.log(`💡 KEY MANAGEMENT RECOMMENDATIONS:\n  - ${recommendations.join('\n  - ')}`);
+    }
+    
+    lastAuditLog = Date.now();
+  }
   
   return { missing, present, warnings, recommendations };
 }
@@ -123,7 +148,9 @@ export class SecureTokenManager {
   constructor() {
     const key = process.env.TOKEN_ENCRYPTION_KEY;
     if (!key) {
-      console.warn('🚨 TOKEN_ENCRYPTION_KEY not set - generating temporary key');
+      if (Date.now() - lastAuditLog > 300000) {
+        console.warn('🚨 TOKEN_ENCRYPTION_KEY not set - generating temporary key');
+      }
       // Generate a secure random key for development
       this.encryptionKey = randomBytes(32);
     } else {
