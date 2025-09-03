@@ -41,6 +41,8 @@ import Settings from './pages/Settings'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 import { getRedirectResult, auth } from './lib/firebase'
 import { initializeTheme } from './lib/theme'
+// P6: Frontend SEO, Accessibility & UX System
+import { initializeP6System, P6Provider, ToastContainer } from './lib/p6-integration'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -52,6 +54,38 @@ function App() {
   // Initialize theme system
   useEffect(() => {
     initializeTheme()
+  }, [])
+
+  // P6: Initialize Frontend SEO, Accessibility & UX System
+  useEffect(() => {
+    initializeP6System({
+      seo: {
+        defaultTitle: 'VeeFore - AI-Powered Social Media Management',
+        defaultDescription: 'Transform your social media presence with VeeFore\'s AI-powered content creation, automated scheduling, and comprehensive analytics.',
+        siteName: 'VeeFore',
+        twitterHandle: '@VeeFore'
+      },
+      accessibility: {
+        enableScreenReaderSupport: true,
+        enableKeyboardNavigation: true,
+        announceRouteChanges: true
+      },
+      ux: {
+        enableLoadingStates: true,
+        enableToastNotifications: true,
+        autoSaveInterval: 30000
+      },
+      mobile: {
+        enableTouchOptimization: true,
+        enableGestureSupport: true,
+        enablePullToRefresh: true
+      },
+      performance: {
+        enableLazyLoading: true,
+        enableImageOptimization: true,
+        enableWebVitalsMonitoring: true
+      }
+    })
   }, [])
 
   console.log('App component rendering:', { location, user: !!user, loading })
@@ -165,6 +199,7 @@ function App() {
   }
 
   return (
+    <P6Provider>
     <>
     <Switch>
       {/* Waitlist pages - full screen without sidebar */}
@@ -798,7 +833,11 @@ function App() {
       isActive={isWalkthroughOpen}
       onClose={() => setIsWalkthroughOpen(false)}
     />
+    
+    {/* P6: Toast notifications container */}
+    <ToastContainer position="top-right" />
     </>
+    </P6Provider>
   )
 }
 

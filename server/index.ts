@@ -116,10 +116,24 @@ import {
   recordStartupMetrics,
   setupGracefulShutdown
 } from './monitoring';
+
+// P5 PERFORMANCE: Initialize comprehensive performance & scalability system
+import { 
+  initializePerformanceSystem,
+  applyPerformanceMiddleware,
+  createPerformanceEndpoints,
+  applyCachedRoutes,
+  performStartupOptimizations
+} from './performance';
+
 initializeReliabilitySystem(app);
 
 // P4 MONITORING: Apply monitoring middleware early
 applyMonitoringMiddleware(app);
+
+// P5 PERFORMANCE: Initialize and apply performance optimization system
+await initializePerformanceSystem(app);
+applyPerformanceMiddleware(app);
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
 app.set('trust proxy', 1);
@@ -586,6 +600,18 @@ app.use((req, res, next) => {
   
   // Additional webhook route to match Meta Console configuration
   app.use('/webhook', webhooksRoutes);
+  
+  // P4 MONITORING: Create monitoring endpoints
+  createMonitoringEndpoints(app);
+  
+  // P5 PERFORMANCE: Create performance monitoring endpoints
+  createPerformanceEndpoints(app);
+  
+  // P5 PERFORMANCE: Apply cached routes optimization
+  applyCachedRoutes(app);
+  
+  // P5 PERFORMANCE: Run startup optimizations
+  await performStartupOptimizations();
 
   // Instagram account management routes
   app.post('/api/instagram/cleanup-duplicates', async (req: any, res: Response) => {
