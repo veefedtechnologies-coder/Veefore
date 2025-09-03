@@ -237,8 +237,9 @@ export default function Integration() {
     placeholderData: (previousData) => previousData // Keep showing old data while new data loads
   })
 
-  // Show skeleton when loading OR when no workspace is available yet
-  const shouldShowSkeleton = isLoading || !currentWorkspace?.id
+  // CRITICAL FIX: Show skeleton by default until EVERYTHING is ready
+  // This prevents blank flash caused by useCurrentWorkspace() waiting for workspaces query
+  const shouldShowSkeleton = !currentWorkspace?.id || isLoading || connectedAccounts === undefined
 
   console.log('Integration state:', { 
     isLoading, 
