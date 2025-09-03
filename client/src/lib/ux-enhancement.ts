@@ -134,13 +134,14 @@ export class UXManager {
   private setupPerformanceMonitoring(): void {
     if (!this.config.enablePerformanceHints) return;
 
-    // Monitor Core Web Vitals
+    // Monitor Core Web Vitals (toasts disabled in development to avoid noise)
     if ('PerformanceObserver' in window) {
       // Largest Contentful Paint
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           const lcp = entry.startTime;
-          if (lcp > 2500) { // Poor LCP
+          // Only show performance toasts in production
+          if (lcp > 5000 && process.env.NODE_ENV === 'production') { // Very poor LCP
             this.showToast({
               type: 'info',
               title: 'Loading Optimization',
