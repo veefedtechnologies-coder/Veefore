@@ -152,27 +152,40 @@ function setupGlobalOptimizations(): void {
       outline-offset: 2px;
     }
     
-    /* Skip links */
+    /* Skip links - Hidden by default, visible on focus */
     .skip-links {
-      position: absolute;
-      top: -100px;
+      position: fixed;
+      top: 0;
       left: 0;
       z-index: 10000;
+      width: 100%;
+      pointer-events: none;
     }
     
     .skip-link {
       position: absolute;
       top: -100px;
-      left: 6px;
+      left: 8px;
       background: #000;
       color: #fff;
       padding: 8px 16px;
       text-decoration: none;
-      border-radius: 4px;
+      border-radius: 0 0 4px 4px;
+      font-weight: 500;
+      font-size: 14px;
+      pointer-events: auto;
+      transition: top 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .skip-link:focus {
-      top: 6px;
+      top: 0;
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    
+    .skip-link:hover {
+      background: #333;
     }
     
     /* Toast notifications */

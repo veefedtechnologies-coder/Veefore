@@ -140,6 +140,9 @@ export class AccessibilityManager {
   private setupSkipLinks(): void {
     if (!this.config.showSkipLinks) return;
 
+    // Check if skip links already exist to prevent duplicates
+    if (document.querySelector('#skip-links')) return;
+
     const skipLinks = document.createElement('div');
     skipLinks.id = 'skip-links';
     skipLinks.className = 'skip-links';
