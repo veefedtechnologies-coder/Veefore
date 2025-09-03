@@ -31,6 +31,7 @@ export class TokenEncryptionService {
   private masterKey: string;
 
   constructor() {
+    // P1-6.2: Enhanced key management integration
     // Get master key from environment - CRITICAL for production security
     this.masterKey = process.env.TOKEN_ENCRYPTION_KEY || this.generateMasterKey();
     

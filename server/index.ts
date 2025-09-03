@@ -34,6 +34,11 @@ import {
   corsContentSecurityPolicy,
   emergencyCorsLockdown 
 } from "./middleware/cors-security";
+import { 
+  initializeKeyManagement, 
+  secretsValidationMiddleware, 
+  keyManagementHeaders 
+} from "./middleware/key-management";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -55,6 +60,9 @@ let serveStatic: any = null;
 
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
+
+// P1-6 SECURITY: Initialize comprehensive key management system
+const keyManagementSystem = initializeKeyManagement();
 
 const app = express();
 
@@ -280,6 +288,11 @@ app.use('/api', globalRateLimiter);
 
 // P1-5 SECURITY: API-specific CORS protection with enhanced validation
 app.use('/api', apiCorsMiddleware);
+
+// P1-6 SECURITY: Key management and secrets validation
+app.use('/api', secretsValidationMiddleware());
+app.use('/api/oauth', keyManagementHeaders());
+app.use('/api/admin', keyManagementHeaders());
 
 // P1-4.3 SECURITY: XSS Protection middleware
 app.use(enhancedXssHeaders());
