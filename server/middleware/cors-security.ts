@@ -306,10 +306,15 @@ export function corsContentSecurityPolicy(req: Request, res: Response, next: Nex
     'ws:'
   ].join(' ');
   
-  // Set CSP header that complements CORS policy
+  // Set CSP header that complements CORS policy - allow Replit iframe in development
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  const frameAncestors = isDevelopment ? 
+    `frame-ancestors 'self' https://replit.com https://*.replit.dev; ` :
+    `frame-ancestors 'none'; `;
+    
   res.header('Content-Security-Policy', 
     `connect-src ${connectSrc}; ` +
-    `frame-ancestors 'none'; ` +
+    frameAncestors +
     `base-uri 'self';`
   );
   

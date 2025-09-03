@@ -287,7 +287,7 @@ app.use(helmet({
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
-      frameAncestors: ["'none'"], // Prevent framing (clickjacking protection)
+      frameAncestors: isDevelopment ? ["'self'", "https://replit.com", "https://*.replit.dev"] : ["'none'"], // Allow Replit iframe in dev
       
       // Worker and manifest support
       workerSrc: ["'self'", "blob:"],
@@ -301,7 +301,7 @@ app.use(helmet({
   },
 
   // P1-2: Enhanced frame protection
-  frameguard: { action: 'deny' }, // More restrictive than default 'sameorigin'
+  frameguard: { action: isDevelopment ? 'sameorigin' : 'deny' }, // Allow iframe in development
   
   // P1-2: Enhanced cross-origin policies
   crossOriginResourcePolicy: { policy: "cross-origin" },
