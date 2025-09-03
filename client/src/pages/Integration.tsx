@@ -128,6 +128,9 @@ export default function Integration() {
 
   console.log('Integration component rendering...')
 
+  // Get current workspace (reactive to workspace switching) - MOVED UP to fix reference error
+  const { currentWorkspace, workspaces } = useCurrentWorkspace();
+
   // Real-time WebSocket listener for instant social account updates
   useEffect(() => {
     if (!currentWorkspace?.id) return
@@ -219,9 +222,6 @@ export default function Integration() {
       setIsProcessingOAuth(false)
     }
   }, [])
-
-  // Get current workspace (reactive to workspace switching)
-  const { currentWorkspace, workspaces } = useCurrentWorkspace();
 
   // Advanced: Stale-While-Revalidate strategy - show cached data instantly, update silently in background
   const { data: connectedAccounts = [], isLoading, refetch } = useQuery({
