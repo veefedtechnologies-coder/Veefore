@@ -143,8 +143,8 @@ function App() {
     }
   }, [user, loading, userData, userDataLoading, location, setLocation, isOnboardingModalOpen])
 
-  // Show loading spinner while checking authentication and user data
-  if (loading || (user && userDataLoading)) {
+  // Show loading spinner only during initial auth - not for user data loading (better UX)
+  if (loading) {
     return <LoadingSpinner />
   }
   

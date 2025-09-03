@@ -510,8 +510,40 @@ export default function Integration() {
     )
   }
 
-  // Never show full-page loading - always show page structure immediately
-  // This eliminates the "refresh flash" issue
+  // Skeleton Loading Components for better UX
+  const PlatformCardSkeleton = () => (
+    <Card className="animate-pulse">
+      <CardContent className="p-6">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          <div className="flex-1">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+          </div>
+          <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        </div>
+        <div className="space-y-2 mb-4">
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        </div>
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      </CardContent>
+    </Card>
+  )
+
+  const StatCardSkeleton = () => (
+    <Card className="animate-pulse">
+      <CardContent className="p-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          <div className="flex-1">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mb-2"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
 
   console.log('Integration - rendering main content')
 
@@ -533,51 +565,61 @@ export default function Integration() {
           </p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Show skeleton while loading */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-blue-200 dark:border-blue-600">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                  <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{connectedAccounts?.length || 0}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Connected Accounts</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {isLoading ? (
+            <>
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+            </>
+          ) : (
+            <>
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-blue-200 dark:border-blue-600">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{connectedAccounts?.length || 0}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Connected Accounts</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-600">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
-                  <BarChart3 className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {connectedAccounts?.reduce((total: number, account: SocialAccount) => total + (account.followers || 0), 0) || 0}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Followers</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-600">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
+                      <BarChart3 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {connectedAccounts?.reduce((total: number, account: SocialAccount) => total + (account.followers || 0), 0) || 0}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Followers</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-purple-200 dark:border-purple-600">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                  <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">24/7</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Auto Scheduling</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-purple-200 dark:border-purple-600">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                      <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">24/7</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Auto Scheduling</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Available Platforms */}
@@ -587,8 +629,20 @@ export default function Integration() {
             Available Platforms
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.keys(platformConfig).map((platform) => 
-              renderPlatformCard(platform as keyof typeof platformConfig)
+            {isLoading ? (
+              // Show skeleton cards while loading
+              <>
+                <PlatformCardSkeleton />
+                <PlatformCardSkeleton />
+                <PlatformCardSkeleton />
+                <PlatformCardSkeleton />
+                <PlatformCardSkeleton />
+                <PlatformCardSkeleton />
+              </>
+            ) : (
+              Object.keys(platformConfig).map((platform) => 
+                renderPlatformCard(platform as keyof typeof platformConfig)
+              )
             )}
           </div>
         </div>
