@@ -10,6 +10,7 @@ import { GetStarted } from './components/dashboard/get-started'
 import { ScheduledPosts, Drafts } from './components/dashboard/scheduled-posts'
 import { Listening } from './components/dashboard/listening'
 import { SocialAccounts } from './components/dashboard/social-accounts'
+import InstagramWebhookListener from './components/dashboard/instagram-webhook-listener'
 import { ScheduledPostsSection } from './components/dashboard/scheduled-posts-section'
 import { DraftsSection } from './components/dashboard/drafts-section'
 import { CalendarView } from './components/calendar/calendar-view'
@@ -233,6 +234,9 @@ function App() {
               {/* Main Content - Scrollable */}
               <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <>
+                  {/* Instagram Webhook Listener for Real-time Updates */}
+                  <InstagramWebhookListener />
+                  
                   {/* Quick Actions - Top Section */}
                   <div className="mb-8">
                     <QuickActions />

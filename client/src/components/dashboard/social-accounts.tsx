@@ -14,63 +14,109 @@ export function SocialAccounts() {
   const { toast } = useToast()
   const { currentWorkspace } = useCurrentWorkspace()
   
-  // Fetch social accounts data for current workspace - PRODUCTION-SAFE rate limit protection
+  // Fetch social accounts data for current workspace - SMART rate limit protection
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes to prevent excessive calls
+    refetchInterval: 15 * 60 * 1000, // Smart polling every 15 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes for faster updates
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnMount: true, // Always fetch fresh data on mount
   })
 
-  // Manual sync mutation for Instagram data - IMMEDIATE mode
+  // Smart Instagram sync mutation - respects rate limits while providing immediate updates
   const syncMutation = useMutation({
-    mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/manual-sync', { 
+    mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/smart-sync', { 
       method: 'POST',
-      body: JSON.stringify({ workspaceId: currentWorkspace.id })
+      body: JSON.stringify({ 
+        workspaceId: currentWorkspace.id,
+        forceRefresh: true,
+        respectRateLimit: true
+      })
     }) : Promise.reject(new Error('No workspace selected')),
     onSuccess: (data) => {
+      console.log('Smart Instagram sync completed:', data)
+      
       // Immediately trigger a refresh of all data
       refetchAccounts()
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
       queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
       
       toast({
-        title: "🚀 Instant sync complete!",
-        description: `Instagram data refreshed successfully! Fetched fresh metrics in real-time.`,
+        title: "🚀 Smart sync complete!",
+        description: `Instagram data refreshed successfully! ${data.newDataCount || 0} new updates fetched.`,
       })
     },
     onError: (error: any) => {
-      toast({
-        title: "❌ Sync failed", 
-        description: error.message || "Failed to sync Instagram data",
-        variant: "destructive"
-      })
+      console.error('Smart Instagram sync failed:', error)
+      
+      // Check if it's a rate limit error
+      if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+        toast({
+          title: "⏳ Rate limit reached", 
+          description: "Instagram API rate limit reached. Will retry automatically in a few minutes.",
+          variant: "destructive"
+        })
+      } else {
+        toast({
+          title: "❌ Sync failed", 
+          description: error.message || "Failed to sync Instagram data",
+          variant: "destructive"
+        })
+      }
     }
   })
 
-  // Auto-refresh when user returns to page for immediate fresh data (with debouncing)
+  // Smart refresh system - detects user activity and provides real-time updates
   React.useEffect(() => {
     let refreshTimeout: NodeJS.Timeout | null = null
+    let lastActivityTime = Date.now()
+    let isUserActive = true
     
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // Debounce the refresh to prevent excessive API calls
-        if (refreshTimeout) {
-          clearTimeout(refreshTimeout)
-        }
+        // User returned to page - check if we need fresh data
+        const timeSinceLastActivity = Date.now() - lastActivityTime
+        const shouldRefresh = timeSinceLastActivity > 5 * 60 * 1000 // 5 minutes
         
-        refreshTimeout = setTimeout(() => {
-          // User returned to page - refresh data with delay
-          refetchAccounts()
-          queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
-        }, 1000) // 1 second delay to prevent rapid refreshes
+        if (shouldRefresh) {
+          console.log('User returned after', Math.round(timeSinceLastActivity / 1000), 'seconds - refreshing data')
+          // Debounce the refresh to prevent excessive API calls
+          if (refreshTimeout) {
+            clearTimeout(refreshTimeout)
+          }
+          
+          refreshTimeout = setTimeout(() => {
+            // User returned to page - refresh data with delay
+            refetchAccounts()
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            lastActivityTime = Date.now()
+          }, 2000) // 2 second delay to prevent rapid refreshes
+        }
+      } else {
+        isUserActive = false
       }
     }
     
+    // Track user activity for smart refreshing
+    const handleUserActivity = () => {
+      lastActivityTime = Date.now()
+      isUserActive = true
+    }
+    
+    // Listen for user activity
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener('mousemove', handleUserActivity)
+    document.addEventListener('keydown', handleUserActivity)
+    document.addEventListener('click', handleUserActivity)
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener('mousemove', handleUserActivity)
+      document.removeEventListener('keydown', handleUserActivity)
+      document.removeEventListener('click', handleUserActivity)
       if (refreshTimeout) {
         clearTimeout(refreshTimeout)
       }
@@ -94,12 +140,14 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - PRODUCTION-SAFE rate limit protection
+  // Polling status query - SMART rate limit protection
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: false, // Disable automatic refetching to prevent app refreshes
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active
+    staleTime: 3 * 60 * 1000, // Cache for 3 minutes for faster updates
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
     enabled: !!socialAccounts && socialAccounts.length > 0
   })
 
@@ -227,22 +275,22 @@ export function SocialAccounts() {
                 </div>
               )}
               
-              {/* IMMEDIATE sync button for Instagram */}
+              {/* SMART sync button for Instagram with rate limit protection */}
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={() => {
-                  // Trigger immediate sync
+                  // Trigger smart sync with rate limit protection
                   syncMutation.mutate()
                   // Also immediately refresh the UI data
                   refetchAccounts()
                 }}
                 disabled={syncMutation.isPending}
                 className="bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                title="Get latest follower count INSTANTLY - no delays!"
+                title="Smart sync with rate limit protection - gets fresh data while respecting Meta's limits"
               >
                 <RefreshCw className={`w-4 h-4 mr-1 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-                {syncMutation.isPending ? 'Getting fresh data...' : '🚀 Instant Sync'}
+                {syncMutation.isPending ? 'Smart Syncing...' : '🧠 Smart Sync'}
               </Button>
               
               <Button variant="outline" size="sm" className="bg-white dark:bg-gray-700 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200">
