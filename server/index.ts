@@ -25,6 +25,7 @@ import {
   socialMediaRateLimiter
 } from "./middleware/rate-limiting-working";
 import { xssProtectionMiddleware, enhancedXssHeaders } from "./middleware/xss-protection";
+import { cleanupTempFiles } from "./middleware/file-upload-security";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -254,6 +255,11 @@ app.use('/api', globalRateLimiter);
 // P1-4.3 SECURITY: XSS Protection middleware
 app.use(enhancedXssHeaders());
 app.use('/api', xssProtectionMiddleware({ sanitizeBody: true, sanitizeQuery: true, sanitizeParams: true }));
+
+// P1-4.4 SECURITY: File upload cleanup service
+setInterval(() => {
+  cleanupTempFiles(24 * 60 * 60 * 1000); // Clean files older than 24 hours
+}, 60 * 60 * 1000); // Run every hour
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
