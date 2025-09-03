@@ -223,9 +223,9 @@ export default function Integration() {
     }
   }, [])
 
-  // Advanced: Stale-While-Revalidate strategy - show cached data instantly, update silently in background
+  // Advanced: Always show page immediately - even without workspace data
   const { data: connectedAccounts = [], isLoading, refetch } = useQuery({
-    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryKey: ['/api/social-accounts', currentWorkspace?.id || 'loading'],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
     staleTime: 0, // Always consider data stale for background updates
@@ -236,6 +236,9 @@ export default function Integration() {
     notifyOnChangeProps: ['data'], // Only notify UI when data actually changes
     placeholderData: (previousData) => previousData // Keep showing old data while new data loads
   })
+
+  // Show skeleton when loading OR when no workspace is available yet
+  const shouldShowSkeleton = isLoading || !currentWorkspace?.id
 
   console.log('Integration state:', { 
     isLoading, 
@@ -567,7 +570,7 @@ export default function Integration() {
 
         {/* Stats Cards - Show skeleton while loading */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {isLoading ? (
+          {shouldShowSkeleton ? (
             <>
               <StatCardSkeleton />
               <StatCardSkeleton />
@@ -629,7 +632,7 @@ export default function Integration() {
             Available Platforms
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
+            {shouldShowSkeleton ? (
               // Show skeleton cards while loading
               <>
                 <PlatformCardSkeleton />
