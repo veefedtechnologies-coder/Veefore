@@ -43,6 +43,8 @@ import { getRedirectResult, auth } from './lib/firebase'
 import { initializeTheme } from './lib/theme'
 // P6: Frontend SEO, Accessibility & UX System
 import { initializeP6System, P6Provider, ToastContainer } from './lib/p6-integration'
+// P7: Accessibility System
+import { initializeAccessibility, SkipLinks, useRouteAnnouncements } from './lib/accessibility'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -51,13 +53,18 @@ function App() {
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
 
+  // P7: Route announcements for accessibility
+  useRouteAnnouncements()
+
   // Initialize theme system
   useEffect(() => {
     initializeTheme()
   }, [])
 
-  // P6: Initialize Frontend SEO, Accessibility & UX System
+  // P6: Initialize Frontend SEO, Accessibility & UX System  
+  // P7: Initialize Accessibility System
   useEffect(() => {
+    initializeAccessibility()
     initializeP6System({
       seo: {
         defaultTitle: 'VeeFore - AI-Powered Social Media Management',

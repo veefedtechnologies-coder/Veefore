@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { Camera, Mail, User, Calendar, CreditCard, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,6 +8,18 @@ import { useUser } from '@/hooks/useUser'
 import { useToast } from '@/hooks/use-toast'
 
 export default function Profile() {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.profile}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <ProfileContent />
+    </>
+  )
+}
+
+function ProfileContent() {
   const { userData } = useUser()
   const { toast } = useToast()
   const [isEditing, setIsEditing] = useState(false)

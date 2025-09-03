@@ -1,6 +1,6 @@
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { TrendingUp, Users, Eye, Heart, MessageCircle, Share, ArrowUpRight } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
@@ -21,7 +21,12 @@ const socialMetrics = [
 
 export function AnalyticsDashboard() {
   return (
-    <div className="space-y-6">
+    <>
+      <SEO 
+        {...seoConfig.analytics}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-gray-200 dark:border-gray-700">
@@ -196,5 +201,6 @@ export function AnalyticsDashboard() {
         </Card>
       </div>
     </div>
+    </>
   )
 }

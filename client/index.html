@@ -4,7 +4,43 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
     <title>VeeFore - Professional Social Media Management</title>
+    <meta name="title" content="VeeFore - Professional Social Media Management" />
+    <meta name="description" content="AI-powered social media management platform. Automate content creation, scheduling, and engagement across Instagram, Twitter, and LinkedIn with advanced analytics and automation." />
+    <meta name="keywords" content="social media management, AI automation, Instagram automation, content creation, social media analytics, engagement automation, social media scheduling" />
+    <meta name="author" content="VeeFore" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://veefore.com/" />
+    <meta property="og:title" content="VeeFore - Professional Social Media Management" />
+    <meta property="og:description" content="AI-powered social media management platform. Automate content creation, scheduling, and engagement across Instagram, Twitter, and LinkedIn with advanced analytics and automation." />
+    <meta property="og:image" content="https://veefore.com/og-image.jpg" />
+    <meta property="og:site_name" content="VeeFore" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://veefore.com/" />
+    <meta property="twitter:title" content="VeeFore - Professional Social Media Management" />
+    <meta property="twitter:description" content="AI-powered social media management platform. Automate content creation, scheduling, and engagement across Instagram, Twitter, and LinkedIn with advanced analytics and automation." />
+    <meta property="twitter:image" content="https://veefore.com/og-image.jpg" />
+    <meta property="twitter:creator" content="@veefore" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VeeFore" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://veefore.com/" />
+    
+    <!-- Font Optimization -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link
       rel="stylesheet"
@@ -48,6 +84,85 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- P7-2: JSON-LD Structured Data for Website -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "VeeFore",
+      "description": "AI-powered social media management platform for businesses and creators.",
+      "url": "https://veefore.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://veefore.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <!-- P7-2: JSON-LD Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "VeeFore",
+      "description": "Leading provider of AI-powered social media management solutions.",
+      "url": "https://veefore.com",
+      "logo": "https://veefore.com/logo.png",
+      "sameAs": [
+        "https://twitter.com/veefore",
+        "https://linkedin.com/company/veefore",
+        "https://instagram.com/veefore"
+      ],
+      "founder": {
+        "@type": "Organization",
+        "name": "VeeFore Team"
+      },
+      "foundingDate": "2024",
+      "industry": "Social Media Management Software",
+      "numberOfEmployees": "10-50"
+    }
+    </script>
+    
+    <!-- P7-2: JSON-LD Software Application Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "VeeFore",
+      "applicationCategory": "BusinessApplication",
+      "description": "Professional social media management platform with AI-powered automation, analytics, and content creation tools.",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "category": "subscription",
+        "price": "0",
+        "priceCurrency": "USD",
+        "priceSpecification": {
+          "@type": "PriceSpecification",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Free Plan"
+        }
+      },
+      "featureList": [
+        "Social Media Automation",
+        "Content Creation",
+        "Analytics Dashboard", 
+        "Multi-Platform Management",
+        "AI Video Generation",
+        "Engagement Automation"
+      ],
+      "screenshot": "https://veefore.com/screenshot.jpg",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "127"
+      }
+    }
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

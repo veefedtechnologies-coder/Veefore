@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { Button } from '@/components/ui/button'
 import { 
   Mic,
@@ -150,6 +151,18 @@ const getImmediateAnalysisStatus = (messageContent: string): string => {
 }
 
 export default function VeeGPT() {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.veeGPT}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <VeeGPTContent />
+    </>
+  )
+}
+
+function VeeGPTContent() {
   const { userData, loading: userLoading, user: firebaseUser } = useUser()
   
   // Debug user data

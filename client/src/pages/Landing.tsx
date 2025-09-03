@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
@@ -27,6 +28,18 @@ interface LandingProps {
 }
 
 const Landing = ({ onNavigate }: LandingProps) => {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.landing}
+        structuredData={generateStructuredData.organization()}
+      />
+      <LandingContent onNavigate={onNavigate} />
+    </>
+  )
+}
+
+const LandingContent = ({ onNavigate }: LandingProps) => {
   const [activeFeature, setActiveFeature] = useState(0)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [previewMode, setPreviewMode] = useState<'overview' | 'detailed'>('overview')

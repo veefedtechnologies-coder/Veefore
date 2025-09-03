@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -49,6 +50,18 @@ interface AutomationRule {
 }
 
 export default function AutomationSimple() {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.automation}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <AutomationSimpleContent />
+    </>
+  )
+}
+
+function AutomationSimpleContent() {
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedPlatform, setSelectedPlatform] = useState('')
   const [selectedContentType, setSelectedContentType] = useState('')

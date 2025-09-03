@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -115,6 +116,18 @@ const platformConfig = {
 }
 
 export default function Integration() {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.integration}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <IntegrationContent />
+    </>
+  )
+}
+
+function IntegrationContent() {
   const queryClient = useQueryClient()
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null)
   const [isProcessingOAuth, setIsProcessingOAuth] = useState(false)

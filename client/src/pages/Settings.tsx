@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { 
   Settings as SettingsIcon, 
   Palette, 
@@ -17,6 +18,18 @@ import { useTheme } from '@/hooks/useTheme'
 import { THEME_CONFIGS, Theme } from '@/lib/theme'
 
 export default function Settings() {
+  return (
+    <>
+      <SEO 
+        {...seoConfig.settings}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <SettingsContent />
+    </>
+  )
+}
+
+function SettingsContent() {
   const { theme, setTheme } = useTheme()
   const [activeTab, setActiveTab] = useState('appearance')
 

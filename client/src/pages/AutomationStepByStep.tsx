@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { 
   Instagram, 
   Bot, 
@@ -955,6 +956,19 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
 
 export default function AutomationStepByStep() {
   console.log('AutomationStepByStep component loaded successfully')
+  
+  return (
+    <>
+      <SEO 
+        {...seoConfig.automation}
+        structuredData={generateStructuredData.softwareApplication()}
+      />
+      <AutomationStepByStepContent />
+    </>
+  )
+}
+
+function AutomationStepByStepContent() {
   
   // Cache is now persistent and won't interfere with auth
   
