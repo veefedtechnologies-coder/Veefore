@@ -676,11 +676,35 @@ export class MongoStorage implements IStorage {
   }
 
   async connect() {
-    if (this.isConnected && mongoose.connection.readyState === 1) return;
+    // Don't reconnect if already connected and healthy
+    if (this.isConnected && mongoose.connection.readyState === 1) {
+      return;
+    }
+    
+    // Don't interrupt existing connection attempts
+    if (mongoose.connection.readyState === 2) {
+      // Wait for connection in progress
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('MongoDB connection timeout'));
+        }, 10000);
+        
+        mongoose.connection.once('connected', () => {
+          clearTimeout(timeout);
+          this.isConnected = true;
+          resolve(undefined);
+        });
+        mongoose.connection.once('error', (error) => {
+          clearTimeout(timeout);
+          this.isConnected = false;
+          reject(error);
+        });
+      });
+    }
     
     try {
-      // Force disconnect and reconnect to ensure correct database
-      if (mongoose.connection.readyState !== 0) {
+      // Only disconnect if connection is in bad state
+      if (mongoose.connection.readyState === 3) { // Disconnected
         await mongoose.disconnect();
       }
       
@@ -693,7 +717,9 @@ export class MongoStorage implements IStorage {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
         maxPoolSize: 10,
-        bufferCommands: false
+        bufferCommands: false,
+        maxIdleTimeMS: 30000,
+        retryWrites: true
       });
       
       this.isConnected = true;
