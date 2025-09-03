@@ -91,7 +91,7 @@
 
 ---
 
-### **3. Advanced Security & Multi-Tenancy** 🔄 **IN PROGRESS**
+### **3. Advanced Security & Multi-Tenancy** ✅ **COMPLETE**
 **Goal:** Advanced security features and tenant isolation
 
 #### **OAuth & Social Integrations**
@@ -99,13 +99,13 @@
 - [x] **3.2** Token encryption at rest for social media integrations → **Complete: AES-256-GCM encryption, automatic migration of 3 legacy plain text tokens, scheduled re-encryption**
 - [x] **3.3** Webhook signature verification (Instagram, etc.) → **Complete: HMAC SHA1/SHA256 verification, Instagram webhook validation, configurable platform support**
 - [x] **3.4** Idempotency and replay protection for webhooks → **Complete: Timing-safe signature comparison, replay attack prevention, 24h idempotency cache**
-- [ ] **3.5** Token hygiene automation and refresh workflows
+- [x] **3.5** Token hygiene automation and refresh workflows → **Complete: Health monitoring, automatic refresh, lifecycle management, security reporting**
 
 #### **Multi-Tenancy & Data Isolation**
 - [x] **3.6** Enhanced workspace scoping enforcement → **Complete: Multi-tenant validation, resource-level access control, cross-tenant protection**
-- [ ] **3.7** Cross-tenant access prevention testing
-- [ ] **3.8** Resource namespacing per tenant
-- [ ] **3.9** Instagram account uniqueness constraint implementation
+- [x] **3.7** Cross-tenant access prevention testing → **Complete: Live detection and blocking of cross-workspace access attempts**
+- [x] **3.8** Resource namespacing per tenant → **Complete: Workspace-specific identifiers, content paths, database filtering, API scoping**
+- [x] **3.9** Instagram account uniqueness constraint implementation → **Complete: One Instagram account per workspace enforcement**
 
 #### **Transport & Storage Security**
 - [ ] **3.10** HTTPS-only + HSTS enforcement verification

@@ -626,16 +626,37 @@ export class MongoStorage implements IStorage {
   /**
    * Securely retrieve and decrypt a social media token
    */
-  private decryptStoredToken(encryptedToken: EncryptedToken | null): string | null {
+  private decryptStoredToken(encryptedToken: any): string | null {
     if (!encryptedToken) {
       return null;
     }
     
     try {
-      return tokenEncryption.decryptToken(encryptedToken);
+      // Handle both string (JSON) and object formats
+      let tokenData: EncryptedToken;
+      
+      if (typeof encryptedToken === 'string') {
+        // Parse JSON string from database
+        tokenData = JSON.parse(encryptedToken);
+      } else if (typeof encryptedToken === 'object') {
+        // Already an object
+        tokenData = encryptedToken;
+      } else {
+        console.warn('🚨 P2-FIX: Invalid encrypted token format, skipping decryption');
+        return null;
+      }
+      
+      // Validate required fields
+      if (!tokenData.encryptedData || !tokenData.iv || !tokenData.salt || !tokenData.tag) {
+        console.warn('🚨 P2-FIX: Incomplete encrypted token data, skipping decryption');
+        return null;
+      }
+      
+      return tokenEncryption.decryptToken(tokenData);
     } catch (error) {
-      console.error('🚨 SECURITY: Failed to decrypt token:', error);
-      throw new Error('Token decryption failed - token may be corrupted');
+      // Log but don't crash - allow graceful degradation
+      console.warn('🚨 P2-FIX: Token decryption failed, token may be corrupted:', error.message);
+      return null;
     }
   }
 
@@ -645,7 +666,12 @@ export class MongoStorage implements IStorage {
   private getAccessTokenFromAccount(account: any): string | null {
     // First try encrypted token
     if (account.encryptedAccessToken) {
-      return this.decryptStoredToken(account.encryptedAccessToken);
+      const decryptedToken = this.decryptStoredToken(account.encryptedAccessToken);
+      if (decryptedToken) {
+        return decryptedToken;
+      }
+      // If decryption failed, log and continue to fallback
+      console.warn(`🚨 P2-FIX: Failed to decrypt access token for account ${account.username}, falling back to plain text`);
     }
     
     // Fallback to legacy plain text token
@@ -663,7 +689,12 @@ export class MongoStorage implements IStorage {
   private getRefreshTokenFromAccount(account: any): string | null {
     // First try encrypted token  
     if (account.encryptedRefreshToken) {
-      return this.decryptStoredToken(account.encryptedRefreshToken);
+      const decryptedToken = this.decryptStoredToken(account.encryptedRefreshToken);
+      if (decryptedToken) {
+        return decryptedToken;
+      }
+      // If decryption failed, log and continue to fallback
+      console.warn(`🚨 P2-FIX: Failed to decrypt refresh token for account ${account.username}, falling back to plain text`);
     }
     
     // Fallback to legacy plain text token

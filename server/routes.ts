@@ -63,6 +63,12 @@ import {
   userCleanupSchema, 
   testUserCreationSchema 
 } from './middleware/user-validation-schemas';
+// P2-8 SECURITY: Import workspace isolation middleware
+import { 
+  requireWorkspaceMiddleware, 
+  socialAccountIsolationMiddleware,
+  InstagramAccountConstraints 
+} from './security/workspace-isolation';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Configure multer for file uploads
@@ -14492,7 +14498,9 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Get social accounts for automation and integration pages
-  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
+  app.get('/api/social-accounts', requireAuth, 
+    requireWorkspaceMiddleware, 
+    async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const workspaceId = req.query.workspaceId as string;
@@ -14674,7 +14682,9 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Connect social account
-  app.post('/api/social-accounts/connect/:platform', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/social-accounts/connect/:platform', requireAuth, 
+    requireWorkspaceMiddleware,
+    async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const platform = req.params.platform;
@@ -14703,7 +14713,9 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Disconnect social account
-  app.delete('/api/social-accounts/:accountId', requireAuth, async (req: any, res: Response) => {
+  app.delete('/api/social-accounts/:accountId', requireAuth, 
+    socialAccountIsolationMiddleware,
+    async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
       const accountId = req.params.accountId;

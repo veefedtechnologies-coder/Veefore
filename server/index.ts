@@ -93,6 +93,14 @@ initializeWebhookSecurity();
 import { initializeWorkspaceIsolation } from './security/workspace-isolation';
 initializeWorkspaceIsolation();
 
+// P2-7 SECURITY: Initialize token hygiene automation
+import { initializeTokenHygiene } from './security/token-hygiene';
+initializeTokenHygiene();
+
+// P2-9 SECURITY: Initialize resource namespacing system
+import { initializeResourceNamespacing } from './security/resource-namespacing';
+initializeResourceNamespacing();
+
 const app = express();
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
