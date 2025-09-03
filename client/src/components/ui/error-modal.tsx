@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, X, Lock } from 'lucide-react'
+import { AlertTriangle, Lock } from 'lucide-react'
 
 interface ErrorModalProps {
   isOpen: boolean
@@ -72,15 +72,6 @@ export function ErrorModal({ isOpen, onClose, title, message, type = 'error' }: 
         data-testid="error-modal"
       >
         <div className="relative">
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute -top-2 -right-2 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            data-testid="error-modal-close"
-          >
-            <X className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-          </button>
-
           {/* Header with icon */}
           <DialogHeader className="space-y-4">
             <div className={`mx-auto w-16 h-16 rounded-full ${getBackgroundColor()} ${getBorderColor()} border-2 flex items-center justify-center`}>
