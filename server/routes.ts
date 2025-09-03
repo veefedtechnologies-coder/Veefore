@@ -54,7 +54,7 @@ import {
   validateContentCreation,
   validateAIGeneration
 } from './middleware/validation';
-import { safeParseOAuthState, safeParseInstagramState } from './middleware/unsafe-json-replacements';
+import { safeParseOAuthState, safeParseInstagramState, safeParseJWTPayload, safeParseAIResponse, safeParseAccountsData } from './middleware/unsafe-json-replacements';
 import { 
   userOnboardingSchema, 
   completeOnboardingSchema, 
@@ -260,7 +260,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       try {
         const finalParts = cleanToken.split('.');
-        const payload = JSON.parse(Buffer.from(finalParts[1], 'base64').toString());
+        const payloadResult = safeParseJWTPayload(finalParts[1]);
+        if (!payloadResult.success) {
+          console.error('[JWT SECURITY] Invalid token payload:', payloadResult.error);
+          return res.status(401).json({ error: 'Invalid token format' });
+        }
+        const payload = payloadResult.data;
         firebaseUid = payload.user_id || payload.sub;
         
         if (!firebaseUid) {
@@ -283,7 +288,12 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         try {
           // Use the cleaned token parts for payload extraction
           const finalTokenParts = cleanToken.split('.');
-          payload = JSON.parse(Buffer.from(finalTokenParts[1], 'base64').toString());
+          const tokenResult = safeParseJWTPayload(finalTokenParts[1]);
+          if (!tokenResult.success) {
+            console.error('[JWT SECURITY] Invalid backup token payload:', tokenResult.error);
+            return res.status(401).json({ error: 'Invalid backup token format' });
+          }
+          payload = tokenResult.data;
           const userEmail = payload.email || `user_${firebaseUid}@example.com`;
           
           // First check if user exists by email (from email verification process)
@@ -9406,14 +9416,26 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       console.log('[CREATE POST] User:', user.id, 'Data received:', {
         content: content?.length,
-        accounts: typeof accounts === 'string' ? JSON.parse(accounts) : accounts,
+        accounts: (() => {
+          const accountsResult = safeParseAccountsData(accounts);
+          if (!accountsResult.success) {
+            console.error('[ACCOUNTS SECURITY] Invalid accounts data:', accountsResult.error);
+            return [];
+          }
+          return accountsResult.data;
+        })(),
         mediaFiles: req.files?.length || 0,
         pinFirstComment,
         location
       });
 
       // Parse accounts if it's a JSON string (from FormData)
-      const accountData = typeof accounts === 'string' ? JSON.parse(accounts) : accounts;
+      const accountsResult = safeParseAccountsData(accounts);
+      if (!accountsResult.success) {
+        console.error('[ACCOUNTS SECURITY] Invalid accounts data format:', accountsResult.error);
+        return res.status(400).json({ error: 'Invalid accounts data format' });
+      }
+      const accountData = accountsResult.data;
       console.log('[CREATE POST] Parsed account data:', accountData);
       
       // Extract account IDs and map account details
@@ -10374,7 +10396,14 @@ Format as JSON with: script, caption, hashtags`;
 
       let result;
       try {
-        result = JSON.parse(response.choices[0].message.content || '{}');
+        const aiContent = response.choices[0].message.content || '{}';
+        const aiResult = safeParseAIResponse(aiContent);
+        if (!aiResult.success) {
+          console.error('[AI SECURITY] Invalid AI response format:', aiResult.error);
+          result = { error: 'AI response parsing failed', fallback: true };
+        } else {
+          result = aiResult.data;
+        }
         console.log('[AI SCRIPT] JSON parse successful:', result);
       } catch (parseError) {
         console.error('[AI SCRIPT] JSON parse failed:', parseError);
@@ -10534,9 +10563,15 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
           max_tokens: 800
         });
 
-        const fallbackData = JSON.parse(fallbackResponse.choices[0].message.content);
+        const fallbackContent = fallbackResponse.choices[0].message.content;
+        const fallbackResult = safeParseAIResponse(fallbackContent);
+        if (!fallbackResult.success) {
+          console.error('[AI SECURITY] Invalid fallback AI response:', fallbackResult.error);
+          throw new Error('Fallback AI response parsing failed');
+        }
+        const fallbackData = fallbackResult.data;
 
-        const fallbackResult = {
+        const fallbackVideoResult = {
           videoUrl: `/api/generated-content/video_${Date.now()}.mp4`,
           thumbnailUrl: `/api/generated-content/video_thumb_${Date.now()}.jpg`,
           duration: parseInt(duration) || 10,
@@ -12524,7 +12559,13 @@ Format the response as JSON with this structure:
         max_tokens: 2000
       });
 
-      const result = JSON.parse(completion.choices[0].message.content);
+      const completionContent = completion.choices[0].message.content;
+      const completionResult = safeParseAIResponse(completionContent);
+      if (!completionResult.success) {
+        console.error('[AI SECURITY] Invalid AI completion response:', completionResult.error);
+        return res.status(500).json({ error: 'AI response parsing failed', details: completionResult.error });
+      }
+      const result = completionResult.data;
 
       // Deduct credits
       await storage.updateUser(user.id, { credits: user.credits - 7 });
@@ -12689,7 +12730,13 @@ Format the response as JSON with this structure:
         max_tokens: 1500
       });
 
-      const result = JSON.parse(completion.choices[0].message.content);
+      const completionContent = completion.choices[0].message.content;
+      const completionResult = safeParseAIResponse(completionContent);
+      if (!completionResult.success) {
+        console.error('[AI SECURITY] Invalid AI completion response:', completionResult.error);
+        return res.status(500).json({ error: 'AI response parsing failed', details: completionResult.error });
+      }
+      const result = completionResult.data;
 
       // Deduct credits
       await storage.updateUser(user.id, { credits: user.credits - 5 });

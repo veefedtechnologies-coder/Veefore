@@ -22,15 +22,22 @@ export const oauthStateSchema = z.object({
   timestamp: z.number().optional()
 });
 
-// Schema for JWT payload validation
+// Schema for JWT payload validation - permissive for Firebase tokens
 export const jwtPayloadSchema = z.object({
-  uid: z.string().min(1),
+  uid: z.string().min(1).optional(),
+  user_id: z.string().min(1).optional(), // Firebase uses user_id
+  sub: z.string().min(1).optional(), // Standard JWT subject
   email: z.string().email().optional(),
-  exp: z.number(),
-  iat: z.number(),
-  aud: z.string().optional(),
-  iss: z.string().optional()
-});
+  exp: z.number().optional(),
+  iat: z.number().optional(),
+  aud: z.union([z.string(), z.array(z.string())]).optional(),
+  iss: z.string().optional(),
+  auth_time: z.number().optional(),
+  firebase: z.record(z.unknown()).optional()
+}).refine(
+  (data) => data.uid || data.user_id || data.sub,
+  { message: 'JWT must contain uid, user_id, or sub field' }
+);
 
 // Schema for AI response validation
 export const aiResponseSchema = z.object({

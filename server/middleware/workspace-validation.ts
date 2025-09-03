@@ -93,8 +93,19 @@ export function validateWorkspaceAccess(options: {
       }
 
       // Validate workspace exists (workspaceId is guaranteed to exist at this point)
-      const workspace = await storage.getWorkspace(workspaceId!);
+      let workspace;
+      try {
+        workspace = await storage.getWorkspace(workspaceId!);
+      } catch (error) {
+        console.error(`🚨 WORKSPACE VALIDATION: Database error for workspace ${workspaceId}:`, error);
+        return res.status(500).json({ 
+          error: 'Database connection error',
+          code: 'DATABASE_ERROR'
+        });
+      }
+      
       if (!workspace) {
+        console.log(`❌ WORKSPACE VALIDATION: Workspace ${workspaceId} not found for user ${userId}`);
         return res.status(404).json({ 
           error: 'Workspace not found',
           code: 'WORKSPACE_NOT_FOUND',
@@ -103,7 +114,17 @@ export function validateWorkspaceAccess(options: {
       }
 
       // CRITICAL SECURITY CHECK: Verify user has access to this workspace
-      const userWorkspaces = await storage.getWorkspacesByUserId(userId);
+      let userWorkspaces;
+      try {
+        userWorkspaces = await storage.getWorkspacesByUserId(userId);
+      } catch (error) {
+        console.error(`🚨 WORKSPACE VALIDATION: Database error getting user workspaces for ${userId}:`, error);
+        return res.status(500).json({ 
+          error: 'Database connection error',
+          code: 'DATABASE_ERROR'
+        });
+      }
+      
       const hasAccess = userWorkspaces.some(w => w.id.toString() === workspaceId!.toString());
       
       if (!hasAccess) {
