@@ -225,7 +225,7 @@ export default function VeeGPT() {
 
   // WebSocket connection management with reconnection prevention
   const [wsReconnectAttempts, setWsReconnectAttempts] = useState(0)
-  const maxReconnectAttempts = 3
+  const maxReconnectAttempts = process.env.NODE_ENV === 'development' ? 1 : 3 // Reduce reconnections in dev
   
   useEffect(() => {
     // Prevent excessive reconnections
@@ -234,87 +234,98 @@ export default function VeeGPT() {
       return
     }
     
-    // Connect to WebSocket server (same port as HTTP server with WebSocket upgrade)
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.host}`
-    
-    console.log('[WebSocket] Connecting to:', wsUrl, 'Attempt:', wsReconnectAttempts + 1)
-    const ws = new WebSocket(wsUrl)
-    
-    // Add connection timeout to prevent hanging connections
-    const connectionTimeout = setTimeout(() => {
-      if (ws.readyState === WebSocket.CONNECTING) {
-        console.log('[WebSocket] Connection timeout, closing...')
-        ws.close()
-      }
-    }, 10000) // 10 second timeout
-    
-    ws.onopen = () => {
-      console.log('[WebSocket] Connected successfully for streaming')
-      wsRef.current = ws
+    // In development, add a small delay to prevent reconnections during hot reloads
+    const connectWebSocket = () => {
+      // Connect to WebSocket server (same port as HTTP server with WebSocket upgrade)
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = `${protocol}//${window.location.host}`
       
-      // Reset reconnection attempts on successful connection
-      setWsReconnectAttempts(0)
+      console.log('[WebSocket] Connecting to:', wsUrl, 'Attempt:', wsReconnectAttempts + 1)
+      const ws = new WebSocket(wsUrl)
       
-      // Subscribe to current conversation if we have one
-      if (currentConversationId) {
-        ws.send(JSON.stringify({
-          type: 'subscribe',
-          conversationId: currentConversationId
-        }))
-        console.log(`[WebSocket] Auto-subscribed to conversation ${currentConversationId}`)
-      }
-    }
-    
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        console.log('[WebSocket] Received:', data)
+      // Add connection timeout to prevent hanging connections
+      const connectionTimeout = setTimeout(() => {
+        if (ws.readyState === WebSocket.CONNECTING) {
+          console.log('[WebSocket] Connection timeout, closing...')
+          ws.close()
+        }
+      }, 10000) // 10 second timeout
+      
+      ws.onopen = () => {
+        console.log('[WebSocket] Connected successfully for streaming')
+        wsRef.current = ws
         
-        // Use the unified stream event handler
-        handleStreamEvent(data)
-      } catch (error) {
-        console.error('[WebSocket] Parse error:', error)
+        // Reset reconnection attempts on successful connection
+        setWsReconnectAttempts(0)
+        
+        // Subscribe to current conversation if we have one
+        if (currentConversationId) {
+          ws.send(JSON.stringify({
+            type: 'subscribe',
+            conversationId: currentConversationId
+          }))
+          console.log(`[WebSocket] Auto-subscribed to conversation ${currentConversationId}`)
+        }
       }
-    }
-    
-    ws.onclose = (event) => {
-      console.log('[WebSocket] Connection closed:', event.code, event.reason)
-      wsRef.current = null
       
-      // Auto-reconnect after 5 seconds if not a normal closure and under max attempts
-      if (event.code !== 1000 && event.code !== 1001 && wsReconnectAttempts < maxReconnectAttempts) {
-        console.log('[WebSocket] Attempting to reconnect in 5 seconds... (Attempt', wsReconnectAttempts + 1, 'of', maxReconnectAttempts, ')')
-        setTimeout(() => {
-          if (!wsRef.current && wsReconnectAttempts < maxReconnectAttempts) {
-            // Increment reconnection attempts
-            setWsReconnectAttempts(prev => prev + 1)
-            console.log('[WebSocket] Reconnecting...')
-            // The useEffect will handle reconnection naturally
-          }
-        }, 5000) // Increased delay to reduce frequency
-      } else if (wsReconnectAttempts >= maxReconnectAttempts) {
-        console.log('[WebSocket] Max reconnection attempts reached, giving up')
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          console.log('[WebSocket] Received:', data)
+          
+          // Use the unified stream event handler
+          handleStreamEvent(data)
+        } catch (error) {
+          console.error('[WebSocket] Parse error:', error)
+        }
+      }
+      
+      ws.onclose = (event) => {
+        console.log('[WebSocket] Connection closed:', event.code, event.reason)
+        wsRef.current = null
+        
+        // Auto-reconnect after 5 seconds if not a normal closure and under max attempts
+        if (event.code !== 1000 && event.code !== 1001 && wsReconnectAttempts < maxReconnectAttempts) {
+          console.log('[WebSocket] Attempting to reconnect in 5 seconds... (Attempt', wsReconnectAttempts + 1, 'of', maxReconnectAttempts, ')')
+          setTimeout(() => {
+            if (!wsRef.current && wsReconnectAttempts < maxReconnectAttempts) {
+              // Increment reconnection attempts
+              setWsReconnectAttempts(prev => prev + 1)
+              console.log('[WebSocket] Reconnecting...')
+              // The useEffect will handle reconnection naturally
+            }
+          }, 5000) // Increased delay to reduce frequency
+        } else if (wsReconnectAttempts >= maxReconnectAttempts) {
+          console.log('[WebSocket] Max reconnection attempts reached, giving up')
+        }
+      }
+      
+      ws.onerror = (error) => {
+        console.error('[WebSocket] Connection error:', error)
+        console.log('[WebSocket] Error details:', {
+          readyState: ws.readyState,
+          url: wsUrl,
+          protocol: window.location.protocol,
+          host: window.location.host
+        })
+      }
+      
+      return () => {
+        clearTimeout(connectionTimeout)
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close()
+        }
       }
     }
     
-    ws.onerror = (error) => {
-      console.error('[WebSocket] Connection error:', error)
-      console.log('[WebSocket] Error details:', {
-        readyState: ws.readyState,
-        url: wsUrl,
-        protocol: window.location.protocol,
-        host: window.location.host
-      })
+    // In development, add a small delay to prevent reconnections during hot reloads
+    if (process.env.NODE_ENV === 'development') {
+      const devTimeout = setTimeout(connectWebSocket, 1000)
+      return () => clearTimeout(devTimeout)
+    } else {
+      return connectWebSocket()
     }
-    
-    return () => {
-      clearTimeout(connectionTimeout)
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close()
-      }
-    }
-  }, [queryClient, wsReconnectAttempts])
+  }, [queryClient]) // Removed wsReconnectAttempts from dependencies to prevent infinite loops
 
   // Subscribe to conversation when it changes or WebSocket connects
   useEffect(() => {

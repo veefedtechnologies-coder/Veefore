@@ -1,7 +1,6 @@
 import express from 'express';
 import crypto from 'crypto';
-// Temporarily disabled for MVP
-// import { MetricsQueueManager } from '../queues/metricsQueue';
+import { MetricsQueueManager } from '../queues/metricsQueue';
 
 const router = express.Router();
 
@@ -153,7 +152,7 @@ async function processWebhookEntry(entry: any): Promise<void> {
 /**
  * Process individual webhook change
  */
-async function processWebhookChange(
+export async function processWebhookChange(
   workspaceId: string, 
   instagramAccountId: string, 
   change: any
@@ -162,10 +161,13 @@ async function processWebhookChange(
     const { field, value } = change;
 
     console.log(`🔄 Processing webhook change - Field: ${field}, Account: ${instagramAccountId}`);
+    console.log(`🔄 Webhook change details:`, { workspaceId, instagramAccountId, field, value });
 
     switch (field) {
       case 'comments':
+        console.log(`💬 Calling handleCommentWebhook for workspace ${workspaceId}`);
         await handleCommentWebhook(workspaceId, instagramAccountId, value);
+        console.log(`✅ handleCommentWebhook completed for workspace ${workspaceId}`);
         break;
 
       case 'mentions':
@@ -218,7 +220,30 @@ async function handleCommentWebhook(
 ): Promise<void> {
   console.log(`💬 Processing comment webhook for account: ${instagramAccountId}`);
 
-  // Queue webhook processing job
+  // IMMEDIATE DATABASE UPDATE: Increment total comments count
+  try {
+    const { storage } = await import('../mongodb-storage');
+    const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+    const account = accounts.find((acc: any) => acc.accountId === instagramAccountId || acc.id === instagramAccountId);
+    
+    if (account) {
+      const currentTotalComments = account.totalComments || 0;
+      const newTotalComments = currentTotalComments + 1;
+      
+      // Update total comments immediately
+      await storage.updateSocialAccount(account.id, {
+        totalComments: newTotalComments,
+        avgComments: account.mediaCount > 0 ? Math.round(newTotalComments / account.mediaCount) : 0,
+        lastSyncAt: new Date()
+      });
+      
+      console.log(`📊 IMMEDIATE UPDATE: Total comments ${currentTotalComments} → ${newTotalComments} for @${account.username}`);
+    }
+  } catch (error) {
+    console.error('Failed to update total comments immediately:', error);
+  }
+
+  // Queue webhook processing job for comprehensive metrics update
   await MetricsQueueManager.processWebhookEvent(
     workspaceId,
     instagramAccountId,
@@ -233,7 +258,35 @@ async function handleCommentWebhook(
     'comments'
   );
 
-  console.log(`✅ Comment webhook queued for processing`);
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    const broadcastData = {
+      type: 'instagram_comment',
+      accountId: instagramAccountId,
+      mediaId: value.media_id,
+      commentId: value.id,
+      text: value.text,
+      from: value.from,
+      timestamp: new Date()
+    };
+    
+    // Broadcast to both workspaces to ensure frontend receives events
+    const workspacesToBroadcast = [
+      workspaceId, // Original workspace from webhook
+      '684402c2fd2cd4eb6521b386' // Frontend workspace
+    ];
+    
+    for (const wsId of workspacesToBroadcast) {
+      console.log(`📢 Broadcasting comment webhook to workspace ${wsId}:`, broadcastData);
+      RealtimeService.broadcastToWorkspace(wsId, 'instagram_comment', broadcastData);
+    }
+    console.log(`✅ Comment webhook broadcasted successfully to ${workspacesToBroadcast.length} workspaces`);
+  } catch (error) {
+    console.error('❌ Failed to broadcast comment webhook:', error);
+  }
+
+  console.log(`✅ Comment webhook processed with immediate database update`);
 }
 
 /**
@@ -258,6 +311,21 @@ async function handleMentionWebhook(
     'mentions'
   );
 
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    RealtimeService.broadcastToWorkspace(workspaceId, 'instagram_mention', {
+      type: 'instagram_mention',
+      accountId: instagramAccountId,
+      mediaId: value.media_id,
+      mentionId: value.id,
+      timestamp: new Date()
+    });
+    console.log(`📢 Mention webhook broadcasted to workspace ${workspaceId}`);
+  } catch (error) {
+    console.error('Failed to broadcast mention webhook:', error);
+  }
+
   console.log(`✅ Mention webhook queued for processing`);
 }
 
@@ -281,6 +349,21 @@ async function handleStoryInsightsWebhook(
     },
     'story_insights'
   );
+
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    RealtimeService.broadcastToWorkspace(workspaceId, 'instagram_story_insight', {
+      type: 'instagram_story_insight',
+      accountId: instagramAccountId,
+      mediaId: value.media_id,
+      insights: value.insights,
+      timestamp: new Date()
+    });
+    console.log(`📢 Story insights webhook broadcasted to workspace ${workspaceId}`);
+  } catch (error) {
+    console.error('Failed to broadcast story insights webhook:', error);
+  }
 
   console.log(`✅ Story insights webhook queued for processing`);
 }
@@ -308,6 +391,22 @@ async function handleMessageWebhook(
     'messages'
   );
 
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    RealtimeService.broadcastToWorkspace(workspaceId, 'instagram_message', {
+      type: 'instagram_message',
+      accountId: instagramAccountId,
+      messaging: value.messaging,
+      recipient: value.recipient,
+      sender: value.sender,
+      timestamp: new Date()
+    });
+    console.log(`📢 Message webhook broadcasted to workspace ${workspaceId}`);
+  } catch (error) {
+    console.error('Failed to broadcast message webhook:', error);
+  }
+
   console.log(`✅ Message webhook queued for processing`);
 }
 
@@ -333,6 +432,22 @@ async function handleMediaUpdateWebhook(
     'media_updates'
   );
 
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    RealtimeService.broadcastToWorkspace(workspaceId, 'instagram_media_update', {
+      type: 'instagram_media_update',
+      accountId: instagramAccountId,
+      mediaId: value.media_id,
+      mediaType: value.media_type,
+      createdTime: value.created_time,
+      timestamp: new Date()
+    });
+    console.log(`📢 Media update webhook broadcasted to workspace ${workspaceId}`);
+  } catch (error) {
+    console.error('Failed to broadcast media update webhook:', error);
+  }
+
   console.log(`✅ Media update webhook queued for processing`);
 }
 
@@ -356,6 +471,21 @@ async function handleAccountReviewWebhook(
     },
     'account_review_update'
   );
+
+  // Broadcast to frontend via WebSocket for immediate updates
+  try {
+    const { RealtimeService } = await import('../services/realtime');
+    RealtimeService.broadcastToWorkspace(workspaceId, 'instagram_account_review', {
+      type: 'instagram_account_review',
+      accountId: instagramAccountId,
+      reviewStatus: value.review_status,
+      reviewerName: value.reviewer_name,
+      timestamp: new Date()
+    });
+    console.log(`📢 Account review webhook broadcasted to workspace ${workspaceId}`);
+  } catch (error) {
+    console.error('Failed to broadcast account review webhook:', error);
+  }
 
   console.log(`✅ Account review webhook queued for processing`);
 }
@@ -416,6 +546,76 @@ router.get('/status', async (req, res) => {
   } catch (error) {
     console.error('🚨 Error fetching webhook status:', error);
     res.status(500).json({ error: 'Failed to fetch webhook status' });
+  }
+});
+
+/**
+ * Test endpoint to verify webhook configuration
+ */
+router.get('/instagram/test', (req, res) => {
+  res.json({
+    status: 'webhook-endpoint-active',
+    url: '/api/webhooks/instagram',
+    timestamp: new Date().toISOString(),
+    message: 'Webhook endpoint is working. Check Instagram Developer Console for comment webhook subscriptions.'
+  });
+});
+
+// Test endpoint to simulate a comment webhook
+router.post('/instagram/test-comment', async (req, res) => {
+  try {
+    console.log('🧪 TEST: Simulating comment webhook...');
+    
+    // Simulate a comment webhook payload
+    const testPayload = {
+      object: 'instagram',
+      entry: [{
+        id: '17841474747481653',
+        time: Math.floor(Date.now() / 1000),
+        changes: [{
+          field: 'comments',
+          value: {
+            id: 'test_comment_' + Date.now(),
+            text: 'Test comment from webhook simulation',
+            from: {
+              id: 'test_user',
+              username: 'test_user'
+            },
+            media_id: '18374233234126113',
+            created_time: Math.floor(Date.now() / 1000)
+          }
+        }]
+      }]
+    };
+    
+    // Process the test webhook directly with the correct workspace and account
+    console.log('🧪 TEST WEBHOOK: About to call processWebhookChange...');
+    await processWebhookChange('684402c2fd2cd4eb6521b386', '25418395794416915', {
+      field: 'comments',
+      value: {
+        id: 'test_comment_' + Date.now(),
+        text: 'Test comment from webhook simulation',
+        from: {
+          id: 'test_user',
+          username: 'test_user'
+        },
+        media_id: '18374233234126113',
+        created_time: Math.floor(Date.now() / 1000)
+      }
+    });
+    console.log('🧪 TEST WEBHOOK: processWebhookChange completed');
+    
+    res.json({
+      status: 'test-webhook-processed',
+      message: 'Test comment webhook processed successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('🧪 TEST: Error processing test webhook:', error);
+    res.status(500).json({
+      status: 'test-webhook-error',
+      error: error.message
+    });
   }
 });
 

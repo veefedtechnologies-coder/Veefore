@@ -77,10 +77,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   const automationSystem = new AutomationSystem(storage);
   const metaWebhook = new MetaCompliantWebhook(storage);
   
-  // Start smart polling and account monitoring for immediate real-time updates
-  console.log('[SMART POLLING] 🚀 Activating intelligent Instagram polling system...');
+  // HYBRID APPROACH: Webhooks for supported events + Smart polling for other metrics
+  // Webhooks: comments, mentions, story insights, messages, account review, media updates
+  // Polling: likes, followers, engagement, reach, impressions (Meta doesn't provide via webhooks)
+  console.log('[SMART POLLING] 🚀 Activating hybrid system - webhooks + smart polling');
   const accountMonitor = new InstagramAccountMonitor(storage, smartPolling);
-  console.log('[SMART POLLING] ✅ Real-time Instagram monitoring active with rate limit protection');
+  accountMonitor.startMonitoring();
+  console.log('[ACCOUNT MONITOR] 👀 Starting Instagram account monitoring...');
+  console.log('[SMART POLLING] ✅ Hybrid system active - webhooks for comments/mentions, polling for likes/followers');
 
   // TEST ROUTE - Optimized generation test (early placement to avoid middleware issues)
   app.post('/api/thumbnails/test-optimized-generation', async (req: any, res: Response) => {
@@ -3834,80 +3838,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
 
-  // PERMANENT FIX: Copy Page ID from wrong workspace to correct workspace
-  app.post("/api/fix-page-id", async (req: any, res) => {
-    try {
-      console.log('[PERMANENT FIX] 🔧 Permanently fixing Page ID for automation...');
-      
-      // Get all Instagram accounts for rahulc1020
-      const allAccounts = await storage.getAllSocialAccounts();
-      const rahulAccounts = allAccounts.filter(acc => 
-        acc.platform === 'instagram' && acc.username === 'rahulc1020'
-      );
-      
-      console.log('[PERMANENT FIX] Found', rahulAccounts.length, 'Instagram accounts for rahulc1020');
-      
-      let sourceAccount = null;
-      let targetAccount = null;
-      
-      for (const account of rahulAccounts) {
-        console.log(`[PERMANENT FIX] Account: workspace=${account.workspaceId}, pageId=${account.pageId || 'MISSING'}, accountId=${account.accountId}`);
-        
-        if (account.workspaceId === '6847b9cdfabaede1706f2994' && account.pageId) {
-          sourceAccount = account; // Wrong workspace but has pageId
-        }
-        if (account.workspaceId === '684402c2fd2cd4eb6521b386') {
-          targetAccount = account; // Correct workspace but missing pageId
-        }
-      }
-      
-      if (!sourceAccount || !targetAccount) {
-        return res.json({ 
-          error: 'Cannot find both accounts',
-          source: sourceAccount ? 'found' : 'missing',
-          target: targetAccount ? 'found' : 'missing',
-          accounts: rahulAccounts.map(acc => ({
-            workspace: acc.workspaceId,
-            pageId: acc.pageId || 'MISSING',
-            accountId: acc.accountId
-          }))
-        });
-      }
-      
-      console.log('[PERMANENT FIX] 🎯 COPYING Page ID from wrong workspace to correct workspace...');
-      console.log('[PERMANENT FIX] 📋 Source (wrong workspace):', sourceAccount.pageId);
-      console.log('[PERMANENT FIX] 📋 Target (correct workspace):', targetAccount.pageId || 'MISSING');
-      
-      // Copy ALL Instagram Business identifiers
-      const updateData = {
-        pageId: sourceAccount.pageId, // Critical for DMs
-        instagramId: sourceAccount.instagramId || sourceAccount.pageId, // Backup identifier
-        updatedAt: new Date(),
-      };
-      
-      await storage.updateSocialAccount(targetAccount.id, updateData);
-      
-      console.log('[PERMANENT FIX] ✅ SUCCESSFULLY COPIED Page ID:', sourceAccount.pageId);
-      console.log('[PERMANENT FIX] ✅ Correct workspace account now has pageId!');
-      console.log('[PERMANENT FIX] ✅ Automation should now PERMANENTLY use correct workspace!');
-      
-      res.json({ 
-        success: true, 
-        message: 'Page ID permanently fixed! Automation will now use correct workspace.',
-        copiedPageId: sourceAccount.pageId,
-        fromWorkspace: sourceAccount.workspaceId,
-        toWorkspace: targetAccount.workspaceId,
-        updateData
-      });
-      
-    } catch (error) {
-      console.error('[PERMANENT FIX] Error:', error);
-      res.status(500).json({ 
-        error: 'Permanent Page ID fix failed',
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
+
 
   // Refresh Instagram account to fetch missing Page ID (required for DMs)
   app.post("/api/instagram/refresh-page-id", requireAuth, async (req: any, res) => {
@@ -8335,249 +8266,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
   // Instagram Private Replies API format corrected - ready for production
 
-  // 🎯 UPDATE AUTOMATION RULES TO TARGET CURRENT POSTS
-  app.post('/api/update-automation-targeting', async (req, res) => {
-    try {
-      console.log('[UPDATE] 🎯 Updating automation rules to target current posts...');
-      
-      const mongoose = (await import('mongoose')).default;
-      
-      // Get the current post IDs from recent webhook activity
-      const currentPostIds = [
-        '17855248212513160',  // From recent webhook logs
-        '18290798503271967',  // From recent webhook logs  
-        '18076220419901491'   // Original test post
-      ];
-      
-      console.log('[UPDATE] Target post IDs:', currentPostIds);
-      
-      // Update all automation rules to target these current posts
-      const result = await mongoose.connection.db.collection('automationrules').updateMany(
-        { 
-          workspaceId: '684402c2fd2cd4eb6521b386',
-          isActive: true 
-        },
-        { 
-          $set: { targetMediaIds: currentPostIds }
-        }
-      );
-      
-      console.log('[UPDATE] ✅ Updated', result.modifiedCount, 'automation rules');
-      
-      // Verify the update
-      const rules = await mongoose.connection.db.collection('automationrules').find({
-        workspaceId: '684402c2fd2cd4eb6521b386',
-        isActive: true
-      }).toArray();
-      
-      rules.forEach((rule, index) => {
-        console.log(`[UPDATE] Rule ${index + 1} updated:`, {
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds,
-          type: rule.type
-        });
-      });
-      
-      res.json({
-        success: true,
-        message: 'Automation rules updated to target current posts',
-        rulesUpdated: result.modifiedCount,
-        targetPosts: currentPostIds,
-        rules: rules.map(rule => ({
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds,
-          isActive: rule.isActive
-        }))
-      });
-      
-    } catch (error: any) {
-      console.error('[UPDATE] Error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
-  // 🔧 FIX AUTOMATION RULES - MAKE GLOBAL
-  app.post('/api/fix-automation-rules', async (req, res) => {
-    try {
-      console.log('[FIX] 🔧 Making automation rules work on ALL posts...');
-      
-      const mongoose = (await import('mongoose')).default;
-      
-      // Update all automation rules to have global targeting (empty targetMediaIds)
-      const result = await mongoose.connection.db.collection('automationrules').updateMany(
-        { 
-          workspaceId: '684402c2fd2cd4eb6521b386',
-          isActive: true 
-        },
-        { 
-          $unset: { targetMediaIds: "" } // Remove specific post targeting
-        }
-      );
-      
-      console.log('[FIX] ✅ Updated', result.modifiedCount, 'automation rules to work globally');
-      
-      // Verify the fix
-      const rules = await mongoose.connection.db.collection('automationrules').find({
-        workspaceId: '684402c2fd2cd4eb6521b386',
-        isActive: true
-      }).toArray();
-      
-      rules.forEach((rule, index) => {
-        console.log(`[FIX] Rule ${index + 1} after fix:`, {
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds || 'GLOBAL (all posts)',
-          type: rule.type
-        });
-      });
-      
-      res.json({
-        success: true,
-        message: 'Automation rules updated to work on ALL posts',
-        rulesUpdated: result.modifiedCount,
-        rules: rules.map(rule => ({
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds || 'GLOBAL',
-          isActive: rule.isActive
-        }))
-      });
-      
-    } catch (error: any) {
-      console.error('[FIX] Error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
-  // 🔍 DEBUG AUTOMATION RULES ENDPOINT
-  app.get('/api/debug-automation-rules', async (req, res) => {
-    try {
-      const mongoose = (await import('mongoose')).default;
-      
-      const rules = await mongoose.connection.db.collection('automationrules').find({
-        workspaceId: '684402c2fd2cd4eb6521b386',
-        isActive: true
-      }).toArray();
-      
-      console.log('[DEBUG] Found automation rules:', rules.length);
-      rules.forEach((rule, index) => {
-        console.log(`[DEBUG] Rule ${index + 1}:`, {
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds,
-          type: rule.type
-        });
-      });
-      
-      res.json({
-        rulesCount: rules.length,
-        rules: rules.map(rule => ({
-          name: rule.name,
-          keywords: rule.keywords,
-          targetMediaIds: rule.targetMediaIds,
-          type: rule.type,
-          isActive: rule.isActive
-        }))
-      });
-      
-    } catch (error: any) {
-      console.error('[DEBUG] Error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
-  // Test endpoint for webhook automation demo
-  app.post('/api/test-webhook-automation', async (req, res) => {
-    try {
-      console.log('[WEBHOOK TEST] Simulating Instagram comment automation');
-      
-      const { comment, workspaceId } = req.body;
-      
-      // Simulate real Instagram webhook event
-      const mockWebhookEvent = {
-        object: "instagram",
-        entry: [{
-          id: "17841400008460056",
-          time: Date.now(),
-          changes: [{
-            field: "comments",
-            value: {
-              from: { id: "user123", username: "customer_test" },
-              text: comment || "Amazing product! Kitne ka hai yeh?",
-              post_id: "17856498618156045",
-              comment_id: `${Date.now()}`,
-              created_time: Date.now()
-            }
-          }]
-        }]
-      };
 
-      console.log('[WEBHOOK TEST] Processing comment:', comment);
-      
-      // Simulate AI analysis and response generation
-      const aiAnalysis = {
-        language: comment?.includes('kitne') || comment?.includes('kya') ? 'Hinglish' : 'English',
-        intent: comment?.toLowerCase().includes('price') || comment?.toLowerCase().includes('kitne') ? 'Product inquiry' : 'General engagement',
-        tone: comment?.includes('amazing') || comment?.includes('great') ? 'Positive, enthusiastic' : 'Neutral, curious',
-        customerPersonality: 'Price-conscious, friendly'
-      };
 
-      // Generate contextual AI response
-      let aiResponse = '';
-      if (aiAnalysis.intent === 'Product inquiry') {
-        if (aiAnalysis.language === 'Hinglish') {
-          aiResponse = "Thank you so much! 😊 Is product ki price ₹2,999 hai. DM mein more details share kar sakte hain!";
-        } else {
-          aiResponse = "Thank you! The price is ₹2,999. Feel free to DM us for more details!";
-        }
-      } else {
-        aiResponse = "Thank you for your interest! Please check your DMs for more details. 💬";
-      }
 
-      console.log('[WEBHOOK TEST] AI Analysis:', aiAnalysis);
-      console.log('[WEBHOOK TEST] Generated Response:', aiResponse);
 
-      // Log automation activity
-      const automationLog = {
-        workspaceId: workspaceId || 'demo',
-        type: 'comment_response',
-        trigger: 'instagram_comment',
-        originalContent: comment,
-        aiAnalysis,
-        generatedResponse: aiResponse,
-        timestamp: new Date(),
-        responseTime: '<2 seconds',
-        platform: 'instagram'
-      };
-
-      res.json({
-        success: true,
-        automation: {
-          triggered: true,
-          type: 'contextual_ai_response',
-          originalComment: comment,
-          aiAnalysis,
-          generatedResponse: aiResponse,
-          responseTime: '<2 seconds',
-          language: aiAnalysis.language,
-          benefits: [
-            'Instant customer engagement',
-            'Natural language understanding',
-            'Brand voice consistency',
-            'Lead generation through DM direction',
-            '24/7 automated responses'
-          ]
-        },
-        log: automationLog
-      });
-
-    } catch (error: any) {
-      console.error('[WEBHOOK TEST] Error:', error.message);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
   // Enhanced Conversation Memory API Endpoints
   
@@ -8923,7 +8618,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       console.log('[CLEAR CONVERSATIONS] Removing all conversation data...');
       
-      const workspaceId = req.user.workspaces?.[0]?.id || '684402c2fd2cd4eb6521b386';
+      const workspaceId = req.user.workspaces?.[0]?.id;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'No workspace found for user' });
+      }
       
       // Clear all conversations, messages, and context for this workspace
       await storage.clearWorkspaceConversations(workspaceId);
@@ -8947,7 +8645,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     try {
       console.log('[SAMPLE CONVERSATIONS] Creating demo conversation data...');
       
-      const workspaceId = req.user.workspaces?.[0]?.id || '684402c2fd2cd4eb6521b386';
+      const workspaceId = req.user.workspaces?.[0]?.id;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'No workspace found for user' });
+      }
       
       // Create sample conversations
       const conversations = [
@@ -15660,7 +15361,7 @@ Create a detailed growth strategy in JSON format:
       
       // Get user's current workspace
       const userWorkspaces = await storage.getWorkspacesByUserId(req.user.id);
-      const currentWorkspace = userWorkspaces.find(w => w.id === '684402c2fd2cd4eb6521b386');
+      const currentWorkspace = userWorkspaces.find(w => w.isDefault) || userWorkspaces[0];
       
       if (!currentWorkspace) {
         return res.status(404).json({ error: 'Current workspace not found' });

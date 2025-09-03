@@ -1,5 +1,5 @@
-// Removed User and Workspace imports - using simplified approach
 import InstagramApiService, { InstagramApiError } from './instagramApi';
+import { UserModel } from '../mongodb-storage';
 // import { MetricsQueueManager } from '../queues/metricsQueue';
 
 // Token status tracking
@@ -37,7 +37,7 @@ export class TokenManager {
       console.log(`🔧 Initializing token pool for workspace: ${workspaceId}`);
       
       // Get all users in the workspace with Instagram tokens
-      const users = await User.find({
+      const users = await UserModel.find({
         workspaceId,
         instagramToken: { $exists: true, $ne: null },
         tokenStatus: { $in: ['active', 'rate_limited'] }
@@ -136,8 +136,8 @@ export class TokenManager {
       tokenInfo.rateLimitResetAt = new Date(Date.now() + (retryAfter * 1000));
 
       // Update in database
-      await User.findOneAndUpdate(
-        { userId: tokenInfo.userId },
+      await UserModel.findOneAndUpdate(
+        { _id: tokenInfo.userId },
         { 
           tokenStatus: 'rate_limited',
           rateLimitResetAt: tokenInfo.rateLimitResetAt
@@ -165,7 +165,7 @@ export class TokenManager {
     try {
       console.log(`🔄 Refreshing token for user ${userId} in workspace ${workspaceId}`);
 
-      const user = await User.findOne({ userId, workspaceId });
+      const user = await UserModel.findOne({ _id: userId, workspaceId });
       if (!user || !user.instagramRefreshToken) {
         console.error(`❌ No refresh token found for user ${userId}`);
         return false;
@@ -175,8 +175,8 @@ export class TokenManager {
       const refreshResult = await InstagramApiService.refreshAccessToken(user.instagramRefreshToken);
 
       // Update user with new token
-      await User.findOneAndUpdate(
-        { userId },
+      await UserModel.findOneAndUpdate(
+        { _id: userId },
         {
           instagramToken: refreshResult.access_token,
           tokenStatus: 'active',
@@ -203,8 +203,8 @@ export class TokenManager {
       console.error(`🚨 Error refreshing token for user ${userId}:`, error);
 
       // Mark token as invalid
-      await User.findOneAndUpdate(
-        { userId },
+      await UserModel.findOneAndUpdate(
+        { _id: userId },
         { tokenStatus: 'invalid' }
       );
 
@@ -242,8 +242,8 @@ export class TokenManager {
       }
 
       // Update user in database
-      await User.findOneAndUpdate(
-        { userId },
+      await UserModel.findOneAndUpdate(
+        { _id: userId },
         {
           instagramToken: token,
           instagramRefreshToken: refreshToken,
@@ -295,8 +295,8 @@ export class TokenManager {
     console.log(`➖ Removing token from workspace ${workspaceId} for user ${userId}`);
 
     // Update database
-    await User.findOneAndUpdate(
-      { userId },
+    await UserModel.findOneAndUpdate(
+      { _id: userId },
       {
         instagramToken: null,
         instagramRefreshToken: null,
@@ -319,8 +319,8 @@ export class TokenManager {
    * Update token usage statistics
    */
   private static async updateTokenUsage(tokenInfo: TokenInfo): Promise<void> {
-    await User.findOneAndUpdate(
-      { userId: tokenInfo.userId },
+    await UserModel.findOneAndUpdate(
+      { _id: tokenInfo.userId },
       {
         lastApiCallTimestamp: tokenInfo.lastUsed,
         apiCallCount: tokenInfo.apiCallCount,

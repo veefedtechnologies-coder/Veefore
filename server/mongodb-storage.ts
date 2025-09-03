@@ -57,6 +57,17 @@ const UserSchema = new mongoose.Schema({
   dailyLoginStreak: { type: Number, default: 0 },
   lastLoginAt: Date,
   feedbackSubmittedAt: Date,
+  // Instagram integration fields
+  workspaceId: { type: String, index: true },
+  instagramToken: String,
+  instagramRefreshToken: String,
+  instagramTokenExpiry: Date,
+  instagramAccountId: String,
+  instagramUsername: String,
+  tokenStatus: { type: String, enum: ['active', 'expired', 'rate_limited', 'invalid'], default: 'active' },
+  lastApiCallTimestamp: Date,
+  rateLimitResetAt: Date,
+  apiCallCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -798,8 +809,10 @@ export class MongoStorage implements IStorage {
       
       // Handle truncated workspace ID issue - fix this before any MongoDB query
       if (idString === '684402' || idString.length === 6) {
-        console.log('[MONGODB DEBUG] Detected truncated workspace ID, using full ObjectId');
-        workspace = await WorkspaceModel.findOne({ _id: '684402c2fd2cd4eb6521b386' });
+        console.log('[MONGODB DEBUG] Detected truncated workspace ID, searching by pattern');
+        workspace = await WorkspaceModel.findOne({ 
+          _id: { $regex: `^${idString}` } 
+        });
       } else if (idString.length === 24) {
         // Full ObjectId - use directly
         workspace = await WorkspaceModel.findOne({ _id: idString });
@@ -810,9 +823,9 @@ export class MongoStorage implements IStorage {
           _id: { $regex: `^${idString}` } 
         });
       } else {
-        // Fallback to known workspace
-        console.log('[MONGODB DEBUG] Unknown ID format, using default workspace');
-        workspace = await WorkspaceModel.findOne({ _id: '684402c2fd2cd4eb6521b386' });
+        // Invalid ID format - return undefined instead of fallback
+        console.log('[MONGODB DEBUG] Invalid ID format, returning undefined');
+        return undefined;
       }
       
       if (workspace) {
@@ -825,16 +838,7 @@ export class MongoStorage implements IStorage {
       
     } catch (objectIdError) {
       console.error('[MONGODB DEBUG] getWorkspace - ObjectId conversion error:', objectIdError);
-      
-      // Final fallback to known valid workspace
-      try {
-        console.log('[MONGODB DEBUG] Using fallback workspace');
-        const fallbackWorkspace = await WorkspaceModel.findOne({ _id: '684402c2fd2cd4eb6521b386' });
-        return fallbackWorkspace ? this.convertWorkspace(fallbackWorkspace) : undefined;
-      } catch (fallbackError) {
-        console.error('[MONGODB DEBUG] Fallback workspace lookup failed:', fallbackError);
-        return undefined;
-      }
+      return undefined;
     }
   }
 
@@ -4715,3 +4719,6 @@ export class MongoStorage implements IStorage {
 
 // Export singleton instance
 export const storage = new MongoStorage();
+
+// Export models for direct access
+export { UserModel, WorkspaceModel, SocialAccountModel };

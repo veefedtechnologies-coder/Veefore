@@ -6,7 +6,8 @@ import {
   FetchMetricsJobData, 
   WebhookProcessJobData, 
   TokenRefreshJobData,
-  redisConnection 
+  redisConnection,
+  redisAvailable
 } from '../queues/metricsQueue';
 import InstagramApiService, { InstagramApiError } from '../services/instagramApi';
 import TokenManager from '../services/tokenManager';
@@ -24,52 +25,63 @@ export class MetricsWorker {
   static start(): void {
     console.log('🚀 Starting Instagram metrics workers...');
 
-    // Metrics fetch worker
-    this.metricsWorker = new Worker(
-      'metrics-fetch',
-      async (job: Job<FetchMetricsJobData>) => {
-        return this.processMetricsFetchJob(job);
-      },
-      {
-        connection: redisConnection,
-        concurrency: 5, // Process 5 jobs concurrently
-        removeOnComplete: { count: 100 },
-        removeOnFail: { count: 50 },
-      }
-    );
+    // Check if Redis is available
+    if (!redisAvailable || !redisConnection) {
+      console.log('⚠️ Redis unavailable, workers will not start. Using fallback polling system.');
+      return;
+    }
 
-    // Webhook processing worker
-    this.webhookWorker = new Worker(
-      'webhook-process',
-      async (job: Job<WebhookProcessJobData>) => {
-        return this.processWebhookJob(job);
-      },
-      {
-        connection: redisConnection,
-        concurrency: 10, // High concurrency for real-time webhooks
-        removeOnComplete: { count: 50 },
-        removeOnFail: { count: 25 },
-      }
-    );
+    try {
+      // Metrics fetch worker
+      this.metricsWorker = new Worker(
+        'metrics-fetch',
+        async (job: Job<FetchMetricsJobData>) => {
+          return this.processMetricsFetchJob(job);
+        },
+        {
+          connection: redisConnection,
+          concurrency: 5, // Process 5 jobs concurrently
+          removeOnComplete: { count: 100 },
+          removeOnFail: { count: 50 },
+        }
+      );
 
-    // Token refresh worker
-    this.tokenRefreshWorker = new Worker(
-      'token-refresh',
-      async (job: Job<TokenRefreshJobData>) => {
-        return this.processTokenRefreshJob(job);
-      },
-      {
-        connection: redisConnection,
-        concurrency: 2, // Lower concurrency for token operations
-        removeOnComplete: { count: 25 },
-        removeOnFail: { count: 10 },
-      }
-    );
+      // Webhook processing worker
+      this.webhookWorker = new Worker(
+        'webhook-process',
+        async (job: Job<WebhookProcessJobData>) => {
+          return this.processWebhookJob(job);
+        },
+        {
+          connection: redisConnection,
+          concurrency: 10, // High concurrency for real-time webhooks
+          removeOnComplete: { count: 50 },
+          removeOnFail: { count: 25 },
+        }
+      );
 
-    // Set up event handlers
-    this.setupEventHandlers();
+      // Token refresh worker
+      this.tokenRefreshWorker = new Worker(
+        'token-refresh',
+        async (job: Job<TokenRefreshJobData>) => {
+          return this.processTokenRefreshJob(job);
+        },
+        {
+          connection: redisConnection,
+          concurrency: 2, // Lower concurrency for token operations
+          removeOnComplete: { count: 25 },
+          removeOnFail: { count: 10 },
+        }
+      );
 
-    console.log('✅ All Instagram metrics workers started successfully');
+      // Set up event handlers
+      this.setupEventHandlers();
+
+      console.log('✅ All Instagram metrics workers started successfully');
+    } catch (error) {
+      console.error('🚨 Failed to start workers:', error);
+      console.log('⚠️ Falling back to existing polling system');
+    }
   }
 
   /**
@@ -78,13 +90,17 @@ export class MetricsWorker {
   static async stop(): Promise<void> {
     console.log('🛑 Stopping Instagram metrics workers...');
     
-    await Promise.all([
-      this.metricsWorker?.close(),
-      this.webhookWorker?.close(),
-      this.tokenRefreshWorker?.close(),
-    ]);
+    try {
+      await Promise.all([
+        this.metricsWorker?.close(),
+        this.webhookWorker?.close(),
+        this.tokenRefreshWorker?.close(),
+      ]);
 
-    console.log('✅ All workers stopped');
+      console.log('✅ All workers stopped');
+    } catch (error) {
+      console.error('🚨 Error stopping workers:', error);
+    }
   }
 
   /**
@@ -458,43 +474,49 @@ export class MetricsWorker {
    */
   private static setupEventHandlers(): void {
     // Metrics worker events
-    this.metricsWorker.on('completed', (job) => {
-      console.log(`✅ Metrics job ${job.id} completed successfully`);
-    });
+    if (this.metricsWorker) {
+      this.metricsWorker.on('completed', (job) => {
+        console.log(`✅ Metrics job ${job.id} completed successfully`);
+      });
 
-    this.metricsWorker.on('failed', (job, err) => {
-      console.error(`❌ Metrics job ${job?.id} failed:`, err);
-    });
+      this.metricsWorker.on('failed', (job, err) => {
+        console.error(`❌ Metrics job ${job?.id} failed:`, err);
+      });
 
-    this.metricsWorker.on('error', (err) => {
-      console.error('🚨 Metrics worker error:', err);
-    });
+      this.metricsWorker.on('error', (err) => {
+        console.error('🚨 Metrics worker error:', err);
+      });
+    }
 
     // Webhook worker events
-    this.webhookWorker.on('completed', (job) => {
-      console.log(`✅ Webhook job ${job.id} completed successfully`);
-    });
+    if (this.webhookWorker) {
+      this.webhookWorker.on('completed', (job) => {
+        console.log(`✅ Webhook job ${job.id} completed successfully`);
+      });
 
-    this.webhookWorker.on('failed', (job, err) => {
-      console.error(`❌ Webhook job ${job?.id} failed:`, err);
-    });
+      this.webhookWorker.on('failed', (job, err) => {
+        console.error(`❌ Webhook job ${job?.id} failed:`, err);
+      });
 
-    this.webhookWorker.on('error', (err) => {
-      console.error('🚨 Webhook worker error:', err);
-    });
+      this.webhookWorker.on('error', (err) => {
+        console.error('🚨 Webhook worker error:', err);
+      });
+    }
 
     // Token refresh worker events
-    this.tokenRefreshWorker.on('completed', (job) => {
-      console.log(`✅ Token refresh job ${job.id} completed successfully`);
-    });
+    if (this.tokenRefreshWorker) {
+      this.tokenRefreshWorker.on('completed', (job) => {
+        console.log(`✅ Token refresh job ${job.id} completed successfully`);
+      });
 
-    this.tokenRefreshWorker.on('failed', (job, err) => {
-      console.error(`❌ Token refresh job ${job?.id} failed:`, err);
-    });
+      this.tokenRefreshWorker.on('failed', (job, err) => {
+        console.error(`❌ Token refresh job ${job?.id} failed:`, err);
+      });
 
-    this.tokenRefreshWorker.on('error', (err) => {
-      console.error('🚨 Token refresh worker error:', err);
-    });
+      this.tokenRefreshWorker.on('error', (err) => {
+        console.error('🚨 Token refresh worker error:', err);
+      });
+    }
   }
 }
 

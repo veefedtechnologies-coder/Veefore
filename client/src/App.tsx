@@ -404,6 +404,8 @@ function App() {
 
                  {/* Main Content - Scrollable */}
                  <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   {/* Instagram Webhook Listener for Real-time Updates */}
+                   <InstagramWebhookListener />
                    <CreatePost />
                  </main>
                </div>
@@ -439,6 +441,8 @@ function App() {
 
                  {/* Main Content - Scrollable */}
                  <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   {/* Instagram Webhook Listener for Real-time Updates */}
+                   <InstagramWebhookListener />
                    <AnalyticsDashboard />
                  </main>
                </div>
@@ -616,6 +620,8 @@ function App() {
 
                  {/* Main Content - Scrollable */}
                  <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   {/* Instagram Webhook Listener for Real-time Updates */}
+                   <InstagramWebhookListener />
                    <Integration />
                  </main>
                </div>
@@ -646,6 +652,8 @@ function App() {
 
                  {/* Main Content - Scrollable */}
                  <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   {/* Instagram Webhook Listener for Real-time Updates */}
+                   <InstagramWebhookListener />
                    <AutomationStepByStep />
                  </main>
                </div>
@@ -700,6 +708,8 @@ function App() {
 
                  {/* Main Content - Scrollable */}
                  <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                   {/* Instagram Webhook Listener for Real-time Updates */}
+                   <InstagramWebhookListener />
                    <Integration />
                  </main>
                </div>

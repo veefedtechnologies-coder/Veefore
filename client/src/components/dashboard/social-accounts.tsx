@@ -14,14 +14,14 @@ export function SocialAccounts() {
   const { toast } = useToast()
   const { currentWorkspace } = useCurrentWorkspace()
   
-  // Fetch social accounts data for current workspace - SMART real-time with rate limit protection
+  // Fetch social accounts data for current workspace - HYBRID: Webhooks + Smart Polling
   const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 5 * 60 * 1000, // Smart polling every 5 minutes (Meta-friendly)
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes for faster updates
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes - webhooks provide immediate updates for comments/mentions
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchOnMount: true, // Always fetch fresh data on mount
     refetchOnReconnect: true, // Refresh when network reconnects
@@ -79,7 +79,7 @@ export function SocialAccounts() {
     }
   })
 
-  // Smart refresh system with rate limit protection - provides immediate updates when needed
+  // Smart refresh system with hybrid approach - Webhooks for comments/mentions + Polling for other metrics
   React.useEffect(() => {
     let refreshTimeout: NodeJS.Timeout | null = null
     let lastRefreshTime = 0
@@ -94,7 +94,7 @@ export function SocialAccounts() {
         const shouldRefresh = timeSinceLastActivity > 3 * 60 * 1000 && timeSinceLastRefresh > MIN_REFRESH_INTERVAL // 3 minutes
         
         if (shouldRefresh) {
-          console.log('User returned after', Math.round(timeSinceLastActivity / 1000), 'seconds - refreshing data (rate limit protected)')
+          console.log('User returned after', Math.round(timeSinceLastActivity / 1000), 'seconds - refreshing data (hybrid mode)')
           // Debounce the refresh to prevent excessive API calls
           if (refreshTimeout) {
             clearTimeout(refreshTimeout)
@@ -122,6 +122,8 @@ export function SocialAccounts() {
     document.addEventListener('keydown', handleUserActivity)
     document.addEventListener('click', handleUserActivity)
     
+    console.log('[SOCIAL ACCOUNTS] Hybrid mode: Webhooks for comments/mentions + Smart polling for likes/followers/engagement')
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       document.removeEventListener('mousemove', handleUserActivity)
@@ -131,9 +133,9 @@ export function SocialAccounts() {
         clearTimeout(refreshTimeout)
       }
     }
-  }, [])
+  }, [refetchAccounts, queryClient])
 
-  // Auto-start polling mutation
+  // Hybrid polling mutation - Webhooks for comments/mentions + Smart polling for other metrics
   const startPollingMutation = useMutation({
     mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/start-polling', { 
       method: 'POST',
@@ -141,16 +143,16 @@ export function SocialAccounts() {
     }) : Promise.reject(new Error('No workspace selected')),
     onSuccess: (data) => {
       toast({
-        title: "🔄 Real-time polling started",
-        description: `Smart polling active for @${data.account}`,
+        title: "🔄 Hybrid System Active",
+        description: "Webhooks for comments/mentions + Smart polling for likes/followers/engagement",
       })
     },
     onError: (error: any) => {
-      console.error('Failed to start polling:', error)
+      console.error('Failed to start hybrid polling:', error)
     }
   })
 
-  // Polling status query - SMART real-time with rate limit protection
+  // Polling status query - Hybrid approach with smart polling
   const { data: pollingStatus } = useQuery({
     queryKey: ['/api/instagram/polling-status'],
     queryFn: () => apiRequest('/api/instagram/polling-status'),

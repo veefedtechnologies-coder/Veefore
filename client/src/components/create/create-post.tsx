@@ -56,11 +56,15 @@ export function CreatePost() {
   const [postType, setPostType] = useState<'post' | 'story' | 'reel'>('post')
   const [showPreview, setShowPreview] = useState(true)
 
-  // Fetch social accounts
+  // Fetch social accounts - HYBRID: Webhooks + Smart Polling
   const { data: socialAccounts, isLoading: accountsLoading } = useQuery({
-    queryKey: ['social-accounts'],
+    queryKey: ['/api/social-accounts'],
     queryFn: () => apiRequest('/api/social-accounts'),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes - webhooks provide immediate updates for comments/mentions
+    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
+    refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchOnReconnect: true, // Refresh when network reconnects
   })
 
   // Handle media upload

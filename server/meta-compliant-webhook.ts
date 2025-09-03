@@ -309,6 +309,25 @@ export class MetaCompliantWebhook {
       // Store for analytics
       await this.storeCommentAnalytics(value, account);
 
+      // 🚀 CRITICAL: Also trigger main webhook handler for immediate database updates and frontend broadcasts
+      try {
+        console.log('[META COMMENT] 🔄 Triggering main webhook handler for immediate updates...');
+        const { processWebhookChange } = await import('./routes/webhooks');
+        await processWebhookChange(account.workspaceId, account.accountId, {
+          field: 'comments',
+          value: {
+            id: commentId,
+            text: text,
+            from: from,
+            media_id: mediaId,
+            created_time: Date.now() / 1000
+          }
+        });
+        console.log('[META COMMENT] ✅ Main webhook handler triggered successfully');
+      } catch (webhookError) {
+        console.error('[META COMMENT] ❌ Error triggering main webhook handler:', webhookError);
+      }
+
     } catch (error) {
       console.error('[META COMMENT] ❌ Error processing comment:', error);
     }
@@ -375,29 +394,22 @@ export class MetaCompliantWebhook {
         console.log(`[ACCOUNT LOOKUP] Account ${index + 1}: workspace=${acc.workspaceId}, username=${acc.username}, updated=${acc.updatedAt}, created=${acc.createdAt}`);
       });
 
-      // PRIORITY 1: Prefer the current user's workspace (684402c2fd2cd4eb6521b386)
-      const currentWorkspaceAccounts = matchingAccounts.filter(acc => acc.workspaceId === '684402c2fd2cd4eb6521b386');
-      
-      // PRIORITY 2: Avoid the old problematic workspace
-      const goodAccounts = matchingAccounts.filter(acc => acc.workspaceId !== '6847b9cdfabaede1706f2994');
+      // Use the most recently updated account from matching accounts
+      const goodAccounts = matchingAccounts.sort((a, b) => {
+        const aDate = new Date(a.updatedAt || a.createdAt || 0);
+        const bDate = new Date(b.updatedAt || b.createdAt || 0);
+        return bDate.getTime() - aDate.getTime();
+      });
       
       let account;
-      if (currentWorkspaceAccounts.length > 0) {
-        // Use account from the current user's workspace
-        account = currentWorkspaceAccounts.sort((a, b) => {
-          const aDate = new Date(a.updatedAt || a.createdAt || 0);
-          const bDate = new Date(b.updatedAt || b.createdAt || 0);
-          return bDate.getTime() - aDate.getTime(); // Most recent first
-        })[0];
-        console.log('[ACCOUNT LOOKUP] ✅ Using CURRENT WORKSPACE account (PRIORITY)');
-      } else if (goodAccounts.length > 0) {
+      if (goodAccounts.length > 0) {
         // Use the most recently updated good account
         account = goodAccounts.sort((a, b) => {
           const aDate = new Date(a.updatedAt || a.createdAt || 0);
           const bDate = new Date(b.updatedAt || b.createdAt || 0);
           return bDate.getTime() - aDate.getTime(); // Most recent first
         })[0];
-        console.log('[ACCOUNT LOOKUP] ✅ Using GOOD account (avoiding old workspace)');
+        console.log('[ACCOUNT LOOKUP] ✅ Using most recently updated account');
       } else {
         // Fallback to most recent if no good accounts found
         account = matchingAccounts.sort((a, b) => {
@@ -405,7 +417,7 @@ export class MetaCompliantWebhook {
           const bDate = new Date(b.updatedAt || b.createdAt || 0);
           return bDate.getTime() - aDate.getTime(); // Most recent first
         })[0];
-        console.log('[ACCOUNT LOOKUP] ⚠️ Using fallback account');
+        console.log('[ACCOUNT LOOKUP] ⚠️ Using fallback account (any matching)');
       }
 
       console.log('[ACCOUNT LOOKUP] ✅ Found account:', account.username);

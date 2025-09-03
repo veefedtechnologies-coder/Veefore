@@ -123,13 +123,14 @@ export default function Automation() {
   // Get current workspace using the proper hook
   const { currentWorkspace } = useCurrentWorkspace()
 
-  // Fetch social accounts with better error handling for current workspace
+  // Fetch social accounts with better error handling for current workspace - HYBRID: Webhooks + Smart Polling
   const { data: socialAccounts = [] } = useQuery<SocialAccount[]>({
     queryKey: ['/api/social-accounts', currentWorkspace?.id],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes - webhooks provide immediate updates for comments/mentions
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 10 * 60 * 1000 // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
   })
 
   // Social accounts loaded successfully

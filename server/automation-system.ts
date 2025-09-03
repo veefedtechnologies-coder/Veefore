@@ -121,29 +121,9 @@ export class AutomationSystem {
     
     let rules = await this.getRules(workspaceId);
     
-    // CRITICAL FIX: Always use correct workspace if we're in the wrong one
-    if (workspaceId === '6847b9cdfabaede1706f2994') {
-      console.log('[AUTOMATION] 🚨 DETECTED WRONG WORKSPACE! Switching to current user workspace...');
-      const fallbackRules = await this.getRules('684402c2fd2cd4eb6521b386');
-      console.log('[AUTOMATION] Found', fallbackRules.length, 'rules in CORRECT workspace');
-      
-      if (fallbackRules.length > 0) {
-        rules = fallbackRules;
-        workspaceId = '684402c2fd2cd4eb6521b386'; // Force correct workspace
-        console.log('[AUTOMATION] ✅ FORCED switch to correct workspace with user rules');
-      }
-    }
-    // Also check if no rules found in any workspace
-    else if (rules.length === 0) {
-      console.log('[AUTOMATION] 🔄 No rules found, checking fallback workspace...');
-      const fallbackRules = await this.getRules('684402c2fd2cd4eb6521b386');
-      console.log('[AUTOMATION] Found', fallbackRules.length, 'fallback rules in current workspace');
-      
-      if (fallbackRules.length > 0) {
-        rules = fallbackRules;
-        workspaceId = '684402c2fd2cd4eb6521b386';
-        console.log('[AUTOMATION] ✅ Using fallback workspace rules');
-      }
+    // Check if no rules found in the current workspace
+    if (rules.length === 0) {
+      console.log('[AUTOMATION] ℹ️ No automation rules found for workspace:', workspaceId);
     }
     
     const activeRules = rules.filter(rule => rule.isActive);

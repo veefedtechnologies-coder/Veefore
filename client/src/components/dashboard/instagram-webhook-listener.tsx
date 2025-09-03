@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
+import { io, Socket } from 'socket.io-client'
 
 /**
  * Instagram Webhook Listener Component
@@ -14,83 +15,177 @@ import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 export function InstagramWebhookListener() {
   const queryClient = useQueryClient()
   const { currentWorkspace } = useCurrentWorkspace()
-  const wsRef = useRef<WebSocket | null>(null)
+  const socketRef = useRef<Socket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectAttemptsRef = useRef(0)
+  const webhookFailureCountRef = useRef(0)
   const maxReconnectAttempts = 5
+  const maxWebhookFailures = 3 // Enable polling fallback after 3 webhook failures
+
+  // Enable polling fallback when webhooks fail (for webhook-supported events only)
+  const enablePollingFallback = () => {
+    console.log('[Instagram Webhook] 🚨 Enabling polling fallback for webhook-supported events due to webhook failures')
+    // Re-enable polling for webhook-supported events (comments, mentions, etc.)
+    queryClient.setQueryData(['/api/social-accounts', currentWorkspace?.id], (oldData: any) => {
+      // Force refetch with polling enabled for webhook events
+      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+      return oldData
+    })
+  }
 
   useEffect(() => {
     if (!currentWorkspace?.id) return
 
-    const connectWebSocket = () => {
+    const connectSocket = () => {
       try {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-        const wsUrl = `${protocol}//${window.location.host}/ws/instagram-webhooks`
+        const socketUrl = `${window.location.protocol}//${window.location.host}`
         
-        console.log('[Instagram Webhook] Connecting to:', wsUrl)
-        const ws = new WebSocket(wsUrl)
+        console.log('[Instagram Webhook] Connecting to Socket.IO:', socketUrl)
+        const socket = io(socketUrl, {
+          path: '/ws/metrics',
+          transports: ['polling'], // Use only polling to avoid WebSocket frame errors
+          auth: {
+            token: localStorage.getItem('firebase-token') || 'anonymous'
+          },
+          timeout: 20000,
+          forceNew: true,
+          upgrade: false, // Disable WebSocket upgrade to avoid frame errors
+          rememberUpgrade: false
+        })
         
-        ws.onopen = () => {
+        socket.on('connect', () => {
           console.log('[Instagram Webhook] Connected successfully')
-          wsRef.current = ws
+          socketRef.current = socket
           reconnectAttemptsRef.current = 0
+          webhookFailureCountRef.current = 0
           
-          // Subscribe to workspace-specific updates
-          ws.send(JSON.stringify({
-            type: 'subscribe',
-            workspaceId: currentWorkspace.id
-          }))
-        }
+          // Join workspace-specific room
+          socket.emit('join-workspace', { workspaceId: currentWorkspace.id })
+        })
         
-        ws.onmessage = (event) => {
+        socket.on('instagram_comment', (data) => {
           try {
-            const data = JSON.parse(event.data)
-            console.log('[Instagram Webhook] Received update:', data)
-            
-            // Handle different types of Instagram updates with immediate refresh
-            switch (data.type) {
-              case 'instagram_metrics_update':
-                console.log('[Instagram Webhook] Instagram metrics updated, refreshing data immediately')
-                // Immediate invalidation and refetch for real-time updates
-                queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
-                queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
-                queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
-                // Force immediate refetch for critical updates
-                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
-                break
-                
-              case 'instagram_post_update':
-                console.log('[Instagram Webhook] Instagram post updated, refreshing immediately')
-                queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
-                queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
-                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
-                break
-                
-              case 'instagram_follower_update':
-                console.log('[Instagram Webhook] Instagram followers updated, refreshing immediately')
-                queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
-                queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
-                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
-                break
-                
-              case 'instagram_engagement_update':
-                console.log('[Instagram Webhook] Instagram engagement updated, refreshing immediately')
-                queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
-                queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
-                queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
-                break
-                
-              default:
-                console.log('[Instagram Webhook] Unknown update type:', data.type)
-            }
+            console.log('[Instagram Webhook] Received comment update:', data)
+            console.log('[Instagram Webhook] New Instagram comment, refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/comments'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Comment webhook processed - social accounts data refreshed')
           } catch (error) {
-            console.error('[Instagram Webhook] Parse error:', error)
+            console.error('[Instagram Webhook] Error processing comment update:', error)
           }
-        }
-        
-        ws.onclose = (event) => {
-          console.log('[Instagram Webhook] Connection closed:', event.code, event.reason)
-          wsRef.current = null
+        })
+
+        socket.on('instagram_mention', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received mention update:', data)
+            console.log('[Instagram Webhook] New Instagram mention, refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/mentions'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Mention webhook processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing mention update:', error)
+          }
+        })
+
+        socket.on('instagram_story_insight', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received story insight update:', data)
+            console.log('[Instagram Webhook] New Instagram story insight, refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/story-insights'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Story insight webhook processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing story insight update:', error)
+          }
+        })
+
+        socket.on('instagram_message', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received message update:', data)
+            console.log('[Instagram Webhook] New Instagram Direct message, refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/messages'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Message webhook processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing message update:', error)
+          }
+        })
+
+        socket.on('instagram_account_review', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received account review update:', data)
+            console.log('[Instagram Webhook] Account review update, refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Account review webhook processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing account review update:', error)
+          }
+        })
+
+        socket.on('instagram_media_update', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received media update:', data)
+            console.log('[Instagram Webhook] Media update (new posts/stories), refreshing immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/media'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Media update webhook processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing media update:', error)
+          }
+        })
+
+        // Legacy event handler for backward compatibility
+        socket.on('instagram_metrics_update', (data) => {
+          try {
+            console.log('[Instagram Webhook] Received metrics update:', data)
+            console.log('[Instagram Webhook] Instagram metrics updated, refreshing data immediately')
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            console.log('[Instagram Webhook] ✅ Metrics update processed - social accounts data refreshed')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing metrics update:', error)
+          }
+        })
+
+        socket.on('disconnect', () => {
+          console.log('[Instagram Webhook] Socket disconnected')
+          socketRef.current = null
+          webhookFailureCountRef.current++
           
           // Auto-reconnect with exponential backoff
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
@@ -99,32 +194,41 @@ export function InstagramWebhookListener() {
             
             reconnectTimeoutRef.current = setTimeout(() => {
               reconnectAttemptsRef.current++
-              connectWebSocket()
+              connectSocket()
             }, delay)
           } else {
-            console.log('[Instagram Webhook] Max reconnection attempts reached, giving up')
+            console.log('[Instagram Webhook] Max reconnection attempts reached, enabling polling fallback')
+            enablePollingFallback()
           }
-        }
-        
-        ws.onerror = (error) => {
+        })
+
+        socket.on('connect_error', (error) => {
           console.error('[Instagram Webhook] Connection error:', error)
-        }
+          webhookFailureCountRef.current++
+          
+          if (webhookFailureCountRef.current >= maxWebhookFailures) {
+            console.log('[Instagram Webhook] Too many webhook failures, enabling polling fallback')
+            enablePollingFallback()
+          }
+        })
+        
+
         
       } catch (error) {
         console.error('[Instagram Webhook] Failed to connect:', error)
       }
     }
 
-    // Connect to webhook WebSocket
-    connectWebSocket()
+    // Connect to webhook Socket.IO
+    connectSocket()
 
     // Cleanup on unmount
     return () => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
       }
-      if (wsRef.current) {
-        wsRef.current.close()
+      if (socketRef.current) {
+        socketRef.current.disconnect()
       }
     }
   }, [currentWorkspace?.id, queryClient])

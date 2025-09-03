@@ -367,6 +367,65 @@ app.use((req, res, next) => {
   // Register metrics and webhook routes
   app.use('/api', metricsRoutes);
   app.use('/api/webhooks', webhooksRoutes);
+  
+  // Additional webhook route to match Meta Console configuration
+  app.use('/webhook', webhooksRoutes);
+
+  // Instagram account management routes
+  app.post('/api/instagram/cleanup-duplicates', async (req: any, res: Response) => {
+    try {
+      const { InstagramAccountManager } = await import('./services/instagram-account-manager');
+      const accountManager = new InstagramAccountManager(storage);
+      
+      console.log('[CLEANUP] Starting Instagram account cleanup...');
+      const result = await accountManager.cleanupDuplicateAccounts();
+      
+      res.json({
+        success: true,
+        message: `Cleaned up ${result.totalRemoved} duplicate accounts`,
+        cleanedAccounts: result.cleanedAccounts,
+        totalRemoved: result.totalRemoved
+      });
+    } catch (error: any) {
+      console.error('[CLEANUP] Error during cleanup:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to cleanup duplicate accounts',
+        error: error.message
+      });
+    }
+  });
+
+  app.post('/api/instagram/ensure-account', async (req: any, res: Response) => {
+    try {
+      const { instagramAccountId, instagramUsername, workspaceId } = req.body;
+      
+      if (!instagramAccountId || !instagramUsername || !workspaceId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields: instagramAccountId, instagramUsername, workspaceId'
+        });
+      }
+
+      const { InstagramAccountManager } = await import('./services/instagram-account-manager');
+      const accountManager = new InstagramAccountManager(storage);
+      
+      const result = await accountManager.ensureAccountInWorkspace(
+        instagramAccountId, 
+        instagramUsername, 
+        workspaceId
+      );
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error('[ENSURE ACCOUNT] Error:', error);
+      res.status(500).json({
+        success: false,
+        action: 'failed',
+        message: error.message
+      });
+    }
+  });
 
   // Set up WebSocket server for real-time chat streaming
   const { createServer } = await import('http');
@@ -403,14 +462,50 @@ app.use((req, res, next) => {
   
   const wss = new WebSocketServer({ server: httpServer });
   
+  // Add global error handler for WebSocket server
+  wss.on('error', (error) => {
+    console.error('[WebSocket Server] Error:', error.message);
+    // Don't crash the server, just log the error
+  });
+  
   // Store WebSocket connections by conversation ID
   const wsConnections = new Map<number, Set<any>>();
   
   // Store buffered messages for conversations without active connections
   const messageBuffer = new Map<number, any[]>();
   
+  // Helper function to safely send WebSocket messages
+  const safeSend = (ws: any, message: any) => {
+    try {
+      if (ws.readyState === ws.OPEN) {
+        ws.send(JSON.stringify(message));
+      }
+    } catch (error) {
+      console.error('[WebSocket] Send error:', error);
+    }
+  };
+  
   wss.on('connection', (ws, req) => {
     console.log('[WebSocket] New client connected for chat streaming');
+    
+    // Add error handling to prevent crashes
+    ws.on('error', (error) => {
+      console.error('[WebSocket] Connection error:', error.message);
+      // Don't crash the server, just log the error
+    });
+    
+    ws.on('close', (code, reason) => {
+      console.log(`[WebSocket] Client disconnected: ${code} ${reason}`);
+      // Clean up connections
+      for (const [convId, connections] of wsConnections.entries()) {
+        if (connections.has(ws)) {
+          connections.delete(ws);
+          if (connections.size === 0) {
+            wsConnections.delete(convId);
+          }
+        }
+      }
+    });
     
     ws.on('message', (message) => {
       try {
@@ -426,14 +521,14 @@ app.use((req, res, next) => {
           console.log(`[WebSocket] Client subscribed to conversation ${convId}`);
           
           // Send subscription confirmation
-          ws.send(JSON.stringify({ type: 'subscribed', conversationId: convId }));
+          safeSend(ws, { type: 'subscribed', conversationId: convId });
           
           // Send any buffered messages immediately
           const buffered = messageBuffer.get(convId);
           if (buffered && buffered.length > 0) {
             console.log(`[WebSocket] Sending ${buffered.length} buffered messages to new client`);
             buffered.forEach(message => {
-              ws.send(JSON.stringify(message));
+              safeSend(ws, message);
             });
             // Clear buffer after sending
             messageBuffer.delete(convId);
@@ -459,10 +554,9 @@ app.use((req, res, next) => {
     console.log(`[WebSocket] Broadcasting to conversation ${conversationId}, connections: ${connections?.size || 0}`);
     
     if (connections && connections.size > 0) {
-      const message = JSON.stringify(data);
       connections.forEach(ws => {
         if (ws.readyState === 1) { // WebSocket.OPEN
-          ws.send(message);
+          safeSend(ws, data);
           console.log(`[WebSocket] Sent ${data.type} to client for conversation ${conversationId}`);
         } else {
           console.log(`[WebSocket] Removing closed connection for conversation ${conversationId}`);
