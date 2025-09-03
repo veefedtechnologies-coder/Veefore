@@ -2,14 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
 import { enhancedAriaHelpers, componentA11y, announceToScreenReader } from '@/lib/accessibility'
 import { 
-  usePerformanceMonitoring,
-  preloadCriticalResources,
-  useLayoutStabilization,
-  useLazyLoading,
-  ResourceOptimizer,
-  inlineCriticalCSS
-} from '@/lib/performance'
-import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 
   Lightbulb, Settings, Lock, 
@@ -68,22 +60,8 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
   const navigationRef = useRef<HTMLElement>(null)
   const demoButtonRef = useRef<HTMLButtonElement>(null)
   
-  // P7-5: Performance optimization hooks
-  const performanceMetrics = usePerformanceMonitoring()
-  const { containerRef, stabilizeLayout } = useLayoutStabilization()
-  const { elementRef: heroLazyRef, isVisible: heroVisible } = useLazyLoading()
-  
-  // P7-5: Initialize performance optimizations
-  useEffect(() => {
-    // Preload critical resources
-    preloadCriticalResources()
-    
-    // Inline critical CSS for above-the-fold content
-    inlineCriticalCSS()
-    
-    // Stabilize layout to prevent CLS
-    setTimeout(() => stabilizeLayout({ images: true, asyncContent: true, animations: true }), 100)
-  }, [])
+  // Refs for container management
+  const containerRef = useRef<HTMLDivElement>(null)
   
   // Device fingerprinting state
   const [deviceStatus, setDeviceStatus] = useState<{
@@ -585,8 +563,6 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
       ref={containerRef}
       className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 text-gray-900 dark:text-gray-100 overflow-x-hidden contain-layout"
     >
-      {/* P7-5: Resource Optimizer for Critical Performance */}
-      <ResourceOptimizer />
       {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Animated gradient mesh */}
@@ -745,9 +721,8 @@ const LandingContent = ({ onNavigate }: LandingProps) => {
 
       {/* Revolutionary Hero Section - World-Class Premium Design */}
       <section 
-        ref={heroLazyRef}
-        className="hero-section relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden will-change-transform"
-        data-async
+        ref={heroRef}
+        className="hero-section relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden"
       >
         {/* Revolutionary Background System */}
         <div className="absolute inset-0">

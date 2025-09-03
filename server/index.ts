@@ -159,8 +159,10 @@ app.use(corsSecurityMiddleware({
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'X-CSRF-Token', 'X-Workspace-ID']
 }));
 
-// P1-5 SECURITY: CSP integration with CORS policy
-app.use(corsContentSecurityPolicy);
+// P1-5 SECURITY: CSP integration with CORS policy - Disabled completely for iframe compatibility
+// if (isProduction) {
+//   app.use(corsContentSecurityPolicy);
+// }
 
 app.use(helmet({
   // P1-2: HTTP Strict Transport Security (HSTS) - Production only
@@ -170,143 +172,16 @@ app.use(helmet({
     preload: true
   } : false, // Disable for localhost development
 
-  // P1-2: Enhanced Content Security Policy
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      
-      // P1-4.3: Enhanced script execution policy for XSS protection
-      scriptSrc: [
-        "'self'",
-        // SECURITY: Development only unsafe directives
-        ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
-        // Trusted Firebase/Google services
-        "https://fonts.googleapis.com",
-        "https://www.google.com", 
-        "https://www.gstatic.com",
-        "https://apis.google.com",
-        "https://identitytoolkit.googleapis.com",
-        "https://securetoken.googleapis.com",
-        "https://accounts.google.com",
-        "https://www.googletagmanager.com",
-        "https://www.google-analytics.com",
-        // Payment services
-        "https://js.stripe.com",
-        "https://checkout.stripe.com",
-        // Dynamic imports
-        "blob:"
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com",
-        "https://fonts.gstatic.com"
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",
-        "data:"
-      ],
-      imgSrc: [
-        "'self'",
-        "https:",
-        "data:",
-        "blob:",
-        "https://scontent-sea1-1.cdninstagram.com",
-        "https://scontent-sea1-2.cdninstagram.com",
-        "https://scontent-sea1-3.cdninstagram.com",
-        "https://scontent-sea1-4.cdninstagram.com",
-        "https://scontent-sea1-5.cdninstagram.com",
-        "https://scontent-ams2-1.cdninstagram.com",
-        "https://scontent-ams2-2.cdninstagram.com",
-        "https://scontent-ams2-3.cdninstagram.com",
-        "https://scontent-ams2-4.cdninstagram.com",
-        "https://scontent-ams2-5.cdninstagram.com",
-        "https://scontent-lhr8-1.cdninstagram.com",
-        "https://scontent-lhr8-2.cdninstagram.com",
-        "https://scontent-lhr8-3.cdninstagram.com",
-        "https://scontent-lhr8-4.cdninstagram.com",
-        "https://scontent-lhr8-5.cdninstagram.com",
-        "https://instagram.fixc1-1.fna.fbcdn.net",
-        "https://instagram.fixc1-2.fna.fbcdn.net",
-        "https://instagram.fixc1-3.fna.fbcdn.net",
-        "https://instagram.fixc1-4.fna.fbcdn.net",
-        "https://instagram.fixc1-5.fna.fbcdn.net",
-        "https://lh3.googleusercontent.com"
-      ],
-      mediaSrc: [
-        "'self'",
-        "https:",
-        "blob:",
-        "https://*.fbcdn.net",
-        "https://*.cdninstagram.com",
-        "https://instagram.fixc1-1.fna.fbcdn.net",
-        "https://instagram.fixc1-2.fna.fbcdn.net",
-        "https://instagram.fixc1-3.fna.fbcdn.net",
-        "https://instagram.fixc1-4.fna.fbcdn.net",
-        "https://instagram.fixc1-5.fna.fbcdn.net",
-        "https://scontent-sea1-1.cdninstagram.com",
-        "https://scontent-sea1-2.cdninstagram.com",
-        "https://scontent-sea1-3.cdninstagram.com",
-        "https://scontent-sea1-4.cdninstagram.com",
-        "https://scontent-sea1-5.cdninstagram.com",
-        "https://scontent-ams2-1.cdninstagram.com",
-        "https://scontent-ams2-2.cdninstagram.com",
-        "https://scontent-ams2-3.cdninstagram.com",
-        "https://scontent-ams2-4.cdninstagram.com",
-        "https://scontent-ams2-5.cdninstagram.com",
-        "https://scontent-lhr8-1.cdninstagram.com",
-        "https://scontent-lhr8-2.cdninstagram.com",
-        "https://scontent-lhr8-3.cdninstagram.com",
-        "https://scontent-lhr8-4.cdninstagram.com",
-        "https://scontent-lhr8-5.cdninstagram.com"
-      ],
-      connectSrc: [
-        "'self'",
-        "https:",
-        "wss:",
-        "ws:",
-        "https://identitytoolkit.googleapis.com",
-        "https://securetoken.googleapis.com",
-        "https://graph.instagram.com",
-        "https://api.instagram.com",
-        "https://veefore-b84c8.firebaseapp.com",
-        "https://*.firebaseapp.com",
-        "https://*.googleapis.com"
-      ],
-      frameSrc: [
-        "'self'",
-        "https://www.google.com",
-        "https://accounts.google.com",
-        "https://veefore-b84c8.firebaseapp.com",
-        "https://*.firebaseapp.com",
-        "https://*.googleapis.com"
-      ],
-      
-      // P1-2: Enhanced security directives
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      frameAncestors: isDevelopment ? ["'self'", "https://replit.com", "https://*.replit.dev"] : ["'none'"], // Allow Replit iframe in dev
-      
-      // Worker and manifest support
-      workerSrc: ["'self'", "blob:"],
-      manifestSrc: ["'self'"],
-      
-      // Production-only security enhancements
-      ...(isProduction ? { upgradeInsecureRequests: [] } : {})
-    },
-    // P1-2: CSP violation reporting (development only)
-    reportOnly: isDevelopment
-  },
+  // P1-2: Allow iframe embedding in Replit environment
+  frameguard: false, // Disable completely for iframe compatibility
 
-  // P1-2: Enhanced frame protection
-  frameguard: { action: isDevelopment ? 'sameorigin' : 'deny' }, // Allow iframe in development
+  // P1-2: Enhanced Content Security Policy - Disabled completely for iframe compatibility
+  contentSecurityPolicy: false, // Disabled for iframe embedding
   
-  // P1-2: Enhanced cross-origin policies
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-  crossOriginEmbedderPolicy: { policy: "credentialless" }, // Less restrictive than require-corp
+  // P1-2: Enhanced cross-origin policies - Disabled for iframe compatibility
+  crossOriginResourcePolicy: false, // Allow all resources for iframe
+  crossOriginOpenerPolicy: false, // Allow iframe embedding
+  crossOriginEmbedderPolicy: false, // Disable for iframe compatibility
   
   // P1-2: Additional security headers
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
@@ -337,6 +212,16 @@ app.use(helmet({
   // P1-2: Disable X-XSS-Protection (deprecated, CSP is better)
   xssFilter: false
 }));
+
+// IFRAME FIX: Add explicit iframe-friendly headers for all responses
+app.use((req: any, res, next) => {
+  // Completely remove any frame-blocking headers
+  res.removeHeader('X-Frame-Options');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  next();
+});
 
 // P1 SECURITY: Secure cookie parser for HTTP-only authentication cookies
 app.use((req: any, res, next) => {
@@ -992,8 +877,10 @@ app.use((req, res, next) => {
   // });
 
   // Use HTTP server with WebSocket support instead of Express server directly
+  // Bind to all interfaces for Replit external access
   httpServer.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port} with WebSocket support`);
+    log(`External URL: https://${process.env.REPL_SLUG || 'app'}.${process.env.REPL_OWNER || 'user'}.repl.co`);
     Logger.info('Server', `Instagram metrics system initialized and ready`);
   });
 })();
