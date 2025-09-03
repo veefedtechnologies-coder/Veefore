@@ -127,7 +127,7 @@ async function processWebhookEntry(entry: any): Promise<void> {
 
     // Find the user for this Instagram account using storage
     const { storage } = await import('../mongodb-storage');
-    const users = await storage.getUsers();
+    const users = await storage.getAllUsers();
     const user = users.find(u => u.instagramAccountId === instagramAccountId);
     if (!user) {
       console.warn(`⚠️ No user found for Instagram account: ${instagramAccountId}`);
