@@ -54,6 +54,7 @@ import {
   validateContentCreation,
   validateAIGeneration
 } from './middleware/validation';
+import { strictCorsMiddleware, corsHealthCheck } from './middleware/cors-security';
 import { safeParseOAuthState, safeParseInstagramState, safeParseJWTPayload, safeParseAIResponse, safeParseAccountsData } from './middleware/unsafe-json-replacements';
 import { 
   userOnboardingSchema, 
@@ -985,7 +986,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Delete workspace
-  app.delete('/api/workspaces/:id', requireAuth, async (req: any, res: Response) => {
+  // P1-5 SECURITY: Strict CORS for workspace deletion
+  app.delete('/api/workspaces/:id', strictCorsMiddleware, requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.params.id;
@@ -3102,7 +3104,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Disconnect social account
-  app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
+  // P1-5 SECURITY: Strict CORS for account deletion
+  app.delete('/api/social-accounts/:id', strictCorsMiddleware, requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const accountId = req.params.id;
@@ -9243,7 +9246,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Delete content route
-  app.delete('/api/content/:id', requireAuth, async (req: any, res: Response) => {
+  // P1-5 SECURITY: Strict CORS for content deletion
+  app.delete('/api/content/:id', strictCorsMiddleware, requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const { id } = req.params;
@@ -13447,6 +13451,9 @@ Create a detailed growth strategy in JSON format:
     next();
   });
 
+  // P1-5 SECURITY: Strict CORS for admin endpoints
+  app.use('/api/admin/*', strictCorsMiddleware);
+  
   app.use('/api/admin/*', (req, res, next) => {
     // This middleware ensures admin routes are handled first
     next();
@@ -14176,6 +14183,9 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Health check endpoint for deployment
+  // P1-5 SECURITY: CORS health check endpoint
+  app.get('/api/cors-health', corsHealthCheck);
+
   app.get('/api/health', async (req: any, res: Response) => {
     try {
       const healthStatus = {

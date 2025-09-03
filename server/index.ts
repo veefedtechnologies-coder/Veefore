@@ -26,6 +26,14 @@ import {
 } from "./middleware/rate-limiting-working";
 import { xssProtectionMiddleware, enhancedXssHeaders } from "./middleware/xss-protection";
 import { cleanupTempFiles } from "./middleware/file-upload-security";
+import { 
+  corsSecurityMiddleware, 
+  strictCorsMiddleware, 
+  apiCorsMiddleware, 
+  corsMetricsMiddleware,
+  corsContentSecurityPolicy,
+  emergencyCorsLockdown 
+} from "./middleware/cors-security";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -52,6 +60,24 @@ const app = express();
 
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
 app.set('trust proxy', 1);
+
+// P1-5 SECURITY: Emergency CORS lockdown check (highest priority)
+app.use(emergencyCorsLockdown);
+
+// P1-5 SECURITY: CORS metrics and monitoring
+app.use(corsMetricsMiddleware);
+
+// P1-5 SECURITY: Main CORS security middleware
+app.use(corsSecurityMiddleware({
+  allowCredentials: true,
+  maxAge: 86400, // 24 hours preflight cache
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'X-Total-Count'],
+  allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'X-CSRF-Token', 'X-Workspace-ID']
+}));
+
+// P1-5 SECURITY: CSP integration with CORS policy
+app.use(corsContentSecurityPolicy);
 
 app.use(helmet({
   // P1-2: HTTP Strict Transport Security (HSTS) - Production only
@@ -251,6 +277,9 @@ app.use((req: any, res, next) => {
 // P1-3 SECURITY: Apply global rate limiting to all requests
 // P1-3 SECURITY: Apply global rate limiting only to API routes, not static assets
 app.use('/api', globalRateLimiter);
+
+// P1-5 SECURITY: API-specific CORS protection with enhanced validation
+app.use('/api', apiCorsMiddleware);
 
 // P1-4.3 SECURITY: XSS Protection middleware
 app.use(enhancedXssHeaders());
