@@ -12,6 +12,39 @@
       onload="this.rel='stylesheet'"
       href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&family=Space+Grotesk%3Awght%40400%3B500%3B700"
     />
+    <style>
+      /* Prevent black flash by setting immediate background */
+      html, body {
+        background-color: #f9fafb; /* gray-50 */
+        color: #111827; /* gray-900 */
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        html, body {
+          background-color: #111827; /* gray-900 */
+          color: #f9fafb; /* gray-50 */
+        }
+      }
+      
+      /* Override for when dark class is explicitly set */
+      html.dark, html.dark body {
+        background-color: #111827 !important; /* gray-900 */
+        color: #f9fafb !important; /* gray-50 */
+      }
+      
+      html.light, html.light body {
+        background-color: #f9fafb !important; /* gray-50 */
+        color: #111827 !important; /* gray-900 */
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

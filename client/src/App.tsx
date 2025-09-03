@@ -40,9 +40,7 @@ import TermsOfService from './pages/TermsOfService'
 import Settings from './pages/Settings'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 import { getRedirectResult, auth } from './lib/firebase'
-import { useToast } from './hooks/use-toast'
 import { initializeTheme } from './lib/theme'
-import { useTheme } from './hooks/useTheme'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -50,8 +48,6 @@ function App() {
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false)
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
-  const { toast } = useToast()
-  const { mounted } = useTheme()
 
   // Initialize theme system
   useEffect(() => {
@@ -81,8 +77,8 @@ function App() {
   })
 
   // Pre-fetch social accounts for current workspace to eliminate loading on Integration page
-  const currentWorkspaceId = workspaces?.find(w => w.isActive)?.id
-  const { data: socialAccounts } = useQuery({
+  const currentWorkspaceId = workspaces?.find((w: any) => w.isActive)?.id
+  useQuery({
     queryKey: ['/api/social-accounts', currentWorkspaceId],
     queryFn: () => currentWorkspaceId ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspaceId}`) : Promise.resolve([]),
     enabled: !!user && !loading && !!currentWorkspaceId,
@@ -142,15 +138,6 @@ function App() {
       }
     }
   }, [user, loading, userData, userDataLoading, location, setLocation, isOnboardingModalOpen])
-
-  // Wait for theme to mount to prevent flash of unstyled content
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-      </div>
-    )
-  }
 
   // Show loading spinner only during initial auth - not for user data loading (better UX)
   if (loading) {
