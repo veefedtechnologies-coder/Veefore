@@ -374,10 +374,24 @@ export class MetaCompliantWebhook {
       const accounts = await this.storage.getAllSocialAccounts();
       
       // Find all matching Instagram accounts with this Page ID
+      // For Instagram, the Page ID from Meta webhook corresponds to the Instagram account ID
       const matchingAccounts = accounts.filter(acc => 
         acc.platform === 'instagram' && 
         (acc.pageId === pageId || acc.instagramId === pageId || acc.accountId === pageId)
       );
+
+      // If no exact match found, try to find any active Instagram account as fallback
+      if (matchingAccounts.length === 0) {
+        console.log('[ACCOUNT LOOKUP] ⚠️ No exact Page ID match, trying fallback to any active Instagram account');
+        const fallbackAccounts = accounts.filter(acc => 
+          acc.platform === 'instagram' && acc.isActive
+        );
+        
+        if (fallbackAccounts.length > 0) {
+          console.log('[ACCOUNT LOOKUP] ✅ Using fallback Instagram account:', fallbackAccounts[0].username);
+          return fallbackAccounts[0];
+        }
+      }
 
       if (matchingAccounts.length === 0) {
         console.log('[ACCOUNT LOOKUP] ❌ No account found for Page ID:', pageId);

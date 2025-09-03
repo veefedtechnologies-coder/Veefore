@@ -271,6 +271,9 @@ async function handleCommentWebhook(
       timestamp: new Date()
     };
     
+    console.log(`🚀 WEBHOOK DEBUG: About to broadcast comment webhook`);
+    console.log(`🚀 WEBHOOK DEBUG: Broadcast data:`, JSON.stringify(broadcastData, null, 2));
+    
     // Broadcast to both workspaces to ensure frontend receives events
     const workspacesToBroadcast = [
       workspaceId, // Original workspace from webhook
@@ -278,12 +281,14 @@ async function handleCommentWebhook(
     ];
     
     for (const wsId of workspacesToBroadcast) {
-      console.log(`📢 Broadcasting comment webhook to workspace ${wsId}:`, broadcastData);
+      console.log(`📢 WEBHOOK DEBUG: Broadcasting comment webhook to workspace ${wsId}`);
+      console.log(`📢 WEBHOOK DEBUG: Workspace ${wsId} connection stats:`, RealtimeService.getWorkspaceStats(wsId));
       RealtimeService.broadcastToWorkspace(wsId, 'instagram_comment', broadcastData);
+      console.log(`✅ WEBHOOK DEBUG: Broadcast sent to workspace ${wsId}`);
     }
-    console.log(`✅ Comment webhook broadcasted successfully to ${workspacesToBroadcast.length} workspaces`);
+    console.log(`✅ WEBHOOK DEBUG: Comment webhook broadcasted successfully to ${workspacesToBroadcast.length} workspaces`);
   } catch (error) {
-    console.error('❌ Failed to broadcast comment webhook:', error);
+    console.error('❌ WEBHOOK DEBUG: Failed to broadcast comment webhook:', error);
   }
 
   console.log(`✅ Comment webhook processed with immediate database update`);

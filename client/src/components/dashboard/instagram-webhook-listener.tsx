@@ -66,17 +66,25 @@ export function InstagramWebhookListener() {
         
         socket.on('instagram_comment', (data) => {
           try {
+            console.log('🎉 FRONTEND DEBUG: Received instagram_comment event!')
+            console.log('🎉 FRONTEND DEBUG: Comment data:', JSON.stringify(data, null, 2))
+            console.log('🎉 FRONTEND DEBUG: Current workspace:', currentWorkspace?.id)
             console.log('[Instagram Webhook] Received comment update:', data)
             console.log('[Instagram Webhook] New Instagram comment, refreshing immediately')
+            
             queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
             queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
             queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
             queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
             queryClient.invalidateQueries({ queryKey: ['/api/instagram/comments'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram-content'] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+            
+            console.log('🎉 FRONTEND DEBUG: ✅ Comment update processed and UI refreshed')
             console.log('[Instagram Webhook] ✅ Comment webhook processed - social accounts data refreshed')
           } catch (error) {
+            console.error('🎉 FRONTEND DEBUG: ❌ Error processing comment update:', error)
             console.error('[Instagram Webhook] Error processing comment update:', error)
           }
         })
@@ -90,6 +98,7 @@ export function InstagramWebhookListener() {
             queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
             queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
             queryClient.invalidateQueries({ queryKey: ['/api/instagram/mentions'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram-content'] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
             console.log('[Instagram Webhook] ✅ Mention webhook processed - social accounts data refreshed')
@@ -157,6 +166,7 @@ export function InstagramWebhookListener() {
             queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
             queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
             queryClient.invalidateQueries({ queryKey: ['/api/instagram/media'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram-content'] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
             queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
             console.log('[Instagram Webhook] ✅ Media update webhook processed - social accounts data refreshed')

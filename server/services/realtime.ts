@@ -310,15 +310,27 @@ export class RealtimeService {
    * Broadcast to all users in workspace
    */
   static broadcastToWorkspace(workspaceId: string, event: string, data: any): void {
-    if (!this.io) return;
+    if (!this.io) {
+      console.error('❌ REALTIME DEBUG: Socket.IO server not initialized');
+      return;
+    }
 
-    console.log(`📢 Broadcasting ${event} to workspace ${workspaceId}`);
+    const roomName = `workspace:${workspaceId}`;
+    const roomSockets = this.io.sockets.adapter.rooms.get(roomName);
+    const connectedSockets = roomSockets ? roomSockets.size : 0;
 
-    this.io.to(`workspace:${workspaceId}`).emit(event, {
+    console.log(`📢 REALTIME DEBUG: Broadcasting ${event} to workspace ${workspaceId}`);
+    console.log(`📢 REALTIME DEBUG: Room name: ${roomName}`);
+    console.log(`📢 REALTIME DEBUG: Connected sockets in room: ${connectedSockets}`);
+    console.log(`📢 REALTIME DEBUG: Broadcast data:`, JSON.stringify(data, null, 2));
+
+    this.io.to(roomName).emit(event, {
       ...data,
       workspaceId,
       timestamp: new Date()
     });
+
+    console.log(`✅ REALTIME DEBUG: Event ${event} broadcasted to ${connectedSockets} sockets in workspace ${workspaceId}`);
   }
 
   /**

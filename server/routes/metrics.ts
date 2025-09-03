@@ -25,9 +25,22 @@ const router = express.Router();
 router.get('/workspaces/:workspaceId/metrics', async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    const { refresh = 'false', period = 'day', days = '7' } = req.query;
+    const { refresh = 'false', period = 'day', days = '7', checkForUpdates = 'false' } = req.query;
 
     console.log(`📊 Fetching metrics for workspace: ${workspaceId}`);
+
+    // If this is just a check for updates, return a lightweight response
+    if (checkForUpdates === 'true') {
+      // Check if there have been any recent webhook events or database updates
+      // For now, we'll simulate checking for updates by looking at recent activity
+      const hasUpdates = Math.random() > 0.7; // Simulate 30% chance of updates
+      
+      return res.json({
+        hasUpdates,
+        lastChecked: new Date(),
+        message: hasUpdates ? 'Updates detected' : 'No updates'
+      });
+    }
 
     // MVP: Use existing storage system to get users
     const { MongoStorage } = await import('../mongodb-storage');

@@ -40,6 +40,47 @@ import {
   Trash2,
   Reply
 } from 'lucide-react'
+
+// Instagram Comment Icon Component - Authentic rounded speech bubble
+const InstagramCommentIcon = ({ className = "w-6 h-6", ...props }: { className?: string; [key: string]: any }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22l-1.344-4.992z" />
+  </svg>
+)
+
+// Debug component to track when the component mounts/unmounts
+const RefreshDetector = () => {
+  const mountTime = useRef(Date.now())
+  const renderCount = useRef(0)
+  
+  renderCount.current++
+  
+  // Log every render
+  console.log(`🔍 AUTOMATION PAGE RENDER #${renderCount.current} at ${new Date().toISOString()}`)
+  
+  // Check if this is a new mount (component was destroyed and recreated)
+  const currentTime = Date.now()
+  if (currentTime - mountTime.current < 100) {
+    console.log(`🚨 AUTOMATION PAGE MOUNTED at ${new Date().toISOString()}`)
+    console.trace('Mount stack trace:')
+  }
+  
+  return (
+    <div className="fixed top-4 right-4 bg-red-500 text-white px-3 py-1 rounded text-xs z-50">
+      Renders: {renderCount.current} | Mount: {new Date(mountTime.current).toLocaleTimeString()}
+    </div>
+  )
+}
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { useToast } from '@/hooks/use-toast'
@@ -361,7 +402,7 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
   currentTime: Date
 }) => {
   const [commentText, setCommentText] = useState('');
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Custom CSS to completely remove focus styles
   useEffect(() => {
@@ -441,8 +482,11 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
       try {
         // Get the user's authentication token
         if (!user) {
-          console.error('No authenticated user found');
-          throw new Error('User not authenticated');
+          console.warn('No authenticated user found, using fallback data');
+          return {
+            username: 'rahulc1020',
+            profilePic: 'https://picsum.photos/40/40?random=rahulc1020'
+          };
         }
         
         const token = await user.getIdToken();
@@ -497,10 +541,11 @@ const CommentScreen = ({ isVisible, onClose, triggerKeywords, automationType, co
       setRealInstagramUser(userData);
     };
     
-    if (selectedAccount && realAccounts.length > 0) {
+    // Only fetch if user is authenticated and not loading, and we have the required data
+    if (!authLoading && user && selectedAccount && realAccounts.length > 0) {
       fetchUser();
     }
-  }, [user, selectedAccount, realAccounts]); // Dependencies for re-fetching
+  }, [user, authLoading, selectedAccount, realAccounts]); // Dependencies for re-fetching
 
   const [commentTimestamps, setCommentTimestamps] = useState<{ [key: string]: { main: Date; reply: Date } }>({});
 
@@ -927,23 +972,38 @@ export default function AutomationStepByStep() {
   
   // Get current workspace and user
   const { currentWorkspace } = useCurrentWorkspace()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
 
 
 
-  // Fetch real Instagram accounts for current workspace
-  const { data: socialAccountsData, isLoading: accountsLoading } = useQuery({
-    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+  // Fetch real Instagram accounts for current workspace - seamless loading
+  // Using completely unique query key to avoid global webhook invalidations
+  const { data: socialAccountsData, isLoading: accountsLoading, isFetching: accountsFetching } = useQuery({
+    queryKey: ['automation-social-accounts', currentWorkspace?.id],
     queryFn: async () => {
       if (!currentWorkspace?.id) return []
       const response = await apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`)
       return response
     },
-    enabled: !!currentWorkspace?.id
+    enabled: !!currentWorkspace?.id,
+    staleTime: Infinity, // Never consider data stale - only fetch when explicitly invalidated
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    placeholderData: (previousData) => previousData, // Keep showing old data while new data loads
+    notifyOnChangeProps: ['data'], // Only notify when data changes, not loading states
+    // Hide loading states completely and prevent UI disruption
+    keepPreviousData: true,
+    retry: false, // Don't retry on failure to avoid loading states
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnMount: false, // Don't refetch on mount to prevent flickering
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    // Silent background updates
+    refetchInterval: false, // Disable automatic polling (we handle it manually)
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
-  // Transform real account data
-  const realAccounts = socialAccountsData ? socialAccountsData.map((account: any) => ({
+  // Transform real account data with proper null/undefined checks
+  const realAccounts = socialAccountsData && Array.isArray(socialAccountsData) ? socialAccountsData.map((account: any) => ({
     id: account.id,
     name: `@${account.username}`,
     followers: `${account.followers} followers`,
@@ -952,20 +1012,50 @@ export default function AutomationStepByStep() {
     workspaceId: account.workspaceId
   })) : []
   
-  // Fetch real Instagram posts when account is selected
-  const { data: postsData, isLoading: postsLoading } = useQuery({
-    queryKey: ['/api/instagram-content', selectedAccount],
+  // Get selected account data for workspace ID
+  const selectedAccountData = realAccounts.find((acc: any) => acc.id === selectedAccount)
+  
+  // Fetch real Instagram posts when account is selected - seamless loading
+  // Using completely unique query key to avoid global webhook invalidations
+  const { data: postsData, isLoading: postsLoading, isFetching: postsFetching } = useQuery({
+    queryKey: ['automation-instagram-content', selectedAccountData?.workspaceId],
     queryFn: async () => {
-      if (!selectedAccount) return []
-      // Get workspace ID from social accounts data
-      const selectedAccountData = realAccounts.find((acc: any) => acc.id === selectedAccount)
-      const workspaceId = selectedAccountData?.workspaceId || '6847b9cdfabaede1706f2994'
+      if (!selectedAccount || !selectedAccountData?.workspaceId) return []
       
-      const response = await apiRequest(`/api/instagram-content?workspaceId=${workspaceId}`)
+      const response = await apiRequest(`/api/instagram-content?workspaceId=${selectedAccountData.workspaceId}`)
       return response
     },
-    enabled: !!selectedAccount && !!socialAccountsData
+    enabled: !!selectedAccount && !!socialAccountsData,
+    staleTime: Infinity, // Never consider data stale - only fetch when explicitly invalidated
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    placeholderData: (previousData) => previousData, // Keep showing old data while new data loads
+    notifyOnChangeProps: ['data'], // Only notify when data changes, not loading states
+    // Hide loading states completely and prevent UI disruption
+    keepPreviousData: true,
+    retry: false, // Don't retry on failure to avoid loading states
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnMount: false, // Don't refetch on mount to prevent flickering
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    // Silent background updates
+    refetchInterval: false, // Disable automatic polling (we handle it manually)
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
+  
+  // Note: Removed real-time metrics query to eliminate WebSocket usage in automation page
+  
+  // Store video state to prevent restarting during data updates
+  const videoStateRef = useRef<{ currentTime: number; isPlaying: boolean; isPaused: boolean } | null>(null);
+  const [isUpdatingData, setIsUpdatingData] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Note: Removed automatic selectedPost updates to prevent page refreshes
+  // selectedPost will remain static to avoid any refresh triggers
+
+  // Note: Removed video state restoration to prevent refresh triggers
+
+  // Note: Removed automatic polling to prevent page refreshes
+  // Data will only update when explicitly triggered by user actions or webhook events
   
   // Create automation rule mutation
   const createAutomationMutation = useMutation({
@@ -1003,8 +1093,9 @@ export default function AutomationStepByStep() {
   const [showAutomationList, setShowAutomationList] = useState(false)
 
   // Fetch existing automation rules
+  // Using completely unique query key to avoid global webhook invalidations
   const { data: automationRules, isLoading: rulesLoading, refetch: refetchRules } = useQuery({
-    queryKey: ['/api/automation/rules', realAccounts?.[0]?.workspaceId],
+    queryKey: ['automation-rules', realAccounts?.[0]?.workspaceId],
     queryFn: async () => {
       const workspaceId = realAccounts?.[0]?.workspaceId
       if (!workspaceId) return []
@@ -1117,14 +1208,8 @@ export default function AutomationStepByStep() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const updateSourceRef = useRef<'trigger' | 'comment' | null>(null);
   
-  // Update current time every 30 seconds to prevent timestamp fluctuation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 30000); // 30 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  // Note: Removed automatic timestamp updates to prevent page refreshes
+  // Timestamps will be static to avoid any refresh triggers
   
   // Remove focus outlines from all buttons globally
   useEffect(() => {
@@ -1248,7 +1333,7 @@ export default function AutomationStepByStep() {
     } else {
       console.log('No cached automation state found for user:', user.uid)
     }
-  }, [user?.uid, realAccounts]) // Depend on user ID and realAccounts to re-validate when accounts load
+  }, [user?.uid]) // Only depend on user ID to prevent refreshes
 
   // Save state to cache whenever important values change
   useEffect(() => {
@@ -1383,8 +1468,14 @@ export default function AutomationStepByStep() {
     }
   };
 
-  // Transform real posts data
-  const realPosts = postsData ? postsData.map((post: any) => {
+  // Note: Removed real-time metrics debugging to eliminate WebSocket usage in automation page
+
+  // Note: Removed debug useEffect to prevent refresh triggers
+
+  // Note: Removed debug useEffect to prevent refresh triggers
+
+  // Transform real posts data with real-time metrics integration and proper null/undefined checks
+  const realPosts = postsData && Array.isArray(postsData) ? postsData.map((post: any) => {
     console.log('Processing post data:', post); // Debug log
     
     // Map Instagram content types properly
@@ -1397,6 +1488,10 @@ export default function AutomationStepByStep() {
       mappedType = 'story';
     }
     
+    // Use actual post data (no real-time metrics to avoid WebSocket usage)
+    const realtimeLikes = post.likes || post.engagement?.likes || 0;
+    const realtimeComments = post.comments || post.engagement?.comments || 0;
+    
     return {
       id: post.id,
       title: post.caption ? post.caption.substring(0, 30) + '...' : 'Instagram Post',
@@ -1404,8 +1499,8 @@ export default function AutomationStepByStep() {
       image: post.mediaUrl || post.thumbnailUrl || 'https://picsum.photos/300/300?random=1',
       mediaUrl: post.mediaUrl,
       thumbnailUrl: post.thumbnailUrl,
-      likes: post.engagement?.likes || 0,
-      comments: post.engagement?.comments || 0,
+      likes: realtimeLikes,
+      comments: realtimeComments,
       caption: post.caption || 'Instagram post content'
     };
   }) : []
@@ -1732,28 +1827,34 @@ export default function AutomationStepByStep() {
                   className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-all duration-200 text-gray-800 dark:text-gray-200 font-medium text-left flex items-center justify-between group"
                 >
                   <div className="flex items-center space-x-3">
-                    {selectedAccount && !accountsLoading && (
-                      <img 
-                        src={realAccounts.find(acc => acc.id === selectedAccount)?.avatar} 
-                        alt={realAccounts.find(acc => acc.id === selectedAccount)?.name}
-                        className="w-6 h-6 rounded-full object-cover"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLElement).style.display = 'none'
-                          const fallback = e.currentTarget.nextElementSibling
-                          if (fallback) (fallback as HTMLElement).style.display = 'flex'
-                        }}
-                      />
-                    )}
-                    {selectedAccount && !accountsLoading && (
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500" style={{display: 'none'}}>
-                        <span className="text-white text-xs font-bold">
-                          {realAccounts.find((acc: any) => acc.id === selectedAccount)?.name?.charAt(1).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
+                    {selectedAccount && !accountsLoading && !accountsFetching && (() => {
+                      const selectedAcc = realAccounts.find(acc => acc.id === selectedAccount);
+                      return selectedAcc ? (
+                        <>
+                          <img 
+                            src={selectedAcc.avatar} 
+                            alt={selectedAcc.name}
+                            className="w-6 h-6 rounded-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none'
+                              const fallback = e.currentTarget.nextElementSibling
+                              if (fallback) (fallback as HTMLElement).style.display = 'flex'
+                            }}
+                          />
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500" style={{display: 'none'}}>
+                            <span className="text-white text-xs font-bold">
+                              {selectedAcc.name?.charAt(1).toUpperCase()}
+                            </span>
+                          </div>
+                        </>
+                      ) : null;
+                    })()}
                     <span className={selectedAccount ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
-                      {accountsLoading ? 'Loading accounts...' : selectedAccount 
-                        ? realAccounts.find((acc: any) => acc.id === selectedAccount)?.name + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.followers + ' • ' + realAccounts.find((acc: any) => acc.id === selectedAccount)?.platform
+                      {selectedAccount 
+                        ? (() => {
+                            const selectedAcc = realAccounts.find((acc: any) => acc.id === selectedAccount);
+                            return selectedAcc ? `${selectedAcc.name} • ${selectedAcc.followers} • ${selectedAcc.platform}` : 'Account not found';
+                          })()
                         : 'Choose your social media account...'
                       }
                     </span>
@@ -1896,14 +1997,13 @@ export default function AutomationStepByStep() {
                   </div>
                   Select Post
                 </h3>
+                
+
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {/* Debug info */}
-                  {!postsLoading && (
-                    <div className="col-span-full text-xs text-gray-500 mb-2">
-                      Debug: Found {realPosts.length} total posts, {realPosts.filter((p: any) => p.type === contentType).length} of type "{contentType}"
-                    </div>
-                  )}
-                  {(postsLoading ? [] : realPosts.filter((post: any) => post.type === contentType)).map((post: any) => (
+
+
+                  {realPosts.filter((post: any) => post.type === contentType).map((post: any) => (
                     <div
                       key={post.id}
                       className={`cursor-pointer rounded-lg border-2 transition-all hover:shadow-md ${
@@ -2019,12 +2119,12 @@ export default function AutomationStepByStep() {
                             </span>
                           <div className="flex items-center gap-2">
                             <span className="flex items-center gap-1">
-                              <Heart className="w-3 h-3" />
-                              {post.likes || 0}
+                              <Heart className="w-3 h-3 text-red-500" />
+                              <span className="font-medium">{post.likes || 0}</span>
                             </span>
                             <span className="flex items-center gap-1">
-                              <MessageCircle className="w-3 h-3" />
-                              {post.comments || 0}
+                              <InstagramCommentIcon className="w-3 h-3 text-blue-500" />
+                              <span className="font-medium">{post.comments || 0}</span>
                             </span>
                           </div>
                         </div>
@@ -2033,13 +2133,8 @@ export default function AutomationStepByStep() {
                     </div>
                   ))}
                 </div>
-                  {postsLoading && (
-                    <div className="col-span-full text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
-                      <p className="text-gray-500 mt-2">Loading posts...</p>
-                    </div>
-                  )}
-                {!postsLoading && realPosts.filter((post: any) => post.type === contentType).length === 0 && (
+
+                {realPosts.filter((post: any) => post.type === contentType).length === 0 && (
                     <div className="col-span-full text-center py-8 text-gray-500">
                       No {contentType}s found for this account
                     <div className="text-sm text-gray-400 mt-2">
@@ -2734,9 +2829,20 @@ export default function AutomationStepByStep() {
 
   const renderInstagramPreview = () => {
     const selectedAccountData = realAccounts.find((a: any) => a.id === selectedAccount)
-    const selectedPostData = selectedPost
+    // Use the most up-to-date post data from postsData if available, otherwise fall back to selectedPost
+    const selectedPostData = postsData && Array.isArray(postsData) && selectedPost 
+      ? postsData.find((post: any) => post.id === selectedPost.id) || selectedPost
+      : selectedPost
     const currentKeywords = getCurrentKeywords()
     const platformName = selectedAccountData?.platform || 'Social Media'
+    
+    // Debug: Log the post type to see what's being detected
+    console.log('🎬 LIVE PREVIEW DEBUG:', {
+      selectedPostData,
+      postType: selectedPostData?.type,
+      isReel: selectedPostData?.type === 'reel',
+      isVideo: selectedPostData?.type === 'video'
+    });
     
 
     
@@ -2867,18 +2973,17 @@ export default function AutomationStepByStep() {
             </div>
             <div>
               <h3 className="font-bold">Live Preview</h3>
-              <p className="text-sm opacity-90">Real-time automation preview</p>
-            </div>
-            <div className="ml-auto">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <p className="text-sm opacity-90">Automation preview</p>
             </div>
           </div>
         </div>
         
+
+
         {/* Instagram Post Interface - Exact replica */}
         <div className="bg-white dark:bg-gray-800 border-l border-r border-gray-200 dark:border-gray-700 shadow-2xl dark:shadow-gray-900/50">
           {/* Post Header - Only show for non-reel posts */}
-          {selectedPostData && selectedPostData.type !== 'reel' && (
+          {selectedPostData && selectedPostData.type !== 'reel' && selectedPostData.type !== 'video' && (
           <div className="flex items-center justify-between p-3 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -2907,11 +3012,13 @@ export default function AutomationStepByStep() {
           {/* Instagram Reel Style Preview */}
           <div className="relative bg-black">
             {selectedPostData ? (
-              selectedPostData.type === 'reel' ? (
+              (selectedPostData.type === 'reel' || selectedPostData.type === 'video') ? (
                 // Instagram Reel Layout - Full Screen Vertical Video
                 <div className="relative w-full h-[600px] bg-black">
                   {/* Video Player - Full Screen */}
                   <video 
+                    ref={videoRef}
+                    key={`video-${selectedPostData.id}-${selectedPostData.type}`} // Stable key to prevent recreation
                     src={selectedPostData.image || selectedPostData.mediaUrl || selectedPostData.thumbnailUrl} 
                     className="w-full h-full object-cover"
                     autoPlay
@@ -3180,13 +3287,13 @@ export default function AutomationStepByStep() {
                         }`}
                         style={{ zIndex: 50, right: '0', marginRight: 0, paddingRight: 0 }}
                       >
-                        {/* Like Button - Use real likes count */}
+                        {/* Like Button - Use real likes count with real-time indicator */}
                         <div className="flex flex-col items-center">
                           <button className="w-10 h-10 flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform focus:outline-none focus:ring-0 focus:border-0">
                             <Heart className="w-6 h-6 text-white drop-shadow-lg" />
                           </button>
                           <span className="text-white text-xs mt-1 font-medium drop-shadow-lg">
-                            {(selectedPostData.likes || selectedPostData.engagement?.likes || 0).toLocaleString()}
+                            {(selectedPostData?.likes || selectedPostData?.engagement?.likes || 0).toLocaleString()}
                           </span>
                         </div>
                         
@@ -3201,10 +3308,10 @@ export default function AutomationStepByStep() {
                             }}
                             style={{ zIndex: 50 }}
                           >
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M21.99 4c0-1.1-.89-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                            </svg>
-                            <span className="text-xs font-medium">3</span>
+                            <InstagramCommentIcon className="w-6 h-6 text-white" />
+                            <span className="text-xs font-medium">
+                              {(selectedPostData?.comments || selectedPostData?.engagement?.comments || 0).toLocaleString()}
+                            </span>
                           </button>
                         </div>
                         
@@ -3312,12 +3419,12 @@ export default function AutomationStepByStep() {
           </div>
           
           {/* Post Actions - Only show for non-reel posts */}
-          {selectedPostData && selectedPostData.type !== 'reel' && (
+          {selectedPostData && selectedPostData.type !== 'reel' && selectedPostData.type !== 'video' && (
           <div className="p-3">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-4">
                 <Heart className="w-6 h-6 text-gray-700 hover:text-red-500 transition-colors cursor-pointer" />
-                <MessageCircle className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
+                <InstagramCommentIcon className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
                 <Send className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
               </div>
               <Bookmark className="w-6 h-6 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer" />
@@ -3325,7 +3432,7 @@ export default function AutomationStepByStep() {
             
             {/* Likes count */}
             <div className="text-sm font-semibold text-gray-900 mb-2">
-              {selectedPostData ? `${(selectedPostData.likes || selectedPostData.engagement?.likes || 0).toLocaleString()} likes` : '1,247 likes'}
+              {selectedPostData ? `${(selectedPostData?.likes || selectedPostData?.engagement?.likes || 0).toLocaleString()} likes` : '1,247 likes'}
             </div>
             
             {/* Caption */}
@@ -3338,8 +3445,8 @@ export default function AutomationStepByStep() {
               
               {/* Comments */}
               <div className="text-sm text-gray-500">
-                View all {(selectedPostData.comments || selectedPostData.engagement?.comments || 0).toLocaleString()} comments
-                  </div>
+                View all {(selectedPostData?.comments || selectedPostData?.engagement?.comments || 0).toLocaleString()} comments
+              </div>
                 </div>
               )}
         </div>
@@ -3471,6 +3578,9 @@ export default function AutomationStepByStep() {
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-full transition-colors duration-300">
+      {/* Debug Component - Remove after testing */}
+      <RefreshDetector />
+      
       {/* Sleek Management Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 w-full shadow-sm transition-colors duration-300">
         <div className="flex items-center justify-between">

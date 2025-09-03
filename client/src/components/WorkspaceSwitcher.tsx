@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
@@ -290,9 +290,11 @@ export function useCurrentWorkspace() {
     staleTime: 5 * 60 * 1000
   })
 
-  const currentWorkspace = workspaces.find((ws: Workspace) => 
-    currentWorkspaceId ? ws.id === currentWorkspaceId : ws.isDefault
-  ) || workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
+  const currentWorkspace = useMemo(() => {
+    return workspaces.find((ws: Workspace) => 
+      currentWorkspaceId ? ws.id === currentWorkspaceId : ws.isDefault
+    ) || workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
+  }, [workspaces, currentWorkspaceId])
 
   return {
     currentWorkspace,

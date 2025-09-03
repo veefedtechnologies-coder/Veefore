@@ -4,8 +4,13 @@ import { QueryClient } from '@tanstack/react-query'
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: Infinity, // Never consider data stale
       retry: false,
+      refetchOnWindowFocus: false, // Don't refetch when window gains focus
+      refetchOnReconnect: false, // Don't refetch when network reconnects
+      refetchOnMount: false, // Don't refetch when component mounts
+      refetchInterval: false, // Disable automatic polling
+      refetchIntervalInBackground: false, // Disable background polling
     },
   },
 })
