@@ -14499,24 +14499,18 @@ Create a detailed growth strategy in JSON format:
 
   // Get social accounts for automation and integration pages
   app.get('/api/social-accounts', requireAuth, 
-    requireWorkspaceMiddleware, 
+    validateWorkspaceAccess({ required: false }),
     async (req: any, res: Response) => {
     try {
       const userId = req.user.id;
-      const workspaceId = req.query.workspaceId as string;
+      const workspaceId = req.query.workspaceId as string || req.workspace?.id;
       console.log(`[SOCIAL ACCOUNTS] Getting social accounts for user ${userId}, workspace: ${workspaceId}`);
       
       let allAccounts = [];
       
       // If workspaceId is provided, get accounts for that specific workspace only
       if (workspaceId) {
-        // Verify user has access to this workspace
-        const userWorkspaces = await storage.getWorkspacesByUserId(userId);
-        const hasAccess = userWorkspaces.some(ws => ws.id === workspaceId);
-        
-        if (!hasAccess) {
-          return res.status(403).json({ error: 'Access denied to workspace' });
-        }
+        console.log(`[SOCIAL ACCOUNTS] Workspace already validated by middleware: ${workspaceId}`);
         
         console.log(`[SOCIAL ACCOUNTS] Getting accounts for specific workspace: ${workspaceId}`);
         const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
