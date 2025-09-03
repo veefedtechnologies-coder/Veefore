@@ -140,8 +140,7 @@ export class UXManager {
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           const lcp = entry.startTime;
-          // Only show performance toasts in production
-          if (lcp > 5000 && process.env.NODE_ENV === 'production') { // Very poor LCP
+          if (lcp > 2500) { // Poor LCP
             this.showToast({
               type: 'info',
               title: 'Loading Optimization',
