@@ -391,10 +391,15 @@ app.use((req, res, next) => {
     console.error('⚠️ RealtimeService failed to initialize:', error);
   }
 
-  // MetricsWorker requires Redis - temporarily disabled in sandbox environment
-  // The existing smart polling system handles metrics updates perfectly
-  console.log('ℹ️ MetricsWorker disabled - using existing smart polling system instead');
-  console.log('📊 Instagram metrics are being fetched automatically by the existing system');
+  // Test Redis connection and start MetricsWorker if available
+  console.log('🔍 Testing Redis connection for advanced queue system...');
+  try {
+    await MetricsWorker.start();
+    console.log('✅ MetricsWorker started with Redis queue system');
+  } catch (error) {
+    console.log('⚠️  MetricsWorker: Redis unavailable, using smart polling fallback');
+    console.log('📊 Instagram metrics continue via existing polling system');
+  }
   
   const wss = new WebSocketServer({ server: httpServer });
   

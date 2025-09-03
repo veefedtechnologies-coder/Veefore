@@ -1,18 +1,39 @@
 import { Queue, QueueOptions, RepeatOptions } from 'bullmq';
 import IORedis from 'ioredis';
 
-// Redis connection configuration (disabled in sandbox environments)
+// Redis connection configuration with status monitoring
 const redisConnection = new IORedis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD,
   maxRetriesPerRequest: null, // Required for BullMQ
-  connectTimeout: 10000,
-  commandTimeout: 5000,
+  connectTimeout: 5000,
+  commandTimeout: 3000,
   lazyConnect: true,
-  retryDelayOnFailover: 500,
-  maxRetriesPerRequest: null,
-  enableOfflineQueue: false, // Prevent connection attempts when Redis is unavailable
+  retryDelayOnFailover: 2000,
+  enableOfflineQueue: false,
+});
+
+// Redis connection event handlers for status monitoring
+redisConnection.on('connect', () => {
+  console.log('🔌 Redis: Attempting connection to localhost:6379...');
+});
+
+redisConnection.on('ready', () => {
+  console.log('✅ Redis: Connected and ready for operations');
+});
+
+redisConnection.on('error', (error) => {
+  console.log('❌ Redis: Connection failed -', error.message);
+  console.log('ℹ️  Redis: Falling back to existing smart polling system');
+});
+
+redisConnection.on('close', () => {
+  console.log('🔌 Redis: Connection closed');
+});
+
+redisConnection.on('reconnecting', (delay) => {
+  console.log(`🔄 Redis: Reconnecting in ${delay}ms...`);
 });
 
 // Queue configuration with rate limiting
