@@ -201,7 +201,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
   return (
     <div className={cn("w-24 bg-white dark:bg-slate-800 flex flex-col min-h-full relative transition-colors duration-300", className)}>
       {/* VeeGPT Logo Section */}
-      <div className="flex flex-col items-center py-6">
+      <div className="flex flex-col items-center py-6 bg-white dark:bg-slate-800">
         <div 
           className={cn(
             "flex flex-col items-center cursor-pointer transition-all duration-500 group py-2 mb-4 transform-gpu veegpt-nav-item",
@@ -273,15 +273,12 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
             <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1.5 h-10 bg-gradient-to-b from-blue-400 via-blue-600 to-purple-600 rounded-full animate-pulse shadow-lg"></div>
           )}
           
-          {/* Glow effect when active */}
-          {activeView === 'veegpt' && (
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-transparent to-purple-400/20 rounded-3xl blur-xl animate-pulse"></div>
-          )}
+          {/* Glow effect when active - removed for consistency */}
         </div>
       </div>
 
       {/* Main Navigation Section */}
-      <div className="flex-1 flex flex-col justify-center">
+      <div className="flex-1 flex flex-col justify-center bg-white dark:bg-slate-800">
         <nav className="flex flex-col space-y-6">
           {sidebarGroups.map((group, groupIndex) => (
             <div key={group.title} className="flex flex-col space-y-4">
@@ -292,7 +289,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
       </div>
 
       {/* Bottom Section - Settings and Logout */}
-      <div className="flex flex-col space-y-4 py-6">
+      <div className="flex flex-col space-y-4 py-6 bg-white dark:bg-slate-800">
         {/* Settings */}
         <div 
           className={cn(
