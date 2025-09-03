@@ -5,9 +5,9 @@ import { registerRoutes } from "./routes";
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
 import { AutoSyncService } from "./auto-sync-service";
-// Temporarily disabled for MVP
-// import MetricsWorker from "./workers/metricsWorker";
-// import RealtimeService from "./services/realtime";
+// Re-enabling for comprehensive testing
+import MetricsWorker from "./workers/metricsWorker";
+import RealtimeService from "./services/realtime";
 import Logger from "./utils/logger";
 import metricsRoutes from "./routes/metrics";
 import webhooksRoutes from "./routes/webhooks";
@@ -383,8 +383,20 @@ app.use((req, res, next) => {
   });
 
   // Temporarily disabled for MVP
-  // RealtimeService.initialize(httpServer);
-  // MetricsWorker.start();
+  // Enable MetricsWorker and RealtimeService for comprehensive testing
+  try {
+    RealtimeService.initialize(httpServer);
+    console.log('✅ RealtimeService initialized for workspace metrics updates');
+  } catch (error) {
+    console.error('⚠️ RealtimeService failed to initialize:', error);
+  }
+
+  try {
+    await MetricsWorker.start();
+    console.log('✅ MetricsWorker started for background metric fetching');
+  } catch (error) {
+    console.error('⚠️ MetricsWorker failed to start (Redis may not be available):', error);
+  }
   
   const wss = new WebSocketServer({ server: httpServer });
   
