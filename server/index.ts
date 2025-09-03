@@ -5,6 +5,12 @@ import { registerRoutes } from "./routes";
 import { MongoStorage } from "./mongodb-storage";
 import { startSchedulerService } from "./scheduler-service";
 import { AutoSyncService } from "./auto-sync-service";
+// Temporarily disabled for MVP
+// import MetricsWorker from "./workers/metricsWorker";
+// import RealtimeService from "./services/realtime";
+import Logger from "./utils/logger";
+import metricsRoutes from "./routes/metrics";
+import webhooksRoutes from "./routes/webhooks";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -357,12 +363,29 @@ app.use((req, res, next) => {
   // autoSyncService.start();
   
   const server = await registerRoutes(app, storage as any, upload);
+  
+  // Register metrics and webhook routes
+  app.use('/api', metricsRoutes);
+  app.use('/api/webhooks', webhooksRoutes);
 
   // Set up WebSocket server for real-time chat streaming
   const { createServer } = await import('http');
   const { WebSocketServer } = await import('ws');
   
   const httpServer = createServer(app);
+  
+  // Initialize logger for metrics system
+  Logger.configure({
+    logLevel: process.env.NODE_ENV === 'production' ? 1 : 3, // WARN in prod, DEBUG in dev
+    enableConsole: true,
+    enableFile: true,
+    includeWorkspaceInLogs: true,
+  });
+
+  // Temporarily disabled for MVP
+  // RealtimeService.initialize(httpServer);
+  // MetricsWorker.start();
+  
   const wss = new WebSocketServer({ server: httpServer });
   
   // Store WebSocket connections by conversation ID
@@ -591,8 +614,24 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = 5000;
   
+  // Graceful shutdown handling (temporarily disabled for MVP)
+  // process.on('SIGTERM', async () => {
+  //   console.log('🛑 Received SIGTERM, shutting down gracefully...');
+  //   await MetricsWorker.stop();
+  //   RealtimeService.shutdown();
+  //   process.exit(0);
+  // });
+
+  // process.on('SIGINT', async () => {
+  //   console.log('🛑 Received SIGINT, shutting down gracefully...');
+  //   await MetricsWorker.stop();
+  //   RealtimeService.shutdown();
+  //   process.exit(0);
+  // });
+
   // Use HTTP server with WebSocket support instead of Express server directly
   httpServer.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port} with WebSocket support`);
+    Logger.info('Server', `Instagram metrics system initialized and ready`);
   });
 })();
