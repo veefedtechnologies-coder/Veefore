@@ -36,6 +36,7 @@ import subscriptionRoutes from './routes/subscription';
 import { registerAdminRoutes } from './admin-routes';
 import videoRoutes, { setupVideoWebSocket } from './video-routes';
 import authRoutes from './auth-routes';
+import authCookiesRouter from './routes/auth-cookies';
 import { validateWorkspace, validateWorkspaceFromParams, validateWorkspaceFromQuery } from './middleware/workspace-validation';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
@@ -14683,6 +14684,9 @@ Create a detailed growth strategy in JSON format:
 
   // Authentication routes
   app.use('/api/auth', authRoutes);
+  
+  // P1 SECURITY: HTTP-only cookie authentication routes
+  app.use('/api/auth-cookies', authCookiesRouter);
 
   // ====== NEW AUTOMATION API ENDPOINTS ======
   

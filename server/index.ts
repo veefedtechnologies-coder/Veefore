@@ -34,25 +34,36 @@ let setupVite: any = null;
 let serveStatic: any = null;
 
 const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 const app = express();
 
-// Secure CSP configuration for both development and production
 app.use(helmet({
+  // P1-2: HTTP Strict Transport Security (HSTS) - Production only
+  strictTransportSecurity: isProduction ? {
+    maxAge: 63072000, // 2 years (required for HSTS preload list)
+    includeSubDomains: true,
+    preload: true
+  } : false, // Disable for localhost development
+
+  // P1-2: Enhanced Content Security Policy
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
+      
+      // P1-2: Strict script execution policy
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'",
-        // Allow specific trusted domains instead of unsafe-eval
+        // SECURITY IMPROVEMENT: Remove unsafe-inline in favor of nonce/hash
+        ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
+        // Allow specific trusted domains for Firebase/Google services
         "https://fonts.googleapis.com",
-        "https://www.google.com",
+        "https://www.google.com", 
         "https://www.gstatic.com",
         "https://apis.google.com",
         "https://identitytoolkit.googleapis.com",
         "https://securetoken.googleapis.com",
-        // Allow blob: for dynamic imports but not eval
+        // Allow blob: for dynamic imports
         "blob:"
       ],
       styleSrc: [
@@ -141,18 +152,80 @@ app.use(helmet({
         "https://*.firebaseapp.com",
         "https://*.googleapis.com"
       ],
+      
+      // P1-2: Enhanced security directives
       objectSrc: ["'none'"],
-      // Add worker-src to allow service workers and web workers
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"], // Prevent framing (clickjacking protection)
+      
+      // Worker and manifest support
       workerSrc: ["'self'", "blob:"],
-      // Add manifest-src for PWA support
       manifestSrc: ["'self'"],
-      // Upgrade insecure requests in production only
+      
+      // Production-only security enhancements
       ...(isProduction ? { upgradeInsecureRequests: [] } : {})
-    }
+    },
+    // P1-2: CSP violation reporting (development only)
+    reportOnly: isDevelopment
   },
+
+  // P1-2: Enhanced frame protection
+  frameguard: { action: 'deny' }, // More restrictive than default 'sameorigin'
+  
+  // P1-2: Enhanced cross-origin policies
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  crossOriginEmbedderPolicy: { policy: "credentialless" }, // Less restrictive than require-corp
+  
+  // P1-2: Additional security headers
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  
+  // P1-2: Permissions Policy (replaces Feature-Policy)
+  permissionsPolicy: {
+    camera: [],
+    microphone: [],
+    geolocation: ["'self'"],
+    payment: [],
+    usb: [],
+    magnetometer: [],
+    gyroscope: [],
+    accelerometer: [],
+    "picture-in-picture": ["'self'"],
+    "fullscreen": ["'self'"]
+  },
+  
+  // P1-2: DNS prefetch control
+  dnsPrefetchControl: { allow: false },
+  
+  // P1-2: Content type options
+  noSniff: true,
+  
+  // P1-2: Download options (IE8+ security)
+  ieNoOpen: true,
+  
+  // P1-2: Disable X-XSS-Protection (deprecated, CSP is better)
+  xssFilter: false
 }));
+
+// P1 SECURITY: Secure cookie parser for HTTP-only authentication cookies
+app.use((req: any, res, next) => {
+  req.cookies = {};
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    cookieHeader.split(';').forEach((cookie: string) => {
+      const trimmed = cookie.trim();
+      const equalIndex = trimmed.indexOf('=');
+      if (equalIndex > 0) {
+        // SECURITY FIX: Handle values containing '=' correctly
+        const name = trimmed.substring(0, equalIndex);
+        const value = trimmed.substring(equalIndex + 1);
+        req.cookies[name] = decodeURIComponent(value);
+      }
+    });
+  }
+  next();
+});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
