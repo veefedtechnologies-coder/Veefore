@@ -107,6 +107,20 @@ initializeGDPRCompliance();
 
 const app = express();
 
+// P4 SECURITY: Initialize Reliability & Observability System
+import { 
+  initializeReliabilitySystem, 
+  applyMonitoringMiddleware,
+  applyErrorTrackingMiddleware,
+  createMonitoringEndpoints,
+  recordStartupMetrics,
+  setupGracefulShutdown
+} from './monitoring';
+initializeReliabilitySystem(app);
+
+// P4 MONITORING: Apply monitoring middleware early
+applyMonitoringMiddleware(app);
+
 // P1-3 SECURITY: Trust proxy for correct req.ip behind load balancers
 app.set('trust proxy', 1);
 
