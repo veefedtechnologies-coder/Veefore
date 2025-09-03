@@ -208,7 +208,7 @@ export class MetricsWorker {
 
       // Trigger immediate metrics refresh for the affected account
       const tokenInfo = await TokenManager.getWorkspaceToken(workspaceId);
-      if (tokenInfo) {
+      if (tokenInfo && metricsQueue) {
         await metricsQueue.add('fetch-metrics' as any, {
           workspaceId,
           userId: tokenInfo.userId,

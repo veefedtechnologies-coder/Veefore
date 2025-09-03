@@ -36,6 +36,7 @@ import subscriptionRoutes from './routes/subscription';
 import { registerAdminRoutes } from './admin-routes';
 import videoRoutes, { setupVideoWebSocket } from './video-routes';
 import authRoutes from './auth-routes';
+import { validateWorkspace, validateWorkspaceFromParams, validateWorkspaceFromQuery } from './middleware/workspace-validation';
 
 export async function registerRoutes(app: Express, storage: IStorage, upload?: any): Promise<Server> {
   // Configure multer for file uploads
@@ -1888,40 +1889,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
 
 
-  app.get('/api/dashboard/analytics', requireAuth, async (req: any, res: Response) => {
+  app.get('/api/dashboard/analytics', requireAuth, validateWorkspaceFromQuery(), async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const workspaceId = req.query.workspaceId;
+      const workspaceId = req.workspaceId; // Now validated by middleware
+      const workspace = req.workspace; // Now validated by middleware
       
       console.log('[DASHBOARD MULTI-PLATFORM] Aggregating analytics from ALL connected social platforms');
       console.log('[DASHBOARD MULTI-PLATFORM] User:', user.id, 'WorkspaceId:', workspaceId);
-
-      // Verify workspace access with enhanced validation
-      let workspace;
-      if (workspaceId) {
-        workspace = await storage.getWorkspace(workspaceId);
-        if (!workspace) {
-          return res.status(404).json({ error: 'Workspace not found' });
-        }
-        
-        // Check if user owns this workspace - handle multiple ID formats for compatibility
-        const workspaceUserId = workspace.userId.toString();
-        const requestUserId = user.id.toString();
-        const firebaseUid = user.firebaseUid;
-        
-        const userOwnsWorkspace = workspaceUserId === requestUserId || 
-                                 workspaceUserId === firebaseUid ||
-                                 workspace.userId === user.id ||
-                                 workspace.userId === user.firebaseUid;
-        
-        if (!userOwnsWorkspace) {
-          console.log('[DASHBOARD ANALYTICS] Access denied - user does not own workspace:', workspaceId);
-          return res.status(403).json({ error: 'Access denied to workspace' });
-        }
-      } else {
-        const workspaces = await storage.getWorkspacesByUserId(user.id);
-        workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
-      }
+      console.log('✅ SECURITY: Workspace access validated by middleware');
       
       if (!workspace) {
         return res.json({ totalPosts: 0, totalReach: 0, engagementRate: 0, topPlatform: 'none' });
@@ -2498,40 +2474,15 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // HISTORICAL ANALYTICS ENDPOINT - Fetch real historical data for trend analysis
-  app.get('/api/analytics/historical', requireAuth, async (req: any, res: Response) => {
+  app.get('/api/analytics/historical', requireAuth, validateWorkspaceFromQuery(), async (req: any, res: Response) => {
     try {
       const { user } = req;
-      const { period = 'month', days = 30, workspaceId } = req.query;
+      const { period = 'month', days = 30 } = req.query;
+      const workspaceId = req.workspaceId; // Now validated by middleware
+      const workspace = req.workspace; // Now validated by middleware
       
       console.log(`[HISTORICAL ANALYTICS] Fetching ${days} days of historical data for user: ${user.id}`);
-      
-      // Get workspace with proper validation
-      let workspace;
-      if (workspaceId) {
-        workspace = await storage.getWorkspace(workspaceId);
-        if (!workspace) {
-          return res.status(404).json({ error: 'Workspace not found' });
-        }
-        
-        // Check if user owns this workspace - handle multiple ID formats for compatibility
-        const workspaceUserId = workspace.userId.toString();
-        const requestUserId = user.id.toString();
-        const firebaseUid = user.firebaseUid;
-        
-        const userOwnsWorkspace = workspaceUserId === requestUserId || 
-                                 workspaceUserId === firebaseUid ||
-                                 workspace.userId === user.id ||
-                                 workspace.userId === user.firebaseUid;
-        
-        if (!userOwnsWorkspace) {
-          console.log('[HISTORICAL ANALYTICS] Access denied - user does not own workspace:', workspaceId);
-          return res.status(403).json({ error: 'Access denied to workspace' });
-        }
-      } else {
-        // Get user's default workspace
-        const workspaces = await storage.getWorkspacesByUserId(user.id);
-        workspace = workspaces.find((w: any) => w.isDefault) || workspaces[0];
-      }
+      console.log('✅ SECURITY: Workspace access validated by middleware');
       
       if (!workspace) {
         return res.json([]);

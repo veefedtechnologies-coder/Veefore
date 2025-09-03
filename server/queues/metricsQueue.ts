@@ -8,29 +8,56 @@ let redisAvailable = false;
 // Initialize Redis connection with graceful fallback
 function initializeRedisConnection(): IORedis | null {
   try {
-    // Support both Redis URL and individual connection parameters
-    const redisConfig = process.env.REDIS_URL ? 
-      process.env.REDIS_URL : 
-      {
+    console.log('🔧 Initializing Redis connection...');
+    console.log('🔍 REDIS_URL available:', !!process.env.REDIS_URL);
+    
+    let connection: IORedis;
+    
+    if (process.env.REDIS_URL) {
+      console.log('🌐 Using Upstash Redis URL configuration');
+      
+      // Configuration for Upstash Redis with BullMQ compatibility
+      const redisConfig = {
+        maxRetriesPerRequest: null, // Required for BullMQ
+        connectTimeout: 10000, // Increased for cloud Redis reliability
+        commandTimeout: 15000, // Increased for cloud Redis reliability
+        lazyConnect: false, // Connect immediately
+        retryDelayOnFailover: 2000,
+        enableOfflineQueue: true, // Enable for better background job reliability
+        // TLS configuration for Upstash Redis - secure by default
+        tls: {
+          // Use default certificate validation for production security
+          // Upstash Redis supports standard CA trust chains
+        },
+      };
+      
+      // Create connection with URL and configuration
+      connection = new IORedis(process.env.REDIS_URL, redisConfig);
+      console.log('✅ Redis connection created with Upstash URL');
+    } else {
+      console.log('🏠 Using localhost Redis configuration');
+      
+      // Traditional connection parameters for local Redis
+      const redisConfig = {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
         tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
         maxRetriesPerRequest: null, // Required for BullMQ
-        connectTimeout: 5000,
-        commandTimeout: 3000,
-        lazyConnect: true,
+        connectTimeout: 10000, // Increased timeout for reliability
+        commandTimeout: 15000, // Increased timeout for reliability
+        lazyConnect: false,
         retryDelayOnFailover: 2000,
-        enableOfflineQueue: false,
+        enableOfflineQueue: true, // Enable for better reliability
       };
-
-    const connection = new IORedis(redisConfig);
+      
+      connection = new IORedis(redisConfig);
+      console.log('✅ Redis connection created with localhost config');
+    }
 
     // Redis connection event handlers for status monitoring
     connection.on('connect', () => {
-      const host = process.env.REDIS_HOST || 'localhost';
-      const port = process.env.REDIS_PORT || '6379';
-      console.log(`🔌 Redis: Attempting connection to ${host}:${port}...`);
+      console.log('🔌 Redis: Attempting connection...');
     });
 
     connection.on('ready', () => {
@@ -64,8 +91,39 @@ function initializeRedisConnection(): IORedis | null {
 // Initialize Redis connection
 redisConnection = initializeRedisConnection();
 
-// Queue configuration with rate limiting
-const queueOptions: QueueOptions = {
+// Create connection configuration for BullMQ
+function getRedisConnectionConfig() {
+  if (process.env.REDIS_URL) {
+    return {
+      host: 'placeholder', // BullMQ will use the URL
+      maxRetriesPerRequest: null,
+      connectTimeout: 5000,
+      commandTimeout: 3000,
+      lazyConnect: true,
+      retryDelayOnFailover: 2000,
+      enableOfflineQueue: false,
+      tls: {
+        rejectUnauthorized: false,
+      },
+    };
+  }
+  
+  return {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    password: process.env.REDIS_PASSWORD,
+    tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
+    maxRetriesPerRequest: null,
+    connectTimeout: 5000,
+    commandTimeout: 3000,
+    lazyConnect: true,
+    retryDelayOnFailover: 2000,
+    enableOfflineQueue: false,
+  };
+}
+
+// Queue configuration with rate limiting  
+const queueOptions: QueueOptions = redisConnection ? {
   connection: redisConnection,
   defaultJobOptions: {
     removeOnComplete: 100, // Keep last 100 completed jobs
@@ -76,7 +134,7 @@ const queueOptions: QueueOptions = {
       delay: 2000,
     },
   },
-};
+} : {};
 
 // Job data interfaces
 export interface FetchMetricsJobData {
