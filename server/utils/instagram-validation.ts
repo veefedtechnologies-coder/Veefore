@@ -16,14 +16,17 @@ export async function checkInstagramAccountExists(instagramAccountId: string): P
     const storage = new MongoStorage();
     await storage.connect();
     
-    const users = await storage.getAllUsers();
-    const existingUser = users.find(u => u.instagramAccountId === instagramAccountId);
+    // Check SocialAccounts collection (the actual source of truth)
+    const socialAccounts = await storage.getAllSocialAccounts();
+    const existingAccount = socialAccounts.find(acc => 
+      acc.platform === 'instagram' && acc.accountId === instagramAccountId
+    );
     
-    if (existingUser) {
+    if (existingAccount) {
       return {
         exists: true,
-        user: existingUser,
-        workspaceId: existingUser.workspaceId
+        user: existingAccount,
+        workspaceId: existingAccount.workspaceId
       };
     }
     
@@ -174,7 +177,10 @@ export async function cleanupDuplicateInstagramAccounts(currentUserWorkspaceId?:
 /**
  * Validate Instagram connection attempt and return appropriate error message
  */
-export function validateInstagramConnection(existingConnection: any): {
+export function validateInstagramConnection(
+  existingConnection: any, 
+  targetWorkspaceId?: string
+): {
   isValid: boolean;
   errorMessage?: string;
   errorCode?: string;
@@ -183,8 +189,14 @@ export function validateInstagramConnection(existingConnection: any): {
     return { isValid: true };
   }
   
+  // Allow reconnection to the same workspace
+  if (targetWorkspaceId && existingConnection.workspaceId === targetWorkspaceId) {
+    return { isValid: true };
+  }
+  
   const existingUser = existingConnection.user;
-  const errorMessage = `This Instagram account (@${existingUser.instagramUsername}) is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.`;
+  const username = existingUser.username || existingUser.instagramUsername || 'Unknown';
+  const errorMessage = `This Instagram account (@${username}) is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.`;
   
   return {
     isValid: false,

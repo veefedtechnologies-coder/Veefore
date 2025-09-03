@@ -14508,7 +14508,7 @@ Create a detailed growth strategy in JSON format:
             profilePictureUrl: profilePictureUrl,
             profilePicture: profilePictureUrl,
             accessToken: account.accessToken ? 'present' : null,
-            workspaceId: workspaceId
+            workspaceId: account.workspaceId
           };
           
           console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
@@ -14582,7 +14582,7 @@ Create a detailed growth strategy in JSON format:
               profilePictureUrl: profilePictureUrl,
               profilePicture: profilePictureUrl,
               accessToken: account.accessToken ? 'present' : null,
-              workspaceId: workspace.id
+              workspaceId: account.workspaceId
             };
             
             console.log(`[SOCIAL ACCOUNTS FINAL] Transformed ${account.username}:`, {
