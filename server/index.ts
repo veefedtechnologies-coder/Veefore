@@ -212,20 +212,13 @@ app.use((req: any, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', '*');
   
-  // CRITICAL: Set comprehensive Permissions-Policy to eliminate ALL deprecated feature warnings
-  // This prevents browser from showing warnings about deprecated policy features
+  // CRITICAL: Set ONLY valid Permissions-Policy features to eliminate warnings
+  // Remove deprecated/invalid features that cause "Unrecognized feature" warnings
   res.setHeader('Permissions-Policy', 
     'camera=(), microphone=(), geolocation=(), fullscreen=(), payment=(), ' +
-    'accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), ' +
-    'display-capture=(), document-domain=(), encrypted-media=(), ' +
-    'execution-while-not-rendered=(), execution-while-out-of-viewport=(), ' +
-    'gyroscope=(), magnetometer=(), midi=(), navigation-override=(), ' +
-    'picture-in-picture=(), publickey-credentials=(), screen-wake-lock=(), ' +
-    'sync-xhr=(), usb=(), vr=(), wake-lock=(), xr-spatial-tracking=()');
-  
-  // Additional step: Also set Feature-Policy for older browsers
-  res.setHeader('Feature-Policy', 
-    'camera \'none\'; microphone \'none\'; geolocation \'none\'; fullscreen \'none\'');
+    'accelerometer=(), autoplay=(), display-capture=(), encrypted-media=(), ' +
+    'gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), ' +
+    'screen-wake-lock=(), sync-xhr=(), usb=(), xr-spatial-tracking=()');
   
   // Support for Replit ?embed=true parameter
   if (req.query.embed === 'true') {

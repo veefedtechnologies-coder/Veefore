@@ -149,6 +149,27 @@
         min-height: 100vh;
       }
     </style>
+    
+    <!-- CRITICAL: Early GraphQL warning suppression (must run before any external libraries) -->
+    <script>
+    (function() {
+      if (typeof window !== 'undefined' && typeof console !== 'undefined') {
+        const originalConsoleWarn = console.warn;
+        console.warn = function(...args) {
+          const message = args.join(' ');
+          if ((message.includes('fragment with name') && message.includes('already exists')) ||
+              (message.includes('graphql-tag') && message.includes('unique')) ||
+              ((message.includes('JamAuthor') || message.includes('Reaction') || 
+                message.includes('Comment') || message.includes('BaseJam') || 
+                message.includes('RecordingLink') || message.includes('User')) &&
+               message.includes('fragment'))) {
+            return; // Suppress GraphQL fragment warnings
+          }
+          originalConsoleWarn.apply(console, args);
+        };
+      }
+    })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -232,7 +253,7 @@
     }
     </script>
     
-    <!-- Cache busting v2: Permissions policy fix applied -->
-    <script type="module" src="/src/main.tsx?v=permissions-fix-2025"></script>
+    <!-- Cache busting v3: Permissions + GraphQL warnings fix applied -->
+    <script type="module" src="/src/main.tsx?v=permissions-graphql-fix-2025"></script>
   </body>
 </html>
