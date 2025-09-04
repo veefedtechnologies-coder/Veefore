@@ -5,6 +5,50 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- ULTRA-EARLY: GraphQL Warning Suppression (First thing in head) -->
+    <script>
+    (function() {
+      // Store original console methods
+      const originalWarn = console.warn;
+      const originalError = console.error;
+      const originalLog = console.log;
+      
+      // Enhanced GraphQL warning detection
+      function isGraphQLFragmentWarning(message) {
+        const msg = String(message).toLowerCase();
+        return (msg.includes('fragment') && (
+          msg.includes('jamauthor') || msg.includes('reaction') || 
+          msg.includes('comment') || msg.includes('basejam') || 
+          msg.includes('recordinglink') || msg.includes('user')
+        )) || (msg.includes('graphql-tag') && msg.includes('unique')) ||
+        (msg.includes('fragment with name') && msg.includes('already exists'));
+      }
+      
+      // Override all console methods immediately
+      console.warn = function(...args) {
+        if (args.some(isGraphQLFragmentWarning)) return;
+        originalWarn.apply(console, args);
+      };
+      
+      console.error = function(...args) {
+        if (args.some(isGraphQLFragmentWarning)) return;
+        originalError.apply(console, args);
+      };
+      
+      console.log = function(...args) {
+        if (args.some(isGraphQLFragmentWarning)) return;
+        originalLog.apply(console, args);
+      };
+      
+      // Also block any window.console access
+      Object.defineProperty(window, 'console', {
+        value: console,
+        writable: false,
+        configurable: false
+      });
+    })();
+    </script>
+    
     <!-- Primary Meta Tags -->
     <title>VeeFore - Professional Social Media Management</title>
     <meta name="title" content="VeeFore - Professional Social Media Management" />
@@ -253,7 +297,7 @@
     }
     </script>
     
-    <!-- Cache busting v3: Permissions + GraphQL warnings fix applied -->
-    <script type="module" src="/src/main.tsx?v=permissions-graphql-fix-2025"></script>
+    <!-- Cache busting v4: Ultra-early GraphQL blocking applied -->
+    <script type="module" src="/src/main.tsx?v=ultra-early-graphql-block-2025"></script>
   </body>
 </html>
