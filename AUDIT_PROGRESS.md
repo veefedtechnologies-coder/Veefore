@@ -223,6 +223,7 @@
 **Goal:** Remove non-production code
 
 - [ ] **11.1** Delete leftover test/demo files
+- [ ] **11.2** Delete Duplicate files for exaample we have many automation file but we use AutomationStepByStep so delete and remove unused files just like automation we have many duplicate_unused files please fix it
 - [ ] **11.2** Verify production build exclusions
 - [ ] **11.3** Scan for unused assets/components
 
