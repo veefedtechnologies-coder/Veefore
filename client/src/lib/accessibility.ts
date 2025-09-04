@@ -361,7 +361,7 @@ export class AccessibilityManager {
   /**
    * P6-2.9: Keyboard navigation handlers
    */
-  private handleTabNavigation(e: KeyboardEvent): void {
+  private handleTabNavigation(_e: KeyboardEvent): void {
     // Custom tab navigation logic can be added here
     // For now, using browser default
   }
