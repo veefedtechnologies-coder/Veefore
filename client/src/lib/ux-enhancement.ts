@@ -159,7 +159,8 @@ export class UXManager {
             clsValue += (entry as any).value;
           }
         }
-        if (clsValue > 0.1) { // Poor CLS
+        // Only warn for significant layout shifts in production
+        if (clsValue > 0.25 && process.env.NODE_ENV === 'production') {
           console.warn('High layout shift detected:', clsValue);
         }
       }).observe({ entryTypes: ['layout-shift'] });

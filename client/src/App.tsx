@@ -39,12 +39,11 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import Settings from './pages/Settings'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
-import { getRedirectResult, auth } from './lib/firebase'
 import { initializeTheme } from './lib/theme'
 // P6: Frontend SEO, Accessibility & UX System
 import { initializeP6System, P6Provider, ToastContainer } from './lib/p6-integration'
 // P7: Accessibility System
-import { initializeAccessibility, SkipLinks, useRouteAnnouncements } from './lib/accessibility'
+import { initializeAccessibility, useRouteAnnouncements } from './lib/accessibility'
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)

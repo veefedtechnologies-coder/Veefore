@@ -733,25 +733,23 @@ app.use((req, res, next) => {
     });
   });
 
-  // CRITICAL FIX: Add proper MIME type handling for static assets BEFORE Vite
-  // This prevents CSS and JS files from being served as text/html
-  app.use((req, res, next) => {
-    // Set proper MIME types for static assets
-    if (req.path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    } else if (req.path.endsWith('.js') || req.path.endsWith('.tsx') || req.path.endsWith('.ts')) {
-      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    } else if (req.path.endsWith('.json')) {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    } else if (req.path.endsWith('.png')) {
-      res.setHeader('Content-Type', 'image/png');
-    } else if (req.path.endsWith('.jpg') || req.path.endsWith('.jpeg')) {
-      res.setHeader('Content-Type', 'image/jpeg');
-    } else if (req.path.endsWith('.svg')) {
-      res.setHeader('Content-Type', 'image/svg+xml');
+  // CRITICAL FIX: Let Vite handle ALL /src requests - no static file interference
+  // Remove static serving that interferes with Vite's module resolution
+  
+  // Serve client public directory
+  app.use(express.static(path.join(process.cwd(), 'client/public'), {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.png')) {
+        res.setHeader('Content-Type', 'image/png');
+      } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+        res.setHeader('Content-Type', 'image/jpeg');
+      } else if (filePath.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      }
     }
-    next();
-  });
+  }));
 
   // Setup Vite in development and static serving in production
   if (app.get("env") === "development" || !isProduction) {
