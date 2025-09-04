@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { Button } from '@/components/ui/button'
 import { 
   Mic,

@@ -300,6 +300,21 @@ export const seoConfig = {
     title: 'Settings - VeeFore',
     description: 'Customize your VeeFore experience with theme, notification, and privacy settings. Personalize your social media management workflow.',
     keywords: ['settings', 'preferences', 'configuration', 'customization']
+  },
+  videoGenerator: {
+    title: 'AI Video Generator - VeeFore',
+    description: 'Create professional videos with AI assistance. Generate scripts, scenes, and complete video content for your social media campaigns.',
+    keywords: ['AI video generation', 'video creator', 'social media videos', 'automated video production']
+  },
+  veeGPT: {
+    title: 'VeeGPT AI Assistant - VeeFore',
+    description: 'Chat with VeeGPT, your AI-powered social media assistant. Get content ideas, strategy advice, and automation help.',
+    keywords: ['AI assistant', 'social media AI', 'content creation AI', 'VeeGPT']
+  },
+  automation: {
+    title: 'Social Media Automation - VeeFore',
+    description: 'Set up intelligent automation for your social media accounts. Auto-reply, schedule posts, and engage with your audience automatically.',
+    keywords: ['social media automation', 'auto-reply', 'scheduled posting', 'automated engagement']
   }
 };
 

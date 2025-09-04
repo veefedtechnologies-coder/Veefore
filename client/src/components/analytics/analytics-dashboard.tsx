@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
-import { TrendingUp, Users, Eye, Heart, MessageCircle, Share, ArrowUpRight } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
+import { TrendingUp, Users, Eye, Heart, Share, ArrowUpRight } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const performanceData = [
   { date: 'Sep 24', score: 50 },

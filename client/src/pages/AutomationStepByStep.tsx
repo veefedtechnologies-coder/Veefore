@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { 
   Instagram, 
   Bot, 
