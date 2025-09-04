@@ -11,6 +11,10 @@ import RealtimeService from "./services/realtime";
 import Logger from "./utils/logger";
 import metricsRoutes from "./routes/metrics";
 import webhooksRoutes from "./routes/webhooks";
+import testingRoutes from "./routes/testing";
+import cicdRoutes from "./routes/cicd";
+import productionRoutes from "./routes/production";
+import auditRoutes from "./routes/audit";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -497,6 +501,10 @@ app.use((req, res, next) => {
   
   // P8 SECURITY: Register advanced security and threat intelligence routes
   app.use('/api/security', securityRoutes);
+  app.use('/api/testing', testingRoutes);
+  app.use('/api/cicd', cicdRoutes);
+  app.use('/api/production', productionRoutes);
+  app.use('/api/audit', auditRoutes);
   
   // P9 INFRASTRUCTURE: Enterprise health check endpoints
   app.use('/health', healthRoutes);

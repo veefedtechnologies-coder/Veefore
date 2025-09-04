@@ -47,6 +47,11 @@ import { initializeP6System, P6Provider, ToastContainer } from './lib/p6-integra
 import { initializeAccessibility, useRouteAnnouncements } from './lib/accessibility'
 // P11: Mobile & Cross-Platform Excellence
 import { initializeMobileExcellence } from './lib/mobile-excellence'
+// P7: SEO, Core Web Vitals & Accessibility Excellence
+import { initializeSEO } from './lib/seo-optimization';
+import { initializeCoreWebVitals } from './lib/core-web-vitals';
+import { initializeAccessibilityCompliance } from './lib/accessibility-compliance';
+import { initializeComponentModernization } from './lib/component-modernization';
 
 function App() {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -70,6 +75,18 @@ function App() {
     initializeAccessibility()
     // P11: Initialize mobile excellence system
     initializeMobileExcellence()
+    
+    // P7: Initialize SEO optimization system
+    initializeSEO()
+    
+    // P7.4: Initialize Core Web Vitals monitoring
+    initializeCoreWebVitals()
+    
+    // P7.5: Initialize accessibility compliance
+    initializeAccessibilityCompliance()
+    
+    // P7.7: Initialize component modernization
+    initializeComponentModernization()
     initializeP6System({
       seo: {
         defaultTitle: 'VeeFore - AI-Powered Social Media Management',
