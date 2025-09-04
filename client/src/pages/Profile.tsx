@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { Camera, Mail, User, Calendar, CreditCard, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

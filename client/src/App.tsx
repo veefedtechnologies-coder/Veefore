@@ -44,13 +44,12 @@ import { initializeTheme } from './lib/theme'
 // P6: Frontend SEO, Accessibility & UX System
 import { initializeP6System, P6Provider, ToastContainer } from './lib/p6-integration'
 // P7: Accessibility System
-import { initializeAccessibility, useRouteAnnouncements } from './lib/accessibility'
+import { initializeAccessibilityCompliance, useAccessibilityRouteAnnouncements } from './lib/accessibility-compliance'
 // P11: Mobile & Cross-Platform Excellence
 import { initializeMobileExcellence } from './lib/mobile-excellence'
 // P7: SEO, Core Web Vitals & Accessibility Excellence
 import { initializeSEO } from './lib/seo-optimization';
 import { initializeCoreWebVitals } from './lib/core-web-vitals';
-import { initializeAccessibilityCompliance } from './lib/accessibility-compliance';
 import { initializeComponentModernization } from './lib/component-modernization';
 
 function App() {
@@ -61,7 +60,7 @@ function App() {
   const [location, setLocation] = useLocation()
 
   // P7: Route announcements for accessibility
-  useRouteAnnouncements()
+  useAccessibilityRouteAnnouncements(location)
 
   // Initialize theme system
   useEffect(() => {
@@ -72,7 +71,7 @@ function App() {
   // P7: Initialize Accessibility System
   // P11: Initialize Mobile & Cross-Platform Excellence
   useEffect(() => {
-    initializeAccessibility()
+    initializeAccessibilityCompliance()
     // P11: Initialize mobile excellence system
     initializeMobileExcellence()
     

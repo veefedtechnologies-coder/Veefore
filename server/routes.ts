@@ -6,7 +6,6 @@ import fs from 'fs';
 import { getAuthenticHashtags } from "./authentic-hashtags";
 import { IStorage } from "./storage";
 import { MongoStorage } from "./mongodb-storage";
-import { InstagramSyncService } from "./instagram-sync";
 import { InstagramOAuthService } from "./instagram-oauth";
 import { InstagramDirectSync } from "./instagram-direct-sync";
 import { InstagramTokenRefresh } from "./instagram-token-refresh";
@@ -97,7 +96,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
     }
   });
-  const instagramSync = new InstagramSyncService(storage);
+  const instagramSync = new InstagramDirectSync(storage);
   const instagramOAuth = new InstagramOAuthService(storage);
   const instagramDirectSync = new InstagramDirectSync(storage);
   const smartPolling = new InstagramSmartPolling(storage);
@@ -3784,7 +3783,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       try {
         // Import the Instagram sync service for immediate data fetch
         const { InstagramSyncService } = await import('./instagram-sync-service');
-        const instagramSync = new InstagramSyncService(storage);
+        const instagramSync = new InstagramDirectSync(storage);
         
         // Sync the specific workspace where the account was added
         await instagramSync.syncInstagramAccountsForWorkspace(workspaceId.toString());
@@ -7449,7 +7448,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       // Import and use the Instagram sync service
       const { InstagramSyncService } = await import('./instagram-sync-service');
-      const instagramSync = new InstagramSyncService(storage);
+      const instagramSync = new InstagramDirectSync(storage);
       
       // Perform immediate sync
       const result = await instagramSync.syncInstagramAccountsForWorkspace(workspaceId);
