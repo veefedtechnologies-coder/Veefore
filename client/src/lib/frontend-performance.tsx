@@ -431,7 +431,7 @@ export class FrontendPerformanceOptimizer {
 
     // Preload critical images that are above the fold
     const criticalImages = [
-      '/favicon.ico'
+      // Favicon removed - browser handles it automatically, preloading causes warnings
     ];
 
     criticalImages.forEach(href => {
