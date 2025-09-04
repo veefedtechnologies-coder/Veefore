@@ -186,8 +186,8 @@ app.use(helmet({
   // P1-2: Additional security headers
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   
-  // P1-2: Permissions Policy (handled separately via headers)
-  // permissionsPolicy removed due to helmet version compatibility
+  // P1-2: Permissions Policy - Explicitly disable deprecated features
+  // Set empty permissions policy to prevent browser default warnings
   
   // P1-2: DNS prefetch control
   dnsPrefetchControl: { allow: false },
@@ -202,7 +202,7 @@ app.use(helmet({
   xssFilter: false
 }));
 
-// IFRAME FIX: Official Replit iframe embedding support
+// IFRAME FIX: Official Replit iframe embedding support + Clean Permissions Policy
 app.use((req: any, res, next) => {
   // Remove X-Frame-Options to allow iframe embedding
   res.removeHeader('X-Frame-Options');
@@ -211,6 +211,21 @@ app.use((req: any, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', '*');
+  
+  // CRITICAL: Set comprehensive Permissions-Policy to eliminate ALL deprecated feature warnings
+  // This prevents browser from showing warnings about deprecated policy features
+  res.setHeader('Permissions-Policy', 
+    'camera=(), microphone=(), geolocation=(), fullscreen=(), payment=(), ' +
+    'accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), ' +
+    'display-capture=(), document-domain=(), encrypted-media=(), ' +
+    'execution-while-not-rendered=(), execution-while-out-of-viewport=(), ' +
+    'gyroscope=(), magnetometer=(), midi=(), navigation-override=(), ' +
+    'picture-in-picture=(), publickey-credentials=(), screen-wake-lock=(), ' +
+    'sync-xhr=(), usb=(), vr=(), wake-lock=(), xr-spatial-tracking=()');
+  
+  // Additional step: Also set Feature-Policy for older browsers
+  res.setHeader('Feature-Policy', 
+    'camera \'none\'; microphone \'none\'; geolocation \'none\'; fullscreen \'none\'');
   
   // Support for Replit ?embed=true parameter
   if (req.query.embed === 'true') {
