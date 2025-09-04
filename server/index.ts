@@ -48,6 +48,8 @@ import {
 } from "./middleware/security-monitoring";
 import { threatDetectionMiddleware } from "./middleware/threat-detection";
 import securityRoutes from "./routes/security";
+import healthRoutes from "./routes/health";
+import { initializeGracefulShutdown } from "./middleware/graceful-shutdown";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -496,6 +498,10 @@ app.use((req, res, next) => {
   // P8 SECURITY: Register advanced security and threat intelligence routes
   app.use('/api/security', securityRoutes);
   
+  // P9 INFRASTRUCTURE: Enterprise health check endpoints
+  app.use('/health', healthRoutes);
+  app.use('/', healthRoutes); // Also available at root for load balancers
+  
   // Additional webhook route to match Meta Console configuration
   app.use('/webhook', webhooksRoutes);
   
@@ -889,20 +895,8 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = 5000;
   
-  // Graceful shutdown handling (temporarily disabled for MVP)
-  // process.on('SIGTERM', async () => {
-  //   console.log('🛑 Received SIGTERM, shutting down gracefully...');
-  //   await MetricsWorker.stop();
-  //   RealtimeService.shutdown();
-  //   process.exit(0);
-  // });
-
-  // process.on('SIGINT', async () => {
-  //   console.log('🛑 Received SIGINT, shutting down gracefully...');
-  //   await MetricsWorker.stop();
-  //   RealtimeService.shutdown();
-  //   process.exit(0);
-  // });
+  // P9 INFRASTRUCTURE: Enterprise graceful shutdown system
+  let gracefulShutdownHandler: any = null;
 
   // Add error handling for HTTP server
   httpServer.on('error', (err) => {
@@ -918,6 +912,17 @@ app.use((req, res, next) => {
     log(`serving on port ${port} with WebSocket support`);
     log(`External URL: https://${process.env.REPL_SLUG || 'app'}.${process.env.REPL_OWNER || 'user'}.repl.co`);
     Logger.info('Server', `Instagram metrics system initialized and ready`);
+    
+    // P9 INFRASTRUCTURE: Initialize graceful shutdown after server starts
+    gracefulShutdownHandler = initializeGracefulShutdown(httpServer, {
+      timeout: 30000,
+      logger: (message: string) => {
+        console.log(message);
+        Logger.info('GracefulShutdown', message);
+      }
+    });
+    
+    console.log('🔄 P9: Graceful shutdown system initialized');
   });
 })().catch((error) => {
   console.error('❌ Server startup failed:', error);
