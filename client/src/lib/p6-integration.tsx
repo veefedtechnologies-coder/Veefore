@@ -5,8 +5,8 @@
  * UX enhancements, mobile optimization, and performance optimization
  */
 
-import { initializeSEO, SEOManager, useSEO, SEO } from './seo';
-import { initializeAccessibility, AccessibilityManager, useAccessibility, useFocusTrap, useAnnouncements } from './accessibility';
+import { initializeSEO, SEOManager, useSEO, SEO } from './seo-optimization';
+import { AccessibilityManager } from './accessibility-compliance';
 import { initializeUXEnhancements, UXManager, useUX, useLoading, useToasts, useAutoSave } from './ux-enhancement';
 import { initializeMobileOptimization, MobileOptimizer, useMobile, useGestures } from './mobile-optimization';
 import { initializeFrontendPerformance, FrontendPerformanceOptimizer, usePerformance, OptimizedImage } from './frontend-performance';
@@ -255,7 +255,7 @@ function setupGlobalEventListeners(): void {
   const checkRouteChange = () => {
     const currentPath = window.location.pathname;
     if (currentPath !== lastPath) {
-      const a11yManager = AccessibilityManager.getInstance();
+      // AccessibilityManager is static, no getInstance needed
       const pageName = getPageName(currentPath);
       a11yManager.announceRouteChange(pageName);
       lastPath = currentPath;
@@ -282,7 +282,7 @@ function setupGlobalEventListeners(): void {
 
   // Error boundary for unhandled errors
   window.addEventListener('error', (event) => {
-    const uxManager = UXManager.getInstance();
+    // UXManager is static, no getInstance needed
     uxManager.handleGlobalError(event.error, 'Global Error Handler');
   });
 
@@ -344,11 +344,11 @@ export const P6Provider: React.FC<P6ProviderProps> = ({ children, config }) => {
 
   useEffect(() => {
     // Update SEO for route changes
-    const seoManager = SEOManager.getInstance();
+    // SEOManager is static, no getInstance needed
     seoManager.updatePageSEO(location);
 
     // Announce route changes
-    const a11yManager = AccessibilityManager.getInstance();
+    // AccessibilityManager is static, no getInstance needed
     const pageName = getPageName(location);
     a11yManager.announceRouteChange(pageName);
   }, [location]);

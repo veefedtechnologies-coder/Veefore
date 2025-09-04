@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
-import { enhancedAriaHelpers, componentA11y, announceToScreenReader } from '@/lib/accessibility'
+import { AccessibilityManager } from '@/lib/accessibility-compliance'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,
   Building2, BarChart3, Calendar, MessageSquare, Bot, Award, Eye, Heart, 

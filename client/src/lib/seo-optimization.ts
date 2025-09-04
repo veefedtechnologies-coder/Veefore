@@ -290,6 +290,11 @@ export const seoConfig = {
     title: 'Analytics - VeeFore',
     description: 'Comprehensive social media analytics and insights. Track engagement, follower growth, and content performance across all platforms.',
     keywords: ['social media analytics', 'performance tracking', 'engagement metrics']
+  },
+  landing: {
+    title: 'VeeFore - AI-Powered Social Media Management',
+    description: 'Revolutionary social media management platform with AI-powered content creation, smart scheduling, and advanced analytics. Join thousands of creators growing their audience.',
+    keywords: ['social media management', 'AI content creation', 'social media automation']
   }
 };
 
@@ -327,5 +332,16 @@ export const generateStructuredData = {
     '@type': 'CreativeWork',
     'name': 'Content Creator',
     'description': 'AI-powered content creation tool'
+  }),
+  organization: () => ({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    'name': 'VeeFore',
+    'description': 'AI-powered social media management platform',
+    'url': 'https://veefore.com',
+    'logo': {
+      '@type': 'ImageObject',
+      'url': 'https://veefore.com/logo.png'
+    }
   })
 };
