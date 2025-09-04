@@ -239,5 +239,93 @@ export function initializeSEO(): void {
   console.log('🚀 P7.1-7.3: SEO Optimization System initialized');
 }
 
-// Import React for the hook
+// Import React for the hook and component
 import { useEffect } from 'react';
+
+/**
+ * SEO Component for rendering meta tags
+ */
+export function SEO({ title, description, keywords, ogImage, ogType, canonical, twitterCard, structuredData }: SEOConfig) {
+  useEffect(() => {
+    SEOManager.updatePageSEO(window.location.pathname, {
+      title,
+      description,
+      keywords,
+      ogImage,
+      ogType,
+      canonical,
+      twitterCard,
+      structuredData
+    });
+  }, [title, description, keywords, ogImage, ogType, canonical, twitterCard, structuredData]);
+
+  return null; // This component doesn't render anything
+}
+
+/**
+ * Page-specific SEO configurations
+ */
+export const seoConfig = {
+  dashboard: {
+    title: 'Dashboard - VeeFore',
+    description: 'Manage all your social media accounts from one powerful dashboard. View analytics, schedule posts, and track performance across platforms.',
+    keywords: ['social media dashboard', 'analytics', 'content management']
+  },
+  profile: {
+    title: 'Profile - VeeFore',
+    description: 'Manage your VeeFore profile settings, preferences, and account information. Customize your social media management experience.',
+    keywords: ['profile settings', 'account management', 'user preferences']
+  },
+  integration: {
+    title: 'Integrations - VeeFore',
+    description: 'Connect your social media accounts including Instagram, Twitter, LinkedIn, and more. Centralized management for all platforms.',
+    keywords: ['social media integration', 'account connection', 'platform management']
+  },
+  create: {
+    title: 'Create Content - VeeFore',
+    description: 'Create engaging social media content with AI assistance. Generate posts, images, and videos optimized for each platform.',
+    keywords: ['content creation', 'AI content', 'social media posts']
+  },
+  analytics: {
+    title: 'Analytics - VeeFore',
+    description: 'Comprehensive social media analytics and insights. Track engagement, follower growth, and content performance across all platforms.',
+    keywords: ['social media analytics', 'performance tracking', 'engagement metrics']
+  }
+};
+
+/**
+ * Generate structured data for different content types
+ */
+export const generateStructuredData = {
+  softwareApplication: () => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    'name': 'VeeFore',
+    'description': 'AI-powered social media management platform',
+    'applicationCategory': 'BusinessApplication',
+    'operatingSystem': 'Web',
+    'offers': {
+      '@type': 'Offer',
+      'price': '0',
+      'priceCurrency': 'USD'
+    }
+  }),
+  webApplication: () => ({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    'name': 'VeeFore Dashboard',
+    'description': 'Social media management dashboard'
+  }),
+  service: () => ({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    'name': 'Social Media Integration',
+    'description': 'Connect and manage multiple social media platforms'
+  }),
+  creativeWork: () => ({
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    'name': 'Content Creator',
+    'description': 'AI-powered content creation tool'
+  })
+};

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '@/lib/queryClient'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,9 +20,7 @@ import {
   BarChart3,
   Calendar,
   Settings,
-  ExternalLink,
   RefreshCw,
-  AlertCircle,
   Shield,
   Sparkles,
   Key,
@@ -130,7 +128,7 @@ export default function Integration() {
 function IntegrationContent() {
   const queryClient = useQueryClient()
   const [connectingPlatform, setConnectingPlatform] = useState<string | null>(null)
-  const [isProcessingOAuth, setIsProcessingOAuth] = useState(false)
+  // const [isProcessingOAuth, setIsProcessingOAuth] = useState(false)
   const [errorModal, setErrorModal] = useState<{
     isOpen: boolean
     title: string
@@ -167,9 +165,9 @@ function IntegrationContent() {
     }
 
     // Listen for real-time updates (assuming WebSocket is available)
-    if (window.socket) {
-      window.socket.on('social-account-update', handleSocialAccountUpdate)
-      return () => window.socket.off('social-account-update', handleSocialAccountUpdate)
+    if ((window as any).socket) {
+      (window as any).socket.on('social-account-update', handleSocialAccountUpdate)
+      return () => (window as any).socket.off('social-account-update', handleSocialAccountUpdate)
     }
   }, [currentWorkspace?.id, queryClient])
 
@@ -241,7 +239,7 @@ function IntegrationContent() {
   }, [])
 
   // Advanced: Always show page immediately - even without workspace data
-  const { data: connectedAccounts = [], isLoading, refetch } = useQuery({
+  const { data: connectedAccounts = [], isLoading } = useQuery({
     queryKey: ['/api/social-accounts', currentWorkspace?.id || 'loading'],
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
@@ -315,7 +313,7 @@ function IntegrationContent() {
       } else {
         // For other platforms, use mock connection for now
         await new Promise(resolve => setTimeout(resolve, 2000))
-        const result = await apiRequest(`/api/social-accounts/connect/${platform}`, {
+        await apiRequest(`/api/social-accounts/connect/${platform}`, {
           method: 'POST'
         })
         
@@ -707,7 +705,7 @@ function IntegrationContent() {
               Connected Accounts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {connectedAccounts.map((account) => (
+              {connectedAccounts.map((account: any) => (
                 <Card key={account.id} className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-200 dark:border-green-600">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4 mb-4">

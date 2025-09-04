@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { enhancedAriaHelpers, componentA11y, announceToScreenReader } from '@/lib/accessibility'
 import { 
   ChevronDown, ChevronUp, Play, Star, TrendingUp, Users, Zap, Shield, Target, Globe, ArrowRight, Check, CheckCircle,

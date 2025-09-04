@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { Camera, Mail, User, Calendar, CreditCard, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,7 @@ function ProfileContent() {
     if (userData?.displayName) return userData.displayName
     if (userData?.email) {
       const emailName = userData.email.split('@')[0]
-      return emailName.replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      return emailName.replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
     }
     return 'User'
   }
