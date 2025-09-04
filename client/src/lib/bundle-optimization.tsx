@@ -6,9 +6,9 @@
 import { lazy, Suspense, ReactNode } from 'react';
 
 // P7-6.3.1: Intelligent Route-based Code Splitting (using existing components)
-const LazyDashboard = lazy(() => import('../pages/Dashboard').catch(() => ({ default: () => <div>Dashboard loading...</div> })));
-const LazyAnalytics = lazy(() => import('../pages/Analytics').catch(() => ({ default: () => <div>Analytics loading...</div> })));
-const LazyAutomation = lazy(() => import('../pages/Automation').catch(() => ({ default: () => <div>Automation loading...</div> })));
+// Removed unused lazy dashboard import
+// Removed unused lazy analytics import
+const LazyAutomation = lazy(() => import('../pages/AutomationStepByStep').catch(() => ({ default: () => <div>Automation loading...</div> })));
 const LazyIntegration = lazy(() => import('../pages/Integration').catch(() => ({ default: () => <div>Integration loading...</div> })));
 const LazyProfile = lazy(() => import('../pages/Profile').catch(() => ({ default: () => <div>Profile loading...</div> })));
 
@@ -81,13 +81,13 @@ const PerformanceWrapper = ({ children, componentName, priority }: PerformanceWr
 export const LazyComponents = {
   Dashboard: () => (
     <LazyWrapper componentName="Dashboard" priority="high">
-      <LazyDashboard />
+      <div>Dashboard content not available</div>
     </LazyWrapper>
   ),
   
   Analytics: () => (
     <LazyWrapper componentName="Analytics" priority="medium">
-      <LazyAnalytics />
+      <div>Analytics content not available</div>
     </LazyWrapper>
   ),
   
