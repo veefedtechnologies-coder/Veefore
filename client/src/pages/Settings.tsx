@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SEO, seoConfig, generateStructuredData } from '@/lib/seo'
+import { SEO, seoConfig, generateStructuredData } from '@/lib/seo-optimization'
 import { 
   Settings as SettingsIcon, 
   Palette, 

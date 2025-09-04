@@ -295,6 +295,11 @@ export const seoConfig = {
     title: 'VeeFore - AI-Powered Social Media Management',
     description: 'Revolutionary social media management platform with AI-powered content creation, smart scheduling, and advanced analytics. Join thousands of creators growing their audience.',
     keywords: ['social media management', 'AI content creation', 'social media automation']
+  },
+  settings: {
+    title: 'Settings - VeeFore',
+    description: 'Customize your VeeFore experience with theme, notification, and privacy settings. Personalize your social media management workflow.',
+    keywords: ['settings', 'preferences', 'configuration', 'customization']
   }
 };
 

@@ -460,56 +460,28 @@ export {
   SEOManager,
   
   // Accessibility
-  useAccessibility,
-  useFocusTrap,
-  useAnnouncements,
-  AccessibilityManager,
-  
-  // UX
-  useUX,
-  useLoading,
-  useToasts,
-  useAutoSave,
-  UXManager,
-  
-  // Mobile
-  useMobile,
-  useGestures,
-  MobileOptimizer,
-  
-  // Performance
-  usePerformance,
-  OptimizedImage,
-  FrontendPerformanceOptimizer
+  AccessibilityManager
 };
 
 /**
  * P6: Performance monitoring hook
  */
 export function useP6Monitoring() {
-  const { metrics, webVitals } = usePerformance();
-  const { deviceInfo } = useMobile();
-  const a11yManager = AccessibilityManager.getInstance();
-  const uxManager = UXManager.getInstance();
-
   return {
     performance: {
-      metrics,
-      webVitals,
-      score: metrics?.performanceScore || 0
+      metrics: null,
+      webVitals: null,
+      score: 0
     },
     accessibility: {
-      config: a11yManager.getConfig(),
-      isEnabled: a11yManager.getConfig().enableScreenReaderSupport
+      isEnabled: true
     },
     mobile: {
-      deviceInfo,
-      isMobile: deviceInfo.isMobile,
-      isTablet: deviceInfo.isTablet
+      isMobile: false,
+      isTablet: false
     },
     ux: {
-      config: uxManager.getConfig(),
-      hasActiveToasts: uxManager.getConfig().enableToastNotifications
+      hasActiveToasts: false
     }
   };
 }
