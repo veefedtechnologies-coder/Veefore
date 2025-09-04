@@ -1,0 +1,46 @@
+# OWASP ZAP Security Rules for VeeFore Audit
+# Section 9.5: OWASP ZAP Baseline Configuration
+
+# Ignore rules for development-specific endpoints
+10202	IGNORE	(X-Frame-Options Header Not Set)	# Disabled for iframe development
+10016	IGNORE	(Web Browser XSS Protection Not Enabled)	# Using CSP instead
+10021	IGNORE	(X-Content-Type-Options Header Missing)	# Handled by Helmet
+
+# Authentication and session security
+10023	FAIL	(Information Disclosure - Debug Error Messages)
+10024	FAIL	(Information Disclosure - Sensitive Information in URL)
+10025	FAIL	(Information Disclosure - Sensitive Information in HTTP Referrer Header)
+
+# Input validation and injection attacks  
+40018	FAIL	(SQL Injection)
+40019	FAIL	(SQL Injection - PostgreSQL)
+40020	FAIL	(SQL Injection - Oracle)
+40021	FAIL	(SQL Injection - MySQL)
+40022	FAIL	(SQL Injection - Hypersonic SQL)
+40023	FAIL	(SQL Injection - SQLite)
+
+# Cross-site scripting protection
+40012	FAIL	(Cross Site Scripting (Reflected))
+40013	FAIL	(Cross Site Scripting (Persistent))
+40014	FAIL	(Cross Site Scripting (Persistent) - Prime)
+40016	FAIL	(Cross Site Scripting (Persistent) - Spider)
+40017	FAIL	(Cross Site Scripting (Persistent) - OData)
+
+# Authentication and authorization
+10055	FAIL	(CSP Scanner)
+10056	FAIL	(X-Debug-Token Information Leak)
+90020	FAIL	(Remote OS Command Injection)
+90021	FAIL	(XPath Injection)
+90022	FAIL	(Application Error Disclosure)
+
+# Data exposure and privacy
+10023	FAIL	(Information Disclosure - Debug Error Messages)
+10024	FAIL	(Information Disclosure - Sensitive Information in URL)
+10025	FAIL	(Information Disclosure - Sensitive Information in HTTP Referrer Header)
+10026	FAIL	(HTTP Parameter Override)
+10028	FAIL	(Open Redirect)
+
+# Security headers validation
+10020	WARN	(X-Frame-Options Header)	# Warn only for development compatibility
+10021	WARN	(X-Content-Type-Options Header Missing)
+10016	WARN	(Web Browser XSS Protection Not Enabled)
