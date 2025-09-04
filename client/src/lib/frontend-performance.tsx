@@ -401,8 +401,7 @@ export class FrontendPerformanceOptimizer {
   private preloadCriticalAssets(): void {
     // Preload critical CSS first (highest priority)
     const criticalCSS = [
-      '/src/index.css',
-      '/src/components/ui/globals.css'
+      '/src/index.css'
     ];
 
     criticalCSS.forEach(href => {
@@ -611,9 +610,9 @@ export class FrontendPerformanceOptimizer {
    */
   private cacheAdditionalResources(): void {
     const additionalResources = [
-      '/src/components/Dashboard.tsx',
-      '/src/components/Analytics.tsx',
-      '/src/hooks/useAuth.ts',
+      '/src/components/analytics/analytics-dashboard.tsx',
+      '/src/components/create/create-post.tsx',
+      '/src/hooks/useFirebaseAuth.ts',
       '/src/lib/firebase.ts'
     ];
 
@@ -881,10 +880,10 @@ export class FrontendPerformanceOptimizer {
    */
   private getCriticalChunksForRoute(path: string): string[] {
     const chunkMap: Record<string, string[]> = {
-      '/': ['/src/pages/Home.tsx', '/src/components/Dashboard.tsx'],
-      '/dashboard': ['/src/pages/Dashboard.tsx', '/src/components/Analytics.tsx'],
-      '/automation': ['/src/pages/Automation.tsx', '/src/components/AutomationBuilder.tsx'],
-      '/analytics': ['/src/pages/Analytics.tsx', '/src/components/Charts.tsx']
+      '/': ['/src/pages/Landing.tsx', '/src/components/analytics/analytics-dashboard.tsx'],
+      '/dashboard': ['/src/components/analytics/analytics-dashboard.tsx', '/src/components/create/create-post.tsx'],
+      '/automation': ['/src/pages/Automation.tsx', '/src/components/create/create-post.tsx'],
+      '/analytics': ['/src/components/analytics/analytics-dashboard.tsx', '/src/components/calendar/calendar-view.tsx']
     };
 
     return chunkMap[path] || [];

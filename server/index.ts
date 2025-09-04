@@ -758,12 +758,47 @@ app.use((req, res, next) => {
     delete process.env.REPL_ID;
     
     try {
-      if (setupVite) {
-        await setupVite(app, server);
-        console.log('[DEBUG] Vite setup completed successfully - serving React application');
-      } else {
-        throw new Error('setupVite not available');
-      }
+      // CRITICAL FIX: Set up Vite directly to avoid catch-all conflicts
+      const { createServer: createViteServer } = await import('vite');
+      const viteConfig = await import('../vite.config');
+      
+      const vite = await createViteServer({
+        ...viteConfig.default,
+        configFile: false,
+        server: {
+          middlewareMode: true,
+          hmr: { server }
+        },
+        appType: "spa"
+      });
+
+      // Use Vite's middleware for handling TypeScript/CSS modules
+      app.use(vite.middlewares);
+      
+      // Only serve HTML for actual SPA routes, not module requests
+      app.get('*', (req, res, next) => {
+        // Skip module requests, API routes, uploads, and Vite-specific paths
+        if (req.path.startsWith('/src') || 
+            req.path.startsWith('/node_modules') || 
+            req.path.startsWith('/@') ||
+            req.path.startsWith('/api') || 
+            req.path.startsWith('/uploads')) {
+          return next();
+        }
+        
+        // Serve index.html for SPA routes only
+        const url = req.originalUrl;
+        const clientTemplate = path.resolve(import.meta.dirname, '..', 'client', 'index.html');
+        
+        fs.promises.readFile(clientTemplate, 'utf-8')
+          .then(template => vite.transformIndexHtml(url, template))
+          .then(html => {
+            res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+          })
+          .catch(next);
+      });
+      
+      console.log('[DEBUG] Custom Vite setup completed successfully - TypeScript modules properly handled');
     } catch (error) {
       console.error('[DEBUG] Vite setup failed:', error);
       console.log('[DEBUG] Falling back to static file serving');
@@ -835,8 +870,8 @@ app.use((req, res, next) => {
         
         // Handle SPA routes - serve index.html for all non-API routes
         app.get('*', (req, res, next) => {
-          // Skip API routes and uploaded files
-          if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+          // Skip API routes, source files, and uploaded files
+          if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/src') || req.path.startsWith('/node_modules') || req.path.startsWith('/@')) {
             return next();
           }
           
@@ -854,7 +889,7 @@ app.use((req, res, next) => {
         console.error('[PRODUCTION] Searched paths:', possiblePaths);
         
         app.get('*', (req, res) => {
-          if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+          if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads') && !req.path.startsWith('/src') && !req.path.startsWith('/node_modules') && !req.path.startsWith('/@')) {
             res.status(503).json({ 
               error: 'Application not built for production',
               message: 'Please run build command first',
