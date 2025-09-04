@@ -38,6 +38,7 @@ import AdminLogin from './pages/AdminLogin'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import Settings from './pages/Settings'
+import SecurityDashboard from './pages/SecurityDashboard'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 import { initializeTheme } from './lib/theme'
 // P6: Frontend SEO, Accessibility & UX System
@@ -809,6 +810,11 @@ function App() {
                  </div>
                </div>
              </div>
+           </Route>
+
+           {/* P8: Security Operations Center Route */}
+           <Route path="/security">
+             <SecurityDashboard />
            </Route>
 
           {/* Privacy Policy Route - Public access */}

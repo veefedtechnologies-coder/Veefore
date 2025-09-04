@@ -46,6 +46,8 @@ import {
   attackDetectionMiddleware,
   auditTrailMiddleware
 } from "./middleware/security-monitoring";
+import { threatDetectionMiddleware } from "./middleware/threat-detection";
+import securityRoutes from "./routes/security";
 
 // Production-safe log function
 let log: (message: string, source?: string) => void;
@@ -256,6 +258,9 @@ app.use('/api', apiCorsMiddleware);
 
 // P1-7 SECURITY: Attack detection and blocking
 app.use('/api', attackDetectionMiddleware);
+
+// P8 SECURITY: Advanced threat detection and real-time response
+app.use(threatDetectionMiddleware);
 
 // P1-6 SECURITY: Key management and secrets validation
 app.use('/api', secretsValidationMiddleware());
@@ -487,6 +492,9 @@ app.use((req, res, next) => {
   // Register metrics and webhook routes
   app.use('/api', metricsRoutes);
   app.use('/api/webhooks', webhooksRoutes);
+  
+  // P8 SECURITY: Register advanced security and threat intelligence routes
+  app.use('/api/security', securityRoutes);
   
   // Additional webhook route to match Meta Console configuration
   app.use('/webhook', webhooksRoutes);
