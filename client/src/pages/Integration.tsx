@@ -119,7 +119,7 @@ export default function Integration() {
   return (
     <>
       <SEO 
-        {...seoConfig.integration}
+        {...seoConfig.analytics}
         structuredData={generateStructuredData.softwareApplication()}
       />
       <IntegrationContent />
@@ -152,15 +152,15 @@ function IntegrationContent() {
   useEffect(() => {
     if (!currentWorkspace?.id) return
 
-    const handleSocialAccountUpdate = (data) => {
+    const handleSocialAccountUpdate = (data: any) => {
       console.log('🔄 Real-time social account update received:', data)
       // Instantly update React Query cache without loading state
       queryClient.setQueryData(['/api/social-accounts', currentWorkspace.id], (oldData) => {
         if (!oldData) return oldData
         if (data.type === 'connected') {
-          return [...oldData, data.account]
+          return Array.isArray(oldData) ? [...oldData, data.account] : [data.account]
         } else if (data.type === 'disconnected') {
-          return oldData.filter(acc => acc.id !== data.accountId)
+          return Array.isArray(oldData) ? oldData.filter((acc: any) => acc.id !== data.accountId) : []
         }
         return oldData
       })
@@ -278,7 +278,7 @@ function IntegrationContent() {
       profilePictureUrl: null
     }
 
-    queryClient.setQueryData(['/api/social-accounts', currentWorkspace.id], (oldData = []) => [
+    queryClient.setQueryData(['/api/social-accounts', currentWorkspace.id], (oldData: any = []) => [
       ...oldData,
       optimisticAccount
     ])
@@ -380,7 +380,7 @@ function IntegrationContent() {
       }
       throw new Error('Platform not supported for refresh')
     },
-    onSuccess: (data: any, platform: string) => {
+    onSuccess: () => {
       // Success - no modal needed for success messages
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
     },
@@ -406,7 +406,7 @@ function IntegrationContent() {
         isOpen: true,
         title: "Token Conversion Initiated",
         message: "Personal tokens are being converted to business tokens. This may take a few moments.",
-        type: "success"
+        type: "warning"
       })
     },
     onError: (error: any) => {
@@ -713,7 +713,10 @@ function IntegrationContent() {
                     <div className="flex items-center space-x-4 mb-4">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                          {platformConfig[account.platform as keyof typeof platformConfig]?.icon}
+                          {(() => {
+                            const IconComponent = platformConfig[account.platform as keyof typeof platformConfig]?.icon;
+                            return IconComponent ? <IconComponent className="w-6 h-6" /> : null;
+                          })()}
                         </div>
                         <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                           <Check className="w-3 h-3 text-white" />

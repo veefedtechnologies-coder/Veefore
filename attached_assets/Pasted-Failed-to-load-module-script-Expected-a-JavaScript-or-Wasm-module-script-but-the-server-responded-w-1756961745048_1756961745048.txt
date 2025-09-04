@@ -1,0 +1,17 @@
+Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of "text/html". Strict MIME type checking is enforced for module scripts per HTML spec.Understand this error
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/components/Dashboard.tsx:1 Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of "text/html". Strict MIME type checking is enforced for module scripts per HTML spec.Understand this error
+instagram-webhook-listener.tsx:59 [Instagram Webhook] Connected successfully
+vite-hmr-fix.js:4 [HMR Fix] Initializing Replit WebSocket fixes...
+vite-hmr-fix.js:30 [HMR Fix] WebSocket and fetch overrides installed
+vite-hmr-fix.js:4 [HMR Fix] Initializing Replit WebSocket fixes...
+vite-hmr-fix.js:30 [HMR Fix] WebSocket and fetch overrides installed
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:11 🔥 Firebase Config: {apiKey: '✅ SET', projectId: '✅ SET', appId: '✅ SET', authDomain: 'veefore-b84c8.firebaseapp.com'}
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:17 🌐 Current domain: 61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:18 🔧 Using authDomain: veefore-b84c8.firebaseapp.com
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:19 🔧 Full URL: https://61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:27 ℹ️ Running on custom domain: 61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:28 ℹ️ Firebase authDomain is always firebaseapp.com for OAuth flows
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:31 🔥 Firebase App Initialized: FirebaseAppImpl {_isDeleted: false, _options: {…}, _config: {…}, _name: '[DEFAULT]', _automaticDataCollectionEnabled: true, …}
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:33 🔥 Firebase Auth Initialized: AuthImpl {app: FirebaseAppImpl, heartbeatServiceProvider: Provider, appCheckServiceProvider: Provider, config: {…}, currentUser: null, …}
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:35 🔥 Firebase Persistence Set
+61ac61b0-5835-4a08-a9df-b5bdf937f9b4-00-2ixvi7v9sb9yz.worf.replit.dev/src/lib/firebase.ts:40 🔥 Google Provider Created: _GoogleAuthProvider {providerId: 'google.com', defaultLanguageCode: null, customParameters: {…}, scopes: Array(1)}
