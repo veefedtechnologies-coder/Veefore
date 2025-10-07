@@ -35,6 +35,7 @@ const sidebarGroups = [
     title: "Management",
     items: [
       { icon: Link, label: 'Integration', key: 'integration', url: '/integration' },
+      { icon: Shield, label: 'IG Diagnostics', key: 'ig-diagnostics', url: '/ig-diagnostics' },
       { icon: Users, label: 'Workspaces', key: 'workspaces', url: '/workspaces' },
       { icon: Shield, label: 'Admin Panel', key: 'admin', url: '/admin' },
       { icon: Globe, label: 'Landing', key: 'landing', url: '/landing' },
@@ -71,6 +72,7 @@ export function Sidebar({ className, isCreateDropdownOpen, setIsCreateDropdownOp
     if (loc === '/integration') return 'integration'
     if (loc === '/workspaces') return 'workspaces'
     if (loc === '/settings') return 'settings'
+    if (loc === '/ig-diagnostics') return 'ig-diagnostics'
     if (loc === '/admin') return 'admin'
     if (loc === '/landing') return 'landing'
     return 'home'

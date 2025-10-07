@@ -1,7 +1,23 @@
 tunnel: cf822810-ff3e-4be3-858b-6dcf7d40b006
 credentials-file: C:\Users\ASUS\.cloudflared\cf822810-ff3e-4be3-858b-6dcf7d40b006.json
 
+# Unified architecture - everything served on port 5000
 ingress:
+  # All requests go to unified server on port 5000
   - hostname: veefore-webhook.veefore.com
     service: http://localhost:5000
+    originRequest:
+      httpHostHeader: localhost:5000
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+      keepAliveConnections: 10
+      keepAliveTimeout: 1m30s
+  
+  # Fallback for unmatched routes
   - service: http_status:404
+
+# Logging configuration
+logLevel: debug
+logfile: ./cloudflared.log

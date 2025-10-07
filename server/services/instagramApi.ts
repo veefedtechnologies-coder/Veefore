@@ -2,7 +2,7 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 
 // Instagram Graph API configuration
 const INSTAGRAM_GRAPH_API_BASE = 'https://graph.instagram.com';
-const INSTAGRAM_GRAPH_API_VERSION = 'v18.0';
+const INSTAGRAM_GRAPH_API_VERSION = 'v23.0';
 const FACEBOOK_GRAPH_API_BASE = 'https://graph.facebook.com';
 
 // Rate limiting configuration
@@ -27,6 +27,7 @@ export interface InstagramAccountInfo {
 export interface InstagramMediaItem {
   id: string;
   media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM' | 'STORY';
+  media_product_type?: 'FEED' | 'REELS' | 'STORY' | 'AD';
   media_url?: string;
   permalink?: string;
   thumbnail_url?: string;
@@ -235,6 +236,7 @@ export class InstagramApiService {
     const fields = [
       'id',
       'media_type',
+      'media_product_type',
       'media_url',
       'permalink',
       'thumbnail_url',
@@ -255,36 +257,167 @@ export class InstagramApiService {
   }
 
   /**
+   * Get user's Stories (separate from regular media)
+   */
+  static async getUserStories(token: string): Promise<{ data: InstagramMediaItem[]; paging?: any }> {
+    const fields = [
+      'id',
+      'media_type',
+      'media_product_type',
+      'media_url',
+      'permalink',
+      'thumbnail_url',
+      'timestamp',
+      'caption',
+      'like_count',
+      'comments_count',
+      'is_shared_to_feed'
+    ].join(',');
+
+    const url = `${INSTAGRAM_GRAPH_API_BASE}/me/stories?fields=${fields}&access_token=${token}`;
+    
+    try {
+      console.log(`[STORIES] Fetching user stories`);
+      return await this.makeApiRequest<{ data: InstagramMediaItem[]; paging?: any }>(url, token);
+    } catch (error: any) {
+      console.log(`[STORIES] Failed to fetch stories:`, error.response?.data || error.message);
+      // Return empty data if stories endpoint fails
+      return { data: [] };
+    }
+  }
+
+  /**
    * Get insights for specific media
    */
   static async getMediaInsights(
     mediaId: string,
     token: string,
-    mediaType: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM' | 'STORY' = 'IMAGE'
+    mediaType: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM' | 'STORY' | 'REEL' = 'IMAGE',
+    mediaProductType?: 'FEED' | 'REELS' | 'STORY' | 'AD'
   ): Promise<InstagramMediaInsights> {
     let metrics: string[];
 
-    if (mediaType === 'VIDEO') {
-      metrics = ['impressions', 'reach', 'likes', 'comments', 'shares', 'saves', 'video_views'];
+    const isReel = mediaType === 'REEL' || mediaProductType === 'REELS';
+
+    if (isReel) {
+      // Reels support shares, saved, etc. - avoid plays as it's not supported for all Reels
+      metrics = ['reach', 'likes', 'comments', 'saved', 'shares'];
+    } else if (mediaType === 'VIDEO') {
+      // Check if this is actually a Reel disguised as VIDEO
+      if ((mediaProductType as any) === 'REELS') {
+        console.log(`[MEDIA INSIGHTS] VIDEO ${mediaId} is actually a Reel (media_product_type=REELS)`);
+        metrics = ['reach', 'likes', 'comments', 'saved', 'shares'];
+      } else {
+        // Classic video post - include shares and saved for feed videos
+        console.log(`[MEDIA INSIGHTS] VIDEO ${mediaId} is a regular video (media_product_type=${mediaProductType || 'undefined'})`);
+        metrics = ['reach', 'likes', 'comments', 'video_views', 'saved', 'shares'];
+      }
     } else if (mediaType === 'STORY') {
-      metrics = ['impressions', 'reach', 'replies', 'taps_forward', 'taps_back', 'exits'];
+      // Stories: avoid impressions which can be rejected; use minimal compatible set
+      metrics = ['reach', 'replies', 'shares'];
+    } else if (mediaType === 'CAROUSEL_ALBUM') {
+      // Carousel - include shares and saved for feed carousels
+      metrics = ['reach', 'likes', 'comments', 'saved', 'shares'];
     } else {
-      metrics = ['impressions', 'reach', 'likes', 'comments', 'shares', 'saves'];
+      // Image - include shares and saved for feed images
+      metrics = ['reach', 'likes', 'comments', 'saved', 'shares'];
     }
 
-    const url = `${FACEBOOK_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=${metrics.join(',')}&access_token=${token}`;
+    // Primary URLs
+    const igUrl = `${INSTAGRAM_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=${metrics.join(',')}&access_token=${token}`;
+    const fbUrlPrimary = `${FACEBOOK_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=${metrics.join(',')}&access_token=${token}`;
     
-    const response = await this.makeApiRequest<any>(url, token);
+    let response: any;
+    let lastError: any;
+    
+    try {
+      // Use Instagram Graph first for all types (including STORY). Facebook is only a later fallback
+      console.log(`[MEDIA INSIGHTS] Trying Instagram Graph API for ${mediaId} (${mediaType}) with metrics: ${metrics.join(',')}`);
+      const res = await axios.get(igUrl, { timeout: 10000 });
+      response = res.data;
+      console.log(`[MEDIA INSIGHTS] ✅ Instagram Graph API success for ${mediaId}`);
+    } catch (e: any) {
+      lastError = e;
+      console.log(`[MEDIA INSIGHTS] ❌ Instagram Graph API failed for ${mediaId}:`, e.response?.data || e.message);
+      
+      // Try with minimal metrics as fallback, tailored per media type
+      const minimalMetrics = (() => {
+        if (mediaType === 'STORY' || mediaProductType === 'STORY') {
+          // Minimal, story-safe metrics (no impressions)
+          return ['reach', 'replies', 'shares'];
+        }
+        if (isReel || (mediaProductType as any) === 'REELS') {
+          // Reels minimal set (avoid plays to reduce failures)
+          return ['reach', 'likes', 'comments', 'shares', 'saved'];
+        }
+        // Feed posts (IMAGE/VIDEO/CAROUSEL)
+        return ['reach', 'likes', 'comments', 'shares', 'saved'];
+      })();
+
+      const minimalUrl = `${INSTAGRAM_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=${minimalMetrics.join(',')}&access_token=${token}`;
+      
+      try {
+        console.log(`[MEDIA INSIGHTS] Trying Instagram Graph API with minimal metrics for ${mediaId}`);
+        const res = await axios.get(minimalUrl, { timeout: 10000 });
+        response = res.data;
+        console.log(`[MEDIA INSIGHTS] ✅ Instagram Graph API success with minimal metrics for ${mediaId}`);
+      } catch (minimalError: any) {
+        console.log(`[MEDIA INSIGHTS] ❌ Instagram Graph API minimal metrics also failed for ${mediaId}:`, minimalError.response?.data || minimalError.message);
+        
+        // Avoid Facebook fallback when token parsing fails (noise for some environments)
+        const igCannotParse = String(lastError?.response?.data?.error?.message || '').includes('Cannot parse access token')
+          || String(minimalError?.response?.data?.error?.message || '').includes('Cannot parse access token');
+        try {
+          if (igCannotParse) {
+            throw new Error('Skip Facebook fallback due to token parse error');
+          }
+          // Final fallback: Facebook Graph
+          const fbUrl = `${FACEBOOK_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=${minimalMetrics.join(',')}&access_token=${token}`;
+          console.log(`[MEDIA INSIGHTS] Trying Facebook Graph API with minimal metrics for ${mediaId}`);
+          const res = await axios.get(fbUrl, { timeout: 10000 });
+          response = res.data;
+          console.log(`[MEDIA INSIGHTS] ✅ Facebook Graph API success with minimal metrics for ${mediaId}`);
+        } catch (fbError: any) {
+          console.log(`[MEDIA INSIGHTS] ❌ Facebook Graph API also failed for ${mediaId}:`, fbError.response?.data || fbError.message);
+          throw new Error(`All API attempts failed. Instagram: ${lastError.response?.data?.error?.message || lastError.message}. Instagram minimal: ${minimalError.response?.data?.error?.message || minimalError.message}. Facebook: ${fbError.response?.data?.error?.message || fbError.message}`);
+        }
+      }
+    }
     
     // Transform insights data
     const insights: InstagramMediaInsights = {};
     if (response.data) {
       response.data.forEach((insight: any) => {
         if (insight.values && insight.values.length > 0) {
-          insights[insight.name as keyof InstagramMediaInsights] = insight.values[0].value;
+          const value = insight.values[0].value;
+          const name: string = insight.name;
+          // Normalize metric names for downstream consumers
+          if (name === 'saved') {
+            (insights as any).saves = value;
+          } else if (name === 'plays') {
+            (insights as any).video_views = value;
+          } else {
+            (insights as any)[name] = value;
+          }
         }
       });
     }
+
+    // For STORY, if shares is still missing, try a last-resort single-metric call
+    if ((mediaType === 'STORY' || mediaProductType === 'STORY') && (insights.shares === undefined)) {
+      try {
+        const singleUrl = `${INSTAGRAM_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/${mediaId}/insights?metric=shares&access_token=${token}`;
+        console.log(`[MEDIA INSIGHTS] STORY shares single-metric attempt for ${mediaId}`);
+        const single = await axios.get(singleUrl, { timeout: 8000 });
+        const data = single.data?.data || [];
+        const metric = data.find((m: any) => m.name === 'shares');
+        if (metric?.values?.[0]?.value !== undefined) {
+          insights.shares = metric.values[0].value;
+        }
+      } catch {}
+    }
+
+    // No extra calls for replies to avoid additional API usage; replies should arrive in the main insights response
 
     return insights;
   }
@@ -432,6 +565,77 @@ export class InstagramApiService {
   }
 
   /**
+   * Get simple engagement data for recent posts
+   */
+  static async getSimpleEngagementData(token: string, limit: number = 6): Promise<any> {
+    try {
+      console.log(`[SIMPLE ENGAGEMENT] Fetching simple engagement data for ${limit} posts + up to 4 stories`);
+      
+      // Get recent media (posts)
+      const mediaResponse = await this.getUserMedia(token, limit);
+      const postItems = mediaResponse.data || [];
+      // Get recent stories (up to 4)
+      const storiesResponse = await this.getUserStories(token);
+      const storyItems = (storiesResponse.data || []).slice(0, 4);
+      // Combine: stories first (they expire) then posts
+      const mediaItems = [...storyItems, ...postItems];
+      
+      let totalLikes = 0;
+      let totalComments = 0;
+      let totalShares = 0;
+      let totalSaves = 0;
+      let totalReach = 0;
+      let totalReplies = 0;
+      
+        // Process each media item (posts + stories)
+      for (const media of mediaItems) {
+        try {
+          // Get insights for this media
+          const insights = await this.getMediaInsights(
+            media.id, 
+            token, 
+              // Normalize media type: force STORY when media_product_type indicates STORY
+              ((media as any).media_product_type === 'STORY') ? 'STORY' : (media.media_type as any),
+            media.media_product_type as any
+          );
+          
+          if (insights) {
+            totalLikes += insights.likes || 0;
+            totalComments += insights.comments || 0;
+            totalShares += insights.shares || 0;
+              totalSaves += (insights as any).saves || 0;
+              totalReplies += (insights as any).replies || 0;
+            totalReach += insights.reach || 0;
+          }
+        } catch (insightError) {
+          console.warn(`[SIMPLE ENGAGEMENT] Failed to get insights for media ${media.id}:`, insightError);
+          // Continue with other media items
+        }
+      }
+      
+        const result = {
+        totalLikes,
+        totalComments,
+        totalShares,
+        totalSaves,
+        totalReach,
+          postsAnalyzed: mediaItems.length,
+          totalReplies,
+        avgLikes: mediaItems.length > 0 ? Math.round(totalLikes / mediaItems.length) : 0,
+        avgComments: mediaItems.length > 0 ? Math.round(totalComments / mediaItems.length) : 0,
+        avgReach: mediaItems.length > 0 ? Math.round(totalReach / mediaItems.length) : 0
+      };
+      
+        console.log(`[SIMPLE ENGAGEMENT] ✅ Successfully calculated engagement data (posts=${postItems.length}, stories=${storyItems.length}):`, result);
+      return result;
+      
+    } catch (error) {
+      console.error(`[SIMPLE ENGAGEMENT] ❌ Failed to get simple engagement data:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Check if token has required permissions
    */
   static async checkTokenPermissions(token: string): Promise<string[]> {
@@ -441,6 +645,34 @@ export class InstagramApiService {
     } catch (error) {
       console.error('🚨 Error checking token permissions:', error);
       return [];
+    }
+  }
+
+  /**
+   * Determine if a token can be used against Facebook Graph endpoints (required for insights)
+   * Uses a minimal /me call without Authorization header to avoid header/query conflicts
+   */
+  static async isFacebookGraphCompatible(token: string): Promise<boolean> {
+    try {
+      const url = `${FACEBOOK_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/me?access_token=${token}`;
+      // Use a raw axios call without Authorization header
+      const response = await axios.get(url, { timeout: 8000 });
+      return !!response.data?.id;
+    } catch (e: any) {
+      return false;
+    }
+  }
+
+  /**
+   * Determine if token can call Instagram Graph v22 endpoints
+   */
+  static async isInstagramGraphCompatible(token: string): Promise<boolean> {
+    try {
+      const url = `${INSTAGRAM_GRAPH_API_BASE}/${INSTAGRAM_GRAPH_API_VERSION}/me?access_token=${token}`;
+      const response = await axios.get(url, { timeout: 8000 });
+      return !!response.data?.id;
+    } catch (e: any) {
+      return false;
     }
   }
 }

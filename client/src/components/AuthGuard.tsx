@@ -23,18 +23,18 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   }
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/signin', '/signup', '/forgot-password']
+  const publicRoutes = ['/', '/signin', '/signup', '/forgot-password', '/privacy-policy', '/terms-of-service']
   
   // If user is not authenticated and trying to access protected route
   if (!user && !publicRoutes.includes(location)) {
-    // Redirect to landing page
-    setLocation('/')
+    // Keep them on the same URL but render nothing until SignIn handles it
+    setLocation('/signin')
     return null
   }
 
   // If user is authenticated and trying to access auth pages, redirect to home
   if (user && (location === '/signin' || location === '/signup')) {
-    setLocation('/home')
+    setLocation('/')
     return null
   }
 

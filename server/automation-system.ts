@@ -578,7 +578,7 @@ export class AutomationSystem {
       const publicReply = `Thanks for your comment! 🎯 I'd love to help you with that - please send me a DM for more details! 💬`;
       
       // Use Instagram Graph API to reply to the comment publicly
-      const replyResponse = await fetch(`https://graph.instagram.com/v21.0/${commentId}/replies`, {
+      const replyResponse = await fetch(`https://graph.instagram.com/v23.0/${commentId}/replies`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -667,7 +667,7 @@ export class AutomationSystem {
               
               // Method 1: Try direct user ID (sometimes works)
               console.log('[AUTOMATION] 📋 Method 1: Trying direct user ID for DM...');
-              const directDMResponse = await fetch(`https://graph.instagram.com/v21.0/${pageId}/messages`, {
+              const directDMResponse = await fetch(`https://graph.instagram.com/v23.0/${pageId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -687,7 +687,7 @@ export class AutomationSystem {
                 
                 // Method 2: Try using User ID as Instagram Business Account ID
                 console.log('[AUTOMATION] 📋 Method 2: Trying DM with Instagram account endpoint...');
-                const accountDMResponse = await fetch(`https://graph.instagram.com/v21.0/${userId}/messages`, {
+                const accountDMResponse = await fetch(`https://graph.instagram.com/v23.0/${userId}/messages`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -707,7 +707,7 @@ export class AutomationSystem {
                   
                   // Method 3: Try Facebook Graph API format (fallback)
                   console.log('[AUTOMATION] 📋 Method 3: Trying Facebook Graph API format...');
-                  const fbDMResponse = await fetch(`https://graph.facebook.com/v21.0/${pageId}/messages`, {
+                  const fbDMResponse = await fetch(`https://graph.facebook.com/v23.0/${pageId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -732,7 +732,7 @@ export class AutomationSystem {
               const accountId = instagramAccount?.accountId;
               if (accountId && accountId !== pageId) {
                 console.log('[AUTOMATION] 📋 Method 4: Trying fallback with account ID:', accountId);
-                const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${accountId}/messages`, {
+                const fallbackResponse = await fetch(`https://graph.instagram.com/v23.0/${accountId}/messages`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -759,7 +759,7 @@ export class AutomationSystem {
       }
       
       // Fallback to standard Instagram API
-      const response = await fetch(`https://graph.instagram.com/v21.0/me/messages`, {
+      const response = await fetch(`https://graph.instagram.com/v23.0/me/messages`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json'
@@ -780,7 +780,7 @@ export class AutomationSystem {
         console.error('[AUTOMATION] ❌ DM failed:', error);
         
         // Try user-specific endpoint as final fallback
-        const fallbackResponse = await fetch(`https://graph.instagram.com/v21.0/${userId}/messages`, {
+        const fallbackResponse = await fetch(`https://graph.instagram.com/v23.0/${userId}/messages`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

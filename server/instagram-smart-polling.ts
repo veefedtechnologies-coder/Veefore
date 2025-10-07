@@ -1,6 +1,7 @@
 import { IStorage } from './storage';
 import { DashboardCache } from './dashboard-cache';
 import { RealtimeService } from './services/realtime';
+import { calculateERF, calculateERR, calculateSmartEngagement, EngagementData } from './utils/engagement-calculator';
 
 interface RateLimitTracker {
   requestCount: number;
@@ -19,6 +20,8 @@ interface PollingConfig {
   lastEngagementData: any;
   consecutiveNoChanges: number;
   lastActivity: number;
+  lastPollTime: number | null;
+  nextScheduledPollTime: number | null; // Timestamp of when next poll is scheduled
 }
 
 export class InstagramSmartPolling {
@@ -39,8 +42,11 @@ export class InstagramSmartPolling {
     NORMAL: 10 * 60 * 1000,       // 10 minutes normal
     REDUCED: 30 * 60 * 1000,      // 30 minutes when no changes
     MINIMAL: 60 * 60 * 1000,      // 1 hour when inactive  
-    NIGHT: 120 * 60 * 1000        // 2 hours during night hours
+    HIBERNATION: null             // No polling when hibernated (1+ hour inactive)
   };
+  
+  // Hibernation threshold: pause polling after 1 hour of inactivity
+  private readonly HIBERNATION_THRESHOLD = 60 * 60 * 1000; // 1 hour
 
   constructor(storage: IStorage) {
     this.storage = storage;
@@ -58,6 +64,12 @@ export class InstagramSmartPolling {
       
       // Get all workspaces and their Instagram accounts
       const allAccounts = await this.getAllInstagramAccounts();
+      
+      if (allAccounts.length === 0) {
+        console.log('[SMART POLLING] ⚠️ No Instagram accounts found for polling');
+        console.log('[SMART POLLING] This is normal if no Instagram accounts are connected yet');
+        return;
+      }
       
       for (const account of allAccounts) {
         await this.setupAccountPolling(account);
@@ -86,7 +98,7 @@ export class InstagramSmartPolling {
         console.log(`[SMART POLLING] Found ${allSocialAccounts.length} total social accounts`);
         
         // Extract unique workspace IDs from social accounts
-        const workspaceIds = [...new Set(allSocialAccounts.map(acc => acc.workspaceId))];
+        const workspaceIds = Array.from(new Set(allSocialAccounts.map(acc => acc.workspaceId)));
         console.log(`[SMART POLLING] Found ${workspaceIds.length} unique workspace IDs from social accounts`);
         
         // Get workspace details for each workspace ID
@@ -190,7 +202,9 @@ export class InstagramSmartPolling {
       lastMediaCount: account.mediaCount || 0,
       lastEngagementData: null,
       consecutiveNoChanges: 0,
-      lastActivity: Date.now()
+      lastActivity: Date.now(),
+      lastPollTime: null, // Initialize as null, will be set on first poll
+      nextScheduledPollTime: null // Initialize as null, will be set when poll is scheduled
     };
 
     this.pollingConfigs.set(config.accountId, config);
@@ -286,19 +300,14 @@ export class InstagramSmartPolling {
   /**
    * Calculate adaptive polling interval based on various factors
    */
-  private calculatePollingInterval(config: PollingConfig): number {
+  private calculatePollingInterval(config: PollingConfig): number | null {
     const now = Date.now();
     const timeSinceLastActivity = now - config.lastActivity;
-    const currentHour = new Date().getHours();
     
-    // Night hours (11 PM - 6 AM) - reduce polling
-    if (currentHour >= 23 || currentHour <= 6) {
-      return this.INTERVALS.NIGHT;
-    }
-    
-    // User inactive for more than 30 minutes
-    if (timeSinceLastActivity > 30 * 60 * 1000) {
-      return this.INTERVALS.MINIMAL;
+    // 🚨 HIBERNATION MODE: User inactive for more than 1 hour - PAUSE polling
+    if (timeSinceLastActivity > this.HIBERNATION_THRESHOLD) {
+      console.log(`[SMART POLLING] 💤 Account ${config.username} entering HIBERNATION - 1+ hour inactive`);
+      return this.INTERVALS.HIBERNATION; // null = no polling
     }
     
     // No changes detected for a while - reduce frequency
@@ -306,12 +315,22 @@ export class InstagramSmartPolling {
       return this.INTERVALS.REDUCED;
     }
     
-    // User recently active (within 10 minutes) - extended for better responsiveness
+    // User recently active (within 10 minutes) - real-time responsiveness
     if (timeSinceLastActivity < 10 * 60 * 1000) {
       return this.INTERVALS.ACTIVE_USER;
     }
     
-    // Default interval
+    // User moderately inactive (10-30 minutes) - normal polling
+    if (timeSinceLastActivity < 30 * 60 * 1000) {
+      return this.INTERVALS.NORMAL;
+    }
+    
+    // User inactive (30-60 minutes) - minimal polling before hibernation
+    if (timeSinceLastActivity < this.HIBERNATION_THRESHOLD) {
+      return this.INTERVALS.MINIMAL;
+    }
+    
+    // Default interval (should never reach here due to hibernation check above)
     return this.INTERVALS.NORMAL;
   }
 
@@ -322,36 +341,109 @@ export class InstagramSmartPolling {
     const config = this.pollingConfigs.get(accountId);
     if (!config) return;
 
-    // Clear existing interval
-    const existingInterval = this.pollingIntervals.get(accountId);
-    if (existingInterval) {
-      clearInterval(existingInterval);
+    // Clear existing timeout
+    const existingTimeout = this.pollingIntervals.get(accountId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout); // ⭐ FIX: Use clearTimeout instead of clearInterval
+      this.pollingIntervals.delete(accountId);
     }
 
     const pollOnce = async () => {
       try {
+        // 🚨 CHECK HIBERNATION FIRST - Skip API calls if hibernated
+        const nextInterval = this.calculatePollingInterval(config);
+        if (nextInterval === null) {
+          console.log(`[SMART POLLING] 💤 Account ${config.username} is HIBERNATED - no API calls until user becomes active`);
+          this.pollingIntervals.delete(accountId);
+          return;
+        }
+
         if (!this.canMakeRequest(accountId)) {
           // Schedule next poll with rate limit consideration
-          const nextInterval = this.calculatePollingInterval(config);
-          setTimeout(pollOnce, Math.max(nextInterval, 20000)); // At least 20 seconds
+          const timeoutId = setTimeout(pollOnce, Math.max(nextInterval, 20000)); // At least 20 seconds
+          this.pollingIntervals.set(accountId, timeoutId); // ⭐ FIX: Store timeout reference
           return;
         }
 
         await this.pollAccountData(accountId);
         
-        // Schedule next poll
-        const nextInterval = this.calculatePollingInterval(config);
-        setTimeout(pollOnce, nextInterval);
+        // Schedule next poll based on activity status
+        const nextPollInterval = this.calculatePollingInterval(config);
+        if (nextPollInterval !== null) {
+          const nextScheduledTime = Date.now() + nextPollInterval;
+          config.nextScheduledPollTime = nextScheduledTime; // Store when next poll is scheduled
+          const timeoutId = setTimeout(pollOnce, nextPollInterval);
+          this.pollingIntervals.set(accountId, timeoutId); // ⭐ FIX: Store timeout reference
+          console.log(`[SMART POLLING] ⏰ Scheduled next poll for @${config.username} in ${Math.round(nextPollInterval / 1000)}s`);
+        } else {
+          // Account entered hibernation during polling
+          console.log(`[SMART POLLING] 💤 Account ${config.username} entered HIBERNATION during poll`);
+          config.nextScheduledPollTime = null;
+          this.pollingIntervals.delete(accountId);
+        }
         
       } catch (error) {
         console.error(`[SMART POLLING] Error polling ${config.username}:`, error);
         // Retry with exponential backoff
-        setTimeout(pollOnce, this.INTERVALS.REDUCED);
+        const timeoutId = setTimeout(pollOnce, this.INTERVALS.REDUCED);
+        this.pollingIntervals.set(accountId, timeoutId); // ⭐ FIX: Store timeout reference
       }
     };
 
     // Start polling
     pollOnce();
+  }
+
+  /**
+   * 🚀 INSTANT ACTIVATION: Trigger immediate sync when user returns from hibernation
+   */
+  public async activateUser(accountId: string): Promise<void> {
+    const config = this.pollingConfigs.get(accountId);
+    if (!config) return;
+
+    console.log(`[SMART POLLING] 🚀 User ACTIVATING account ${config.username} - triggering instant sync`);
+    
+    // Update activity timestamp to "now" to bring back from hibernation
+    config.lastActivity = Date.now();
+    
+    // Reset consecutive no-changes counter as user returning is "activity"
+    config.consecutiveNoChanges = 0;
+    
+    try {
+      // 🔥 INSTANT DATA SYNC: Like Instagram direct sync but for active users
+      await this.pollAccountData(accountId);
+      console.log(`[SMART POLLING] ✅ Instant sync completed for ${config.username}`);
+      
+      // Restart polling with new activity status
+      await this.startPollingForAccount(accountId);
+    } catch (error) {
+      console.error(`[SMART POLLING] ❌ Failed instant sync for ${config.username}:`, error);
+    }
+  }
+
+  /**
+   * Update user activity (called when user visits dashboard)
+   */
+  public updateUserActivity(accountId: string): void {
+    const config = this.pollingConfigs.get(accountId);
+    if (!config) return;
+
+    const wasHibernated = (Date.now() - config.lastActivity) > this.HIBERNATION_THRESHOLD;
+    config.lastActivity = Date.now();
+    
+    console.log(`[SMART POLLING] 📱 User activity updated for ${config.username}${wasHibernated ? ' - AWAKENING from hibernation!' : ''}`);
+    
+    // If user was hibernated, activate instantly
+    if (wasHibernated) {
+      this.activateUser(accountId).catch(error => {
+        console.error(`[SMART POLLING] Failed to activate hibernated user ${config.username}:`, error);
+      });
+    } else {
+      // Just restart polling to update intervals
+      this.startPollingForAccount(accountId).catch(error => {
+        console.error(`[SMART POLLING] Failed to restart polling for ${config.username}:`, error);
+      });
+    }
   }
 
   /**
@@ -383,10 +475,19 @@ export class InstagramSmartPolling {
       
       // Check if this is a business account to determine if we can fetch reach data
       const accounts = await this.storage.getSocialAccountsByWorkspace(config.workspaceId);
-      const account = accounts.find((acc: any) => 
+      // Prefer strict match by accountId when available
+      let account = accounts.find((acc: any) => 
         acc.platform === 'instagram' && 
         (acc.accountId === config.accountId || acc.id === config.accountId)
       );
+      // Fallback 1: match by platform + username when accountId changed after reconnect
+      if (!account && config.username) {
+        account = accounts.find((acc: any) => acc.platform === 'instagram' && acc.username === config.username);
+      }
+      // Fallback 2: match first instagram account in the workspace (single-IG setup)
+      if (!account) {
+        account = accounts.find((acc: any) => acc.platform === 'instagram');
+      }
       // Debug current account type values
       console.log(`[SMART POLLING] Account @${config.username} debug:`, {
         isBusinessAccount: account?.isBusinessAccount,
@@ -403,8 +504,48 @@ export class InstagramSmartPolling {
       
       console.log(`[SMART POLLING] Account @${config.username} - Business account: ${isBusinessAccount}`);
       
-      // Fetch comprehensive engagement metrics
-      const engagementMetrics = await this.fetchEngagementMetrics(config.accessToken, isBusinessAccount);
+      // 🚀 ENHANCED: Fetch comprehensive engagement metrics including real reach data
+      let engagementMetrics;
+      
+      if (isBusinessAccount) {
+        console.log(`[SMART POLLING] 🔥 Using Instagram Direct Sync for real reach data (same as manual sync)...`);
+        
+        try {
+          // Import and use Instagram Direct Sync for comprehensive data
+          const { InstagramDirectSync } = await import('./instagram-direct-sync');
+          const directSync = new InstagramDirectSync(this.storage);
+          
+          // Get comprehensive data including real reach - WITH DEBUG LOGGING
+          console.log(`[SMART POLLING] 🔍 Calling fetchComprehensiveData with accessToken: ${config.accessToken ? 'EXISTS' : 'MISSING'}, accountId: ${config.accountId || 'MISSING'}`);
+          const comprehensiveData = await directSync.fetchComprehensiveData(config.accessToken, config.accountId);
+          console.log(`[SMART POLLING] 🔍 fetchComprehensiveData result:`, comprehensiveData ? 'SUCCESS' : 'FAILED/NULL');
+          
+          if (comprehensiveData) {
+            engagementMetrics = {
+              avgLikes: comprehensiveData.avgLikes || 0,
+              avgComments: comprehensiveData.avgComments || 0,
+              avgReach: comprehensiveData.avgReach || 0,
+              engagementRate: comprehensiveData.engagementRate || 0,
+              totalLikes: comprehensiveData.totalLikes || 0,
+              totalComments: comprehensiveData.totalComments || 0,
+              totalReach: comprehensiveData.totalReach || 0, // 🎯 Real Instagram Business API reach data
+              avgEngagement: comprehensiveData.avgEngagement || 0,
+              reachByPeriod: comprehensiveData.reachByPeriod || {} // 🚀 ENHANCED: Include periodized reach data
+            };
+            console.log(`[SMART POLLING] ✅ Got real reach data: ${engagementMetrics.totalReach} (same as manual sync)`);
+            console.log(`[SMART POLLING] 📊 Periodized reach data:`, JSON.stringify(engagementMetrics.reachByPeriod, null, 2)); // 🔧 SHOW FULL DATA
+          } else {
+            console.log(`[SMART POLLING] ⚠️ Direct sync failed, falling back to basic engagement metrics`);
+            engagementMetrics = await this.fetchEngagementMetrics(config.accessToken, isBusinessAccount, config.accountId);
+          }
+        } catch (directSyncError) {
+          console.log(`[SMART POLLING] Direct sync error, using fallback:`, directSyncError.message);
+          engagementMetrics = await this.fetchEngagementMetrics(config.accessToken, isBusinessAccount, config.accountId);
+        }
+      } else {
+        // For non-business accounts, use basic engagement metrics
+        engagementMetrics = await this.fetchEngagementMetrics(config.accessToken, isBusinessAccount, config.accountId);
+      }
 
       // Check if ANY data changed (not just followers)
       const hasChanges = newFollowerCount !== config.lastFollowerCount || 
@@ -426,6 +567,29 @@ export class InstagramSmartPolling {
         console.log(`[SMART POLLING] 📊 Changes detected for @${config.username}: ${changes.join(', ')}`);
         
         // Update database with ALL available metrics INCLUDING real account type
+        // 🚀 NEW: Use advanced engagement calculator for smart calculations
+        const totalEngagement = (engagementMetrics.totalLikes || 0) + (engagementMetrics.totalComments || 0) + (engagementMetrics.totalShares || 0) + (engagementMetrics.totalSaves || 0);
+        
+        // Create engagement data for smart calculation
+        const engagementData: EngagementData = {
+          likes: engagementMetrics.totalLikes,
+          comments: engagementMetrics.totalComments,
+          shares: engagementMetrics.totalShares || 0,
+          saves: engagementMetrics.totalSaves || 0,
+          followers: newFollowerCount,
+          reach: engagementMetrics.totalReach || 0
+        };
+        
+        // Use smart engagement calculation (automatically chooses ERF or ERR based on account size)
+        const smartEngagement = calculateSmartEngagement(engagementData);
+        const engagementRate = smartEngagement.rate;
+        
+        console.log(`[SMART POLLING] 🧠 Smart engagement calculation for @${config.username}:`, {
+          method: smartEngagement.method,
+          rate: smartEngagement.rate.toFixed(2) + '%',
+          description: smartEngagement.description
+        });
+
         await this.updateAccountData(config, {
           followersCount: newFollowerCount,
           mediaCount: mediaCount,
@@ -434,11 +598,20 @@ export class InstagramSmartPolling {
           avgLikes: engagementMetrics.avgLikes,
           avgComments: engagementMetrics.avgComments,
           avgReach: engagementMetrics.avgReach,
-          engagementRate: engagementMetrics.engagementRate,
+          engagementRate: parseFloat(engagementRate.toFixed(2)), // Total engagement rate
           totalLikes: engagementMetrics.totalLikes,
           totalComments: engagementMetrics.totalComments,
+          // ✅ Persist shares/saves from engagement metrics (previously omitted -> always 0 in DB/UI)
+          totalShares: engagementMetrics.totalShares || 0,
+          totalSaves: engagementMetrics.totalSaves || 0,
+          postsAnalyzed: engagementMetrics.postsAnalyzed || 0,
           totalReach: engagementMetrics.totalReach,
-          avgEngagement: engagementMetrics.avgEngagement,
+          avgEngagement: engagementMetrics.avgEngagement, // Average engagement per post
+          // 🚀 ENHANCED: Include periodized reach data for automatic updates
+          accountLevelReach: engagementMetrics.accountLevelReach || 0,
+          postLevelReach: engagementMetrics.postLevelReach || 0,
+          reachSource: engagementMetrics.reachSource || 'unavailable',
+          reachByPeriod: engagementMetrics.reachByPeriod || {},
           lastSyncAt: new Date()
         });
 
@@ -468,12 +641,35 @@ export class InstagramSmartPolling {
         config.lastFollowerCount = newFollowerCount;
         config.lastMediaCount = mediaCount;
         config.lastEngagementData = engagementMetrics;
+        config.lastPollTime = Date.now(); // Update last poll time for accurate nextPollIn calculation
         
         console.log(`[SMART POLLING] ✅ Updated @${config.username} - ALL metrics synchronized`);
       } else {
         config.consecutiveNoChanges++;
         console.log(`[SMART POLLING] 📊 No changes for @${config.username} (${config.consecutiveNoChanges} consecutive)`);
+        
+        // CRITICAL FIX: Even if no changes, update lastSyncAt and broadcast completion
+        // This ensures frontend knows the data is current
+        await this.storage.updateSocialAccount(account.id, {
+          lastSyncAt: new Date()
+        });
+        
+        // Clear dashboard cache to ensure fresh data on next request
+        this.dashboardCache.clearWorkspaceCache(config.workspaceId);
+        
+        // Broadcast poll completion event (even with no changes) so frontend can refresh
+        RealtimeService.broadcastToWorkspace(config.workspaceId, 'instagram_poll_completed', {
+          accountId: config.accountId,
+          username: config.username,
+          hasChanges: false,
+          lastSyncAt: new Date()
+        });
+        
+        console.log(`[SMART POLLING] 📡 Broadcasted poll completion to workspace ${config.workspaceId}`);
       }
+      
+      // Update last poll time regardless of changes
+      config.lastPollTime = Date.now();
 
     } catch (error) {
       console.error(`[SMART POLLING] ❌ Failed to poll @${config.username}:`, error);
@@ -488,126 +684,201 @@ export class InstagramSmartPolling {
   /**
    * Fetch comprehensive engagement metrics from Instagram using Business API when available
    */
-  private async fetchEngagementMetrics(accessToken: string, isBusinessAccount: boolean = false): Promise<any> {
+  private async fetchEngagementMetrics(accessToken: string, isBusinessAccount: boolean = false, accountId?: string): Promise<any> {
     try {
-      // Fetch recent media posts
-      const mediaResponse = await fetch(`https://graph.instagram.com/me/media?fields=id,like_count,comments_count&limit=25&access_token=${accessToken}`);
-      if (!mediaResponse.ok) {
-        console.log('[SMART POLLING] Media data not available, using defaults');
-        return { avgLikes: 0, avgComments: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalReach: 0, avgEngagement: 0 };
-      }
+      // 🚀 SIMPLE: Use simple engagement analysis (last 6 posts only)
+      console.log('[SMART POLLING] Using simple engagement analysis (last 6 posts)...');
       
-      const mediaData = await mediaResponse.json();
-      const mediaList = mediaData.data || [];
+      // Import the InstagramApiService to use the new simple method
+      const { InstagramApiService } = await import('./services/instagramApi');
       
-      if (!mediaList.length) {
-        return { avgLikes: 0, avgComments: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalReach: 0, avgEngagement: 0 };
-      }
-      
-      // Calculate basic engagement metrics
-      const totalLikes = mediaList.reduce((sum: number, media: any) => sum + (media.like_count || 0), 0);
-      const totalComments = mediaList.reduce((sum: number, media: any) => sum + (media.comments_count || 0), 0);
-      
-      const avgLikes = Math.round(totalLikes / mediaList.length);
-      const avgComments = Math.round(totalComments / mediaList.length);
-      const avgEngagement = avgLikes + avgComments;
-      
-      // Try to fetch REAL reach data using Business API insights
-      let totalReach = 0;
-      let reachCount = 0;
-      
-      if (isBusinessAccount) {
-        console.log('[SMART POLLING] 🔥 Business account detected - fetching REAL reach data from Instagram Business API');
-        for (const media of mediaList.slice(0, 5)) { // Sample first 5 posts to avoid rate limits
-          try {
-            const insightsResponse = await fetch(`https://graph.instagram.com/${media.id}/insights?metric=reach&access_token=${accessToken}`);
-            if (insightsResponse.ok) {
-              const insights = await insightsResponse.json();
-              const reach = insights.data?.[0]?.values?.[0]?.value || 0;
-              if (reach > 0) {
-                totalReach += reach;
-                reachCount++;
-                console.log(`[SMART POLLING] ✅ Real reach for post ${media.id}: ${reach}`);
-              }
-            } else {
-              console.log(`[SMART POLLING] Insights failed for ${media.id}: ${insightsResponse.status}`);
-            }
-          } catch (error) {
-            console.log(`[SMART POLLING] Could not fetch reach for post ${media.id}:`, error.message);
-          }
-        }
-      } else {
-        // Even if not detected as business, try ONE Business API call to test if we actually have access
-        console.log('[SMART POLLING] 🧪 Testing Business API access even though account not detected as business...');
-        if (mediaList.length > 0) {
-          try {
-            const testMedia = mediaList[0];
-            const testResponse = await fetch(`https://graph.instagram.com/${testMedia.id}/insights?metric=reach&access_token=${accessToken}`);
-            if (testResponse.ok) {
-              const insights = await testResponse.json();
-              const reach = insights.data?.[0]?.values?.[0]?.value || 0;
-              console.log(`[SMART POLLING] 🎉 SURPRISE! We DO have Business API access! Reach: ${reach}`);
-              // If Business API works, treat as business account and fetch more data
-              for (const media of mediaList.slice(0, 5)) {
-                try {
-                  const insightsResponse = await fetch(`https://graph.instagram.com/${media.id}/insights?metric=reach&access_token=${accessToken}`);
-                  if (insightsResponse.ok) {
-                    const insights = await insightsResponse.json();
-                    const reach = insights.data?.[0]?.values?.[0]?.value || 0;
-                    if (reach > 0) {
-                      totalReach += reach;
-                      reachCount++;
-                    }
-                  }
-                } catch (error) {
-                  // Continue if some posts fail
+      try {
+        // Get simple engagement data (last 6 posts only)
+        const simpleData = await InstagramApiService.getSimpleEngagementData(accessToken);
+        
+        console.log('[SMART POLLING] ✅ Simple engagement data received:', {
+          totalLikes: simpleData.totalLikes,
+          totalComments: simpleData.totalComments,
+          totalShares: simpleData.totalShares,
+          totalSaves: simpleData.totalSaves,
+          postsAnalyzed: simpleData.postsAnalyzed,
+          strategy: simpleData.samplingStrategy
+        });
+        
+        // Use simple data for accurate totals
+        const totalLikes = simpleData.totalLikes;
+        const totalComments = simpleData.totalComments;
+        const totalShares = simpleData.totalShares;
+        const totalSaves = simpleData.totalSaves;
+        const avgLikes = simpleData.avgLikesPerPost;
+        const avgComments = simpleData.avgCommentsPerPost;
+        const avgShares = simpleData.avgSharesPerPost;
+        const avgSaves = simpleData.avgSavesPerPost;
+        const totalEngagement = totalLikes + totalComments + totalShares + totalSaves;
+        const avgEngagementPerPost = simpleData.postsAnalyzed > 0 ? Math.round(totalEngagement / simpleData.postsAnalyzed) : 0;
+        
+        console.log(`[SMART POLLING] ✅ Simple engagement calculated: ${totalLikes} likes, ${totalComments} comments, ${totalShares} shares, ${totalSaves} saves across ${simpleData.postsAnalyzed} posts (${simpleData.samplingStrategy})`);
+        
+        // Continue with reach data fetching...
+        let totalReach = 0;
+        let reachCount = 0;
+        
+        // 🚀 ENHANCED: Initialize periodized reach data variables outside the business account block
+        let accountLevelReach = 0;
+        const reachByPeriod: any = {};
+        
+        if (isBusinessAccount && accountId) {
+          console.log('[SMART POLLING] 🔥 Business account detected - fetching COMPREHENSIVE reach data from Instagram Business API');
+          
+          // 🚀 ENHANCED: Fetch periodized reach data (day, week, month) for comprehensive updates
+          
+          console.log('[SMART POLLING] 🔧 Initializing periodized reach fetching...');
+          
+          const periods = [
+            { key: 'day', apiPeriod: 'day', label: 'Today' },
+            { key: 'week', apiPeriod: 'week', label: 'This Week' },
+            { key: 'days_28', apiPeriod: 'days_28', label: 'This Month' }
+          ];
+          
+          // Fetch reach data for each period
+          for (const period of periods) {
+            try {
+              const reachUrl = `https://graph.facebook.com/v23.0/${accountId}/insights?metric=reach&period=${period.apiPeriod}&access_token=${accessToken}`;
+              const reachResponse = await fetch(reachUrl);
+              
+              if (reachResponse.ok) {
+                const reachData = await reachResponse.json();
+                const reachValue = reachData.data?.[0]?.values?.[0]?.value || 0;
+                
+                if (reachValue > 0) {
+                  reachByPeriod[period.key] = {
+                    value: reachValue,
+                    source: 'account-level',
+                    updatedAt: new Date().toISOString()
+                  };
+                  
+                  console.log(`[SMART POLLING] ✅ ${period.label} reach: ${reachValue} (account-level)`);
+                  
+                  // Add to total reach calculation
+                  totalReach += reachValue;
+                  reachCount++;
+                } else {
+                  console.log(`[SMART POLLING] ⚠️ No ${period.label} reach data available`);
                 }
+              } else {
+                console.log(`[SMART POLLING] ⚠️ Could not fetch ${period.label} reach data: ${reachResponse.status}`);
               }
-            } else {
-              console.log(`[SMART POLLING] Business API test failed: ${testResponse.status} - confirmed personal account`);
+              
+              // Rate limiting delay between requests
+              await new Promise(resolve => setTimeout(resolve, 200));
+              
+            } catch (periodError) {
+              console.log(`[SMART POLLING] ⚠️ Error fetching ${period.label} reach:`, periodError);
             }
-          } catch (error) {
-            console.log(`[SMART POLLING] Business API test error: ${error.message}`);
           }
+          
+          // Calculate account-level reach as average of available periods
+          if (reachCount > 0) {
+            accountLevelReach = Math.round(totalReach / reachCount);
+            console.log(`[SMART POLLING] ✅ Account-level reach calculated: ${accountLevelReach} (from ${reachCount} periods)`);
+          }
+          
+        } else {
+          console.log('[SMART POLLING] ⚠️ Not a business account or missing account ID - skipping reach data');
         }
+        
+        // Calculate engagement rate
+        const engagementRate = simpleData.postsAnalyzed > 0 ? (totalEngagement / simpleData.postsAnalyzed) : 0;
+        
+        return {
+          avgLikes,
+          avgComments,
+          avgShares,
+          avgSaves,
+          avgReach: accountLevelReach,
+          engagementRate,
+          totalLikes,
+          totalComments,
+          totalShares,
+          totalSaves,
+          totalReach: accountLevelReach,
+          avgEngagement: avgEngagementPerPost,
+          // 🚀 NEW: Include simple data for better insights
+          postsAnalyzed: simpleData.postsAnalyzed,
+          samplingStrategy: simpleData.samplingStrategy,
+          reachByPeriod
+        };
+        
+      } catch (simpleError) {
+        console.log('[SMART POLLING] ⚠️ Simple analysis failed, falling back to basic method:', simpleError);
+        
+        // Fallback to original method if simple analysis fails
+        const mediaResponse = await fetch(`https://graph.instagram.com/me/media?fields=id,like_count,comments_count&limit=6&access_token=${accessToken}`);
+        if (!mediaResponse.ok) {
+          console.log('[SMART POLLING] Media data not available, using defaults');
+          return { avgLikes: 0, avgComments: 0, avgShares: 0, avgSaves: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalShares: 0, totalSaves: 0, totalReach: 0, avgEngagement: 0 };
+        }
+        
+        const mediaData = await mediaResponse.json();
+        const mediaList = mediaData.data || [];
+        
+        if (!mediaList.length) {
+          return { avgLikes: 0, avgComments: 0, avgShares: 0, avgSaves: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalShares: 0, totalSaves: 0, totalReach: 0, avgEngagement: 0 };
+        }
+        
+        // Calculate basic engagement metrics
+        const totalLikes = mediaList.reduce((sum: number, media: any) => sum + (media.like_count || 0), 0);
+        const totalComments = mediaList.reduce((sum: number, media: any) => sum + (media.comments_count || 0), 0);
+        const totalShares = mediaList.reduce((sum: number, media: any) => sum + (media.shares_count || 0), 0);
+        const totalSaves = mediaList.reduce((sum: number, media: any) => sum + (media.saves_count || 0), 0);
+        
+        const avgLikes = Math.round(totalLikes / mediaList.length);
+        const avgComments = Math.round(totalComments / mediaList.length);
+        const avgShares = Math.round(totalShares / mediaList.length);
+        const avgSaves = Math.round(totalSaves / mediaList.length);
+        const totalEngagement = totalLikes + totalComments + totalShares + totalSaves;
+        const avgEngagementPerPost = Math.round(totalEngagement / mediaList.length);
+        
+        // Return fallback data with basic reach calculation
+        return {
+          avgLikes,
+          avgComments,
+          avgShares,
+          avgSaves,
+          avgReach: 0, // No reach data in fallback
+          engagementRate: mediaList.length > 0 ? (totalEngagement / mediaList.length) : 0,
+          totalLikes,
+          totalComments,
+          totalShares,
+          totalSaves,
+          totalReach: 0,
+          avgEngagement: avgEngagementPerPost,
+          postsAnalyzed: mediaList.length,
+          samplingStrategy: 'fallback-recent'
+        };
       }
       
-      const avgReach = reachCount > 0 ? Math.round(totalReach / reachCount) : 0;
-      const totalReachEstimate = avgReach * mediaList.length;
-      const engagementRate = avgReach > 0 ? Math.round((avgEngagement / avgReach) * 100) : 0;
-      
-      console.log(`[SMART POLLING] ✅ Real engagement data: ${totalLikes} likes, ${totalComments} comments across ${mediaList.length} posts`);
-      if (isBusinessAccount && reachCount > 0) {
-        console.log(`[SMART POLLING] ✅ Real reach data: ${totalReach} total reach from ${reachCount} posts, avg: ${avgReach}`);
-      }
-      
-      return {
-        avgLikes,
-        avgComments,
-        avgReach,
-        engagementRate,
-        totalLikes,
-        totalComments,
-        totalReach: totalReachEstimate,
-        avgEngagement
-      };
     } catch (error) {
-      console.log('[SMART POLLING] Failed to fetch engagement metrics:', error.message);
-      return { avgLikes: 0, avgComments: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalReach: 0, avgEngagement: 0 };
+      console.error('[SMART POLLING] Error in engagement metrics fetch:', error);
+      return { avgLikes: 0, avgComments: 0, avgShares: 0, avgSaves: 0, avgReach: 0, engagementRate: 0, totalLikes: 0, totalComments: 0, totalShares: 0, totalSaves: 0, totalReach: 0, avgEngagement: 0 };
     }
   }
-  
+
   /**
-   * Check if engagement metrics have changed
+   * Check if engagement data has changed significantly
    */
   private hasEngagementChanges(config: PollingConfig, newMetrics: any): boolean {
     if (!config.lastEngagementData) return true;
     
     const old = config.lastEngagementData;
+    // BUGFIX: we weren't checking shares/saves, so updates never persisted when only these changed
     return old.avgLikes !== newMetrics.avgLikes ||
            old.avgComments !== newMetrics.avgComments ||
            old.totalLikes !== newMetrics.totalLikes ||
-           old.totalComments !== newMetrics.totalComments;
+           old.totalComments !== newMetrics.totalComments ||
+           old.totalShares !== newMetrics.totalShares ||
+           old.totalSaves !== newMetrics.totalSaves ||
+           old.postsAnalyzed !== newMetrics.postsAnalyzed;
   }
 
   /**
@@ -623,10 +894,53 @@ export class InstagramSmartPolling {
       );
 
       if (account) {
-        await this.storage.updateSocialAccount(account.id, updates);
+        // 🚨 DATA CONSISTENCY FIX: Only prevent overwriting real data with 0, but allow updates with new real data
+        // If we have new real Instagram Business API data (> 0), always use it
+        // Only prevent overwriting real data with 0 or negative values
+        if (updates.totalReach !== undefined && updates.totalReach > 0) {
+          console.log(`[SMART POLLING] ✅ Updating with new real Instagram Business API reach data: ${updates.totalReach}`);
+          // Allow the update - this is new real data
+        } else if (updates.totalReach !== undefined && updates.totalReach === 0 && account.totalReach > 0) {
+          console.log(`[SMART POLLING] 🛡️ Preserving existing real reach data (${account.totalReach}) - not overwriting with 0`);
+          delete updates.totalReach; // Don't update totalReach if it would overwrite real data with 0
+        }
+        
+        // Only filter out updates that would overwrite real data with 0
+        const filteredUpdates = Object.fromEntries(
+          Object.entries(updates).filter(([key, value]) => {
+            if (key === 'totalReach' && value === 0 && account.totalReach > 0) {
+              return false; // Don't overwrite real data with 0
+            }
+            return true;
+          })
+        );
+        
+        console.log(`[SMART POLLING] Updating account with filtered data for @${account.username}:`, filteredUpdates);
+        console.log(`[SMART POLLING] 🔧 DEBUG: reachByPeriod in updates:`, JSON.stringify(filteredUpdates.reachByPeriod, null, 2));
+        await this.storage.updateSocialAccount(account.id, filteredUpdates);
         
         // 📊 SAVE DAILY ANALYTICS SNAPSHOT - Building Real Historical Data!
         await this.recordDailyAnalytics(config, updates);
+        
+        // 🔄 TRIGGER REAL-TIME CACHE INVALIDATION - Notify frontend of data changes
+        try {
+          const workspaceId = account.workspaceId || account.workspace;
+          if (workspaceId) {
+            // Update dashboard cache with new data to trigger change detection
+            this.dashboardCache.updateCache(workspaceId.toString(), {
+              totalReach: updates.totalReach || account.totalReach,
+              engagementRate: updates.avgEngagement || account.avgEngagement,
+              followers: updates.followersCount || account.followersCount,
+              totalPosts: updates.mediaCount || account.mediaCount,
+              totalLikes: updates.totalLikes || account.totalLikes,
+              totalComments: updates.totalComments || account.totalComments,
+              accountUsername: account.username
+            });
+            console.log(`[SMART POLLING] 🔄 Cache invalidation triggered for workspace ${workspaceId}`);
+          }
+        } catch (cacheError) {
+          console.error('[SMART POLLING] Cache invalidation error:', cacheError);
+        }
       }
     } catch (error) {
       console.error('[SMART POLLING] Failed to update account data:', error);
@@ -642,11 +956,7 @@ export class InstagramSmartPolling {
       today.setHours(0, 0, 0, 0); // Start of day
       
       // Check if we already have an analytics record for today
-      const existingAnalytics = await this.storage.getAnalyticsByWorkspace(
-        config.workspaceId, 
-        'instagram', 
-        1 // Last 1 day
-      );
+      const existingAnalytics = await this.storage.getAnalyticsByWorkspace(config.workspaceId);
       
       const todayRecord = existingAnalytics.find((record: any) => {
         const recordDate = new Date(record.date);
@@ -837,48 +1147,6 @@ export class InstagramSmartPolling {
   }
 
   /**
-   * Notify system of user activity to adjust polling
-   */
-  updateUserActivity(accountId: string): void {
-    const config = this.pollingConfigs.get(accountId);
-    if (config) {
-      config.lastActivity = Date.now();
-      console.log(`[SMART POLLING] 👤 User activity detected for @${config.username}`);
-    }
-  }
-
-  /**
-   * Get polling status for all accounts
-   */
-  getPollingStatus(): any {
-    const status: any = {
-      totalAccounts: this.pollingConfigs.size,
-      accounts: []
-    };
-
-    this.pollingConfigs.forEach((config, accountId) => {
-      const rateLimitInfo = this.rateLimitTrackers.get(accountId);
-      const nextPollIn = this.calculatePollingInterval(config);
-      
-      status.accounts.push({
-        username: config.username,
-        accountId: accountId,
-        lastFollowerCount: config.lastFollowerCount,
-        consecutiveNoChanges: config.consecutiveNoChanges,
-        timeSinceActivity: Date.now() - config.lastActivity,
-        nextPollIn: nextPollIn,
-        rateLimitStatus: rateLimitInfo ? {
-          requestsUsed: rateLimitInfo.requestCount,
-          requestsRemaining: this.MAX_REQUESTS_PER_HOUR - rateLimitInfo.requestCount,
-          windowResetIn: Math.max(0, (rateLimitInfo.windowStart + this.HOUR_IN_MS) - Date.now())
-        } : null
-      });
-    });
-
-    return status;
-  }
-
-  /**
    * Force immediate poll for an account (respecting rate limits)
    */
   async forcePoll(accountId: string): Promise<boolean> {
@@ -893,9 +1161,9 @@ export class InstagramSmartPolling {
    * Stop polling for an account
    */
   stopPolling(accountId: string): void {
-    const interval = this.pollingIntervals.get(accountId);
-    if (interval) {
-      clearInterval(interval);
+    const timeout = this.pollingIntervals.get(accountId);
+    if (timeout) {
+      clearTimeout(timeout); // ⭐ FIX: Use clearTimeout instead of clearInterval
       this.pollingIntervals.delete(accountId);
     }
     this.pollingConfigs.delete(accountId);
@@ -907,8 +1175,8 @@ export class InstagramSmartPolling {
    * Stop all polling
    */
   stopAllPolling(): void {
-    this.pollingIntervals.forEach((interval) => {
-      clearInterval(interval);
+    this.pollingIntervals.forEach((timeout) => {
+      clearTimeout(timeout); // ⭐ FIX: Use clearTimeout instead of clearInterval
     });
     this.pollingIntervals.clear();
     this.pollingConfigs.clear();
@@ -922,28 +1190,76 @@ export class InstagramSmartPolling {
    * Get current polling status for all accounts
    */
   getPollingStatus(): any {
-    const accounts = Array.from(this.pollingConfigs.values()).map(config => {
+    console.log('[SMART POLLING] 📊 getPollingStatus called - polling configs:', this.pollingConfigs.size);
+    
+    const status: any = {
+      totalAccounts: this.pollingConfigs.size,
+      accounts: []
+    };
+
+    if (this.pollingConfigs.size === 0) {
+      console.log('[SMART POLLING] ⚠️ No polling configurations found - no Instagram accounts are being polled');
+      return status;
+    }
+
+    this.pollingConfigs.forEach((config, accountId) => {
+      const rateLimitInfo = this.rateLimitTrackers.get(accountId);
       const interval = this.calculatePollingInterval(config);
-      const nextPollTime = new Date(config.lastActivity + interval);
-      const nextPollIn = Math.max(0, nextPollTime.getTime() - Date.now());
+      const timeSinceActivity = Date.now() - config.lastActivity;
+      const isHibernated = timeSinceActivity > this.HIBERNATION_THRESHOLD;
       
-      return {
-        id: config.accountId,
+      // Calculate nextPollIn correctly using nextScheduledPollTime
+      let nextPollIn = 0;
+      const now = Date.now();
+      
+      console.log(`[SMART POLLING DEBUG] Account @${config.username} - nextPollIn calculation:
+        - interval: ${interval}
+        - now: ${now}
+        - nextScheduledPollTime: ${config.nextScheduledPollTime}
+        - lastPollTime: ${config.lastPollTime}`);
+      
+      if (interval === null) {
+        // Hibernated - no polling
+        nextPollIn = 0;
+      } else if (config.nextScheduledPollTime) {
+        // Use the actual scheduled poll time
+        nextPollIn = Math.max(0, config.nextScheduledPollTime - now);
+        console.log(`[SMART POLLING DEBUG] Account @${config.username} - Using nextScheduledPollTime:
+          - nextScheduledPollTime: ${config.nextScheduledPollTime}
+          - nextPollIn: ${nextPollIn} (${Math.round(nextPollIn / 1000)}s)`);
+      } else if (config.lastPollTime) {
+        // Fallback: calculate from lastPollTime if nextScheduledPollTime is not set
+        const timeSinceLastPoll = now - config.lastPollTime;
+        nextPollIn = Math.max(0, interval - timeSinceLastPoll);
+        console.log(`[SMART POLLING DEBUG] Account @${config.username} - Fallback using lastPollTime:
+          - timeSinceLastPoll: ${timeSinceLastPoll}
+          - nextPollIn: ${nextPollIn}`);
+      } else {
+        // No previous poll, use full interval
+        nextPollIn = interval;
+        console.log(`[SMART POLLING DEBUG] Account @${config.username} - No lastPollTime, using full interval: ${nextPollIn}`);
+      }
+      
+      console.log(`[SMART POLLING] 📊 Account @${config.username}: interval=${interval}, nextPollIn=${nextPollIn}, isHibernated=${isHibernated}`);
+      
+      status.accounts.push({
         username: config.username,
-        isActive: config.isActive,
-        lastPolled: new Date(config.lastActivity),
+        accountId: accountId,
+        lastFollowerCount: config.lastFollowerCount,
+        consecutiveNoChanges: config.consecutiveNoChanges,
+        timeSinceActivity: timeSinceActivity,
         nextPollIn: nextPollIn,
-        interval: interval,
-        requestsToday: 0 // Simplified for now
-      };
+        status: isHibernated ? 'HIBERNated' : 'ACTIVE',
+        hibernationThreshold: this.HIBERNATION_THRESHOLD,
+        rateLimitStatus: rateLimitInfo ? {
+          requestsUsed: rateLimitInfo.requestCount,
+          requestsRemaining: this.MAX_REQUESTS_PER_HOUR - rateLimitInfo.requestCount,
+          windowResetIn: Math.max(0, (rateLimitInfo.windowStart + this.HOUR_IN_MS) - Date.now())
+        } : null
+      });
     });
 
-    return {
-      totalAccounts: this.pollingConfigs.size,
-      activeAccounts: Array.from(this.pollingConfigs.values()).filter(config => config.isActive).length,
-      totalRequestsToday: this.requestHistory?.length || 0,
-      rateLimitRemaining: Math.max(0, this.MAX_REQUESTS_PER_HOUR - (this.requestHistory?.length || 0)),
-      accounts: accounts
-    };
+    console.log('[SMART POLLING] 📊 Returning polling status:', JSON.stringify(status, null, 2));
+    return status;
   }
 }

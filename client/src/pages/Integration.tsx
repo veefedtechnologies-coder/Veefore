@@ -134,11 +134,13 @@ function IntegrationContent() {
     title: string
     message: string
     type: 'error' | 'warning' | 'constraint'
+    showRetry?: boolean
   }>({
     isOpen: false,
     title: '',
     message: '',
-    type: 'error'
+    type: 'error',
+    showRetry: false
   })
 
   console.log('Integration component rendering...')
@@ -185,19 +187,96 @@ function IntegrationContent() {
     
     if (success === 'true' || connected === 'instagram' || connected === 'youtube') {
       console.log('OAuth callback success detected, refreshing data...')
+      const synced = urlParams.get('synced')
+      const username = urlParams.get('username')
+      console.log('OAuth sync status:', synced)
+      console.log('OAuth username:', username)
       
       // Clean up URL parameters first to prevent double execution
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Background refresh without loading state - data will update silently
-      Promise.all([
-        queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] }),
-        queryClient.refetchQueries({ queryKey: ['/api/workspaces'] })
-      ]).then(() => {
-        console.log('✅ OAuth success: Background refresh complete')
-        setIsProcessingOAuth(false)
-      })
+      // CRITICAL: Wait for workspace to load, then sync
+      const waitForWorkspaceAndSync = async () => {
+        let attempts = 0
+        const maxAttempts = 10
+        
+        // Wait for currentWorkspace to be available
+        while (!currentWorkspace?.id && attempts < maxAttempts) {
+          console.log(`⏳ Waiting for workspace to load... (attempt ${attempts + 1}/${maxAttempts})`)
+          await new Promise(resolve => setTimeout(resolve, 500))
+          attempts++
+        }
+        
+        if (!currentWorkspace?.id) {
+          console.error('❌ Workspace not available after waiting, skipping immediate sync')
+          // Still try to refetch without sync
+          queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+          queryClient.refetchQueries({ queryKey: ['/api/workspaces'] })
+          setIsProcessingOAuth(false)
+          return
+        }
+        
+        console.log('✅ Workspace loaded:', currentWorkspace.id)
+        
+        // Now that we have workspace, call immediate sync
+        try {
+          if (connected === 'instagram' || (success === 'true' && username)) {
+            console.log('🚀 Calling immediate sync API for workspace:', currentWorkspace.id)
+            
+            // Call the immediate sync endpoint
+            const syncResponse = await apiRequest('/api/instagram/immediate-sync', {
+              method: 'POST',
+              body: JSON.stringify({ 
+                workspaceId: currentWorkspace.id 
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }).catch(err => {
+              console.error('⚠️ Immediate sync API failed:', err)
+              return null
+            })
+            
+            if (syncResponse) {
+              console.log('✅ Immediate sync API succeeded:', syncResponse)
+            } else {
+              console.warn('⚠️ Sync returned null, data might not be updated')
+            }
+            
+            // Wait a bit for DB write
+            await new Promise(resolve => setTimeout(resolve, 1500))
+          }
+        } catch (error) {
+          console.error('❌ Force sync error:', error)
+        }
+        
+        // Background refresh without loading state - data will update silently
+        // Use correct query key that matches the actual query
+        Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] }),
+          queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] }),
+          queryClient.refetchQueries({ queryKey: ['/api/workspaces'] })
+        ]).then(() => {
+          console.log('✅ OAuth success: Background refresh complete')
+          setIsProcessingOAuth(false)
+          
+          // Force another refetch after 2 seconds to ensure data is loaded
+          setTimeout(() => {
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            console.log('✅ Secondary refresh triggered')
+          }, 2000)
+          
+          // Force a third refetch after 5 seconds as final fallback
+          setTimeout(() => {
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            console.log('✅ Final refresh triggered')
+          }, 5000)
+        })
+      }
+      
+      // Start the sync process
+      waitForWorkspaceAndSync()
     } else if (error) {
       console.log('OAuth callback error detected:', error)
       
@@ -205,32 +284,108 @@ function IntegrationContent() {
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
       
-      // Handle specific error messages with modal
-      let errorTitle = "Connection Failed"
-      let errorDescription = "Failed to connect your social media account."
-      let errorType: 'error' | 'warning' | 'constraint' = 'error'
+      // Get additional error parameters
+      const urlParamsForError = new URLSearchParams(window.location.search)
+      const message = urlParamsForError.get('message')
+      const retry = urlParamsForError.get('retry')
       
-      if (error.includes('already connected') || error.includes('another workspace')) {
-        errorTitle = "Account Already Connected"
-        errorDescription = decodeURIComponent(error)
-        errorType = 'constraint'
-      } else if (error === 'token_exchange_failed') {
-        errorDescription = "Authentication failed. Please try again."
-      } else if (error === 'profile_fetch_failed') {
-        errorDescription = "Could not fetch your profile information. Please try again."
-      } else if (error === 'missing_code_or_state') {
-        errorDescription = "Authentication flow was interrupted. Please try again."
-      } else if (error === 'invalid_state') {
-        errorDescription = "Invalid authentication state. Please try again."
-      } else {
-        errorDescription = decodeURIComponent(error)
+      // Handle comprehensive error messages with retry options
+      let errorTitle = "Connection Failed"
+      let errorDescription = message ? decodeURIComponent(message) : "Failed to connect your social media account."
+      let errorType: 'error' | 'warning' | 'constraint' = 'error'
+      let showRetry = retry === 'true'
+      
+      // Map error types to user-friendly messages
+      switch (error) {
+        case 'authorization_code_used':
+          errorTitle = "Account Already Connected"
+          errorDescription = message ? decodeURIComponent(message) : 'Your Instagram account was already connected. We have cleared the old connection so you can reconnect.'
+          errorType = 'constraint'
+          showRetry = true
+          break
+          
+        case 'oauth_exception':
+          errorTitle = "Instagram Access Denied"
+          errorDescription = message ? decodeURIComponent(message) : 'Instagram denied access to your account. Please check your permissions and try again.'
+          break
+          
+        case 'invalid_client':
+          errorTitle = "Configuration Error"
+          errorDescription = message ? decodeURIComponent(message) : 'Instagram app configuration error. Please contact support.'
+          showRetry = false
+          break
+          
+        case 'rate_limited':
+          errorTitle = "Too Many Attempts"
+          errorDescription = message ? decodeURIComponent(message) : 'Too many connection attempts. Please wait a few minutes and try again.'
+          break
+          
+        case 'server_error':
+          errorTitle = "Instagram Service Error"
+          errorDescription = message ? decodeURIComponent(message) : 'Instagram servers are experiencing issues. Please try again in a few minutes.'
+          break
+          
+        case 'timeout':
+          errorTitle = "Connection Timeout"
+          errorDescription = message ? decodeURIComponent(message) : 'Connection timed out. Please check your internet connection and try again.'
+          break
+          
+        case 'long_lived_token_failed':
+          errorTitle = "Token Extension Failed"
+          errorDescription = message ? decodeURIComponent(message) : 'Failed to extend access token. Please try connecting again.'
+          break
+          
+        case 'profile_fetch_failed':
+          errorTitle = "Profile Access Failed"
+          errorDescription = message ? decodeURIComponent(message) : 'Could not access your Instagram profile. Please check permissions and try again.'
+          break
+          
+        case 'database_save_failed':
+          errorTitle = "Save Failed"
+          errorDescription = message ? decodeURIComponent(message) : 'Failed to save your account. Please try again.'
+          break
+          
+        case 'account_already_exists':
+          errorTitle = "Account Already Exists"
+          errorDescription = message ? decodeURIComponent(message) : 'This Instagram account is already connected.'
+          errorType = 'constraint'
+          showRetry = false
+          break
+          
+        case 'instagram_already_connected':
+          errorTitle = "Account Already In Use"
+          errorDescription = message ? decodeURIComponent(message) : 'This Instagram account is already connected to a workspace. Please disconnect it first or use a different account.'
+          errorType = 'constraint'
+          showRetry = false
+          break
+          
+        case 'missing_code_or_state':
+          errorTitle = "Authentication Interrupted"
+          errorDescription = 'Authentication flow was interrupted. Please try again.'
+          break
+          
+        case 'invalid_state':
+          errorTitle = "Security Error"
+          errorDescription = 'Invalid authentication state. Please try again.'
+          break
+          
+        default:
+          if (error.includes('already connected') || error.includes('another workspace')) {
+            errorTitle = "Account Already Connected"
+            errorDescription = decodeURIComponent(error)
+            errorType = 'constraint'
+            showRetry = false
+          } else {
+            errorDescription = decodeURIComponent(error)
+          }
       }
       
       setErrorModal({
         isOpen: true,
         title: errorTitle,
         message: errorDescription,
-        type: errorType
+        type: errorType,
+        showRetry: showRetry
       })
       
       // Don't trigger loading state for errors
@@ -354,6 +509,17 @@ function IntegrationContent() {
       })
     },
     onSuccess: () => {
+      // Clear OAuth state from URL to prevent authorization code reuse
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('code') || url.searchParams.has('state')) {
+        url.searchParams.delete('code');
+        url.searchParams.delete('state');
+        url.searchParams.delete('error');
+        url.searchParams.delete('synced');
+        window.history.replaceState({}, document.title, url.toString());
+        console.log('🧹 [DISCONNECT] Cleared OAuth state from URL');
+      }
+      
       // Success - no modal needed for success messages
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
     },
@@ -371,16 +537,42 @@ function IntegrationContent() {
   const refreshMutation = useMutation({
     mutationFn: async (platform: string) => {
       if (platform === 'instagram') {
-        return apiRequest('/api/instagram/force-sync', {
+        console.log('🔄 [FRONTEND] Manual refresh triggered')
+        console.log('🔄 [FRONTEND] Current workspace:', currentWorkspace)
+        console.log('🔄 [FRONTEND] Workspace ID:', currentWorkspace?.id)
+        
+        if (!currentWorkspace?.id) {
+          throw new Error('No workspace selected. Please refresh the page and try again.')
+        }
+        
+        console.log('🔄 [FRONTEND] Calling API:', '/api/instagram/immediate-sync')
+        console.log('🔄 [FRONTEND] Request body:', { workspaceId: currentWorkspace.id })
+        
+        const response = await apiRequest('/api/instagram/immediate-sync', {
           method: 'POST',
-          body: JSON.stringify({ workspaceId: currentWorkspace?.id })
+          body: JSON.stringify({ workspaceId: currentWorkspace.id }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
         })
+        console.log('✅ [FRONTEND] Manual refresh completed:', response)
+        return response
       }
       throw new Error('Platform not supported for refresh')
     },
-    onSuccess: () => {
-      // Success - no modal needed for success messages
+    onSuccess: (data: any) => {
+      // Success - force immediate refetch
+      console.log('✅ Refresh mutation success, refetching data...')
       queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+      queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+      
+      // Show success message with username
+      setErrorModal({
+        isOpen: true,
+        title: "✅ Data Synced!",
+        message: `Instagram data updated successfully for @${data.username || 'your account'}`,
+        type: "warning" // Using warning for success (green color)
+      })
     },
     onError: (error: any, platform: string) => {
       setErrorModal({
@@ -439,7 +631,8 @@ function IntegrationContent() {
 
   const hasValidAccessToken = (account: SocialAccount | undefined) => {
     if (!account) return false
-    return account.accessToken && account.accessToken.trim() !== ''
+    // Check hasAccessToken boolean flag from backend (tokens are never exposed for security)
+    return (account as any).hasAccessToken === true
   }
 
   const renderPlatformCard = (platform: keyof typeof platformConfig) => {
@@ -930,6 +1123,13 @@ function IntegrationContent() {
         title={errorModal.title}
         message={errorModal.message}
         type={errorModal.type}
+        showRetry={errorModal.showRetry}
+        onRetry={() => {
+          setErrorModal(prev => ({ ...prev, isOpen: false }))
+          if (connectingPlatform) {
+            handleOAuthConnect(connectingPlatform)
+          }
+        }}
       />
     </div>
   )

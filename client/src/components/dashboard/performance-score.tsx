@@ -1,11 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useLocation } from 'wouter'
-import { useState, useEffect } from 'react'
-import { apiRequest } from '@/lib/queryClient'
+import { useState, useEffect, useMemo } from 'react'
+import { apiRequest, queryClient } from '@/lib/queryClient'
 import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, Sparkles, Users, Heart, MessageCircle, Share, Eye, ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react'
+import { useCacheInvalidation } from '@/hooks/useCacheInvalidation'
+import { useToast } from '@/hooks/use-toast'
 
 export function PerformanceScore() {
   const [, setLocation] = useLocation()
@@ -13,91 +15,233 @@ export function PerformanceScore() {
   const { currentWorkspace } = useCurrentWorkspace()
   const [showDataStory, setShowDataStory] = useState(false)
   const [storyAnimation, setStoryAnimation] = useState(0)
+  const { toast } = useToast()
+  
+  // Enable real-time cache invalidation for instant updates
+  const { isConnected: cacheConnected } = useCacheInvalidation()
 
   // Create unique data story when period changes
   useEffect(() => {
     setShowDataStory(true)
     setStoryAnimation(prev => prev + 1)
+    
+    // FORCE REFRESH: Invalidate cache when period changes to ensure fresh data
+    console.log(`🔄 [PERIOD CHANGE] Invalidating cache for period: ${selectedPeriod}`);
+    queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics', currentWorkspace?.id] })
+    queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+    
     // No auto-close timer - only closes when user clicks X
-  }, [selectedPeriod])
+  }, [selectedPeriod, currentWorkspace?.id, queryClient])
 
-  // Generate unique data stories based on actual performance
+  // Story rotation state
+  const [storyIndex, setStoryIndex] = useState(0)
+  const [forceRefresh, setForceRefresh] = useState(0)
+
+  // Fetch AI insights from the server - FORCE NEW AI STORIES ONLY
+  const { data: aiInsights, isLoading: insightsLoading, error: insightsError, refetch: refetchAI } = useQuery({
+    queryKey: ['/api/ai-growth-insights', currentWorkspace?.id, selectedPeriod, forceRefresh], // Period-specific AI stories
+    queryFn: async () => {
+      console.log('🔍 [AI INSIGHTS] Query triggered!');
+      console.log('🔍 [AI INSIGHTS] Current workspace:', currentWorkspace?.id);
+      console.log('🔍 [AI INSIGHTS] Selected period:', selectedPeriod);
+      console.log('🔍 [AI INSIGHTS] Timestamp:', new Date().toISOString());
+      
+      if (!currentWorkspace?.id) {
+        console.log('⚠️ [AI INSIGHTS] No workspace ID - skipping');
+        return { stories: [], insights: [], message: 'Connect social accounts' };
+      }
+      
+      console.log('📡 [AI INSIGHTS] Fetching from API...');
+      const url = `/api/ai-growth-insights?workspaceId=${currentWorkspace.id}&period=${selectedPeriod}&nocache=${Date.now()}`;
+      console.log('📡 [AI INSIGHTS] URL:', url, 'for period:', selectedPeriod);
+      
+      const result = await apiRequest(url);
+      console.log('✅ [AI INSIGHTS] Response received:', result);
+      console.log('📊 [AI INSIGHTS] Stories count:', result?.stories?.length || 0);
+      
+      // Log all story titles to compare
+      if (result?.stories?.length > 0) {
+        console.log('📝 [AI INSIGHTS] Story titles:', result.stories.map((s: any) => s.title).join(' ! '));
+        console.log('📝 [AI INSIGHTS] First story:', result.stories[0]);
+      } else {
+        console.log('❌ [AI INSIGHTS] No stories in response!');
+      }
+      
+      return result;
+    },
+    enabled: !!currentWorkspace?.id,
+    staleTime: 30 * 1000, // Cache AI stories for 30 seconds - balance freshness and performance
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
+  })
+
+  // Debug logging
+  console.log('🎯 [DEBUG] Component rendered - aiInsights:', aiInsights ? 'has data' : 'null');
+  console.log('🎯 [DEBUG] insightsLoading:', insightsLoading);
+  console.log('🎯 [DEBUG] insightsError:', insightsError);
+  console.log('🎯 [DEBUG] currentWorkspace?.id:', currentWorkspace?.id);
+  console.log('🎯 [DEBUG] forceRefresh counter:', forceRefresh);
+  
+  // Log current story being displayed
+  if (aiInsights?.stories?.length > 0) {
+    const currentStory = aiInsights.stories[storyIndex % aiInsights.stories.length];
+    console.log('🎯 [DEBUG] Current displayed story:');
+    console.log('  Title:', currentStory.title);
+    console.log('  Emoji:', currentStory.emoji);
+    console.log('  Story:', currentStory.story);
+    console.log('  Working:', currentStory.working);
+    console.log('  Attention:', currentStory.attention);
+    console.log('  Suggestion:', currentStory.suggestion);
+  } else {
+    console.log('🎯 [DEBUG] No AI stories available to display.');
+  }
+
+  // Get current AI story for display
+  const getAIStory = () => {
+    console.log('🔍 [GET AI STORY] Function called');
+    console.log('🔍 [GET AI STORY] aiInsights:', aiInsights);
+    console.log('🔍 [GET AI STORY] aiInsights?.stories:', aiInsights?.stories);
+    console.log('🔍 [GET AI STORY] aiInsights?.stories type:', typeof aiInsights?.stories);
+    console.log('🔍 [GET AI STORY] aiInsights?.stories length:', aiInsights?.stories?.length);
+    
+    const aiStories = aiInsights?.stories || [];
+    
+    console.log('[FRONTEND] getAIStory called - period:', selectedPeriod, 'stories available:', aiStories.length);
+    console.log('[FRONTEND] aiStories array:', aiStories);
+    
+    if (aiStories.length === 0) {
+      console.log('[FRONTEND] ❌ No AI stories available - returning null');
+      console.log('[FRONTEND] aiInsights object:', JSON.stringify(aiInsights, null, 2));
+      return null; // Will use loading state
+    }
+
+    // Rotate through available stories
+    const currentStory = aiStories[storyIndex % aiStories.length];
+    console.log('[FRONTEND] Selected story index:', storyIndex % aiStories.length);
+    console.log('[FRONTEND] Story title:', currentStory.title);
+    console.log('[FRONTEND] Story emoji:', currentStory.emoji);
+    console.log('[FRONTEND] Story text:', currentStory.story);
+    console.log('[FRONTEND] What\'s working:', currentStory.working);
+    console.log('[FRONTEND] Needs attention:', currentStory.attention);
+    
+    // Determine color based on period
+    const periodColors = {
+      day: 'bg-gradient-to-br from-orange-500 via-pink-500 to-red-600 text-white dark:text-white',
+      week: 'bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600 text-white dark:text-white',
+      month: 'bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-600 text-white dark:text-white'
+    };
+    
+    return {
+      emoji: currentStory.emoji || '📊',
+      title: currentStory.title || 'Performance Update',
+      story: currentStory.story || '',
+      working: currentStory.working || '',
+      attention: currentStory.attention || '',
+      insight: currentStory.suggestion || '',
+      color: periodColors[selectedPeriod as keyof typeof periodColors] || periodColors.month,
+      textColor: 'text-white dark:text-white'
+    };
+  };
+
+  // Generate story from AI insights - FORCE NEW AI STORIES ONLY
   const generateDataStory = (currentData: any) => {
-    const followerCount = currentData?.followers || 4
-    const engagement = currentData?.engagement || 567
-    const reach = currentData?.reach || 135
-    const posts = currentData?.posts || 15
-    const period = currentData?.period || selectedPeriod
+    console.log('🎯 [GENERATE STORY] Called with data:', currentData);
+    console.log('🎯 [GENERATE STORY] aiInsights available:', !!aiInsights);
+    console.log('🎯 [GENERATE STORY] aiInsights.stories:', aiInsights?.stories);
+    console.log('🎯 [GENERATE STORY] aiInsights.stories length:', aiInsights?.stories?.length);
+    
+    // FORCE USE NEW AI STORIES - NO FALLBACK
+    const aiStory = getAIStory();
+    console.log('🎯 [GENERATE STORY] getAIStory() result:', aiStory);
+    
+    if (aiStory) {
+      console.log('✅ [GENERATE STORY] Using NEW AI story:', aiStory.title);
+      return aiStory;
+    }
 
-    const stories = {
+    // If no AI stories available, show immediate default story based on period
+    console.log('⚠️ [GENERATE STORY] No AI stories available - showing immediate default story');
+    
+    const periodColors = {
+      day: 'bg-gradient-to-br from-orange-500 via-pink-500 to-red-600 text-white dark:text-white',
+      week: 'bg-gradient-to-br from-purple-500 via-indigo-500 to-blue-600 text-white dark:text-white',
+      month: 'bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-600 text-white dark:text-white'
+    };
+    
+    const defaultStories = {
       day: {
-        emoji: "⚡",
-        title: "Right Now Mode",
-        story: engagement > 100 
-          ? `🔥 Your content is ON FIRE today! ${engagement.toFixed(0)}% engagement means every post gets massive love`
-          : `📊 Today's snapshot: ${followerCount} followers are watching. Time to drop that viral content!`,
-        insight: posts > 0 ? "Peak activity detected! Your audience is most active right now." : "Perfect timing to post - your audience is waiting!",
-        color: "bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 dark:from-slate-800 dark:via-slate-700 dark:to-slate-600",
-        textColor: "text-gray-100 dark:text-gray-200"
+        emoji: "📊",
+        title: "Today's Performance",
+        story: "Analyzing your daily metrics and engagement patterns to provide actionable insights.",
+        working: "Processing today's data",
+        attention: "Generating insights",
+        insight: "AI is analyzing your performance to give you honest feedback"
       },
       week: {
-        emoji: "🎯", 
-        title: "Weekly Pulse",
-        story: reach > followerCount 
-          ? `🚀 VIRAL ALERT! You reached ${reach} people with just ${followerCount} followers. That's ${Math.round(reach/followerCount)}x amplification!`
-          : `📈 This week: ${posts} posts, ${followerCount} loyal followers, building your empire one post at a time`,
-        insight: "Weekly patterns reveal your content's true impact. Consistency is key!",
-        color: "bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 dark:from-slate-800 dark:via-slate-700 dark:to-slate-600", 
-        textColor: "text-gray-100 dark:text-gray-200"
+        emoji: "📈",
+        title: "Weekly Analysis",
+        story: "Reviewing your weekly trends and content performance to identify growth opportunities.",
+        working: "Analyzing weekly patterns",
+        attention: "Processing trends",
+        insight: "AI is examining your weekly data for strategic insights"
       },
       month: {
-        emoji: "💎",
-        title: "Growth Journey", 
-        story: posts >= 10 
-          ? `🏆 CONTENT MACHINE! ${posts} posts this month = ${(posts/30).toFixed(1)} posts/day. You're building a media empire!`
-          : `💪 ${posts} quality posts, ${followerCount} engaged followers. Quality > Quantity strategy in action!`,
-        insight: engagement > 300 ? "Your content strategy is working! Keep this momentum going." : "Steady growth foundation set. Ready to scale up?",
-        color: "bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 dark:from-slate-800 dark:via-slate-700 dark:to-slate-600",
-        textColor: "text-gray-100 dark:text-gray-200"  
+        emoji: "🎯",
+        title: "Monthly Strategy",
+        story: "Evaluating your monthly performance and long-term growth patterns for strategic planning.",
+        working: "Analyzing monthly trends",
+        attention: "Processing strategy",
+        insight: "AI is reviewing your monthly data for strategic recommendations"
       }
-    }
-    return stories[period]
+    };
+    
+    const defaultStory = defaultStories[selectedPeriod as keyof typeof defaultStories] || defaultStories.month;
+    
+    return {
+      ...defaultStory,
+      color: periodColors[selectedPeriod as keyof typeof periodColors] || periodColors.month,
+      textColor: "text-white dark:text-white"
+    };
   }
   
-  // Fetch real dashboard analytics data for current workspace - PRODUCTION-SAFE
+  // Fetch real dashboard analytics data for current workspace - PERIOD-AWARE WITH REAL-TIME UPDATES
   const { data: analytics, isLoading, isFetching } = useQuery({
-    queryKey: ['/api/dashboard/analytics', currentWorkspace?.id],
+    queryKey: ['/api/dashboard/analytics', currentWorkspace?.id, 'optimized'], // Single cache key - no period
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/dashboard/analytics?workspaceId=${currentWorkspace.id}`) : Promise.resolve({}),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
+    refetchInterval: cacheConnected ? 300000 : 30000, // 5 minutes if real-time connected, 30 seconds if not
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchOnReconnect: true, // Refresh when network reconnects
-    refetchOnMount: false, // Don't refetch on mount - rely on cache
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes before marking as stale
-    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
-    placeholderData: (previousData) => previousData, // Show cached data immediately while refetching
+    refetchOnMount: true, // Always refetch on mount to get latest calculations
+    staleTime: cacheConnected ? 1 * 60 * 1000 : 0, // 1 minute if real-time connected, immediate if not
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: 1, // Retry once on failure
+    retryDelay: 3000, // 3-second delay before retry
+    placeholderData: undefined, // Don't show cached data - force fresh data
   })
 
-  // Fetch real social accounts data for current workspace - HYBRID: Webhooks + Smart Polling
+  // Fetch real social accounts data for current workspace - PERIOD-AWARE WITH REAL-TIME UPDATES
   const { data: socialAccounts } = useQuery({
-    queryKey: ['/api/social-accounts', currentWorkspace?.id],
+    queryKey: ['/api/social-accounts', currentWorkspace?.id, 'optimized'], // Single cache key - no period
     queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
     refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchOnReconnect: true, // Refresh when network reconnects
-    refetchOnMount: false, // Don't refetch on mount - rely on cache
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes before marking as stale
-    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
-    placeholderData: (previousData) => previousData, // Show cached data immediately while refetching
+    refetchOnMount: true, // Always refetch on mount to get latest calculations
+    staleTime: 1 * 60 * 1000, // Cache for 1 minute - fresher data
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    placeholderData: undefined, // Don't show cached data - force fresh sync
   })
 
   // Fetch historical analytics data for trend comparisons - HYBRID: Webhooks + Smart Polling
   const { data: historicalData } = useQuery({
-    queryKey: ['/api/analytics/historical', selectedPeriod, currentWorkspace?.id],
-    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/analytics/historical?period=${selectedPeriod}&days=${selectedPeriod === 'day' ? 7 : selectedPeriod === 'week' ? 30 : 90}&workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+    queryKey: ['/api/analytics/historical', currentWorkspace?.id, 'optimized'], // Single cache key - fetch all periods at once
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/analytics/historical?period=month&days=90&workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
     refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
@@ -107,6 +251,50 @@ export function PerformanceScore() {
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes before marking as stale
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     placeholderData: (previousData) => previousData, // Show cached data immediately while refetching
+  })
+
+  // Manual Instagram sync mutation for dashboard
+  const syncMutation = useMutation({
+    mutationFn: () => {
+      console.log('🔄 [DASHBOARD] Manual sync triggered for workspace:', currentWorkspace?.id)
+      
+      if (!currentWorkspace?.id) {
+        console.error('🔄 [DASHBOARD] ERROR: No workspace ID!')
+        return Promise.reject(new Error('No workspace selected'))
+      }
+      
+      console.log('🔄 [DASHBOARD] Calling immediate-sync endpoint...')
+      return apiRequest('/api/instagram/immediate-sync', { 
+        method: 'POST',
+        body: JSON.stringify({ workspaceId: currentWorkspace.id })
+      })
+    },
+    onSuccess: (data) => {
+      console.log('✅ [DASHBOARD] Sync successful:', data)
+      
+      // Invalidate all relevant queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+      
+      toast({
+        title: "Sync Successful! 🎉",
+        description: "Instagram data has been refreshed with latest metrics including reach data.",
+        duration: 5000,
+      })
+    },
+    onError: (error: any) => {
+      console.error('❌ [DASHBOARD] Sync failed:', error)
+      
+      const errorMessage = error?.response?.data?.message || error?.message || 'Sync failed'
+      
+      toast({
+        title: "Sync Failed ❌",
+        description: `Failed to sync Instagram data: ${errorMessage}`,
+        variant: "destructive",
+        duration: 5000,
+      })
+    }
   })
 
   // Calculate REAL growth data using historical records
@@ -185,27 +373,19 @@ export function PerformanceScore() {
   }
 
 
-  if (!analytics && isLoading) {
-    return (
-      <Card data-testid="performance-score" className="border-gray-200/50 dark:border-gray-700/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
-        <CardHeader className="text-center pb-4">
-          <div className="animate-pulse">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-2"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mx-auto"></div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-4">
-            <div className="grid grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+  // Show skeleton loading only for a limited time, then show error state
+  const [showError, setShowError] = useState(false)
+  
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setShowError(true)
+      }, 10000) // Show error after 10 seconds of loading
+      return () => clearTimeout(timer)
+    } else {
+      setShowError(false)
+    }
+  }, [isLoading])
 
   // Map real connected platforms from social accounts
   const connectedPlatforms = socialAccounts?.filter((account: any) => {
@@ -224,17 +404,68 @@ export function PerformanceScore() {
            account.platform === 'twitter' ? 'from-blue-400 to-blue-600' : 
            account.platform === 'linkedin' ? 'from-blue-700 to-blue-900' : 'from-blue-600 to-blue-700',
     followers: account.followersCount || account.followers || 0,
-    engagement: account.avgEngagement ? `${account.avgEngagement.toFixed(1)}%` : '0%',
+    engagement: (() => {
+      // Calculate real engagement rate using industry standard formula
+      const totalEngagement = (account.totalLikes || 0) + (account.totalComments || 0)
+      const followers = account.followersCount || account.followers || 0
+      const realEngagementRate = followers > 0 ? (totalEngagement / followers) * 100 : 0
+      return `${realEngagementRate.toFixed(1)}%`
+    })(),
     reach: account.totalReach || 0,
     posts: account.mediaCount || account.posts || 0,
-    username: account.username
+    username: account.username,
+    // CRITICAL FIX: Include periodized reach data for proper period-specific calculations
+    reachByPeriod: account.reachByPeriod || {},
+    totalReach: account.totalReach || 0
   })) || []
 
-  // Calculate total metrics from real data
-  const totalFollowers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
-  const totalReach = analytics?.totalReach || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.reach, 0)
-  const avgEngagement = connectedPlatforms.length > 0 ? parseFloat(connectedPlatforms[0].engagement) || 0 : 0
-  const totalPosts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.posts, 0)
+  // PERFORMANCE OPT: Client-side period filtering for INSTANT response
+  const getPeriodicReach = (platform: any, period: 'day' | 'week' | 'month') => {
+    // Map frontend periods to backend keys
+    const periodKey = period === 'day' ? 'day' : period === 'week' ? 'week' : 'days_28'
+    return platform?.reachByPeriod?.[periodKey]?.value || platform?.totalReach || 0
+  }
+
+  // PERFORMANCE OPT: Memoize period-specific calculations for instant switching
+  const periodMetrics = useMemo(() => {
+    // DEBUG: Log period-specific calculations
+    console.log(`🔍 [PERIOD METRICS] Calculating for period: ${selectedPeriod}`);
+    console.log(`🔍 [PERIOD METRICS] Connected platforms:`, connectedPlatforms.length);
+    console.log(`🔍 [PERIOD METRICS] Raw social accounts data:`, socialAccounts);
+    
+    // Extract period-specific reach data from platforms
+    const reach = connectedPlatforms.reduce((sum: number, platform: any) => {
+      const periodicReach = getPeriodicReach(platform, selectedPeriod);
+      console.log(`🔍 [PERIOD METRICS] ${platform.username}: reachByPeriod`, platform.reachByPeriod, '→ extracted:', periodicReach);
+      return sum + periodicReach;
+    }, 0)
+    
+    console.log(`🔍 [PERIOD METRICS] Total reach for ${selectedPeriod}:`, reach);
+    
+    // For followers - this should stay constant (it's total followers, not period-specific)
+    const followers = analytics?.totalFollowers || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.followers, 0)
+    
+    // For engagement - should be period-aware but falls back to current engagement
+    const engagement = connectedPlatforms.length > 0 ? parseFloat(connectedPlatforms[0].avgEngagement || connectedPlatforms[0].engagement) || 0 : 0
+    
+    // For posts - this should be period-specific based on media count (for now using total)
+    // TODO: Future enhancement - calculate daily/weekly/monthly post counts
+    const posts = analytics?.totalPosts || connectedPlatforms.reduce((sum: number, platform: any) => sum + platform.mediaCount, 0)
+    
+    return {
+      reach,      // Period-specific reach (2 for day, 263 for week, 436 for month)
+      followers,  // Constant total followers across periods
+      engagement, // Period-aware engagement rate
+      posts,      // Posts in period (could be enhanced later)
+      timestamp: Date.now() // Cache invalidation timing
+    }
+  }, [selectedPeriod, analytics, connectedPlatforms])
+
+  // Use memoized metrics for instant performance
+  const totalFollowers = periodMetrics.followers
+  const totalReach = periodMetrics.reach
+  const avgEngagement = periodMetrics.engagement  
+  const totalPosts = periodMetrics.posts
 
   // Calculate real content score based on performance metrics
   const calculateContentScore = () => {
@@ -242,8 +473,8 @@ export function PerformanceScore() {
     
     let score = 0
     
-    // Engagement Rate Score (40% weight) - 566.7% is exceptional
-    const engagementScore = Math.min(avgEngagement / 10, 10) // Cap at 10, since 100%+ engagement is max score
+    // Engagement Rate Score (40% weight) - Industry standard scoring
+    const engagementScore = Math.min(avgEngagement / 5, 10) // Cap at 10, 5%+ engagement is excellent
     score += engagementScore * 0.4
     
     // Post Activity Score (30% weight) - Based on total posts
@@ -276,21 +507,21 @@ export function PerformanceScore() {
 
   // Calculate time-based metrics and growth data using REAL historical data
   const calculateTimeBasedData = (period: 'day' | 'week' | 'month') => {
-    // Use REAL Instagram data directly
-    const totalFollowersBase = totalFollowers || 0
-    const totalReachBase = totalReach || 0
-    const totalPostsBase = totalPosts || 0
+    // PERFORMANCE OPT: Use memoized metrics for instant period switching
+    const totalFollowersBase = periodMetrics.followers || 0
+    const totalReachBase = periodMetrics.reach || 0
+    const totalPostsBase = periodMetrics.posts || 0
     
     // Calculate proper engagement rate from analytics data
     const realEngagementRate = analytics?.engagementRate || 0
-    const avgEngagementBase = realEngagementRate > 0 ? realEngagementRate : avgEngagement || 0
+    const avgEngagementBase = realEngagementRate > 0 ? realEngagementRate : periodMetrics.engagement || 0
 
-    // Show REAL current data
+    // Show REAL current data with instant period-specific reach
     const periodData = {
-      reach: totalReachBase,           // Real Instagram reach: 27
-      posts: totalPostsBase,           // Real Instagram posts: 15
+      reach: totalReachBase,           // Period-filtered Instagram reach (instant switching)
+      posts: totalPostsBase,          // Real Instagram posts: 15
       engagement: avgEngagementBase,   // Real Instagram engagement rate from backend
-      followerGains: 0,                // Will calculate from historical data
+      followerGains: 0,               // Will calculate from historical data
       followerTotal: totalFollowersBase // Real Instagram followers: 3
     }
 
@@ -314,6 +545,63 @@ export function PerformanceScore() {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
     return num.toString()
+  }
+
+  // Show loading state
+  if (!analytics && isLoading && !showError) {
+    return (
+      <Card data-testid="performance-score" className="border-gray-200/50 dark:border-gray-700/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
+        <CardHeader className="text-center pb-4">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mx-auto"></div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Show error state if loading takes too long
+  if (showError && !analytics) {
+    return (
+      <Card data-testid="performance-score" className="border-gray-200/50 dark:border-gray-700/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-0 rounded-3xl overflow-hidden">
+        <CardHeader className="text-center pb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Performance Overview</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Unable to load data</p>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Please make sure you're logged in and have connected social accounts.
+            </p>
+            <button
+              onClick={() => {
+                setShowError(false)
+                // Retry the query
+                window.location.reload()
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -343,6 +631,16 @@ export function PerformanceScore() {
               </button>
             ))}
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+            className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-green-700 dark:hover:text-green-400 rounded-xl px-4 font-semibold flex items-center space-x-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+            <span>{syncMutation.isPending ? 'Syncing...' : 'Sync Data'}</span>
+          </Button>
           <Button variant="outline" size="sm" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-indigo-700 dark:hover:text-indigo-400 rounded-xl px-6 font-semibold">
             View Details
           </Button>
@@ -382,12 +680,27 @@ export function PerformanceScore() {
                     <span className="text-2xl">{currentStory.emoji}</span>
                     <h3 className="text-lg font-bold tracking-wide">{currentStory.title}</h3>
                   </div>
-                  <button
-                    onClick={() => setShowDataStory(false)}
-                    className="text-gray-300/70 dark:text-gray-400/70 hover:text-gray-100 dark:hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/20 dark:hover:bg-gray-300/20"
-                  >
-                    ✕
-                  </button>
+                  <div className="flex items-center space-x-1">
+                    <button
+                      onClick={() => {
+                        setForceRefresh(prev => prev + 1); // Increment to force refetch
+                        refetchAI(); // Manually refetch?
+                        setStoryAnimation(prev => prev + 1); // Trigger animation
+                        setStoryIndex(0); // Reset story index
+                        console.log('🔄 [FRONTEND] Manual refresh triggered!');
+                      }}
+                      className="text-gray-300/70 dark:text-gray-400/70 hover:text-gray-100 dark:hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/20 dark:hover:bg-gray-300/20"
+                      title="Refresh AI Story"
+                    >
+                      🔄
+                    </button>
+                    <button
+                      onClick={() => setShowDataStory(false)}
+                      className="text-gray-300/70 dark:text-gray-400/70 hover:text-gray-100 dark:hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/20 dark:hover:bg-gray-300/20"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="space-y-3">
@@ -409,7 +722,7 @@ export function PerformanceScore() {
 
       <CardContent className="space-y-8">
         {/* Show Reconnect Prompt in Center if Access Token Missing - Replaces All Data */}
-        {socialAccounts?.some((account: any) => !account.hasAccessToken && !account.accessToken) ? (
+        {socialAccounts?.some((account: any) => !account.hasAccessToken) ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center max-w-md">
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 flex items-center justify-center">
@@ -517,10 +830,13 @@ export function PerformanceScore() {
               </div>
               <div className="relative z-10">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">{formatNumber(periodData.reach)}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-2">
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium mb-1">
                   {selectedPeriod === 'day' ? 'Today\'s Reach' : 
                    selectedPeriod === 'week' ? 'Weekly Reach' : 
                    'Monthly Reach'}
+                </div>
+                <div className="text-xs text-purple-500 dark:text-purple-400 font-semibold mb-2">
+                  📊 Account-level Reach (Instagram Business API)
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="w-full bg-white/60 dark:bg-gray-600/60 rounded-full h-1.5 mr-2">

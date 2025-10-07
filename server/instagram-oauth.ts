@@ -10,10 +10,8 @@ export class InstagramOAuthService {
     this.appSecret = process.env.INSTAGRAM_APP_SECRET!;
     // Environment-agnostic URL generation
     const getBaseUrl = () => {
-      if (process.env.REPLIT_DEV_DOMAIN) return `https://${process.env.REPLIT_DEV_DOMAIN}`;
-      if (process.env.REPL_SLUG && process.env.REPL_OWNER) return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
-      if (process.env.VITE_APP_URL) return process.env.VITE_APP_URL;
-      return process.env.NODE_ENV === 'production' ? 'https://your-domain.com' : 'http://localhost:5000';
+      // Always use the tunnel domain for OAuth redirects
+      return 'https://veefore-webhook.veefore.com';
     };
     
     this.redirectUri = `${getBaseUrl()}/api/instagram/callback`;
@@ -123,8 +121,31 @@ export class InstagramOAuthService {
         id: profileData.id,
         idType: typeof profileData.id,
         username: profileData.username,
-        account_type: profileData.account_type
+        account_type: profileData.account_type,
+        profile_picture_url: profileData.profile_picture_url || 'MISSING',
+        profile_picture_url_length: profileData.profile_picture_url ? profileData.profile_picture_url.length : 0,
+        all_fields: Object.keys(profileData)
       });
+      
+      // If profile picture is missing, try alternative API call
+      let finalProfilePictureUrl = profileData.profile_picture_url;
+      if (!finalProfilePictureUrl) {
+        console.log('[INSTAGRAM OAUTH] Profile picture missing, trying alternative API call...');
+        try {
+          const altResponse = await fetch(
+            `https://graph.instagram.com/${profileData.id}?fields=profile_picture_url&access_token=${accessToken}`
+          );
+          if (altResponse.ok) {
+            const altData = await altResponse.json();
+            finalProfilePictureUrl = altData.profile_picture_url;
+            console.log('[INSTAGRAM OAUTH] Alternative API result:', {
+              profile_picture_url: finalProfilePictureUrl || 'STILL MISSING'
+            });
+          }
+        } catch (altError) {
+          console.log('[INSTAGRAM OAUTH] Alternative API failed:', altError);
+        }
+      }
       
       // Step 2: Get connected Facebook Page ID for Business accounts (required for DMs)
       let pageId = null;
@@ -132,7 +153,7 @@ export class InstagramOAuthService {
         try {
           console.log('[INSTAGRAM OAUTH] 🔥 Business account detected - fetching Page ID for DMs...');
           const pageResponse = await fetch(
-            `https://graph.facebook.com/v21.0/${profileData.id}?fields=connected_instagram_account&access_token=${accessToken}`
+            `https://graph.facebook.com/v23.0/${profileData.id}?fields=connected_instagram_account&access_token=${accessToken}`
           );
           
           if (pageResponse.ok) {
@@ -142,7 +163,7 @@ export class InstagramOAuthService {
           } else {
             // Try alternative method for Page ID
             const pagesResponse = await fetch(
-              `https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`
+              `https://graph.facebook.com/v23.0/me/accounts?access_token=${accessToken}`
             );
             
             if (pagesResponse.ok) {
@@ -164,7 +185,7 @@ export class InstagramOAuthService {
         username: profileData.username,
         accountType: profileData.account_type,
         mediaCount: profileData.media_count,
-        profilePictureUrl: profileData.profile_picture_url,
+        profilePictureUrl: finalProfilePictureUrl,
         pageId: pageId ? String(pageId) : null, // Ensure Page ID is also a string
         platform: 'instagram',
       };
@@ -197,7 +218,7 @@ export class InstagramOAuthService {
       } else {
         // Create new account
         await this.storage.createSocialAccount({
-          workspaceId: parseInt(workspaceId),
+          workspaceId: workspaceId, // Keep as string - MongoDB ObjectId
           platform: 'instagram',
           username: accountData.username,
           accountId: accountData.accountId,

@@ -64,6 +64,7 @@ export class TokenEncryptionService {
     return crypto.pbkdf2Sync(this.masterKey, salt, 100000, KEY_LENGTH, 'sha256');
   }
 
+
   /**
    * Encrypt a social media access token
    * @param token - Plain text access token to encrypt
@@ -180,6 +181,7 @@ export class TokenEncryptionService {
       throw new Error(`Token decryption failed: ${error.message}`);
     }
   }
+
 
   /**
    * Validate that an encrypted token can be successfully decrypted

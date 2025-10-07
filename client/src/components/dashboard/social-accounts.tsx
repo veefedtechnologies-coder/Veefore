@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useLocation } from 'wouter'
 import { apiRequest, queryClient } from '@/lib/queryClient'
@@ -7,49 +7,179 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { useCurrentWorkspace } from '@/components/WorkspaceSwitcher'
-import { Users, TrendingUp, MessageSquare, Share2, Eye, Calendar, BarChart3, Heart, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
+import { Users, TrendingUp, MessageSquare, Eye, BarChart3, Instagram, Facebook, Twitter, Linkedin, Youtube, RefreshCw } from 'lucide-react'
+import { useCacheInvalidation } from '@/hooks/useCacheInvalidation'
+
+type TimePeriod = 'today' | 'week' | 'month'
 
 export function SocialAccounts() {
+  console.log('[SOCIAL ACCOUNTS] Component loaded with updated formatCountdown function')
   const [, setLocation] = useLocation()
   const { toast } = useToast()
   const { currentWorkspace } = useCurrentWorkspace()
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('today')
+  const [currentTime, setCurrentTime] = useState(Date.now())
+
+  // Enable real-time cache invalidation for instant updates
+  const { isConnected: cacheConnected } = useCacheInvalidation()
+
+  // Update current time every second for real-time countdown
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now())
+    }, 1000)
+    
+    return () => clearInterval(interval)
+  }, [])
+
+  // Helper function to format countdown time
+  const formatCountdown = (nextPollIn: number, dataUpdatedAt?: number) => {
+    // Debug logging
+    console.log(`[COUNTDOWN DEBUG] nextPollIn: ${nextPollIn}, currentTime: ${currentTime}, dataUpdatedAt: ${dataUpdatedAt}`)
+    
+    // CORRECTED LOGIC: nextPollIn from backend is already the remaining time
+    // We just need to subtract the time elapsed since the data was fetched
+    const timeElapsedSinceUpdate = dataUpdatedAt ? currentTime - dataUpdatedAt : 0
+    const timeRemaining = Math.max(0, nextPollIn - timeElapsedSinceUpdate)
+    
+    console.log(`[COUNTDOWN DEBUG] timeElapsedSinceUpdate: ${timeElapsedSinceUpdate}, timeRemaining: ${timeRemaining}`)
+    
+    // Don't handle the "Polling now..." case here - let the parent component decide
+    // This function should only format the time remaining
+    const hours = Math.floor(timeRemaining / (1000 * 60 * 60))
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000)
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${seconds}s`
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds}s`
+    } else if (seconds > 0) {
+      return `${seconds}s`
+    } else {
+      return '0s'
+    }
+  }
+
+  // Helper function to get polling status color and animation
+  const getPollingStatusStyle = (accountStatus: any) => {
+    const isHibernated = accountStatus?.status === 'HIBERNated'
+    // CORRECTED: Use formatCountdown logic for accurate timeRemaining calculation
+    const timeElapsedSinceUpdate = dataUpdatedAt ? currentTime - dataUpdatedAt : 0
+    const timeRemaining = Math.max(0, (accountStatus?.nextPollIn || 0) - timeElapsedSinceUpdate)
+    const isPollingNow = timeRemaining <= 1000
+    
+    if (isHibernated) {
+      return {
+        color: 'text-gray-500 dark:text-gray-400',
+        dotColor: 'bg-gray-400',
+        animation: ''
+      }
+    } else if (isPollingNow) {
+      return {
+        color: 'text-green-600 dark:text-green-400',
+        dotColor: 'bg-green-500',
+        animation: 'animate-pulse'
+      }
+    } else {
+      return {
+        color: 'text-blue-600 dark:text-blue-400',
+        dotColor: 'bg-blue-500',
+        animation: 'animate-pulse'
+      }
+    }
+  }
   
-  // Fetch social accounts data for current workspace - HYBRID: Webhooks + Smart Polling
-  const { data: socialAccounts, isLoading, isFetching, refetch: refetchAccounts } = useQuery({
-    queryKey: ['/api/social-accounts', currentWorkspace?.id],
-    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}`) : Promise.resolve([]),
+  // Fetch social accounts data for current workspace - PERIOD-AWARE WITH REAL-TIME UPDATES
+  const { data: socialAccounts, isLoading, refetch: refetchAccounts } = useQuery({
+    queryKey: ['/api/social-accounts', currentWorkspace?.id, selectedPeriod, 'real-time-data'], // Include period in cache key
+    // Bypass server-side route cache by adding a timestamp param
+    queryFn: () => currentWorkspace?.id ? apiRequest(`/api/social-accounts?workspaceId=${currentWorkspace.id}&period=${selectedPeriod}&_ts=${Date.now()}`) : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
-    refetchInterval: 10 * 60 * 1000, // Smart polling every 10 minutes for likes/followers/engagement (Meta-friendly)
+    refetchInterval: cacheConnected ? 300000 : 30000, // 5 minutes if real-time connected, 30 seconds if not
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes before marking as stale (faster updates)
+    staleTime: cacheConnected ? 5 * 60 * 1000 : 0, // 5 minutes if real-time connected, immediate if not
     refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchOnMount: false, // Don't refetch on mount - rely on cache
+    refetchOnMount: true, // Always refetch on mount to get latest calculations
     refetchOnReconnect: true, // Refresh when network reconnects
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     placeholderData: (previousData) => previousData, // Show cached data immediately while refetching
   })
 
+  // Profile picture refresh mutation
+  const refreshProfilePicMutation = useMutation({
+    mutationFn: () => {
+      if (!currentWorkspace?.id) {
+        return Promise.reject(new Error('No workspace selected'))
+      }
+      
+      return apiRequest('/api/social-accounts/refresh-profile-picture', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          workspaceId: currentWorkspace.id,
+          platform: 'instagram'
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+    onSuccess: (data) => {
+      console.log('✅ [PROFILE PICTURE] Refresh completed:', data)
+      
+      // Immediately refresh the UI data
+      refetchAccounts()
+      
+      toast({
+        title: "🖼️ Profile picture refreshed!",
+        description: "Your Instagram profile picture has been updated",
+      })
+    },
+    onError: (error: any) => {
+      console.error('Profile picture refresh failed:', error)
+      
+      toast({
+        title: "❌ Refresh failed", 
+        description: error.message || "Failed to refresh profile picture",
+        variant: "destructive"
+      })
+    }
+  })
+
   // Smart Instagram sync mutation with rate limit protection and immediate updates
   const syncMutation = useMutation({
-    mutationFn: () => currentWorkspace?.id ? apiRequest('/api/instagram/force-sync', { 
-      method: 'POST',
-      body: JSON.stringify({ 
-        workspaceId: currentWorkspace.id
+    mutationFn: () => {
+      console.log('🔄 [SOCIAL-ACCOUNTS] Sync triggered for workspace:', currentWorkspace?.id)
+      
+      if (!currentWorkspace?.id) {
+        console.error('🔄 [SOCIAL-ACCOUNTS] ERROR: No workspace ID!')
+        return Promise.reject(new Error('No workspace selected'))
+      }
+      
+      console.log('🔄 [SOCIAL-ACCOUNTS] Calling immediate-sync endpoint...')
+      return apiRequest('/api/instagram/immediate-sync', { 
+        method: 'POST',
+        body: JSON.stringify({ 
+          workspaceId: currentWorkspace.id
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
-    }) : Promise.reject(new Error('No workspace selected')),
-    onSuccess: (data) => {
-      console.log('Smart Instagram sync completed:', data)
+    },
+    onSuccess: () => {
+      console.log('✅ [SOCIAL-ACCOUNTS] Smart Instagram sync completed')
       
       // Immediately trigger a refresh of all data for real-time updates
       refetchAccounts()
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
       queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
       // Force immediate refetch for instant updates
-      queryClient.refetchQueries({ queryKey: ['/api/social-accounts'] })
+      queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace.id] })
       
       toast({
-        title: "🚀 Real-time sync complete!",
-        description: `Instagram data refreshed instantly! ${data.newDataCount || 0} new updates fetched.`,
+        title: "🚀 Sync complete!",
+        description: "Instagram data updated successfully",
       })
     },
     onError: (error: any) => {
@@ -79,7 +209,7 @@ export function SocialAccounts() {
   })
 
   // Smart refresh system with hybrid approach - Webhooks for comments/mentions + Polling for other metrics
-  React.useEffect(() => {
+  useEffect(() => {
     let refreshTimeout: NodeJS.Timeout | null = null
     let lastRefreshTime = 0
     let lastActivityTime = Date.now()
@@ -140,7 +270,7 @@ export function SocialAccounts() {
       method: 'POST',
       body: JSON.stringify({ workspaceId: currentWorkspace.id })
     }) : Promise.reject(new Error('No workspace selected')),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "🔄 Hybrid System Active",
         description: "Webhooks for comments/mentions + Smart polling for likes/followers/engagement",
@@ -151,13 +281,19 @@ export function SocialAccounts() {
     }
   })
 
-  // Polling status query - Hybrid approach with smart polling
-  const { data: pollingStatus } = useQuery({
-    queryKey: ['/api/instagram/polling-status'],
-    queryFn: () => apiRequest('/api/instagram/polling-status'),
-    refetchInterval: 3 * 60 * 1000, // Smart polling every 3 minutes (Meta-friendly)
+  // Polling status query - Real-time countdown updates
+  const { data: pollingStatus, dataUpdatedAt } = useQuery({
+    queryKey: ['/api/instagram/polling-status'], // ⭐ FIX: Removed currentTime to prevent refetching every second
+    queryFn: async () => {
+      const data = await apiRequest('/api/instagram/polling-status');
+      console.log('[POLLING STATUS API] Received data:', data);
+      console.log('[POLLING STATUS API] dataUpdatedAt will be:', Date.now());
+      return data;
+    },
+    refetchInterval: 5 * 1000, // Refresh every 5 seconds for accurate countdown
     refetchIntervalInBackground: false, // Don't poll when tab is not active to save API calls
-    staleTime: 1 * 60 * 1000, // Cache for 1 minute for faster updates
+    staleTime: 0, // No caching - always fetch fresh data
+    gcTime: 0, // Don't cache at all
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchOnReconnect: true, // Refresh when network reconnects
     enabled: !!socialAccounts && socialAccounts.length > 0
@@ -171,8 +307,8 @@ export function SocialAccounts() {
   const [selectedAccount, setSelectedAccount] = useState(connectedAccounts[0]?.platform || 'instagram')
 
   // PRODUCTION-SAFE: Only start polling once on initial load, not on every update
-  const [hasStartedPolling, setHasStartedPolling] = React.useState(false)
-  React.useEffect(() => {
+  const [hasStartedPolling, setHasStartedPolling] = useState(false)
+  useEffect(() => {
     const instagramAccount = connectedAccounts.find((acc: any) => acc.platform === 'instagram')
     if (instagramAccount && !startPollingMutation.isPending && !hasStartedPolling) {
       setHasStartedPolling(true)
@@ -184,7 +320,21 @@ export function SocialAccounts() {
     }
   }, [connectedAccounts, startPollingMutation.isPending, hasStartedPolling])
 
-  if (!socialAccounts && isLoading) {
+  // Show skeleton loading only for a limited time, then show error state
+  const [showError, setShowError] = useState(false)
+  
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setShowError(true)
+      }, 10000) // Show error after 10 seconds of loading
+      return () => clearTimeout(timer)
+    } else {
+      setShowError(false)
+    }
+  }, [isLoading])
+
+  if (!socialAccounts && isLoading && !showError) {
     return (
       <Card data-testid="social-accounts" className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
         <CardContent className="p-6">
@@ -201,6 +351,37 @@ export function SocialAccounts() {
     )
   }
 
+  // Show error state if loading takes too long
+  if (showError && !socialAccounts) {
+    return (
+      <Card data-testid="social-accounts" className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+        <CardContent className="p-6">
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Social Accounts</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Unable to load social accounts. Please make sure you're logged in.
+            </p>
+            <button
+              onClick={() => {
+                setShowError(false)
+                // Retry the query
+                window.location.reload()
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Find current account
   const currentAccount = connectedAccounts.find((acc: any) => acc.platform === selectedAccount) || connectedAccounts[0]
 
@@ -211,25 +392,22 @@ export function SocialAccounts() {
     return num?.toString() || '0'
   }
 
-  // Calculate real engagement rate from authentic data
+  // Graceful display for platform fields that may not be provided (e.g., Instagram shares/saves)
+  const formatMetricOrNA = (value: number | undefined | null) => {
+    return value === null || value === undefined ? 'N/A' : formatNumber(value)
+  }
+
+  // Calculate Smart engagement (ERR for small accounts with valid reach; else ERF)
   const calculateEngagement = (account: any) => {
-    if (!account.followersCount || account.followersCount === 0) return '0.0'
-    
-    // Use real engagement data if available
-    if (account.avgEngagement) {
-      // Normalize extremely high engagement rates (typical for small accounts)
-      const normalizedRate = account.avgEngagement > 100 ? 
-        Math.min(account.avgEngagement / 10, 15) : // Cap at 15% for display
-        account.avgEngagement
-      return normalizedRate.toFixed(1)
-    }
-    
-    // Fallback calculation using real metrics
+    const followers = account.followersCount || 0
+    const reach = account.totalReach || 0 // periodized account-level reach
     const totalEngagement = (account.totalLikes || 0) + (account.totalComments || 0)
-    const avgEngagementPerPost = account.mediaCount ? totalEngagement / account.mediaCount : 0
-    const engagementRate = account.followersCount ? (avgEngagementPerPost / account.followersCount) * 100 : 0
-    
-    return Math.min(engagementRate, 15).toFixed(1) // Cap at 15% for realistic display
+    const isSmallAccount = followers >= 0 && followers <= 100
+    const hasValidReach = reach > 0
+    const rate = (isSmallAccount && hasValidReach)
+      ? (totalEngagement > 0 && reach > 0 ? (totalEngagement / reach) * 100 : 0)
+      : (followers > 0 ? (totalEngagement / followers) * 100 : 0)
+    return rate.toFixed(1)
   }
 
   // Get platform icon
@@ -279,14 +457,6 @@ export function SocialAccounts() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your connected platforms</p>
             </div>
             <div className="flex space-x-2">
-              {/* Polling status indicator */}
-              {pollingStatus && pollingStatus.totalAccounts > 0 && (
-                <div className="flex items-center space-x-1 px-2 py-1 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-600 rounded text-xs text-green-700 dark:text-green-400">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>Live polling active</span>
-                </div>
-              )}
-              
               {/* SMART sync button for Instagram with rate limit protection */}
               <Button 
                 variant="outline" 
@@ -309,6 +479,23 @@ export function SocialAccounts() {
                 See all accounts
               </Button>
             </div>
+          </div>
+
+          {/* Period Selector */}
+          <div className="flex space-x-1 mb-4">
+            {(['today', 'week', 'month'] as TimePeriod[]).map((period) => (
+              <button
+                key={period}
+                onClick={() => setSelectedPeriod(period)}
+                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  selectedPeriod === period
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-700/80 border border-gray-200 dark:border-gray-600'
+                }`}
+              >
+                {period === 'today' ? 'Today' : period === 'week' ? 'This Week' : 'This Month'}
+              </button>
+            ))}
           </div>
 
           {/* Account Selector */}
@@ -344,7 +531,7 @@ export function SocialAccounts() {
         {currentAccount && (
           <div className={`p-6 ${getPlatformBgColor(currentAccount.platform)}`}>
             {/* Reconnect Warning - Show when access token is missing */}
-            {(!currentAccount.hasAccessToken && !currentAccount.accessToken) ? (
+            {(!(currentAccount as any).hasAccessToken) ? (
               <div className="bg-white dark:bg-gray-700 rounded-2xl p-8 shadow-sm border-2 border-orange-200 dark:border-orange-600">
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 flex items-center justify-center">
@@ -373,16 +560,53 @@ export function SocialAccounts() {
               {/* Account Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white bg-gradient-to-r ${getPlatformColor(currentAccount.platform)}`}>
-                    {currentAccount.profilePictureUrl || currentAccount.profilePicture ? (
-                      <img 
-                        src={currentAccount.profilePictureUrl || currentAccount.profilePicture} 
-                        alt={currentAccount.username}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-2xl font-bold">{currentAccount.username?.[0]?.toUpperCase() || 'A'}</span>
-                    )}
+                  <div className="relative">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white bg-gradient-to-r ${getPlatformColor(currentAccount.platform)} relative overflow-hidden`}>
+                      {currentAccount.profilePictureUrl || currentAccount.profilePicture ? (
+                        <img 
+                          src={currentAccount.profilePictureUrl || currentAccount.profilePicture} 
+                          alt={currentAccount.username}
+                          className="w-16 h-16 rounded-full object-cover"
+                          onError={(e) => {
+                            console.log('[PROFILE PICTURE] Failed to load image:', currentAccount.profilePictureUrl || currentAccount.profilePicture);
+                            console.log('[PROFILE PICTURE] Account data:', {
+                              username: currentAccount.username,
+                              profilePictureUrl: currentAccount.profilePictureUrl,
+                              profilePicture: currentAccount.profilePicture,
+                              platform: currentAccount.platform
+                            });
+                            // Hide the broken image and show fallback
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                          onLoad={() => {
+                            console.log('[PROFILE PICTURE] Successfully loaded:', currentAccount.profilePictureUrl || currentAccount.profilePicture);
+                          }}
+                        />
+                      ) : null}
+                      {/* Fallback avatar - always present but hidden when image loads */}
+                      <span 
+                        className="text-2xl font-bold absolute inset-0 flex items-center justify-center"
+                        style={{ display: (currentAccount.profilePictureUrl || currentAccount.profilePicture) ? 'none' : 'flex' }}
+                      >
+                        {currentAccount.username?.[0]?.toUpperCase() || 'A'}
+                      </span>
+                    </div>
+                    {/* Profile picture refresh button */}
+                    <button
+                      onClick={() => refreshProfilePicMutation.mutate()}
+                      disabled={refreshProfilePicMutation.isPending}
+                      className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center text-xs transition-colors disabled:opacity-50"
+                      title="Refresh profile picture"
+                    >
+                      {refreshProfilePicMutation.isPending ? (
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3 h-3" />
+                      )}
+                    </button>
                   </div>
                   <div>
                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">@{currentAccount.username}</div>
@@ -401,16 +625,49 @@ export function SocialAccounts() {
                       </span>
                       
                       {/* Real-time polling status for this account */}
-                      {pollingStatus?.accounts?.find((acc: any) => acc.username === currentAccount.username) && (
-                        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center space-x-1">
-                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span>Smart polling: next check in {
-                            Math.round(
-                              (pollingStatus.accounts.find((acc: any) => acc.username === currentAccount.username)?.nextPollIn || 0) / 1000 / 60
-                            )
-                          } min</span>
-                        </div>
-                      )}
+                      {pollingStatus && 'accounts' in pollingStatus && pollingStatus.accounts?.find((acc: any) => acc.username === currentAccount.username) && (() => {
+                        const accountStatus = pollingStatus.accounts.find((acc: any) => acc.username === currentAccount.username);
+                        const isHibernated = accountStatus?.status === 'HIBERNATED';
+                        // CORRECTED: Use formatCountdown logic for accurate timeRemaining calculation
+                        const timeElapsedSinceUpdate = dataUpdatedAt ? currentTime - dataUpdatedAt : 0
+                        const timeRemaining = Math.max(0, (accountStatus?.nextPollIn || 0) - timeElapsedSinceUpdate)
+                        
+                        // FIXED: Only show "Polling now..." during the actual sync, not when nextPollIn is 0
+                        // When nextPollIn is 0, it means "ready to poll" but not necessarily "polling right now"
+                        // We need to check if we're in the middle of a sync operation
+                        const isPollingNow = syncMutation.isPending || startPollingMutation.isPending;
+                        const style = getPollingStatusStyle(accountStatus);
+                        
+                        // Debug logging - FIXED: Use backend status instead of frontend calculation
+                        console.log(`[POLLING STATUS DEBUG] Account: ${currentAccount.username}`, {
+                          accountStatus,
+                          nextPollIn: accountStatus?.nextPollIn,
+                          timeRemaining,
+                          isPollingNow,
+                          isSyncPending: syncMutation.isPending,
+                          isStartPollingPending: startPollingMutation.isPending,
+                          isHibernated: accountStatus?.status === 'HIBERNATED',
+                          backendStatus: accountStatus?.status,
+                          currentTime
+                        });
+                        
+                        return (
+                          <div className={`text-xs mt-1 flex items-center space-x-1 ${style.color}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${style.dotColor} ${style.animation}`}></div>
+                            <span>
+                              {isHibernated ? (
+                                '💤 Hibernated - waiting for user activity'
+                              ) : isPollingNow ? (
+                                '🔄 Polling now...'
+                              ) : timeRemaining > 1000 ? (
+                                `Smart polling: next check in ${formatCountdown(accountStatus?.nextPollIn || 0, dataUpdatedAt)}`
+                              ) : (
+                                '✅ Ready for next poll'
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -457,7 +714,35 @@ export function SocialAccounts() {
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100">Account Reach</h4>
                   <span className="text-sm font-medium text-blue-600 dark:text-blue-400">{currentAccount.totalReach || 0}</span>
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Total accounts reached: {currentAccount.totalLikes || 0} likes • {currentAccount.totalComments || 0} comments</div>
+                <div className="text-xs text-blue-500 dark:text-blue-400 font-semibold mb-1">
+                  ✅ Account-level reach
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  {(() => {
+                    const parts: string[] = []
+                    parts.push(`${formatNumber(currentAccount.totalLikes || 0)} likes`)
+                    parts.push(`${formatNumber(currentAccount.totalComments || 0)} comments`)
+                    if (currentAccount.totalShares !== undefined && currentAccount.totalShares !== null) {
+                      parts.push(`${formatNumber(currentAccount.totalShares)} shares`)
+                    }
+                    if (currentAccount.totalSaves !== undefined && currentAccount.totalSaves !== null) {
+                      parts.push(`${formatNumber(currentAccount.totalSaves)} saves`)
+                    }
+                    return <>Engagement (last 6 posts): {parts.join(' • ')} </>
+                  })()}
+                  {currentAccount.postsAnalyzed && (
+                    <span className="text-blue-500 dark:text-blue-400 ml-1">
+                      (from {currentAccount.postsAnalyzed} posts)
+                    </span>
+                  )}
+                </div>
+                {/* Engagement breakdown chips */}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs rounded-md bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 text-gray-700 dark:text-gray-200">👍 Likes: {formatNumber(currentAccount.totalLikes || 0)}</span>
+                  <span className="px-2 py-1 text-xs rounded-md bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 text-gray-700 dark:text-gray-200">💬 Comments: {formatNumber(currentAccount.totalComments || 0)}</span>
+                  <span className="px-2 py-1 text-xs rounded-md bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 text-gray-700 dark:text-gray-200">🔁 Shares: {formatMetricOrNA(currentAccount.totalShares)}</span>
+                  <span className="px-2 py-1 text-xs rounded-md bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 text-gray-700 dark:text-gray-200">📌 Saves: {formatMetricOrNA(currentAccount.totalSaves)}</span>
+                </div>
                 <div className="w-full bg-white dark:bg-gray-600 rounded-full h-3 overflow-hidden">
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min((currentAccount.totalReach || 0) / 500 * 100, 100)}%` }}></div>
                 </div>

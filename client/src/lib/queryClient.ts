@@ -35,12 +35,20 @@ function getApiBaseUrl(): string {
   const currentHost = window.location.hostname;
   const currentProtocol = window.location.protocol;
   
+  // Check for environment variable override (useful for development)
+  const apiBaseOverride = import.meta.env.VITE_API_BASE_URL;
+  if (apiBaseOverride) {
+    console.log('[API CONFIG] Using API base URL override:', apiBaseOverride);
+    return apiBaseOverride;
+  }
+  
   // If we're on localhost, use HTTP
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
     return 'http://localhost:5000';
   }
   
-  // If we're on the Cloudflare tunnel, use HTTPS
+  // If we're on the Cloudflare tunnel, use the same domain but with proper API path
+  // The tunnel should handle both frontend and API requests
   if (currentHost === 'veefore-webhook.veefore.com') {
     return 'https://veefore-webhook.veefore.com';
   }
@@ -49,11 +57,29 @@ function getApiBaseUrl(): string {
   return `${currentProtocol}//${currentHost}`;
 }
 
-// API request function with authentication
+// API request function with authentication and workspace validation
 export async function apiRequest(url: string, options: RequestInit = {}) {
   const { getAuth } = await import('firebase/auth')
   const auth = getAuth()
   const user = auth.currentUser
+
+  // CRITICAL FIX: Validate workspace ID in URL parameters to prevent cross-workspace issues
+  // Only validate if user is authenticated (prevents pre-auth validation errors)
+  const workspaceIdMatch = url.match(/workspaceId=([^&]+)/)
+  if (workspaceIdMatch && user) {
+    const workspaceId = workspaceIdMatch[1]
+    try {
+      const { validateBeforeApiCall } = await import('@/utils/workspaceValidator')
+      const validatedId = await validateBeforeApiCall(workspaceId)
+      
+      if (validatedId !== workspaceId) {
+        console.log(`[API REQUEST] 🔧 Workspace ID corrected: ${workspaceId} → ${validatedId}`)
+        url = url.replace(`workspaceId=${workspaceId}`, `workspaceId=${validatedId}`)
+      }
+    } catch (error) {
+      console.warn('[API REQUEST] ⚠️ Workspace validation failed, proceeding with original ID:', error)
+    }
+  }
 
   // Ensure URL is absolute
   if (!url.startsWith('http')) {
@@ -92,7 +118,30 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
   if (!response.ok) {
     const errorData = await response.text()
     console.error('API Error:', response.status, response.statusText, errorData)
-    throw new Error(`${response.status}: ${response.statusText} - ${errorData}`)
+    
+    // Special handling for 502 Bad Gateway (Cloudflare tunnel issues)
+    if (response.status === 502) {
+      console.warn('[API REQUEST] 502 Bad Gateway - Cloudflare tunnel may be down, skipping request')
+      // For user activity tracking, we can safely ignore this error
+      if (url.includes('/api/instagram/user-activity')) {
+        console.log('[API REQUEST] Ignoring user activity tracking error due to tunnel issues')
+        return { success: false, message: 'Tunnel unavailable', skipped: true }
+      }
+      throw new Error('Service temporarily unavailable - please try again later')
+    }
+    
+    // Provide more helpful error messages
+    if (response.status === 401) {
+      throw new Error('Please sign in to continue')
+    } else if (response.status === 403) {
+      throw new Error('Access denied - you may not have permission for this action')
+    } else if (response.status === 404) {
+      throw new Error('Resource not found')
+    } else if (response.status >= 500) {
+      throw new Error('Server error - please try again later')
+    } else {
+      throw new Error(`${response.status}: ${response.statusText} - ${errorData}`)
+    }
   }
 
   const contentType = response.headers.get('content-type')

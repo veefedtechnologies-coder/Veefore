@@ -18,6 +18,7 @@ import { RealVideoProcessor } from './real-video-processor';
 import { DashboardCache } from "./dashboard-cache";
 import { AutomationSystem } from "./automation-system";
 import { MetaCompliantWebhook } from "./meta-compliant-webhook";
+import { calculateERF, calculateERR, calculateSmartEngagement, EngagementData } from './utils/engagement-calculator';
 import { emailService } from "./email-service";
 import { youtubeService } from "./youtube-service";
 import { createCopilotRoutes } from "./ai-copilot";
@@ -28,6 +29,8 @@ import { generateCompetitorAnalysis } from './competitor-analysis-ai';
 import { abTestingAI } from './ab-testing-ai';
 import { personaSuggestionsAI } from './persona-suggestions-ai';
 import { generateAIGrowthInsights, generateVisualInsights } from './ai-growth-insights';
+import { PerformanceSnapshotService } from './performance-snapshot-service';
+import { AIStoryGenerator } from './ai-story-generator';
 import { TrendingTopicsAPI } from './trending-topics-api';
 import OpenAI from "openai";
 import { firebaseAdmin } from './firebase-admin';
@@ -108,6 +111,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   // CLEAN AUTOMATION SYSTEM INSTANCES
   const automationSystem = new AutomationSystem(storage);
   const metaWebhook = new MetaCompliantWebhook(storage);
+  
+  // PERFORMANCE SNAPSHOT & AI STORY SERVICES
+  const snapshotService = new PerformanceSnapshotService(storage);
+  const aiStoryGenerator = new AIStoryGenerator(snapshotService);
   
   // HYBRID APPROACH: Webhooks for supported events + Smart polling for other metrics
   // Webhooks: comments, mentions, story insights, messages, account review, media updates
@@ -745,7 +752,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: error.message });
     }
   });
-
   // POST endpoint to refresh/trigger new trend data fetching with credit system
   app.post("/api/analytics/refresh-trends", requireAuth, async (req: any, res: any) => {
     try {
@@ -1481,14 +1487,28 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: error.message || 'Failed to refresh analytics' });
     }
   });
+  // Test endpoint to verify AI story system is loaded
+  app.get('/api/ai-growth-insights/status', (req: any, res: Response) => {
+    res.json({
+      status: 'operational',
+      servicesLoaded: {
+        snapshotService: !!snapshotService,
+        aiStoryGenerator: !!aiStoryGenerator,
+      },
+      timestamp: new Date().toISOString()
+    });
+  });
 
-
-  // AI Growth Insights endpoint
+  // AI Growth Insights endpoint - Now with snapshot-based caching and trend analysis
   app.get('/api/ai-growth-insights', requireAuth, async (req: any, res) => {
     try {
-      console.log('[AI INSIGHTS API] Generating comprehensive growth insights for user:', req.user.id);
-      
-      // Use AI insights functions (import at top of file)
+      const { workspaceId, period = 'month' } = req.query;
+      console.log('[AI INSIGHTS API] ⭐ REQUEST RECEIVED for workspace:', workspaceId, 'period:', period);
+      console.log('[AI INSIGHTS API] Period type:', typeof period, 'value:', period);
+      console.log('[AI INSIGHTS API] Services available:', {
+        snapshotService: !!snapshotService,
+        aiStoryGenerator: !!aiStoryGenerator
+      });
       
       // Get user's workspaces
       const workspaces = await storage.getWorkspacesByUserId(req.user.id);
@@ -1496,128 +1516,96 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(404).json({ error: 'No workspaces found' });
       }
 
-      const workspace = workspaces[0]; // Use first workspace
+      const workspace = workspaceId 
+        ? workspaces.find(w => w.id === workspaceId) 
+        : workspaces[0];
       
       // Get all social accounts for the workspace
       const socialAccounts = await storage.getSocialAccountsByWorkspace(workspace.id);
       
       if (!socialAccounts || socialAccounts.length === 0) {
         return res.json({
+          stories: [],
           insights: [],
           message: 'Connect social accounts to get AI growth insights'
         });
       }
+
+      // Get primary account (first Instagram account)
+      const primaryAccount = socialAccounts.find(a => a.platform === 'instagram') || socialAccounts[0];
       
-      // Prepare comprehensive data for AI analysis
+      // Prepare current metrics
+      const currentMetrics = {
+        followers: primaryAccount.followersCount || primaryAccount.subscriberCount || 0,
+        following: 0,
+        posts: primaryAccount.mediaCount || primaryAccount.videosCount || 0,
+        reach: primaryAccount.totalReach || 0,
+        impressions: 0,
+        engagement: primaryAccount.totalLikes + primaryAccount.totalComments || 0,
+        likes: primaryAccount.totalLikes || 0,
+        comments: primaryAccount.totalComments || 0,
+        shares: 0,
+        saves: 0,
+        engagementRate: primaryAccount.avgEngagement || 0,
+        growthRate: 0,
+        contentScore: 75
+      };
+
+      // COMPLETELY DISABLE CACHE - Force fresh AI generation every time
+      console.log('[AI INSIGHTS API] 🔄 CACHE COMPLETELY DISABLED - Force generating fresh stories for period:', period);
+      
+      // Skip all cache checks - always generate fresh stories
+      console.log('[AI INSIGHTS API] ⚡ Generating fresh AI stories for period:', period);
+
+      // Skip data change check - always generate fresh stories
+      console.log('[AI INSIGHTS API] ⚡ Skipping data change check - generating fresh stories');
+
+      // Generate new AI stories
+      const aiStories = await aiStoryGenerator.generateStoriesForPeriod(
+        workspace.id,
+        primaryAccount.id,
+        period as 'day' | 'week' | 'month',
+        currentMetrics,
+        primaryAccount.username
+      );
+
+      // Also generate traditional insights
       const analysisData = {
-        platforms: [],
+        platforms: [{
+          platform: primaryAccount.platform,
+          username: primaryAccount.username,
+          followers: currentMetrics.followers,
+          posts: currentMetrics.posts,
+          engagement: currentMetrics.engagementRate,
+          recentPosts: []
+        }],
         overallMetrics: {
-          totalReach: 0,
-          avgEngagement: 0,
-          totalFollowers: 0,
-          contentScore: 75 // Base score
+          totalReach: currentMetrics.reach,
+          avgEngagement: currentMetrics.engagementRate,
+          totalFollowers: currentMetrics.followers,
+          contentScore: currentMetrics.contentScore
         }
       };
-      
-      let totalFollowers = 0;
-      let totalEngagement = 0;
-      let platformCount = 0;
-      
-      // Process each social account
-      for (const account of socialAccounts) {
-        platformCount++;
-        const followers = account.followersCount || account.subscriberCount || 0;
-        const posts = account.mediaCount || account.videosCount || 0;
-        totalFollowers += followers;
-        
-        // Calculate engagement rate based on platform
-        let engagementRate = 0;
-        if (account.platform === 'instagram' && followers > 0) {
-          // Estimate engagement based on follower count (industry averages)
-          engagementRate = followers < 1000 ? 8.5 : followers < 10000 ? 4.2 : 2.1;
-        } else if (account.platform === 'youtube' && followers > 0) {
-          engagementRate = followers < 1000 ? 12.0 : followers < 10000 ? 6.5 : 3.2;
-        }
-        
-        totalEngagement += engagementRate;
-        
-        // Get recent content for this platform (if available)
-        let recentPosts = [];
-        try {
-          if (account.platform === 'instagram') {
-            // Skip Instagram media analysis for now (media URLs not directly available)
-            console.log('[AI INSIGHTS] Skipping Instagram media analysis - using account metadata only');
-            
-            // Use placeholder post data for AI analysis
-            recentPosts = [{
-              id: `${account.username}_recent_1`,
-              caption: 'Recent Instagram post',
-              hashtags: [],
-              likes: Math.round(account.followersCount * 0.05),
-              comments: Math.round(account.followersCount * 0.01),
-              mediaUrl: null,
-              mediaType: 'image',
-              timestamp: new Date().toISOString()
-            }];
-          }
-        } catch (error) {
-          console.error('[AI INSIGHTS] Error fetching recent posts for', account.platform, error);
-        }
-        
-        analysisData.platforms.push({
-          platform: account.platform,
-          username: account.username,
-          followers,
-          posts,
-          engagement: engagementRate,
-          recentPosts
-        });
-      }
-      
-      // Calculate overall metrics
-      analysisData.overallMetrics = {
-        totalReach: Math.round(totalFollowers * 2.5), // Estimated reach
-        avgEngagement: platformCount > 0 ? totalEngagement / platformCount : 0,
-        totalFollowers,
-        contentScore: calculateContentScore(analysisData.platforms)
-      };
-      
-      console.log('[AI INSIGHTS] Analysis data prepared:', {
-        platforms: analysisData.platforms.length,
-        totalFollowers: analysisData.overallMetrics.totalFollowers,
-        avgEngagement: analysisData.overallMetrics.avgEngagement
-      });
-      
-      // Generate AI-powered insights using real Anthropic Claude analysis
-      console.log('[AI INSIGHTS API] Calling real AI analysis functions...');
-      const [generalInsights, visualInsights] = await Promise.all([
-        generateAIGrowthInsights(analysisData),
-        generateVisualInsights(analysisData)
-      ]);
-      
-      console.log('[AI INSIGHTS API] AI analysis completed:', {
-        generalInsights: generalInsights.length,
-        visualInsights: visualInsights.length
-      });
-      
-      // Combine and prioritize insights
-      const allInsights = [...generalInsights, ...visualInsights]
-        .sort((a, b) => {
-          const priorityOrder = { high: 3, medium: 2, low: 1 };
-          return priorityOrder[b.priority] - priorityOrder[a.priority];
-        })
-        .slice(0, 8); // Limit to top 8 insights
-      
-      console.log('[AI INSIGHTS] Generated', allInsights.length, 'total insights');
+
+      const traditionalInsights = await generateAIGrowthInsights(analysisData);
+
+      // Cache the results
+      await snapshotService.cacheAIStories(
+        workspace.id,
+        period as 'day' | 'week' | 'month',
+        currentMetrics,
+        aiStories,
+        traditionalInsights
+      );
+
+      console.log('[AI INSIGHTS API] Generated', aiStories.length, 'stories and', traditionalInsights.length, 'insights');
+      console.log('[AI INSIGHTS API] Sample story:', JSON.stringify(aiStories[0], null, 2));
       
       res.json({
-        insights: allInsights,
-        metadata: {
-          analysisDate: new Date().toISOString(),
-          platformsAnalyzed: analysisData.platforms.length,
-          totalContent: analysisData.platforms.reduce((sum, p) => sum + (p.recentPosts?.length || 0), 0),
-          overallScore: analysisData.overallMetrics.contentScore
-        }
+        stories: aiStories,
+        insights: traditionalInsights,
+        cached: false,
+        generatedAt: new Date().toISOString()
       });
       
     } catch (error) {
@@ -1765,9 +1753,18 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
               username: account.username,
               followers: account.followersCount || 0,
               posts: account.mediaCount || 0,
-              reach: account.totalReach || 0,
+              // Prefer account-level reach for aggregation; fallback to post-level, then legacy totalReach
+              reach: (account.accountLevelReach && account.accountLevelReach > 0)
+                ? account.accountLevelReach
+                : ((account.postLevelReach && account.postLevelReach > 0)
+                    ? account.postLevelReach
+                    : (account.totalReach || 0)),
               likes: account.totalLikes || 0,
-              comments: account.totalComments || 0
+              comments: account.totalComments || 0,
+              // 🚀 NEW: Comprehensive reach data
+              accountLevelReach: account.accountLevelReach || 0,
+              postLevelReach: account.postLevelReach || 0,
+              reachSource: account.reachSource || 'unavailable'
             };
             
             aggregatedMetrics.totalPosts += instagramMetrics.posts;
@@ -1926,16 +1923,14 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       default: return 1.0;
     }
   }
-
-
-
-
-
   app.get('/api/dashboard/analytics', requireAuth, validateWorkspaceFromQuery(), validateAnalyticsQuery, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const workspaceId = req.workspaceId; // Now validated by middleware
       const workspace = req.workspace; // Now validated by middleware
+      const period = (req.query.period as string)?.toLowerCase?.() || 'day'; // day|week|month
+      // Map frontend period names to backend period names
+      const mappedPeriod = period === 'today' ? 'day' : period;
       
       console.log('[DASHBOARD MULTI-PLATFORM] Aggregating analytics from ALL connected social platforms');
       console.log('[DASHBOARD MULTI-PLATFORM] User:', user.id, 'WorkspaceId:', workspaceId);
@@ -1985,7 +1980,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
       // Process each connected social platform
       for (const account of allSocialAccounts) {
-        if (!account.accessToken && account.platform !== 'youtube') continue; // Skip inactive accounts except YouTube
+        // Skip accounts without valid tokens (check both plain and encrypted tokens)
+        const hasValidToken = account.hasAccessToken || account.accessToken || account.encryptedAccessToken || account.platform === 'youtube';
+        if (!hasValidToken) continue; // Skip inactive accounts except YouTube
         
         const platform = account.platform.toLowerCase();
         aggregatedMetrics.connectedPlatforms.push(platform);
@@ -1995,21 +1992,43 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         // Platform-specific metric extraction
         switch (platform) {
           case 'instagram':
-            // Calculate reach estimate if not available from database
-            let instagramReach = account.totalReach || 0;
-            if (instagramReach === 0 && account.followersCount > 0 && account.mediaCount > 0) {
-              // Estimate reach as 60% of followers per post for personal accounts
-              instagramReach = Math.round(account.followersCount * account.mediaCount * 0.6);
-              console.log(`[INSTAGRAM] Estimated reach for @${account.username}: ${instagramReach} (${account.followersCount} followers × ${account.mediaCount} posts × 0.6)`);
+            // 🚀 NEW: Use periodized reach data for analytics
+            let instagramReach = 0;
+            const reachByPeriod = (account as any).reachByPeriod || {};
+            
+            // Map period to Instagram API period format
+            const instagramPeriod = mappedPeriod === 'month' ? 'days_28' : (mappedPeriod === 'week' ? 'week' : 'day');
+            
+            if (reachByPeriod[instagramPeriod] && reachByPeriod[instagramPeriod].value > 0) {
+              instagramReach = reachByPeriod[instagramPeriod].value;
+              console.log(`[INSTAGRAM PERIOD] ✅ Using ${period} reach data for @${account.username}: ${instagramReach} (source: ${reachByPeriod[instagramPeriod].source})`);
+            } else {
+              // Fallback to legacy reach data
+              instagramReach = (account.accountLevelReach && account.accountLevelReach > 0)
+                ? account.accountLevelReach
+                : ((account.postLevelReach && account.postLevelReach > 0)
+                    ? account.postLevelReach
+                    : (account.totalReach || 0));
+              console.log(`[INSTAGRAM PERIOD] ⚠️ No ${period} reach data, using fallback: ${instagramReach}`);
+            }
+            
+            if (instagramReach === 0) {
+              console.log(`[INSTAGRAM] ⚠️ No real Instagram Business API reach data available for @${account.username} - showing 0`);
+            } else {
+              console.log(`[INSTAGRAM] ✅ Using authentic Instagram Business API reach data for @${account.username}: ${instagramReach}`);
             }
             
             const instagramMetrics = {
-              posts: account.mediaCount || 0,
+              posts: account.mediaCount || account.media || 0,
               reach: instagramReach,
-              followers: account.followersCount || 0,
+              followers: account.followersCount || account.followers || 0,
               likes: account.totalLikes || 0,
               comments: account.totalComments || 0,
-              username: account.username
+              username: account.username,
+              // 🚀 NEW: Comprehensive reach data
+              accountLevelReach: account.accountLevelReach || 0,
+              postLevelReach: account.postLevelReach || 0,
+              reachSource: account.reachSource || 'unavailable'
             };
             
             aggregatedMetrics.totalPosts += instagramMetrics.posts;
@@ -2137,23 +2156,30 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         topPlatform
       });
       
-      // REALISTIC ENGAGEMENT RATE CALCULATION - Fix the inconsistency
+      // 🚀 NEW: Use advanced engagement calculator for smart calculations
       const totalEngagements = aggregatedMetrics.totalLikes + aggregatedMetrics.totalComments;
       
-      // Calculate realistic engagement rate using followers (industry standard)
-      let engagementRate = 0;
-      if (aggregatedMetrics.totalFollowers > 0 && totalEngagements > 0 && aggregatedMetrics.totalPosts > 0) {
-        // Standard calculation: Average engagement per post / followers * 100
-        const avgEngagementPerPost = totalEngagements / aggregatedMetrics.totalPosts;
-        engagementRate = (avgEngagementPerPost / aggregatedMetrics.totalFollowers) * 100; // REAL rate, no cap
-        console.log('[ENGAGEMENT] Calculated REAL rate:', engagementRate.toFixed(2), '%');
-        console.log('[ENGAGEMENT] Formula: (', avgEngagementPerPost.toFixed(1), '÷', aggregatedMetrics.totalFollowers, ') × 100');
-        console.log('[ENGAGEMENT] Your engagement is', engagementRate > 100 ? 'exceptional!' : 'normal');
-      } else {
-        // Fallback: No engagement data available
-        engagementRate = 0;
-        console.log('[ENGAGEMENT] No engagement calculation possible - missing data');
-      }
+      // Create engagement data for smart calculation
+      const engagementData: EngagementData = {
+        likes: aggregatedMetrics.totalLikes,
+        comments: aggregatedMetrics.totalComments,
+        shares: 0, // Not available in basic Instagram API
+        saves: 0, // Not available in basic Instagram API
+        followers: aggregatedMetrics.totalFollowers,
+        reach: aggregatedMetrics.totalReach
+      };
+      
+      // Use smart engagement calculation (automatically chooses ERF or ERR based on account size)
+      const smartEngagement = calculateSmartEngagement(engagementData);
+      const engagementRate = smartEngagement.rate;
+      
+      console.log('[ENGAGEMENT] 🧠 Smart engagement calculation:', {
+        method: smartEngagement.method,
+        rate: smartEngagement.rate.toFixed(2) + '%',
+        description: smartEngagement.description
+      });
+      
+      console.log('[ENGAGEMENT] Your engagement is', engagementRate > 10 ? 'excellent!' : engagementRate > 5 ? 'good' : 'needs improvement');
       
       console.log('[REAL DATA] Final engagement rate:', engagementRate.toFixed(2), '% (authentic calculation)');
 
@@ -2293,7 +2319,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         let accessToken = instagramAccount.accessToken;
         
         // First, try with current token to get real media content
-        let mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
+        let mediaUrl = `https://graph.facebook.com/v23.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
         
         console.log('[CONTENT API] Fetching real Instagram media for account:', instagramAccount.username);
         
@@ -2327,7 +2353,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   
                   // Retry media fetch with new token
                   accessToken = refreshData.access_token;
-                  mediaUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
+                  mediaUrl = `https://graph.facebook.com/v23.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type,media_url,thumbnail_url,permalink&limit=20&access_token=${accessToken}`;
                   mediaResponse = await fetch(mediaUrl);
                   
                   if (mediaResponse.ok) {
@@ -2709,7 +2735,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to generate creative brief' });
     }
   });
-
   // Content Repurpose AI
   app.post('/api/ai/content-repurpose', requireAuth, async (req: any, res: Response) => {
     try {
@@ -3056,8 +3081,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         return res.status(404).json({ error: 'No Instagram account connected' });
       }
 
-      // Sync real-time Instagram data
-      await instagramSync.syncInstagramData(workspaceId, instagramAccount.accessToken);
+      // Sync real-time Instagram data using the correct method
+      await instagramSync.syncInstagramAccount(instagramAccount.accessToken, instagramAccount.accountId);
       
       res.json({ success: true, message: 'Instagram data synchronized' });
 
@@ -3131,6 +3156,47 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // 🚀 INSTANT ACTIVATION: Track user activity and trigger instant sync if hibernated
+  app.post("/api/instagram/user-activity", requireAuth, async (req: any, res: any) => {
+    try {
+      const { workspaceId } = req.body;
+      const user = req.user;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+
+      console.log(`[USER ACTIVITY] 📱 User ${user.email} is active in workspace ${workspaceId}`);
+
+      // Get Instagram account for this workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram' && acc.isActive);
+
+      if (!instagramAccount) {
+        return res.json({ 
+          success: true, 
+          message: 'No Instagram account found for this workspace',
+          activated: false 
+        });
+      }
+
+      // 🚀 Update user activity and trigger instant sync if hibernated
+      smartPolling.updateUserActivity(instagramAccount.id);
+
+      res.json({
+        success: true,
+        message: 'User activity registered',
+        activated: true,
+        accountId: instagramAccount.id,
+        username: instagramAccount.username
+      });
+
+    } catch (error: any) {
+      console.error('[USER ACTIVITY] Error:', error);
+      res.status(500).json({ error: 'Failed to register user activity' });
+    }
+  });
+
   // Public endpoint to check Instagram account status (for debugging)
   app.get("/api/instagram/account-status/:workspaceId", async (req: any, res: any) => {
     try {
@@ -3182,8 +3248,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   });
 
   // Disconnect social account
-  // P1-5 SECURITY: Strict CORS for account deletion
-  app.delete('/api/social-accounts/:id', strictCorsMiddleware, requireAuth, async (req: any, res: Response) => {
+  // P1-5 SECURITY: Authentication required for account deletion
+  app.delete('/api/social-accounts/:id', requireAuth, async (req: any, res: Response) => {
     try {
       const { user } = req;
       const accountId = req.params.id;
@@ -3291,7 +3357,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       if (!code || !state) {
         console.error('[YOUTUBE CALLBACK] Missing code or state parameter');
-        return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
+        return res.redirect(`https://veefore-webhook.veefore.com/integrations?error=missing_code_or_state`);
       }
 
       // Decode state
@@ -3451,7 +3517,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.redirect(`https://${req.get('host')}/integrations?error=unexpected_error&details=${encodeURIComponent(error.message || 'Unknown error')}`);
     }
   });
-
   // YouTube data refresh endpoint
   app.post("/api/youtube/refresh", requireAuth, async (req: any, res: any) => {
     try {
@@ -3664,8 +3729,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
       }
 
-      const currentDomain = req.get('host');
-      const redirectUri = `https://${currentDomain}/api/instagram/callback`;
+      // Always use the tunnel domain for OAuth redirects to ensure consistency
+      const redirectUri = `https://veefore-webhook.veefore.com/api/instagram/callback`;
       const stateData = {
         workspaceId: workspace.id,
         userId: user.id,
@@ -3689,6 +3754,19 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // In-memory cache to prevent duplicate authorization code processing
+  const processedAuthCodes = new Map<string, number>(); // code => timestamp
+  
+  // Clean up old codes every 5 minutes (authorization codes expire after 10 minutes)
+  setInterval(() => {
+    const now = Date.now();
+    for (const [code, timestamp] of processedAuthCodes.entries()) {
+      if (now - timestamp > 10 * 60 * 1000) { // 10 minutes
+        processedAuthCodes.delete(code);
+      }
+    }
+  }, 5 * 60 * 1000);
+
   app.get('/api/instagram/callback', async (req: any, res: Response) => {
     try {
       const { code, state, error, error_reason, error_description } = req.query;
@@ -3705,13 +3783,25 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       if (error) {
         console.error(`[INSTAGRAM CALLBACK] OAuth error: ${error}`);
-        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(error as string)}`);
+        return res.redirect(`https://veefore-webhook.veefore.com/integrations?error=${encodeURIComponent(error as string)}`);
       }
       
       if (!code || !state) {
         console.error('[INSTAGRAM CALLBACK] Missing code or state parameter');
-        return res.redirect(`https://${req.get('host')}/integrations?error=missing_code_or_state`);
+        return res.redirect(`https://veefore-webhook.veefore.com/integrations?error=missing_code_or_state`);
       }
+
+      // 🔒 DUPLICATE PREVENTION: Check if this code is already being processed
+      const codeStr = String(code);
+      if (processedAuthCodes.has(codeStr)) {
+        console.log(`[INSTAGRAM CALLBACK] ⚠️ Duplicate callback detected - authorization code already processed ${Date.now() - processedAuthCodes.get(codeStr)!}ms ago`);
+        return res.redirect(`https://${req.get('host')}/integrations?success=true&duplicate=true`);
+      }
+      
+      // Mark this code as being processed
+      processedAuthCodes.set(codeStr, Date.now());
+      console.log(`[INSTAGRAM CALLBACK] ✅ Authorization code marked as processing`);
+      
 
       // Decode state
       let stateData;
@@ -3724,11 +3814,11 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         stateData = stateResult.data;
       } catch (decodeError) {
         console.error('[INSTAGRAM CALLBACK] Failed to decode state:', decodeError);
-        return res.redirect(`https://${req.get('host')}/integrations?error=invalid_state`);
+        return res.redirect(`https://veefore-webhook.veefore.com/integrations?error=invalid_state`);
       }
 
       const { workspaceId } = stateData;
-      const redirectUri = `https://${req.get('host')}/api/instagram/callback`;
+      const redirectUri = `https://veefore-webhook.veefore.com/api/instagram/callback`;
       
       console.log(`[INSTAGRAM CALLBACK] Processing for workspace ${workspaceId}`);
       console.log(`[INSTAGRAM CALLBACK] Using redirect URI: ${redirectUri}`);
@@ -3752,7 +3842,64 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       if (!tokenResponse.ok) {
         const errorText = await tokenResponse.text();
         console.error(`[INSTAGRAM CALLBACK] Token exchange failed:`, errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=token_exchange_failed`);
+        
+        let errorType = 'token_exchange_failed';
+        let errorMessage = 'Authentication failed. Please try connecting again.';
+        let shouldRetry = true;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          
+          if (errorData.error_message === "This authorization code has been used") {
+            console.log('[INSTAGRAM CALLBACK] 🔄 Authorization code already used - clearing existing connection');
+            errorType = 'authorization_code_used';
+            errorMessage = 'Your Instagram account was already connected. We have cleared the old connection so you can reconnect.';
+            
+            // Clear any existing Instagram connections for this workspace
+            const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+            const instagramAccounts = accounts.filter((acc: any) => acc.platform === 'instagram');
+            
+            for (const account of instagramAccounts) {
+              try {
+                await storage.deleteSocialAccount(account.id);
+                console.log(`[INSTAGRAM CALLBACK] ✅ Cleared existing account: ${account.username}`);
+              } catch (deleteError) {
+                console.error(`[INSTAGRAM CALLBACK] ❌ Failed to clear ${account.username}:`, deleteError);
+              }
+            }
+            
+            // Clear dashboard cache
+            try {
+              await storage.clearAllDashboardCache();
+              console.log('[INSTAGRAM CALLBACK] ✅ Dashboard cache cleared');
+            } catch (cacheError) {
+              console.log('[INSTAGRAM CALLBACK] ⚠️ Cache clear failed:', cacheError);
+            }
+          } else if (errorData.error_type === 'OAuthException') {
+            errorType = 'oauth_exception';
+            errorMessage = `Instagram connection failed: ${errorData.error_message || 'OAuth error occurred'}`;
+          } else if (tokenResponse.status === 400) {
+            errorType = 'invalid_client';
+            errorMessage = 'Invalid Instagram app configuration. Please contact support.';
+            shouldRetry = false;
+          } else if (tokenResponse.status === 429) {
+            errorType = 'rate_limited';
+            errorMessage = 'Too many connection attempts. Please wait a few minutes and try again.';
+          } else {
+            errorMessage = `Connection failed: ${errorData.error_message || errorText}`;
+          }
+        } catch (parseError) {
+          console.log('[INSTAGRAM CALLBACK] Could not parse error response:', parseError);
+          if (tokenResponse.status >= 500) {
+            errorType = 'server_error';
+            errorMessage = 'Instagram servers are experiencing issues. Please try again in a few minutes.';
+          } else if (tokenResponse.status === 408) {
+            errorType = 'timeout';
+            errorMessage = 'Connection timed out. Please check your internet connection and try again.';
+          }
+        }
+        
+        return res.redirect(`https://${req.get('host')}/integrations?error=${errorType}&message=${encodeURIComponent(errorMessage)}&retry=${shouldRetry}&cleared=${errorType === 'authorization_code_used'}`);
       }
 
       const tokenData = await tokenResponse.json();
@@ -3768,7 +3915,27 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       if (!longLivedResponse.ok) {
         const errorText = await longLivedResponse.text();
         console.error(`[INSTAGRAM CALLBACK] Long-lived token exchange failed:`, errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=long_lived_token_failed`);
+        
+        let errorType = 'long_lived_token_failed';
+        let errorMessage = 'Failed to extend access token. Please try connecting again.';
+        let shouldRetry = true;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.error_type === 'OAuthException') {
+            errorMessage = `Token extension failed: ${errorData.error_message || 'Unable to extend token'}`;
+          }
+        } catch (parseError) {
+          if (longLivedResponse.status === 400) {
+            errorMessage = 'Invalid token for extension. Please reconnect your account.';
+          } else if (longLivedResponse.status >= 500) {
+            errorMessage = 'Instagram servers are experiencing issues. Please try again in a few minutes.';
+          } else if (longLivedResponse.status === 408) {
+            errorMessage = 'Token extension timed out. Please check your internet connection and try again.';
+          }
+        }
+        
+        return res.redirect(`https://${req.get('host')}/integrations?error=${errorType}&message=${encodeURIComponent(errorMessage)}&retry=${shouldRetry}`);
       }
 
       const longLivedToken = await longLivedResponse.json();
@@ -3777,26 +3944,112 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       // Get user profile using Instagram Business API
       console.log(`[INSTAGRAM CALLBACK] Fetching user profile...`);
       const profileResponse = await fetch(
-        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url&access_token=${longLivedToken.access_token}`
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url,followers_count,name,biography&access_token=${longLivedToken.access_token}`
       );
 
       if (!profileResponse.ok) {
         const errorText = await profileResponse.text();
         console.error(`[INSTAGRAM CALLBACK] Profile fetch failed:`, errorText);
-        return res.redirect(`https://${req.get('host')}/integrations?error=profile_fetch_failed`);
+        
+        let errorType = 'profile_fetch_failed';
+        let errorMessage = 'Could not fetch your Instagram profile. Please try connecting again.';
+        let shouldRetry = true;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.error_type === 'OAuthException') {
+            errorMessage = `Profile access failed: ${errorData.error_message || 'Unable to access profile data'}`;
+          } else if (errorData.error?.message === 'Invalid user id') {
+            errorMessage = 'Your Instagram account is not accessible. Please ensure your account is public or business account.';
+            shouldRetry = false;
+          }
+        } catch (parseError) {
+          if (profileResponse.status === 403) {
+            errorMessage = 'Access denied to your Instagram profile. Please check if your account permissions allow third-party access.';
+          } else if (profileResponse.status >= 500) {
+            errorMessage = 'Instagram servers are experiencing issues. Please try again in a few minutes.';
+          } else if (profileResponse.status === 408) {
+            errorMessage = 'Profile fetch timed out. Please check your internet connection and try again.';
+          }
+        }
+        
+        return res.redirect(`https://${req.get('host')}/integrations?error=${errorType}&message=${encodeURIComponent(errorMessage)}&retry=${shouldRetry}`);
       }
 
       const profile = await profileResponse.json();
       console.log(`[INSTAGRAM CALLBACK] Profile retrieved: @${profile.username} (ID: ${profile.id})`);
+      console.log(`[INSTAGRAM CALLBACK] 🔍 Profile data debug:`, {
+        username: profile.username,
+        followers_count: profile.followers_count,
+        media_count: profile.media_count,
+        account_type: profile.account_type,
+        raw_profile_picture_url: profile.profile_picture_url || 'NOT PROVIDED BY API',
+        raw_profile_picture_url_length: profile.profile_picture_url ? profile.profile_picture_url.length : 0,
+        all_fields: Object.keys(profile)
+      });
+
+      let finalProfilePictureUrl = profile.profile_picture_url;
+
+      // If profile picture is missing, try alternative approach
+      if (!finalProfilePictureUrl) {
+        console.log('[INSTAGRAM CALLBACK] Profile picture missing from initial response, trying alternative API call...');
+        
+        try {
+          // Try with different field combination
+          const altResponse = await fetch(
+            `https://graph.instagram.com/${profile.id}?fields=profile_picture_url&access_token=${longLivedToken.access_token}`
+          );
+          
+          if (altResponse.ok) {
+            const altData = await altResponse.json();
+            finalProfilePictureUrl = altData.profile_picture_url;
+            console.log('[INSTAGRAM CALLBACK] Alternative API result:', {
+              profile_picture_url: finalProfilePictureUrl || 'STILL MISSING'
+            });
+          } else {
+            console.warn(`[INSTAGRAM CALLBACK] Alternative API call failed with status: ${altResponse.status}`);
+          }
+        } catch (altError) {
+          console.error('[INSTAGRAM CALLBACK] Alternative API call error:', altError);
+        }
+      }
+
+      // Only use Dicebear fallback if Instagram didn't provide a profile picture
+      if (!finalProfilePictureUrl) {
+        console.log('[INSTAGRAM CALLBACK] ⚠️ No profile picture provided by Instagram API, using Dicebear fallback.');
+        finalProfilePictureUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}&backgroundColor=6366f1,8b5cf6,ec4899`;
+      } else {
+        console.log('[INSTAGRAM CALLBACK] ✅ Real Instagram profile picture received from API');
+      }
+
+      console.log(`[INSTAGRAM CALLBACK] Final profile picture URL determined: ${finalProfilePictureUrl}`);
       
       // UNIQUE CONSTRAINT: Check if Instagram account is already connected elsewhere
       const { checkInstagramAccountExists, validateInstagramConnection } = await import('./utils/instagram-validation');
       const existingConnection = await checkInstagramAccountExists(profile.id);
-      const validation = validateInstagramConnection(existingConnection);
+      
+      console.log(`[INSTAGRAM CALLBACK] 🔍 Existing connection check for @${profile.username}:`, {
+        exists: existingConnection.exists,
+        hasValidToken: existingConnection.hasValidToken,
+        existingWorkspaceId: existingConnection.workspaceId,
+        existingWorkspaceIdType: typeof existingConnection.workspaceId,
+        currentWorkspaceId: workspaceId.toString(),
+        currentWorkspaceIdType: typeof workspaceId,
+        isSameWorkspace: String(existingConnection.workspaceId) === String(workspaceId)
+      });
+      
+      const validation = validateInstagramConnection(existingConnection, workspaceId.toString());
+      
+      console.log(`[INSTAGRAM CALLBACK] 📋 Validation result for @${profile.username}:`, {
+        isValid: validation.isValid,
+        errorCode: validation.errorCode,
+        errorMessage: validation.errorMessage
+      });
       
       if (!validation.isValid) {
-        console.log(`🚨 [INSTAGRAM CALLBACK] Account @${profile.username} already connected to workspace ${existingConnection.workspaceId}`);
-        return res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent('This Instagram account is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.')}`);
+        console.log(`🚨 [INSTAGRAM CALLBACK] ❌ BLOCKING CONNECTION: Account @${profile.username} already connected to workspace ${existingConnection.workspaceId} (trying to connect to ${workspaceId})`);
+        const errorMessage = validation.errorMessage || 'This Instagram account is already connected to another workspace. Each Instagram account can only be connected to one workspace at a time.';
+        return res.redirect(`https://${req.get('host')}/integrations?error=instagram_already_connected&message=${encodeURIComponent(errorMessage)}`);
       }
 
       console.log(`✅ [INSTAGRAM CALLBACK] Instagram account @${profile.username} is available for connection`);
@@ -3813,7 +4066,8 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         refreshToken: null,
         expiresAt: expiresAt,
         isActive: true,
-        profilePictureUrl: profile.profile_picture_url,
+        profilePictureUrl: finalProfilePictureUrl,
+        followersCount: profile.followers_count || 0, // 🐛 FIX: Add follower count from OAuth
         mediaCount: profile.media_count || 0,
         accountType: profile.account_type,
         pageId: profile.pageId ? String(profile.pageId) : null, // Also ensure Page ID is a string
@@ -3827,7 +4081,10 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         workspaceIdType: typeof socialAccountData.workspaceId,
         platform: socialAccountData.platform,
         accountId: socialAccountData.accountId,
-        hasAccessToken: socialAccountData.hasAccessToken
+        accessTokenLength: socialAccountData.accessToken?.length || 0,
+        accessTokenPresent: !!socialAccountData.accessToken,
+        profilePictureUrl: socialAccountData.profilePictureUrl || 'MISSING',
+        profilePictureUrlLength: socialAccountData.profilePictureUrl ? socialAccountData.profilePictureUrl.length : 0
       });
       
       // Check if account already exists
@@ -3846,28 +4103,54 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         }
       } catch (accountError: any) {
         console.error(`[INSTAGRAM CALLBACK] Error saving account:`, accountError);
-        throw accountError;
+        
+        let errorType = 'database_save_failed';
+        let errorMessage = 'Failed to save your Instagram account. Please try connecting again.';
+        let shouldRetry = true;
+        
+        if (accountError.message?.includes('duplicate') || accountError.code === 11000) {
+          errorType = 'account_already_exists';
+          errorMessage = 'This Instagram account is already connected. Please check your connected accounts.';
+          shouldRetry = false;
+        } else if (accountError.message?.includes('validation')) {
+          errorMessage = 'Invalid account data. Please ensure your Instagram account meets our requirements.';
+        } else if (accountError.message?.includes('timeout')) {
+          errorMessage = 'Database timeout. Please check your internet connection and try again.';
+        }
+        
+        return res.redirect(`https://${req.get('host')}/integrations?error=${errorType}&message=${encodeURIComponent(errorMessage)}&retry=${shouldRetry}`);
       }
       
       console.log(`[INSTAGRAM CALLBACK] Social account saved successfully`);
       
       // IMMEDIATE SYNC: Fetch Instagram data right after account connection
       console.log(`[INSTAGRAM CALLBACK] 🚀 Triggering immediate Instagram data sync for new account...`);
+      let syncSuccessful = false;
       try {
         // Import the Instagram sync service for immediate data fetch
         const { InstagramDirectSync } = await import('./instagram-direct-sync');
         const instagramSync = new InstagramDirectSync(storage);
         
-        // Sync the specific workspace where the account was added
-        await instagramSync.updateAccountWithRealData(workspaceId.toString());
+        // Use the new syncInstagramAccount method with accountId and accessToken we already have
+        console.log(`[INSTAGRAM CALLBACK] Syncing account ${String(profile.id)} with username @${profile.username}`);
+        console.log(`[INSTAGRAM CALLBACK] Access token length: ${longLivedToken.access_token.length}`);
+        
+        // Wait for the sync to complete before redirecting
+        await instagramSync.syncInstagramAccount(String(profile.id), longLivedToken.access_token);
         console.log(`[INSTAGRAM CALLBACK] ✅ Immediate Instagram sync completed successfully`);
+        syncSuccessful = true;
         
         // Clear dashboard cache for this workspace to show fresh data
         dashboardCache.clearCache();
         console.log(`[INSTAGRAM CALLBACK] ✅ Dashboard cache cleared for fresh data display`);
         
-      } catch (syncError) {
+        // Small delay to ensure database write completes
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (syncError: any) {
         console.error(`[INSTAGRAM CALLBACK] ⚠️ Immediate sync failed, but account was connected:`, syncError);
+        console.error(`[INSTAGRAM CALLBACK] Sync error message:`, syncError?.message);
+        console.error(`[INSTAGRAM CALLBACK] Sync error stack:`, syncError?.stack);
       }
       
       // If this is during onboarding, also create default workspace if needed
@@ -3885,17 +4168,32 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       }
       
       const redirectPage = stateData.source === 'onboarding' ? 'onboarding' : 'integrations';
-      console.log(`[INSTAGRAM CALLBACK] Redirecting to ${redirectPage} page`);
+      console.log(`[INSTAGRAM CALLBACK] Redirecting to ${redirectPage} page (sync successful: ${syncSuccessful})`);
       
+      // 🔒 Clean up processed authorization code
+      if (code) {
+        processedAuthCodes.delete(String(code));
+        console.log(`[INSTAGRAM CALLBACK] ✅ Authorization code cleaned up from cache`);
+      }
+
       // Use the correct redirect format that matches the frontend routing
+      // Add timestamp to force cache refresh and sync status
+      const timestamp = Date.now();
       const redirectUrl = redirectPage === 'integrations' 
-        ? `https://${req.get('host')}/integration?success=true&connected=instagram&username=${profile.username}`
-        : `https://${req.get('host')}/${redirectPage}?success=instagram_connected&username=${profile.username}`;
+        ? `https://veefore-webhook.veefore.com/integration?success=true&connected=instagram&username=${profile.username}&synced=${syncSuccessful}&t=${timestamp}`
+        : `https://veefore-webhook.veefore.com/${redirectPage}?success=instagram_connected&username=${profile.username}&synced=${syncSuccessful}&t=${timestamp}`;
       
       console.log(`[INSTAGRAM CALLBACK] Final redirect URL: ${redirectUrl}`);
       res.redirect(redirectUrl);
       
     } catch (error: any) {
+      // 🔒 Clean up processed authorization code on error
+      const { code } = req.query;
+      if (code) {
+        processedAuthCodes.delete(String(code));
+        console.log(`[INSTAGRAM CALLBACK] ✅ Authorization code cleaned up from cache (error case)`);
+      }
+
       console.error('[INSTAGRAM CALLBACK] Error details:', {
         message: error.message,
         stack: error.stack?.split('\n')[0],
@@ -3907,7 +4205,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         errorMessage = `Instagram API Error: ${JSON.stringify(error.response.data)}`;
       }
       
-      res.redirect(`https://${req.get('host')}/integrations?error=${encodeURIComponent(errorMessage)}`);
+      res.redirect(`https://veefore-webhook.veefore.com/integrations?error=${encodeURIComponent(errorMessage)}`);
     }
   });
 
@@ -4153,7 +4451,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: error.message || 'Failed to create subscription' });
     }
   });
-
   // Razorpay Payment Verification
   app.post('/api/razorpay/verify-payment', requireAuth, async (req: any, res: Response) => {
     try {
@@ -4933,6 +5230,269 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to fetch Instagram insights' });
     }
   });
+  // Automatic profile picture refresh for all Instagram accounts
+  async function refreshAllInstagramProfilePictures() {
+    try {
+      console.log('[AUTO PROFILE REFRESH] 🚀 Starting automatic profile picture refresh...');
+      
+      // Get all Instagram accounts across all workspaces
+      console.log('[AUTO PROFILE REFRESH] 📊 Fetching all social accounts...');
+      const allAccounts = await storage.getAllSocialAccounts();
+      console.log(`[AUTO PROFILE REFRESH] 📊 Found ${allAccounts.length} total social accounts`);
+      
+      const instagramAccounts = allAccounts.filter(acc => {
+        const isInstagram = acc.platform === 'instagram';
+        const isActive = acc.isActive;
+        const hasToken = acc.accessToken;
+        console.log(`[AUTO PROFILE REFRESH] 🔍 Account @${acc.username}: platform=${acc.platform}, isActive=${isActive}, hasToken=${!!hasToken}`);
+        return isInstagram && isActive && hasToken;
+      });
+      
+      console.log(`[AUTO PROFILE REFRESH] 📊 Found ${instagramAccounts.length} active Instagram accounts to refresh`);
+      
+      if (instagramAccounts.length === 0) {
+        console.log('[AUTO PROFILE REFRESH] ⚠️ No Instagram accounts found to refresh');
+        return;
+      }
+      
+      for (const account of instagramAccounts) {
+        try {
+          console.log(`[AUTO PROFILE REFRESH] 🔄 Refreshing profile picture for @${account.username}...`);
+          console.log(`[AUTO PROFILE REFRESH] 🔍 Account details: ID=${account.id}, Token=${account.accessToken ? 'EXISTS' : 'MISSING'}`);
+          
+          // Fetch fresh profile data from Instagram API
+          const profileResponse = await fetch(
+            `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url,followers_count,name,biography&access_token=${account.accessToken}`
+          );
+
+          if (!profileResponse.ok) {
+            const errorText = await profileResponse.text();
+            console.log(`[AUTO PROFILE REFRESH] ❌ Failed to fetch profile for @${account.username}: ${profileResponse.status} - ${errorText}`);
+            continue;
+          }
+
+          const profileData = await profileResponse.json();
+          console.log(`[AUTO PROFILE REFRESH] 📊 Profile data for @${account.username}:`, {
+            username: profileData.username,
+            id: profileData.id,
+            profile_picture_url: profileData.profile_picture_url || 'MISSING',
+            profile_picture_url_length: profileData.profile_picture_url ? profileData.profile_picture_url.length : 0
+          });
+          
+          let finalProfilePictureUrl = profileData.profile_picture_url;
+          
+          // If profile picture is missing, try alternative approach
+          if (!finalProfilePictureUrl) {
+            console.log(`[AUTO PROFILE REFRESH] 🔄 Profile picture missing for @${account.username}, trying alternative API call...`);
+            try {
+              const altResponse = await fetch(
+                `https://graph.instagram.com/${profileData.id}?fields=profile_picture_url&access_token=${account.accessToken}`
+              );
+              if (altResponse.ok) {
+                const altData = await altResponse.json();
+                finalProfilePictureUrl = altData.profile_picture_url;
+                console.log(`[AUTO PROFILE REFRESH] ✅ Alternative API result for @${account.username}:`, {
+                  profile_picture_url: finalProfilePictureUrl || 'STILL MISSING'
+                });
+              } else {
+                console.log(`[AUTO PROFILE REFRESH] ❌ Alternative API failed for @${account.username}: ${altResponse.status}`);
+              }
+            } catch (altError) {
+              console.log(`[AUTO PROFILE REFRESH] ❌ Alternative API error for @${account.username}:`, altError);
+            }
+          }
+          
+          // Update the account if we got a profile picture
+          if (finalProfilePictureUrl && finalProfilePictureUrl !== account.profilePictureUrl) {
+            console.log(`[AUTO PROFILE REFRESH] 🔄 Updating profile picture for @${account.username}...`);
+            await storage.updateSocialAccount(account.id, {
+              profilePictureUrl: finalProfilePictureUrl,
+              lastSyncAt: new Date(),
+              updatedAt: new Date()
+            });
+            console.log(`[AUTO PROFILE REFRESH] ✅ Updated profile picture for @${account.username}: ${finalProfilePictureUrl}`);
+          } else {
+            console.log(`[AUTO PROFILE REFRESH] ℹ️ No profile picture update needed for @${account.username} (current: ${account.profilePictureUrl || 'NONE'}, new: ${finalProfilePictureUrl || 'NONE'})`);
+          }
+          
+        } catch (error) {
+          console.error(`[AUTO PROFILE REFRESH] ❌ Error refreshing @${account.username}:`, error);
+        }
+      }
+      
+      console.log('[AUTO PROFILE REFRESH] ✅ Completed automatic profile picture refresh');
+    } catch (error) {
+      console.error('[AUTO PROFILE REFRESH] ❌ Error during automatic refresh:', error);
+    }
+  }
+
+  // Schedule automatic profile picture refresh every 6 hours
+  setInterval(refreshAllInstagramProfilePictures, 6 * 60 * 60 * 1000); // 6 hours
+  console.log('[AUTO PROFILE REFRESH] Scheduled automatic profile picture refresh every 6 hours');
+
+  // Run initial profile picture refresh for existing accounts (with delay to let server fully start)
+  setTimeout(async () => {
+    console.log('[AUTO PROFILE REFRESH] Running initial profile picture refresh for existing accounts...');
+    await refreshAllInstagramProfilePictures();
+  }, 30000); // 30 seconds delay
+
+  // Manual trigger endpoint for testing
+  app.post('/api/admin/trigger-profile-refresh', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[MANUAL TRIGGER] Profile picture refresh triggered manually');
+      await refreshAllInstagramProfilePictures();
+      res.json({ success: true, message: 'Profile picture refresh completed' });
+    } catch (error) {
+      console.error('[MANUAL TRIGGER] Error:', error);
+      res.status(500).json({ error: 'Failed to refresh profile pictures' });
+    }
+  });
+
+  // Check for duplicate Instagram accounts across workspaces
+  app.get('/api/admin/check-duplicate-accounts', requireAuth, async (req: any, res: Response) => {
+    try {
+      console.log('[ADMIN] Checking for duplicate Instagram accounts...');
+      
+      // Get all social accounts
+      const allAccounts = await storage.getAllSocialAccounts();
+      const instagramAccounts = allAccounts.filter(acc => acc.platform === 'instagram' && acc.isActive);
+      
+      console.log(`[ADMIN] Found ${instagramAccounts.length} active Instagram accounts`);
+      
+      // Group by accountId to find duplicates
+      const accountGroups: { [key: string]: any[] } = {};
+      instagramAccounts.forEach(account => {
+        const accountId = account.accountId;
+        if (!accountGroups[accountId]) {
+          accountGroups[accountId] = [];
+        }
+        accountGroups[accountId].push({
+          id: account.id,
+          username: account.username,
+          workspaceId: account.workspaceId,
+          hasAccessToken: account.hasAccessToken,
+          lastSync: account.lastSyncAt
+        });
+      });
+      
+      // Find duplicates (accounts connected to multiple workspaces)
+      const duplicates = Object.entries(accountGroups)
+        .filter(([_, accounts]) => accounts.length > 1)
+        .map(([accountId, accounts]) => ({
+          instagramAccountId: accountId,
+          username: accounts[0].username,
+          connectedWorkspaces: accounts.length,
+          workspaces: accounts
+        }));
+      
+      console.log(`[ADMIN] Found ${duplicates.length} duplicate Instagram accounts`);
+      
+      res.json({
+        success: true,
+        duplicates,
+        totalDuplicates: duplicates.length,
+        message: duplicates.length > 0 
+          ? `Found ${duplicates.length} Instagram account(s) connected to multiple workspaces` 
+          : 'No duplicate Instagram accounts found'
+      });
+    } catch (error) {
+      console.error('[ADMIN] Error checking duplicates:', error);
+      res.status(500).json({ error: 'Failed to check duplicate accounts' });
+    }
+  });
+
+  // Profile picture refresh endpoint
+  app.post('/api/social-accounts/refresh-profile-picture', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { user } = req;
+      const { workspaceId, platform = 'instagram' } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID required' });
+      }
+
+      // Get the social account
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const account = accounts.find(acc => acc.platform === platform);
+      
+      if (!account) {
+        return res.status(404).json({ error: `${platform} account not found` });
+      }
+
+      if (!account.accessToken) {
+        return res.status(400).json({ error: 'Account not properly connected' });
+      }
+
+      // Fetch fresh profile data from Instagram API with comprehensive fields
+      const profileResponse = await fetch(
+        `https://graph.instagram.com/me?fields=id,username,account_type,media_count,profile_picture_url,followers_count,name,biography&access_token=${account.accessToken}`
+      );
+
+      if (!profileResponse.ok) {
+        const errorData = await profileResponse.json();
+        console.error('[PROFILE PICTURE REFRESH] API Error:', errorData);
+        return res.status(400).json({ error: 'Failed to fetch profile data from Instagram' });
+      }
+
+      const profileData = await profileResponse.json();
+      console.log('[PROFILE PICTURE REFRESH] Fresh profile data:', {
+        username: profileData.username,
+        id: profileData.id,
+        account_type: profileData.account_type,
+        profile_picture_url: profileData.profile_picture_url || 'MISSING',
+        profile_picture_url_length: profileData.profile_picture_url ? profileData.profile_picture_url.length : 0,
+        all_fields: Object.keys(profileData)
+      });
+
+      // Update the account with fresh profile picture
+      let finalProfilePictureUrl = profileData.profile_picture_url;
+      
+      // If profile picture is missing, try alternative approach
+      if (!finalProfilePictureUrl) {
+        console.log('[PROFILE PICTURE REFRESH] Profile picture missing, trying alternative API call...');
+        
+        try {
+          // Try with different field combination
+          const altResponse = await fetch(
+            `https://graph.instagram.com/${profileData.id}?fields=profile_picture_url&access_token=${account.accessToken}`
+          );
+          
+          if (altResponse.ok) {
+            const altData = await altResponse.json();
+            finalProfilePictureUrl = altData.profile_picture_url;
+            console.log('[PROFILE PICTURE REFRESH] Alternative API result:', {
+              profile_picture_url: finalProfilePictureUrl || 'STILL MISSING'
+            });
+          }
+        } catch (altError) {
+          console.log('[PROFILE PICTURE REFRESH] Alternative API failed:', altError);
+        }
+      }
+      
+      await storage.updateSocialAccount(account.id, {
+        profilePictureUrl: finalProfilePictureUrl,
+        followersCount: profileData.followers_count || account.followersCount,
+        mediaCount: profileData.media_count || account.mediaCount,
+        lastSyncAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      res.json({
+        success: true,
+        profilePictureUrl: finalProfilePictureUrl,
+        message: finalProfilePictureUrl ? 'Profile picture refreshed successfully' : 'Profile picture not available from Instagram API',
+        debug: {
+          originalUrl: profileData.profile_picture_url,
+          finalUrl: finalProfilePictureUrl,
+          apiFields: Object.keys(profileData)
+        }
+      });
+
+    } catch (error) {
+      console.error('[PROFILE PICTURE REFRESH] Error:', error);
+      res.status(500).json({ error: 'Failed to refresh profile picture' });
+    }
+  });
 
   // Instagram user profile endpoint for comment replies
   app.get('/api/instagram/user-profile', requireAuth, async (req: any, res: Response) => {
@@ -5141,7 +5701,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
             console.log('[TOKEN VALIDATION] Token (first 20 chars):', account.accessToken?.substring(0, 20) + '...');
 
             // Test basic token validity
-            const meResponse = await fetch(`https://graph.instagram.com/v21.0/me?access_token=${account.accessToken}`);
+            const meResponse = await fetch(`https://graph.instagram.com/v23.0/me?access_token=${account.accessToken}`);
             const meData = await meResponse.json();
 
             console.log('[TOKEN VALIDATION] /me response status:', meResponse.status);
@@ -5152,7 +5712,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
 
               // Test content publishing permissions by attempting to access media endpoint
               const mediaTestResponse = await fetch(
-                `https://graph.instagram.com/v21.0/${account.accountId}/media?access_token=${account.accessToken}&limit=1`,
+                `https://graph.instagram.com/v23.0/${account.accountId}/media?access_token=${account.accessToken}&limit=1`,
                 { method: 'GET' }
               );
               const mediaTestData = await mediaTestResponse.json();
@@ -5167,7 +5727,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                 // Test video publishing permissions
                 try {
                   const videoTestResponse = await fetch(
-                    `https://graph.instagram.com/v21.0/${account.accountId}?fields=media_count&access_token=${account.accessToken}`
+                    `https://graph.instagram.com/v23.0/${account.accountId}?fields=media_count&access_token=${account.accessToken}`
                   );
                   if (videoTestResponse.ok) {
                     publishingPermissions.canPublishVideos = true;
@@ -5245,11 +5805,13 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       avgLikes = 0,
       avgComments = 0,
       avgReach = 0,
-      avgEngagement = 0
+      avgEngagement = 0,
+      engagementRate = 0
     } = instagramAccount;
 
     // Use the authentic engagement rate directly from Instagram Business API
-    let engagementPercent = avgEngagement || 0;
+    // Check if we have engagementRate (total rate) or avgEngagement (per post)
+    let engagementPercent = engagementRate || avgEngagement || 0;
     
     // Log which engagement rate we're using
     if (engagementPercent > 0) {
@@ -5699,7 +6261,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to get suggestions' });
     }
   });
-
   // AI Script Generation - 2 credits
   app.post('/api/content/generate-script', requireAuth, async (req: any, res: Response) => {
     try {
@@ -6474,7 +7035,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to perform social listening' });
     }
   });
-
   // Content Theft Detection API - 7 credits
   app.post('/api/ai/content-theft-detection', requireAuth, async (req: any, res: Response) => {
     try {
@@ -6799,7 +7359,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           console.log(`[AI SUGGESTIONS] Account ID: ${instagramAccount.accountId}`);
           console.log(`[AI SUGGESTIONS] Current cached data - Likes: ${instagramAccount.avgLikes}, Comments: ${instagramAccount.avgComments}`);
           
-          const apiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`;
+          const apiUrl = `https://graph.facebook.com/v23.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${instagramAccount.accessToken}`;
           console.log(`[AI SUGGESTIONS] Making API call to: ${apiUrl.replace(instagramAccount.accessToken, 'TOKEN_HIDDEN')}`);
           
           // Fetch latest media with actual current engagement
@@ -6888,7 +7448,7 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
                   
                   // Retry API call with new token
                   console.log(`[AI SUGGESTIONS] Retrying Instagram API call with refreshed token...`);
-                  const retryApiUrl = `https://graph.facebook.com/v21.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${refreshResult.access_token}`;
+                  const retryApiUrl = `https://graph.facebook.com/v23.0/${instagramAccount.accountId}/media?fields=id,caption,like_count,comments_count,timestamp,media_type&limit=50&access_token=${refreshResult.access_token}`;
                   console.log(`[AI SUGGESTIONS] Retry URL: ${retryApiUrl.replace(refreshResult.access_token, 'NEW_TOKEN_HIDDEN')}`);
                   
                   const retryResponse = await fetch(retryApiUrl);
@@ -7212,7 +7772,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to process bulk repurposing' });
     }
   });
-
   // AI Content Generation Routes
   app.post('/api/ai/generate-caption', requireAuth, async (req, res) => {
     try {
@@ -7508,6 +8067,91 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   });
 
+  // 🚀 NEW: Advanced engagement calculation endpoint with user controls
+  app.post('/api/engagement/calculate', async (req: any, res: any) => {
+    try {
+      const { workspaceId, method, postCount, timePeriod } = req.body;
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+      
+      console.log(`[ENGAGEMENT CALCULATOR] 🧠 Advanced calculation requested:`, {
+        workspaceId,
+        method: method || 'smart',
+        postCount: postCount || 'all',
+        timePeriod: timePeriod || 'all'
+      });
+      
+      // Get Instagram account for this workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find((acc: any) => acc.platform === 'instagram' && acc.isActive);
+      
+      if (!instagramAccount) {
+        return res.status(400).json({ error: 'No Instagram account found for this workspace' });
+      }
+      
+      // Prepare engagement data
+      const engagementData: EngagementData = {
+        likes: instagramAccount.totalLikes || 0,
+        comments: instagramAccount.totalComments || 0,
+        shares: 0, // Not available in basic Instagram API
+        saves: 0, // Not available in basic Instagram API
+        followers: instagramAccount.followersCount || 0,
+        reach: instagramAccount.totalReach || 0
+      };
+      
+      let result;
+      
+      // Calculate based on user's method preference
+      switch (method) {
+        case 'erf':
+          result = {
+            method: 'ERF',
+            rate: calculateERF(engagementData),
+            description: `Engagement Rate by Followers: ${calculateERF(engagementData).toFixed(2)}% (${engagementData.likes + engagementData.comments} engagements from ${engagementData.followers} followers)`
+          };
+          break;
+        case 'err':
+          if (!engagementData.reach || engagementData.reach <= 0) {
+            return res.status(400).json({ error: 'Reach data is required for ERR calculation' });
+          }
+          result = {
+            method: 'ERR',
+            rate: calculateERR(engagementData),
+            description: `Engagement Rate by Reach: ${calculateERR(engagementData).toFixed(2)}% (${engagementData.likes + engagementData.comments} engagements from ${engagementData.reach} people reached)`
+          };
+          break;
+        case 'smart':
+        default:
+          result = calculateSmartEngagement(engagementData);
+          break;
+      }
+      
+      console.log(`[ENGAGEMENT CALCULATOR] ✅ Calculation complete:`, result);
+      
+      res.json({
+        success: true,
+        calculation: result,
+        account: {
+          username: instagramAccount.username,
+          followers: engagementData.followers,
+          reach: engagementData.reach,
+          totalLikes: engagementData.likes,
+          totalComments: engagementData.comments
+        },
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('[ENGAGEMENT CALCULATOR] Error:', error);
+      res.status(500).json({
+        error: 'Engagement calculation failed',
+        details: error.message
+      });
+    }
+  });
+
   // Manual Instagram sync endpoint for immediate data refresh
   app.post('/api/instagram/manual-sync', async (req: any, res: any) => {
     try {
@@ -7529,46 +8173,33 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       
       console.log(`[INSTAGRAM MANUAL SYNC] Found Instagram account: @${instagramAccount.username}`);
       
-      // Try smart polling first
-      const pollingSuccess = await smartPolling.forcePoll(instagramAccount.accountId || instagramAccount.id);
+      // Always use direct sync for reach data updates (smart polling doesn't fetch reach data properly)
+      console.log(`[INSTAGRAM MANUAL SYNC] 🔥 Using Instagram direct sync for real reach data`);
       
-      if (pollingSuccess) {
-        console.log(`[INSTAGRAM MANUAL SYNC] ✅ Smart polling successful for @${instagramAccount.username}`);
-        
-        // Get updated account data
-        const updatedAccount = await storage.getSocialAccount(instagramAccount.id);
-        
-        res.json({
-          success: true,
-          message: 'Instagram data synced successfully via smart polling',
-          account: {
-            username: updatedAccount.username,
-            followersCount: updatedAccount.followersCount,
-            mediaCount: updatedAccount.mediaCount,
-            lastSyncAt: updatedAccount.lastSyncAt
-          },
-          method: 'smart_polling',
-          timestamp: new Date().toISOString()
-        });
-      } else {
-        console.log(`[INSTAGRAM MANUAL SYNC] ⚠️ Smart polling rate limited, using direct sync`);
-        
-        // Fallback to direct sync
-        const { InstagramDirectSync } = await import('./instagram-direct-sync');
-        const instagramSync = new InstagramDirectSync(storage);
-        
-        await instagramSync.updateAccountWithRealData(workspaceId);
-        
-        res.json({
-          success: true,
-          message: 'Instagram data synced successfully via direct API',
-          method: 'direct_api',
-          timestamp: new Date().toISOString()
-        });
-      }
+      const { InstagramDirectSync } = await import('./instagram-direct-sync');
+      const instagramSync = new InstagramDirectSync(storage);
       
-      // Clear dashboard cache to show fresh data
-      dashboardCache.clearCache();
+      await instagramSync.updateAccountWithRealData(workspaceId);
+      
+      // Get updated account data
+      const updatedAccount = await storage.getSocialAccount(instagramAccount.id);
+      
+      res.json({
+        success: true,
+        message: 'Instagram data synced successfully with real reach data',
+        account: {
+          username: updatedAccount.username,
+          followersCount: updatedAccount.followersCount,
+          mediaCount: updatedAccount.mediaCount,
+          totalReach: updatedAccount.totalReach,
+          lastSyncAt: updatedAccount.lastSyncAt
+        },
+        method: 'direct_api_with_reach',
+        timestamp: new Date().toISOString()
+      });
+      
+      // Trigger real-time cache invalidation to notify frontend immediately
+      dashboardCache.forceCacheInvalidation(workspaceId, 'manual-sync');
       
     } catch (error: any) {
       console.error('[INSTAGRAM MANUAL SYNC] Error:', error);
@@ -7837,6 +8468,375 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       });
     }
   });
+  // IMMEDIATE sync endpoint - called right after OAuth
+  app.post('/api/instagram/immediate-sync', async (req: any, res: Response) => {
+    console.log('🔵 [IMMEDIATE SYNC] ========== REQUEST RECEIVED ==========');
+    console.log('🔵 [IMMEDIATE SYNC] Request body:', JSON.stringify(req.body, null, 2));
+    console.log('🔵 [IMMEDIATE SYNC] Request headers:', req.headers);
+    
+    try {
+      const { workspaceId, accountId } = req.body;
+      
+      console.log('[IMMEDIATE SYNC] 🚀 Force sync requested for workspace:', workspaceId);
+      
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId required' });
+      }
+
+      // Get Instagram account for this workspace  
+      const socialAccounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      console.log('[IMMEDIATE SYNC] Retrieved accounts from storage:', socialAccounts.length);
+      
+      const instagramAccount = socialAccounts.find(acc => 
+        acc.platform === 'instagram' && 
+        acc.isActive &&
+        (!accountId || String(acc.accountId) === String(accountId))
+      );
+
+      if (!instagramAccount) {
+        console.error('[IMMEDIATE SYNC] ❌ No Instagram account found for workspace:', workspaceId);
+        console.error('[IMMEDIATE SYNC] Available accounts:', socialAccounts.map(a => ({ platform: a.platform, username: a.username })));
+        return res.status(404).json({ error: 'Instagram account not found' });
+      }
+
+      console.log('[IMMEDIATE SYNC] Account object keys:', Object.keys(instagramAccount));
+      console.log('[IMMEDIATE SYNC] Has accessToken field:', 'accessToken' in instagramAccount);
+      console.log('[IMMEDIATE SYNC] AccessToken value type:', typeof instagramAccount.accessToken);
+      console.log('[IMMEDIATE SYNC] AccessToken value:', instagramAccount.accessToken ? `EXISTS (${instagramAccount.accessToken.length} chars)` : 'NULL/UNDEFINED');
+
+      if (!instagramAccount.accessToken) {
+        console.error('[IMMEDIATE SYNC] ❌ No access token for account:', instagramAccount.username);
+        console.error('[IMMEDIATE SYNC] Account data:', JSON.stringify(instagramAccount, null, 2));
+        return res.status(400).json({ error: 'No access token available' });
+      }
+
+      console.log('[IMMEDIATE SYNC] Found account:', {
+        username: instagramAccount.username,
+        accountId: instagramAccount.accountId,
+        hasToken: !!instagramAccount.accessToken,
+        tokenLength: instagramAccount.accessToken?.length || 0,
+        tokenPreview: instagramAccount.accessToken ? instagramAccount.accessToken.substring(0, 20) + '...' : 'NO TOKEN'
+      });
+
+      // Use the direct sync service
+      const { InstagramDirectSync } = await import('./instagram-direct-sync');
+      const sync = new InstagramDirectSync(storage);
+      
+      await sync.syncInstagramAccount(
+        String(instagramAccount.accountId), 
+        instagramAccount.accessToken
+      );
+
+      // Clear cache
+      dashboardCache.clearCache();
+
+      console.log('[IMMEDIATE SYNC] ✅ Sync completed successfully');
+
+      return res.json({ 
+        success: true, 
+        message: 'Instagram data synced successfully',
+        username: instagramAccount.username
+      });
+
+    } catch (error: any) {
+      console.error('[IMMEDIATE SYNC] ❌ Error:', error);
+      res.status(500).json({ 
+        error: 'Sync failed', 
+        message: error.message 
+      });
+    }
+  });
+
+  // Debug endpoint to check account data
+app.get('/api/debug/instagram-accounts', async (req: any, res: Response) => {
+  try {
+    const allAccounts = await storage.getAllSocialAccounts();
+    const instagramAccounts = allAccounts.filter(acc => acc.platform === 'instagram');
+    
+    const debugData = instagramAccounts.map(acc => ({
+      id: acc.id,
+      username: acc.username,
+      accountId: acc.accountId,
+      workspaceId: acc.workspaceId,
+      followersCount: acc.followersCount,
+      mediaCount: acc.mediaCount,
+      accountType: acc.accountType,
+      isActive: acc.isActive,
+      hasAccessToken: acc.hasAccessToken,
+      lastSyncAt: acc.lastSyncAt
+    }));
+    
+    console.log('[DEBUG] Instagram accounts in database:', debugData);
+    
+    return res.json({
+      totalAccounts: instagramAccounts.length,
+      accounts: debugData
+    });
+  } catch (error: any) {
+    console.error('[DEBUG] Error fetching accounts:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Debug endpoint to check for specific Instagram account
+app.get('/api/debug/instagram-account/:username', async (req: any, res: Response) => {
+  try {
+    const { username } = req.params;
+    const allAccounts = await storage.getAllSocialAccounts();
+    const instagramAccount = allAccounts.find(acc => 
+      acc.platform === 'instagram' && acc.username === username
+    );
+    
+    if (instagramAccount) {
+      console.log(`[DEBUG] Found Instagram account '${username}':`, {
+        id: instagramAccount.id,
+        username: instagramAccount.username,
+        workspaceId: instagramAccount.workspaceId,
+        followersCount: instagramAccount.followersCount,
+        hasAccessToken: instagramAccount.hasAccessToken,
+        isActive: instagramAccount.isActive
+      });
+      
+      return res.json({
+        found: true,
+        account: {
+          id: instagramAccount.id,
+          username: instagramAccount.username,
+          workspaceId: instagramAccount.workspaceId,
+          followersCount: instagramAccount.followersCount,
+          mediaCount: instagramAccount.mediaCount,
+          accountType: instagramAccount.accountType,
+          isActive: instagramAccount.isActive,
+          hasAccessToken: instagramAccount.hasAccessToken,
+          lastSyncAt: instagramAccount.lastSyncAt
+        }
+      });
+    } else {
+      console.log(`[DEBUG] Instagram account '${username}' NOT FOUND in database`);
+      return res.json({
+        found: false,
+        message: `Instagram account '${username}' not found in database`
+      });
+    }
+  } catch (error: any) {
+    console.error('[DEBUG] Error fetching account:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Debug endpoint to check workspace mapping
+app.get('/api/debug/workspace-mapping', async (req: any, res: Response) => {
+  try {
+    const allWorkspaces = await storage.getAllWorkspaces();
+    const workspaceMapping = allWorkspaces.map(ws => ({
+      id: ws.id,
+      name: ws.name,
+      slug: ws.slug,
+      userId: ws.userId
+    }));
+    
+    console.log('[DEBUG] All workspaces:', workspaceMapping);
+    
+    return res.json({
+      totalWorkspaces: allWorkspaces.length,
+      workspaces: workspaceMapping
+    });
+  } catch (error: any) {
+    console.error('[DEBUG] Error fetching workspaces:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// CRITICAL FIX: Workspace ID validation endpoint
+app.get('/api/workspace/validate/:workspaceId', async (req: any, res: Response) => {
+  try {
+    const { workspaceId } = req.params;
+    
+    // Get workspace by ID directly
+    const workspace = await storage.getWorkspace(workspaceId);
+    
+    if (workspace) {
+      console.log(`[WORKSPACE VALIDATION] ✅ Valid workspace: ${workspace.name} (${workspaceId})`);
+      return res.json({
+        valid: true,
+        workspace: {
+          id: workspace.id,
+          name: workspace.name,
+          slug: workspace.slug,
+          userId: workspace.userId
+        }
+      });
+    } else {
+      console.warn(`[WORKSPACE VALIDATION] ❌ Invalid workspace ID: ${workspaceId}`);
+      
+      // Get all workspaces to find potential matches
+      const allWorkspaces = await storage.getAllWorkspaces();
+      
+      // Try to find by name (for corrupted IDs)
+      const workspaceByName = allWorkspaces.find(ws => 
+        ws.name.toLowerCase() === 'cghgh' || 
+        ws.name.toLowerCase().includes('cghgh')
+      );
+      
+      if (workspaceByName) {
+        console.log(`[WORKSPACE VALIDATION] 🔧 Found workspace by name: ${workspaceByName.name} (${workspaceByName.id})`);
+        return res.json({
+          valid: false,
+          corrupted: true,
+          suggestedWorkspace: {
+            id: workspaceByName.id,
+            name: workspaceByName.name,
+            slug: workspaceByName.slug,
+            userId: workspaceByName.userId
+          },
+          message: `Workspace ID ${workspaceId} is invalid. Suggested: ${workspaceByName.name} (${workspaceByName.id})`
+        });
+      }
+      
+      return res.json({
+        valid: false,
+        corrupted: true,
+        message: `Workspace ID ${workspaceId} is invalid and no matching workspace found`
+      });
+    }
+  } catch (error: any) {
+    console.error('[WORKSPACE VALIDATION] Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+  // Instagram API debug endpoint to test reach data fetching
+  app.get('/api/instagram/debug-reach', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = req.query.workspaceId || req.user.defaultWorkspaceId;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      console.log('[INSTAGRAM DEBUG] Testing reach data fetching for workspace:', workspaceId);
+
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccount = accounts.find(acc => acc.platform === 'instagram' && acc.isActive);
+
+      if (!instagramAccount) {
+        return res.status(404).json({ error: 'No active Instagram account found' });
+      }
+
+      if (!instagramAccount.accessToken) {
+        return res.status(400).json({ error: 'No access token available' });
+      }
+
+      console.log('[INSTAGRAM DEBUG] Testing API calls for account:', instagramAccount.username);
+
+      const debugResults: any = {};
+      const periods = [
+        { key: 'day', apiPeriod: 'day', label: 'Today' },
+        { key: 'week', apiPeriod: 'week', label: 'This Week' },
+        { key: 'days_28', apiPeriod: 'days_28', label: 'This Month' }
+      ];
+
+      for (const period of periods) {
+        try {
+          console.log(`[INSTAGRAM DEBUG] Testing ${period.label} reach...`);
+          const apiUrl = `https://graph.instagram.com/${instagramAccount.accountId}/insights?metric=reach&period=${period.apiPeriod}&access_token=${instagramAccount.accessToken}`;
+          
+          const response = await fetch(apiUrl);
+          const responseText = await response.text();
+          
+          debugResults[period.key] = {
+            status: response.status,
+            ok: response.ok,
+            response: responseText,
+            url: apiUrl
+          };
+          
+          console.log(`[INSTAGRAM DEBUG] ${period.label} - Status: ${response.status}, OK: ${response.ok}`);
+        } catch (error: any) {
+          debugResults[period.key] = {
+            error: error.message,
+            url: `https://graph.instagram.com/${instagramAccount.accountId}/insights?metric=reach&period=${period.apiPeriod}&access_token=${instagramAccount.accessToken}`
+          };
+        }
+      }
+
+      res.json({
+        success: true,
+        account: {
+          username: instagramAccount.username,
+          accountId: instagramAccount.accountId,
+          accountType: instagramAccount.accountType
+        },
+        debugResults
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM DEBUG] Error:', error);
+      res.status(500).json({ 
+        error: 'Debug failed', 
+        message: error.message 
+      });
+    }
+  });
+
+  // Instagram disconnect endpoint to clear OAuth state
+  app.post('/api/instagram/disconnect', requireAuth, async (req: any, res: Response) => {
+    try {
+      const workspaceId = req.body.workspaceId || req.user.defaultWorkspaceId;
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'Workspace ID is required' });
+      }
+
+      console.log('[INSTAGRAM DISCONNECT] Disconnecting Instagram accounts for workspace:', workspaceId);
+
+      // Get all Instagram accounts for this workspace
+      const accounts = await storage.getSocialAccountsByWorkspace(workspaceId);
+      const instagramAccounts = accounts.filter((acc: any) => acc.platform === 'instagram');
+
+      if (instagramAccounts.length === 0) {
+        return res.json({ 
+          success: true,
+          message: 'No Instagram accounts to disconnect',
+          disconnectedCount: 0
+        });
+      }
+
+      let disconnectedCount = 0;
+      for (const account of instagramAccounts) {
+        try {
+          // Delete the Instagram account from storage
+          await storage.deleteSocialAccount(account.id);
+          disconnectedCount++;
+          console.log(`[INSTAGRAM DISCONNECT] ✅ Disconnected account: ${account.username}`);
+        } catch (error: any) {
+          console.error(`[INSTAGRAM DISCONNECT] ❌ Failed to disconnect ${account.username}:`, error.message);
+        }
+      }
+
+      // Clear dashboard cache
+      try {
+        await storage.clearAllDashboardCache();
+        console.log('[INSTAGRAM DISCONNECT] ✅ Dashboard cache cleared');
+      } catch (cacheError) {
+        console.log('[INSTAGRAM DISCONNECT] ⚠️ Cache clear failed:', cacheError);
+      }
+
+      console.log(`[INSTAGRAM DISCONNECT] Disconnected ${disconnectedCount} Instagram accounts`);
+
+      res.json({
+        success: true,
+        message: `Disconnected ${disconnectedCount} Instagram accounts`,
+        disconnectedCount,
+        workspaceId
+      });
+
+    } catch (error: any) {
+      console.error('[INSTAGRAM DISCONNECT] Error:', error.message);
+      res.status(500).json({ 
+        error: error.message,
+        success: false 
+      });
+    }
+  });
 
   // Force Instagram analytics sync endpoint
   app.post('/api/instagram/force-analytics-sync', requireAuth, async (req: any, res: Response) => {
@@ -7882,10 +8882,36 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         const avgLikes = posts > 0 ? Math.round(totalLikes / posts) : 0;
         const avgComments = posts > 0 ? Math.round(totalComments / posts) : 0;
         
-        // Calculate realistic reach estimate if not available from API
-        if (totalReach === 0 && followers > 0) {
-          // Estimate reach as 50-70% of followers for personal accounts
+        // 🚀 ENHANCED: Try to fetch real Instagram Business API reach data first
+        if (account.accountType === 'BUSINESS' && account.hasAccessToken) {
+          console.log(`[FORCE SYNC] 🔥 Attempting to fetch real Instagram Business API reach data...`);
+          
+          try {
+            // Import and use Instagram Direct Sync for real reach data
+            const { InstagramDirectSync } = await import('./instagram-direct-sync');
+            const directSync = new InstagramDirectSync(storage);
+            
+            // Get comprehensive data including real reach
+            const comprehensiveData = await directSync.fetchComprehensiveData(account.accessToken, account.accountId);
+            
+            if (comprehensiveData && comprehensiveData.totalReach > 0) {
+              totalReach = comprehensiveData.totalReach;
+              console.log(`[FORCE SYNC] ✅ Got real Instagram Business API reach data: ${totalReach}`);
+            } else {
+              console.log(`[FORCE SYNC] ⚠️ No real reach data available, preserving existing: ${account.totalReach || 0}`);
+              totalReach = account.totalReach || 0;
+            }
+          } catch (directSyncError) {
+            console.log(`[FORCE SYNC] Direct sync error, preserving existing data:`, directSyncError.message);
+            totalReach = account.totalReach || 0;
+          }
+        } else if (totalReach === 0 && followers > 0 && account.accountType !== 'BUSINESS') {
+          // Estimate reach as 50-70% of followers for personal accounts only
           totalReach = Math.round(followers * posts * 0.6);
+          console.log(`[FORCE SYNC] ⚠️ Estimating reach for personal account: ${totalReach}`);
+        } else if (totalReach === 0) {
+          console.log(`[FORCE SYNC] 🛡️ Preserving existing reach data (${account.totalReach || 0}) - not overwriting`);
+          totalReach = account.totalReach || 0; // Keep existing data
         }
         const avgReach = posts > 0 ? Math.round(totalReach / posts) : 0;
 
@@ -7894,11 +8920,39 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
         const avgEngagement = posts > 0 ? Math.round(totalEngagements / posts) : 0;
         const engagementRate = followers > 0 ? (avgEngagement / followers) * 100 : 0;
 
+        // 🚀 NEW: Fetch real shares/saves from Instagram API
+        let realShares = 0;
+        let realSaves = 0;
+        let postsAnalyzed = posts;
+        
+        try {
+          // Get decrypted access token from storage
+          const decryptedToken = await storage.getAccessTokenFromAccount(account);
+          if (decryptedToken) {
+            const { InstagramApiService } = await import('./services/instagramApi');
+            const engagementData = await InstagramApiService.getSimpleEngagementData(decryptedToken, 6);
+            realShares = engagementData.totalShares || 0;
+            realSaves = engagementData.totalSaves || 0;
+            postsAnalyzed = engagementData.postsAnalyzed || posts;
+            console.log(`[COMPLETE SYNC] Real engagement for @${account.username}:`, {
+              shares: realShares,
+              saves: realSaves,
+              postsAnalyzed
+            });
+          } else {
+            console.warn(`[COMPLETE SYNC] No access token available for @${account.username}`);
+          }
+        } catch (error) {
+          console.warn(`[COMPLETE SYNC] Could not fetch real shares/saves for @${account.username}:`, error);
+        }
+
         console.log(`[COMPLETE SYNC] Updating @${account.username}:`, {
           followers,
           posts,
           totalLikes,
           totalComments,
+          totalShares: realShares,
+          totalSaves: realSaves,
           totalReach,
           avgLikes,
           avgComments, 
@@ -7917,6 +8971,9 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
           engagementRate,
           totalLikes,
           totalComments,
+          totalShares: realShares, // Use real shares from API
+          totalSaves: realSaves,   // Use real saves from API
+          postsAnalyzed: postsAnalyzed, // Use real analysis count
           totalReach,
           avgEngagement,
           lastSyncAt: new Date()
@@ -8167,6 +9224,39 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
   app.post('/webhook/instagram', async (req, res) => {
     console.log('[META WEBHOOK] 🎯 Real Instagram webhook event from Meta');
     await metaWebhook.handleEvent(req, res);
+  });
+
+  // 🔍 DEBUG: Check Instagram account token status
+  app.get('/api/debug/instagram-tokens', requireAuth, async (req, res) => {
+    try {
+      const user = req.user;
+      const workspaces = await storage.getWorkspacesByUserId(user.id);
+      
+      const debugInfo = [];
+      
+      for (const workspace of workspaces) {
+        const accounts = await storage.getSocialAccountsByWorkspace(workspace.id);
+        const instagramAccounts = accounts.filter(acc => acc.platform === 'instagram');
+        
+        for (const account of instagramAccounts) {
+          debugInfo.push({
+            workspaceId: workspace.id,
+            username: account.username,
+            accountId: account.accountId,
+            hasAccessToken: account.hasAccessToken,
+            expiresAt: account.expiresAt,
+            isExpired: account.expiresAt ? new Date() >= new Date(account.expiresAt) : 'no_expiry_date',
+            isActive: account.isActive,
+            _debugTokenValidation: account._debugTokenValidation
+          });
+        }
+      }
+      
+      res.json({ debugInfo });
+    } catch (error: any) {
+      console.error('[DEBUG] Error:', error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // 🔧 UPDATE INSTAGRAM TOKEN ENDPOINT
@@ -8599,7 +9689,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: 'Failed to fetch conversation history' });
     }
   });
-
   // Helper function to search for authentic multilingual messages
   async function getAuthenticMultilingualMessages(workspaceId: string): Promise<any[]> {
     try {
@@ -9374,7 +10463,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ error: error.message });
     }
   });
-
   // Schedule content route - CRITICAL MISSING ENDPOINT
   app.post('/api/content/schedule', requireAuth, async (req: any, res: Response) => {
     try {
@@ -9886,6 +10974,104 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
     }
   }, 24 * 60 * 60 * 1000); // Run daily
 
+  // Schedule 4 AM daily snapshot creation and cache invalidation
+  const schedule4AMTasks = () => {
+    const now = new Date();
+    let next4AM = new Date();
+    next4AM.setHours(4, 0, 0, 0);
+    
+    // If current time is past 4 AM, schedule for next day
+    if (now.getHours() >= 4) {
+      next4AM.setDate(next4AM.getDate() + 1);
+    }
+    
+    const timeUntil4AM = next4AM.getTime() - now.getTime();
+    
+    console.log(`[SCHEDULER] Next 4 AM snapshot task scheduled at: ${next4AM.toISOString()}`);
+    
+    setTimeout(async () => {
+      try {
+        console.log('[SCHEDULER 4AM] Running daily snapshot and cache invalidation...');
+        
+        // Invalidate expired AI story caches
+        await snapshotService.invalidateExpiredCaches();
+        
+        // Get all workspaces and create snapshots
+        const allSocialAccounts = await storage.getAllConnectedAccounts();
+        
+        for (const account of allSocialAccounts) {
+          try {
+            const metrics = {
+              followers: account.followersCount || 0,
+              following: 0,
+              posts: account.mediaCount || 0,
+              reach: account.totalReach || 0,
+              impressions: 0,
+              engagement: (account.totalLikes || 0) + (account.totalComments || 0),
+              likes: account.totalLikes || 0,
+              comments: account.totalComments || 0,
+              shares: 0,
+              saves: 0,
+              engagementRate: account.avgEngagement || 0,
+              growthRate: 0,
+              contentScore: 75
+            };
+
+            // Create daily snapshot
+            await snapshotService.createSnapshot(
+              account.workspaceId,
+              account.id,
+              account.platform,
+              account.username,
+              'daily',
+              metrics
+            );
+
+            // Create weekly snapshot on Mondays
+            if (now.getDay() === 1) {
+              await snapshotService.createSnapshot(
+                account.workspaceId,
+                account.id,
+                account.platform,
+                account.username,
+                'weekly',
+                metrics
+              );
+            }
+
+            // Create monthly snapshot on 1st of month
+            if (now.getDate() === 1) {
+              await snapshotService.createSnapshot(
+                account.workspaceId,
+                account.id,
+                account.platform,
+                account.username,
+                'monthly',
+                metrics
+              );
+            }
+          } catch (error: any) {
+            console.error(`[SCHEDULER 4AM] Error creating snapshot for ${account.username}:`, error.message);
+          }
+        }
+
+        // Cleanup old snapshots
+        await snapshotService.cleanupOldSnapshots();
+
+        console.log('[SCHEDULER 4AM] Daily tasks completed successfully');
+        
+        // Schedule next run
+        schedule4AMTasks();
+      } catch (error: any) {
+        console.error('[SCHEDULER 4AM] Error running daily tasks:', error.message);
+        schedule4AMTasks(); // Reschedule even if failed
+      }
+    }, timeUntil4AM);
+  };
+
+  // Start the 4 AM scheduler
+  schedule4AMTasks();
+
   // Global workspace cleanup endpoint for fixing database duplicates
   app.post('/api/admin/cleanup-duplicate-workspaces', async (req: any, res: Response) => {
     try {
@@ -10119,7 +11305,6 @@ export async function registerRoutes(app: Express, storage: IStorage, upload?: a
       res.status(500).json({ message: 'Error sending verification email: ' + error.message });
     }
   });
-
   // Verify email with OTP
   app.post('/api/auth/verify-email', async (req: any, res: Response) => {
     try {
@@ -10666,7 +11851,6 @@ Format as JSON with: script, caption, hashtags`;
             {
               role: "user", 
               content: `Create a detailed video concept for: "${script}"
-
 Include:
 1. Visual sequence breakdown
 2. Optimal captions and hashtags
@@ -11283,7 +12467,6 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       res.status(500).json({ error: error.message || 'Failed to publish content' });
     }
   });
-
   // Instagram Publishing API Endpoint
   app.post('/api/instagram/publish', requireAuth, async (req: any, res: Response) => {
     try {
@@ -11335,7 +12518,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         case 'image':
         case 'post':
           // For image/post publishing - Instagram Basic Display API format
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v23.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             image_url: mediaUrl,
@@ -11346,7 +12529,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
         case 'video':
         case 'reel':
           // For video/reel publishing - Instagram Basic Display API format
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v23.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             video_url: mediaUrl,
@@ -11356,7 +12539,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
           break;
         case 'story':
           // For story publishing - Instagram Stories API format
-          publishEndpoint = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media`;
+          publishEndpoint = `https://graph.instagram.com/v23.0/${instagramAccount.accountId}/media`;
           publishData = {
             ...publishData,
             image_url: mediaUrl.includes('video') || mediaUrl.endsWith('.mp4') ? undefined : mediaUrl,
@@ -11445,7 +12628,7 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       console.log('[INSTAGRAM PUBLISH] Container response data:', JSON.stringify(containerData, null, 2));
 
       // Step 2: Publish the media container
-      const publishEndpointFinal = `https://graph.instagram.com/v21.0/${instagramAccount.accountId}/media_publish`;
+      const publishEndpointFinal = `https://graph.instagram.com/v23.0/${instagramAccount.accountId}/media_publish`;
       const publishPayload = {
         creation_id: containerId,
         access_token: instagramAccount.accessToken
@@ -12024,7 +13207,6 @@ Format as JSON with: concept, visualSequence, caption, hashtags`
       });
     }
   });
-
   // STAGES 4-7: Complete Generation Pipeline - 7-Stage Thumbnail AI Maker Pro
   app.post('/api/thumbnails/generate-complete', requireAuth, async (req: any, res: Response) => {
     console.log('[THUMBNAIL PRO] === 7-STAGE GENERATION PIPELINE STARTED ===');
@@ -12798,7 +13980,6 @@ Format the response as JSON with this structure:
       console.log('[EMOTION ANALYSIS] Analyzing emotional content');
 
       const analysisPrompt = `Perform a comprehensive psychological emotion analysis of this ${contentType} content using Plutchik's Wheel of Emotions: "${content}"
-
 Analyze the emotional profile, psychological insights, audience resonance, and optimization recommendations.
 
 Format the response as JSON with this structure:
@@ -14274,7 +15455,6 @@ Create a detailed growth strategy in JSON format:
       });
     }
   });
-
   // Claim Early Access Welcome Bonus
   app.post('/api/early-access/claim-welcome-bonus', requireAuth, async (req: any, res: Response) => {
     try {
@@ -14652,11 +15832,19 @@ Create a detailed growth strategy in JSON format:
   });
 
   // Get social accounts for automation and integration pages
-  app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
-    try {
-      const userId = req.user.id;
-      const workspaceId = req.query.workspaceId as string || req.workspace?.id;
-      console.log(`[SOCIAL ACCOUNTS] Getting social accounts for user ${userId}, workspace: ${workspaceId}`);
+app.get('/api/social-accounts', requireAuth, async (req: any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const workspaceId = req.query.workspaceId as string || req.workspace?.id;
+    const period = (req.query.period as string)?.toLowerCase?.() || 'day'; // day|week|month
+    // Map frontend period names to backend period names
+    const mappedPeriod = period === 'today' ? 'day' : period;
+    console.log(`[SOCIAL ACCOUNTS] Getting social accounts for user ${userId}, workspace: ${workspaceId}, period: ${period} -> mapped: ${mappedPeriod}`);
+    
+    // 🔥 FORCE FRESH DATA - Disable caching for debugging
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
       
       let allAccounts = [];
       
@@ -14686,11 +15874,60 @@ Create a detailed growth strategy in JSON format:
           
           // Get the actual profile picture URL or use a fallback
           const hasRealProfilePic = account.profilePictureUrl && 
-                                   !account.profilePictureUrl.includes('dicebear.com');
+                                   !account.profilePictureUrl.includes('dicebear.com') &&
+                                   !account.profilePictureUrl.includes('picsum.photos');
           const profilePictureUrl = hasRealProfilePic ? account.profilePictureUrl :
-                                   (account.profilePicture && !account.profilePicture.includes('dicebear.com') ? account.profilePicture :
-                                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`);
+                                   (account.profilePicture && !account.profilePicture.includes('dicebear.com') && !account.profilePicture.includes('picsum.photos') ? account.profilePicture :
+                                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}&backgroundColor=6366f1,8b5cf6,ec4899`);
           
+          // Debug profile picture data
+          console.log(`[PROFILE PICTURE DEBUG] Account: ${account.username}`, {
+            originalProfilePictureUrl: account.profilePictureUrl,
+            originalProfilePicture: account.profilePicture,
+            hasRealProfilePic,
+            finalProfilePictureUrl: profilePictureUrl,
+            isDicebearFallback: profilePictureUrl.includes('dicebear.com')
+          });
+          
+          // Determine periodized reach from cache when available
+          const reachByPeriod = (account as any).reachByPeriod || {};
+          const periodKey = mappedPeriod === 'month' ? 'days_28' : (mappedPeriod === 'week' ? 'week' : 'day');
+          const cachedPeriod = reachByPeriod[periodKey];
+          const periodizedReach = cachedPeriod?.value || 0;
+          
+          console.log(`\n================================`);
+          console.log(`[REACH DEBUG @${account.username}] FULL DIAGNOSTIC:`);
+          console.log(`  Period Request: ${period} -> Mapped: ${mappedPeriod} -> Key: ${periodKey}`);
+          console.log(`  Cached Period Data:`, cachedPeriod);
+          console.log(`  Periodized Reach Value: ${periodizedReach}`);
+          console.log(`  ReachByPeriod Object:`, JSON.stringify(reachByPeriod, null, 2));
+          console.log(`  Account totalReach: ${account.totalReach}`);
+          console.log(`  🔧 RAW ACCOUNT DATA:`, JSON.stringify({
+            totalReach: account.totalReach,
+            accountLevelReach: account.accountLevelReach,
+            postLevelReach: account.postLevelReach,
+            reachSource: account.reachSource,
+            reachByPeriod: account.reachByPeriod
+          }, null, 2));
+          console.log(`  Account accountLevelReach: ${account.accountLevelReach}`);
+          console.log(`  Account postLevelReach: ${account.postLevelReach}`);
+          console.log(`================================\n`);
+
+          // 🎯 ONLY USE ACCOUNT-LEVEL REACH - NO POST-LEVEL AGGREGATION
+          let currentPeriodReach = 0;
+          let currentPeriodReachSource = 'unavailable';
+
+          if (periodizedReach > 0) {
+            currentPeriodReach = periodizedReach;
+            currentPeriodReachSource = cachedPeriod.source;
+            console.log(`[PERIOD DEBUG] ✅ Using periodized reach: ${currentPeriodReach} (${currentPeriodReachSource})`);
+          } else {
+            // Fallback to account-level reach only (no post-level aggregation)
+            currentPeriodReach = account.accountLevelReach || 0;
+            currentPeriodReachSource = 'account-level';
+            console.log(`[PERIOD DEBUG] ⚠️ No periodized data, using account-level reach: ${currentPeriodReach}`);
+          }
+
           const transformedAccount = {
             id: account.id,
             platform: account.platform,
@@ -14699,12 +15936,22 @@ Create a detailed growth strategy in JSON format:
             followers: followersCount,
             // Add full Instagram metrics data
             followersCount: account.followersCount || account.followers || account.subscriberCount || 0,
-            totalReach: account.totalReach || 0,
+            // 🎯 ONLY ACCOUNT-LEVEL REACH - NO ENHANCEMENT LOGIC
+            totalReach: currentPeriodReach,
             avgEngagement: account.avgEngagement || 0,
             mediaCount: account.mediaCount || 0,
-            totalLikes: account.totalLikes || 0,
-            totalComments: account.totalComments || 0,
+            totalLikes: account.totalLikes || (account as any).realEngagement?.totalLikes || 0,
+            totalComments: account.totalComments || (account as any).realEngagement?.totalComments || 0,
+            // INCLUDE shares and saves for dashboard with fallbacks from realEngagement
+            totalShares: (account as any).totalShares || (account as any).realEngagement?.totalShares || 0,
+            totalSaves: (account as any).totalSaves || (account as any).realEngagement?.totalSaves || 0,
+            postsAnalyzed: (account as any).postsAnalyzed || (account as any).realEngagement?.postsAnalyzed || 0,
             avgComments: account.avgComments || 0,
+            // 🚀 NEW: Comprehensive reach data
+            accountLevelReach: account.accountLevelReach || 0,
+            postLevelReach: account.postLevelReach || 0,
+            reachSource: currentPeriodReachSource, // Source for the displayed reach
+            reachByPeriod: reachByPeriod,
             isConnected: account.isActive !== false,
             isVerified: true,
             lastSync: account.lastSyncAt?.toISOString() || new Date().toISOString(),
@@ -14722,6 +15969,9 @@ Create a detailed growth strategy in JSON format:
             totalReach: transformedAccount.totalReach,
             avgEngagement: transformedAccount.avgEngagement,
             mediaCount: transformedAccount.mediaCount,
+            totalShares: transformedAccount.totalShares,
+            totalSaves: transformedAccount.totalSaves,
+            postsAnalyzed: transformedAccount.postsAnalyzed,
             originalProfilePic: account.profilePictureUrl || account.profilePicture,
             finalProfilePic: transformedAccount.profilePictureUrl,
             fullResponse: transformedAccount
@@ -14761,10 +16011,20 @@ Create a detailed growth strategy in JSON format:
             
             // Get the actual profile picture URL or use a fallback
             const hasRealProfilePic = account.profilePictureUrl && 
-                                     !account.profilePictureUrl.includes('dicebear.com');
+                                     !account.profilePictureUrl.includes('dicebear.com') &&
+                                     !account.profilePictureUrl.includes('picsum.photos');
             const profilePictureUrl = hasRealProfilePic ? account.profilePictureUrl :
-                                     (account.profilePicture && !account.profilePicture.includes('dicebear.com') ? account.profilePicture :
-                                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}`);
+                                     (account.profilePicture && !account.profilePicture.includes('dicebear.com') && !account.profilePicture.includes('picsum.photos') ? account.profilePicture :
+                                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${account.username}&backgroundColor=6366f1,8b5cf6,ec4899`);
+            
+            // Debug profile picture data
+            console.log(`[PROFILE PICTURE DEBUG] Account: ${account.username}`, {
+              originalProfilePictureUrl: account.profilePictureUrl,
+              originalProfilePicture: account.profilePicture,
+              hasRealProfilePic,
+              finalProfilePictureUrl: profilePictureUrl,
+              isDicebearFallback: profilePictureUrl.includes('dicebear.com')
+            });
             
             const transformedAccount = {
               id: account.id,
@@ -14774,11 +16034,19 @@ Create a detailed growth strategy in JSON format:
               followers: followersCount,
             // Add full Instagram metrics data
             followersCount: account.followersCount || account.followers || account.subscriberCount || 0,
-            totalReach: account.totalReach || 0,
+            // Prefer account-level reach for dashboard display; fallback to post-level, then legacy totalReach
+            totalReach: (account.accountLevelReach && account.accountLevelReach > 0)
+              ? account.accountLevelReach
+              : ((account.postLevelReach && account.postLevelReach > 0)
+                  ? account.postLevelReach
+                  : (account.totalReach || 0)),
             avgEngagement: account.avgEngagement || 0,
             mediaCount: account.mediaCount || 0,
-            totalLikes: account.totalLikes || 0,
-            totalComments: account.totalComments || 0,
+              totalLikes: account.totalLikes || (account as any).realEngagement?.totalLikes || 0,
+              totalComments: account.totalComments || (account as any).realEngagement?.totalComments || 0,
+              totalShares: (account as any).totalShares || (account as any).realEngagement?.totalShares || 0,
+              totalSaves: (account as any).totalSaves || (account as any).realEngagement?.totalSaves || 0,
+              postsAnalyzed: (account as any).postsAnalyzed || (account as any).realEngagement?.postsAnalyzed || 0,
             avgComments: account.avgComments || 0,
               isConnected: account.isActive !== false,
               isVerified: true,
@@ -14858,25 +16126,7 @@ Create a detailed growth strategy in JSON format:
     }
   });
 
-  // Disconnect social account
-  app.delete('/api/social-accounts/:accountId', requireAuth, 
-    socialAccountIsolationMiddleware,
-    async (req: any, res: Response) => {
-    try {
-      const userId = req.user.id;
-      const accountId = req.params.accountId;
-      
-      console.log(`[SOCIAL ACCOUNTS] Disconnecting account ${accountId} for user ${userId}`);
-      
-      // Delete the social account
-      await storage.deleteSocialAccount(accountId);
-      
-      res.json({ success: true });
-    } catch (error: any) {
-      console.error('[SOCIAL ACCOUNTS] Error disconnecting account:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+  // Disconnect endpoint is defined earlier at line 3211 - this duplicate has been removed
 
   // Instagram OAuth auth URL endpoint
   app.get('/api/instagram/auth', requireAuth, async (req: any, res: Response) => {
@@ -15068,7 +16318,6 @@ Create a detailed growth strategy in JSON format:
   // Global conversation state for stop functionality and streaming
   const activeGenerations = new Map<number, boolean>();
   const streamingData = new Map<number, { chunks: string[], currentIndex: number, messageId: number }>();
-
   // Polling endpoint for streaming chunks (alternative to SSE)
   app.get('/api/chat/stream/:conversationId', requireAuth, async (req: any, res: Response) => {
     try {

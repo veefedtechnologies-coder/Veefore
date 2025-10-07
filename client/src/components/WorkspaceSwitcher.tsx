@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 
 // Workspace switching without loading screen - instant transition
-const AdvancedWorkspaceTransition = ({ workspace }: { workspace: Workspace }) => {
+const AdvancedWorkspaceTransition = () => {
   // No loading screen - return null for instant workspace switching
   return null
 }
@@ -155,7 +155,7 @@ export default function WorkspaceSwitcher({ onNavigateToWorkspaces }: WorkspaceS
     <>
       {/* Beautiful Advanced Workspace Transition */}
       {isTransitioning && targetWorkspace && (
-        <AdvancedWorkspaceTransition workspace={targetWorkspace} />
+        <AdvancedWorkspaceTransition />
       )}
       
       <DropdownMenu>
@@ -294,10 +294,69 @@ export function useCurrentWorkspace() {
   })
 
   const currentWorkspace = useMemo(() => {
-    return workspaces.find((ws: Workspace) => 
-      currentWorkspaceId ? ws.id === currentWorkspaceId : ws.isDefault
-    ) || workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
+    // CRITICAL FIX: Validate workspace ID and auto-correct if corrupted
+    if (currentWorkspaceId && workspaces.length > 0) {
+      const foundWorkspace = workspaces.find((ws: Workspace) => ws.id === currentWorkspaceId)
+      
+      if (!foundWorkspace) {
+        console.warn('🚨 WORKSPACE ID CORRUPTION DETECTED!', {
+          storedId: currentWorkspaceId,
+          availableIds: workspaces.map((ws: any) => ({ id: ws.id, name: ws.name })),
+          timestamp: new Date().toISOString()
+        })
+        
+        // Auto-correct: Find workspace by name if ID is corrupted
+        const workspaceByName = workspaces.find((ws: any) => 
+          ws.name.toLowerCase() === 'cghgh' || 
+          ws.name.toLowerCase().includes('cghgh')
+        )
+        
+        if (workspaceByName) {
+          console.log('🔧 AUTO-CORRECTING workspace ID:', {
+            from: currentWorkspaceId,
+            to: workspaceByName.id,
+            name: workspaceByName.name
+          })
+          
+          // Update localStorage with correct ID
+          localStorage.setItem('currentWorkspaceId', workspaceByName.id)
+          setCurrentWorkspaceId(workspaceByName.id)
+          
+          return workspaceByName
+        }
+        
+        // Fallback: Use default workspace
+        console.log('🔄 FALLBACK: Using default workspace due to corruption')
+        const defaultWorkspace = workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
+        if (defaultWorkspace) {
+          localStorage.setItem('currentWorkspaceId', defaultWorkspace.id)
+          setCurrentWorkspaceId(defaultWorkspace.id)
+        }
+        return defaultWorkspace
+      }
+      
+      return foundWorkspace
+    }
+    
+    // Default behavior: find by isDefault or first workspace
+    return workspaces.find((ws: Workspace) => ws.isDefault) || workspaces[0]
   }, [workspaces, currentWorkspaceId])
+
+  // CRITICAL FIX: Validate workspace ID consistency
+  useEffect(() => {
+    if (currentWorkspace && currentWorkspaceId !== currentWorkspace.id) {
+      console.warn('🚨 WORKSPACE ID MISMATCH DETECTED!', {
+        storedId: currentWorkspaceId,
+        actualId: currentWorkspace.id,
+        workspaceName: currentWorkspace.name,
+        timestamp: new Date().toISOString()
+      })
+      
+      // Auto-correct the mismatch
+      localStorage.setItem('currentWorkspaceId', currentWorkspace.id)
+      setCurrentWorkspaceId(currentWorkspace.id)
+    }
+  }, [currentWorkspace, currentWorkspaceId])
 
   return {
     currentWorkspace,

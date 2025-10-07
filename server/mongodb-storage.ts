@@ -138,8 +138,26 @@ const SocialAccountSchema = new mongoose.Schema({
   // Instagram Business API engagement totals
   totalLikes: { type: Number, default: 0 },
   totalComments: { type: Number, default: 0 },
+  // NEW: persist shares/saves and analysis window
+  totalShares: { type: Number, default: 0 },
+  totalSaves: { type: Number, default: 0 },
+  // NEW: persist story replies aggregated
+  totalReplies: { type: Number, default: 0 },
+  postsAnalyzed: { type: Number, default: 0 },
   totalReach: { type: Number, default: 0 },
   avgEngagement: { type: Number, default: 0 },
+  // 🚀 NEW: Comprehensive reach data
+  accountLevelReach: { type: Number, default: 0 },
+  postLevelReach: { type: Number, default: 0 },
+  reachSource: { type: String, default: 'unavailable' },
+  // 🚀 NEW: Periodized reach cache to avoid frequent API calls
+  // Structure example:
+  // reachByPeriod: {
+  //   day: { value: number, source: 'account-level'|'post-level'|'unavailable', updatedAt: Date },
+  //   week: { value: number, source: string, updatedAt: Date },
+  //   days28: { value: number, source: string, updatedAt: Date }
+  // }
+  reachByPeriod: { type: mongoose.Schema.Types.Mixed, default: {} },
   lastSyncAt: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -561,6 +579,69 @@ const DmTemplateSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Performance Snapshot Schema - Stores daily/weekly/monthly snapshots of social media data
+const PerformanceSnapshotSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true, index: true },
+  socialAccountId: { type: mongoose.Schema.Types.Mixed, required: true, index: true },
+  platform: { type: String, required: true },
+  username: { type: String, required: true },
+  snapshotType: { type: String, enum: ['daily', 'weekly', 'monthly'], required: true, index: true },
+  snapshotDate: { type: Date, required: true, index: true },
+  
+  // Core metrics
+  followers: { type: Number, default: 0 },
+  following: { type: Number, default: 0 },
+  posts: { type: Number, default: 0 },
+  reach: { type: Number, default: 0 },
+  impressions: { type: Number, default: 0 },
+  engagement: { type: Number, default: 0 },
+  
+  // Engagement breakdown
+  likes: { type: Number, default: 0 },
+  comments: { type: Number, default: 0 },
+  shares: { type: Number, default: 0 },
+  saves: { type: Number, default: 0 },
+  
+  // Calculated metrics
+  engagementRate: { type: Number, default: 0 },
+  growthRate: { type: Number, default: 0 },
+  contentScore: { type: Number, default: 0 },
+  
+  // Period comparisons (vs previous period)
+  followerGrowth: { type: Number, default: 0 },
+  reachGrowth: { type: Number, default: 0 },
+  engagementGrowth: { type: Number, default: 0 },
+  
+  // Raw data for deeper analysis
+  rawMetrics: { type: mongoose.Schema.Types.Mixed, default: {} },
+  
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// AI Story Cache Schema - Caches AI-generated stories to avoid redundant API calls
+const AIStoryCacheSchema = new mongoose.Schema({
+  workspaceId: { type: mongoose.Schema.Types.Mixed, required: true, index: true },
+  period: { type: String, enum: ['day', 'week', 'month'], required: true, index: true },
+  dataHash: { type: String, required: true }, // Hash of the metrics data to detect changes
+  
+  // AI-generated content
+  stories: { type: mongoose.Schema.Types.Mixed, required: true }, // Array of story objects
+  insights: { type: mongoose.Schema.Types.Mixed, required: true }, // Array of AI insights
+  
+  // Metadata
+  generatedAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date, required: true, index: true }, // Auto-expire at 4 AM next day
+  isValid: { type: Boolean, default: true },
+  
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Compound index for efficient querying
+PerformanceSnapshotSchema.index({ workspaceId: 1, snapshotType: 1, snapshotDate: -1 });
+AIStoryCacheSchema.index({ workspaceId: 1, period: 1, expiresAt: 1 });
+
 // MongoDB Models
 const UserModel = mongoose.model('User', UserSchema);
 const WaitlistUserModel = mongoose.model('WaitlistUser', WaitlistUserSchema);
@@ -583,6 +664,8 @@ const TeamInvitationModel = mongoose.model('TeamInvitation', TeamInvitationSchem
 const DmConversationModel = mongoose.model('DmConversation', DmConversationSchema);
 const DmMessageModel = mongoose.model('DmMessage', DmMessageSchema);
 const ConversationContextModel = mongoose.model('ConversationContext', ConversationContextSchema);
+const PerformanceSnapshotModel = mongoose.model('PerformanceSnapshot', PerformanceSnapshotSchema);
+const AIStoryCacheModel = mongoose.model('AIStoryCache', AIStoryCacheSchema);
 
 // Admin Models
 const AdminModel = mongoose.model('Admin', AdminSchema);
@@ -679,66 +762,164 @@ export class MongoStorage implements IStorage {
         tokenLength: typeof encryptedToken === 'string' ? encryptedToken.length : 'N/A',
         hasBasicStructure: !!(encryptedToken && typeof encryptedToken === 'object')
       });
+      
       return null;
     }
   }
 
+
   /**
-   * Get access token from social account with automatic migration from plain text
+   * Get access token from social media account.
+   * If a legacy plain token exists, seamlessly migrate it to encrypted storage
+   * and remove the legacy field. Always returns the decrypted encrypted token.
    */
-  private getAccessTokenFromAccount(account: any): string | null {
-    console.log(`[TOKEN DEBUG] Checking access token for account: ${account.username}`);
-    console.log(`[TOKEN DEBUG] Has encryptedAccessToken: ${!!account.encryptedAccessToken}`);
-    console.log(`[TOKEN DEBUG] Has plain accessToken: ${!!account.accessToken}`);
+  public async getAccessTokenFromAccount(account: any): Promise<string | null> {
+    console.log(`[TOKEN DEBUG] Validating encrypted token for ${account.username}:`, {
+      hasExpiresAt: !!account.expiresAt,
+      expiresAt: account.expiresAt,
+      hasEncryptedToken: !!account.encryptedAccessToken,
+      hasLegacyToken: !!account.accessToken,
+      encryptedType: typeof account.encryptedAccessToken,
+      legacyType: typeof account.accessToken,
+      encryptedValue: account.encryptedAccessToken ? 'EXISTS' : 'NULL',
+      legacyValue: account.accessToken ? 'EXISTS' : 'NULL',
+      rawAccountKeys: Object.keys(account).filter(k => k.includes('Token') || k.includes('token'))
+    });
     
-    // First try encrypted token
-    if (account.encryptedAccessToken) {
-      console.log(`[TOKEN DEBUG] Attempting to decrypt encrypted token for ${account.username}`);
+    // Check if token has expired first
+    if (account.expiresAt && new Date() >= new Date(account.expiresAt)) {
+      console.log(`[TOKEN VALIDATION] Account ${account.username} token expired at ${account.expiresAt}`);
+      return null;
+    }
+
+    // If no encrypted token but a legacy token exists, migrate it now
+    if (!account.encryptedAccessToken && account.accessToken) {
+      console.log(`[ACCESS TOKEN MIGRATION] Starting migration for ${account.username}`);
       try {
-        const decryptedToken = this.decryptStoredToken(account.encryptedAccessToken);
-        if (decryptedToken) {
-          console.log(`[TOKEN DEBUG] ✅ Successfully decrypted token for ${account.username}`);
-          return decryptedToken;
+        const encrypted = this.encryptAndStoreToken(account.accessToken);
+        if (!encrypted) {
+          throw new Error('encryptAndStoreToken returned null');
         }
-        console.warn(`[TOKEN DEBUG] ❌ Decryption returned null for ${account.username}`);
-      } catch (error) {
-        console.error(`[TOKEN DEBUG] ❌ Decryption failed for ${account.username}:`, error.message);
+        
+        const SocialAccountModel = (this as any).SocialAccount;
+        const accountId = account._id || account.id;
+        if (SocialAccountModel && accountId) {
+          const updateResult = await SocialAccountModel.updateOne(
+            { _id: accountId },
+            { $set: { encryptedAccessToken: encrypted }, $unset: { accessToken: '' } }
+          );
+          console.log(`[ACCESS TOKEN MIGRATION] Database update result:`, updateResult);
+        }
+        account.encryptedAccessToken = encrypted;
+        delete account.accessToken;
+        console.log(`[TOKEN MIGRATION] ✅ Successfully upgraded access token to encrypted storage for ${account.username}`);
+      } catch (e: any) {
+        console.error(`🚨 SECURITY: Failed to migrate legacy access token for ${account.username}:`, e?.message || e);
+        console.error(`[ACCESS TOKEN MIGRATION] Error details:`, e);
+        return null; // Return null instead of continuing with legacy token
       }
-      // If decryption failed, log and continue to fallback
-      console.warn(`🚨 P2-FIX: Failed to decrypt access token for account ${account.username}, falling back to plain text`);
+    }
+
+    // If both exist, drop legacy in background
+    if (account.encryptedAccessToken && account.accessToken) {
+      console.log(`[LEGACY CLEANUP] Removing legacy access token for ${account.username}`);
+      try {
+        const SocialAccountModel = (this as any).SocialAccount;
+        const accountId = account._id || account.id;
+        if (SocialAccountModel && accountId) {
+          const cleanupResult = await SocialAccountModel.updateOne(
+            { _id: accountId }, 
+            { $unset: { accessToken: '' } }
+          );
+          console.log(`[LEGACY CLEANUP] Database cleanup result:`, cleanupResult);
+        }
+        delete account.accessToken;
+        console.log(`[LEGACY CLEANUP] ✅ Successfully removed legacy access token for ${account.username}`);
+      } catch (e: any) {
+        console.error(`[LEGACY CLEANUP] Failed to remove legacy access token for ${account.username}:`, e?.message || e);
+      }
+    }
+
+    // Decrypt the encrypted token (if present after migration)
+    const decryptedToken = account.encryptedAccessToken
+      ? this.decryptStoredToken(account.encryptedAccessToken)
+      : null;
+    if (!decryptedToken || decryptedToken.trim() === '') {
+      console.warn(`🚨 SECURITY: Failed to decrypt access token for account ${account.username}`);
+      return null;
     }
     
-    // Fallback to legacy plain text token
-    if (account.accessToken) {
-      console.log('📊 SECURITY: Found legacy plain text token, should migrate to encrypted storage');
-      return account.accessToken;
-    }
-    
-    console.log(`[TOKEN DEBUG] ❌ No valid access token found for ${account.username}`);
-    return null;
+    console.log(`[TOKEN DEBUG] Successfully decrypted encrypted token for ${account.username} (length: ${decryptedToken.length})`);
+    return decryptedToken;
   }
 
   /**
-   * Get refresh token from social account with automatic migration from plain text
+   * Get refresh token from social account.
+   * Seamlessly migrates legacy refresh tokens to encrypted storage when found.
    */
-  private getRefreshTokenFromAccount(account: any): string | null {
-    // First try encrypted token  
-    if (account.encryptedRefreshToken) {
-      const decryptedToken = this.decryptStoredToken(account.encryptedRefreshToken);
-      if (decryptedToken) {
-        return decryptedToken;
+  private async getRefreshTokenFromAccount(account: any): Promise<string | null> {
+    console.log(`[REFRESH TOKEN DEBUG] Processing refresh token for ${account.username}:`, {
+      hasEncryptedRefreshToken: !!account.encryptedRefreshToken,
+      hasLegacyRefreshToken: !!account.refreshToken,
+      encryptedType: typeof account.encryptedRefreshToken,
+      legacyType: typeof account.refreshToken,
+      encryptedValue: account.encryptedRefreshToken ? 'EXISTS' : 'NULL',
+      legacyValue: account.refreshToken ? 'EXISTS' : 'NULL',
+      rawAccountKeys: Object.keys(account).filter(k => k.includes('Token') || k.includes('token'))
+    });
+
+    // Migrate legacy refresh token if needed
+    if (!account.encryptedRefreshToken && account.refreshToken && account.refreshToken !== null && account.refreshToken !== '') {
+      console.log(`[REFRESH TOKEN MIGRATION] Starting migration for ${account.username}`);
+      try {
+        const encrypted = this.encryptAndStoreToken(account.refreshToken);
+        if (!encrypted) {
+          throw new Error('encryptAndStoreToken returned null');
+        }
+        
+        const SocialAccountModel = (this as any).SocialAccount;
+        const accountId = account._id || account.id;
+        if (SocialAccountModel && accountId) {
+          const updateResult = await SocialAccountModel.updateOne(
+            { _id: accountId },
+            { $set: { encryptedRefreshToken: encrypted }, $unset: { refreshToken: '' } }
+          );
+          console.log(`[REFRESH TOKEN MIGRATION] Database update result:`, updateResult);
+        }
+        account.encryptedRefreshToken = encrypted;
+        delete account.refreshToken;
+        console.log(`[TOKEN MIGRATION] ✅ Successfully upgraded refresh token to encrypted storage for ${account.username}`);
+      } catch (e: any) {
+        console.error(`🚨 SECURITY: Failed to migrate legacy refresh token for account ${account.username}:`, e?.message || e);
+        console.error(`[REFRESH TOKEN MIGRATION] Error details:`, e);
+        return null; // Return null instead of continuing with legacy token
       }
-      // If decryption failed, log and continue to fallback
-      console.warn(`🚨 P2-FIX: Failed to decrypt refresh token for account ${account.username}, falling back to plain text`);
+    } else if (!account.encryptedRefreshToken && (!account.refreshToken || account.refreshToken === null || account.refreshToken === '')) {
+      console.log(`[REFRESH TOKEN DEBUG] No valid refresh token found for ${account.username} - skipping migration`);
+      return null; // No valid refresh token to migrate or decrypt
+    }
+
+    if (account.encryptedRefreshToken && account.refreshToken) {
+      try {
+        const SocialAccountModel = (this as any).SocialAccount;
+        const accountId = account._id || account.id;
+        if (SocialAccountModel && accountId) {
+          await SocialAccountModel.updateOne({ _id: accountId }, { $unset: { refreshToken: '' } });
+        }
+        delete account.refreshToken;
+      } catch {}
+    }
+
+    const decryptedToken = account.encryptedRefreshToken
+      ? this.decryptStoredToken(account.encryptedRefreshToken)
+      : null;
+    if (!decryptedToken || decryptedToken.trim() === '') {
+      console.warn(`🚨 SECURITY: Failed to decrypt refresh token for account ${account.username}`);
+      return null;
     }
     
-    // Fallback to legacy plain text token
-    if (account.refreshToken) {
-      console.log('📊 SECURITY: Found legacy plain text refresh token, should migrate to encrypted storage');
-      return account.refreshToken;
-    }
-    
-    return null;
+    console.log(`[TOKEN DEBUG] Successfully decrypted encrypted refresh token for ${account.username}`);
+    return decryptedToken;
   }
 
   async connect() {
@@ -1083,6 +1264,22 @@ export class MongoStorage implements IStorage {
     await WorkspaceModel.findOneAndDelete({ _id: id });
   }
 
+  // CRITICAL: Method needed for workspace validation
+  async getAllWorkspaces(): Promise<Workspace[]> {
+    await this.connect();
+    console.log('[MONGODB DEBUG] getAllWorkspaces called');
+    
+    try {
+      const workspaces = await WorkspaceModel.find({});
+      console.log(`[MONGODB DEBUG] Found ${workspaces.length} workspaces`);
+      
+      return workspaces.map(workspace => this.convertWorkspace(workspace));
+    } catch (error: any) {
+      console.error('[MONGODB DEBUG] getAllWorkspaces error:', error);
+      throw error;
+    }
+  }
+
   async setDefaultWorkspace(userId: number | string, workspaceId: number | string): Promise<void> {
     await this.connect();
     
@@ -1181,11 +1378,24 @@ export class MongoStorage implements IStorage {
     };
   }
 
-  private convertSocialAccount(mongoAccount: any): SocialAccount {
+  private async convertSocialAccount(mongoAccount: any): Promise<SocialAccount> {
     console.log(`[CONVERT DEBUG] Converting social account: ${mongoAccount.username}`);
     console.log(`[CONVERT DEBUG] Raw mongoAccount pageId:`, mongoAccount.pageId);
     console.log(`[CONVERT DEBUG] Raw mongoAccount accountId:`, mongoAccount.accountId);
-    console.log(`[CONVERT DEBUG] All available fields:`, Object.keys(mongoAccount.toObject ? mongoAccount.toObject() : mongoAccount));
+    
+    // Convert Mongoose document to plain object to ensure all fields are accessible
+    const plainAccount = mongoAccount.toObject ? mongoAccount.toObject() : mongoAccount;
+    console.log(`[CONVERT DEBUG] All available fields:`, Object.keys(plainAccount));
+    console.log(`[CONVERT DEBUG] Token fields in plain object:`, {
+      accessToken: !!plainAccount.accessToken,
+      refreshToken: !!plainAccount.refreshToken,
+      encryptedAccessToken: !!plainAccount.encryptedAccessToken,
+      encryptedRefreshToken: !!plainAccount.encryptedRefreshToken
+    });
+    
+    // Cache token results to avoid multiple migration attempts
+    const accessToken = await this.getAccessTokenFromAccount(plainAccount);
+    const refreshToken = await this.getRefreshTokenFromAccount(plainAccount);
     
     return {
       id: mongoAccount._id.toString(),
@@ -1194,9 +1404,12 @@ export class MongoStorage implements IStorage {
       username: mongoAccount.username,
       accountId: mongoAccount.accountId || null,
       pageId: mongoAccount.pageId || null,
-      // SECURITY: Never expose actual tokens in API responses - return boolean flags only
-      hasAccessToken: this.getAccessTokenFromAccount(mongoAccount) !== null,
-      hasRefreshToken: this.getRefreshTokenFromAccount(mongoAccount) !== null,
+      // SECURITY: Include actual tokens for internal use (sync operations)
+      // NOTE: API routes should NEVER send these to clients
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      hasAccessToken: accessToken !== null,
+      hasRefreshToken: refreshToken !== null,
       expiresAt: mongoAccount.expiresAt || null,
       isActive: mongoAccount.isActive !== false,
       // Platform-specific sync data fields
@@ -1222,8 +1435,18 @@ export class MongoStorage implements IStorage {
       // Critical engagement fields for analytics
       totalLikes: mongoAccount.totalLikes ?? null,
       totalComments: mongoAccount.totalComments ?? null,
+      // NEW: map persisted shares/saves/postsAnalyzed
+      totalShares: mongoAccount.totalShares ?? null,
+      totalSaves: mongoAccount.totalSaves ?? null,
+      postsAnalyzed: mongoAccount.postsAnalyzed ?? null,
       totalReach: mongoAccount.totalReach ?? null,
       avgEngagement: mongoAccount.avgEngagement ?? null,
+      // 🚀 NEW: Comprehensive reach data
+      accountLevelReach: mongoAccount.accountLevelReach ?? null,
+      postLevelReach: mongoAccount.postLevelReach ?? null,
+      reachSource: mongoAccount.reachSource ?? null,
+      // 🚀 NEW: Periodized reach cache
+      reachByPeriod: mongoAccount.reachByPeriod ?? null,
       lastSyncAt: mongoAccount.lastSyncAt ?? null,
       createdAt: mongoAccount.createdAt || new Date(),
       updatedAt: mongoAccount.updatedAt || new Date()
@@ -1263,13 +1486,31 @@ export class MongoStorage implements IStorage {
       }
     }
     
-    return account ? this.convertSocialAccount(account) : undefined;
+    return account ? await this.convertSocialAccount(account) : undefined;
   }
 
   async getSocialAccountByWorkspaceAndPlatform(workspaceId: number, platform: string): Promise<SocialAccount | undefined> {
     await this.connect();
     const account = await SocialAccountModel.findOne({ workspaceId: workspaceId.toString(), platform });
-    return account ? this.convertSocialAccount(account) : undefined;
+    return account ? await this.convertSocialAccount(account) : undefined;
+  }
+
+  async getAllConnectedAccounts(): Promise<SocialAccount[]> {
+    await this.connect();
+    
+    try {
+      const mongoClient = mongoose.connection.getClient();
+      const db = mongoClient.db('veeforedb');
+      const collection = db.collection('socialaccounts');
+      
+      const allAccounts = await collection.find({ isConnected: true }).toArray();
+      console.log(`[MONGODB DEBUG] getAllConnectedAccounts found ${allAccounts.length} connected accounts`);
+      
+      return allAccounts.map((doc: any) => this.mapSocialAccountFromDB(doc));
+    } catch (error) {
+      console.error('[MONGODB] Error getting all connected accounts:', error);
+      return [];
+    }
   }
 
   async getSocialAccountsByWorkspace(workspaceId: any): Promise<SocialAccount[]> {
@@ -1333,10 +1574,29 @@ export class MongoStorage implements IStorage {
       }
     }
     
+    // DECRYPT tokens for internal use
+    for (const account of accounts) {
+      if (account.encryptedAccessToken && !account.accessToken) {
+        try {
+          account.accessToken = tokenEncryption.decryptToken(account.encryptedAccessToken);
+          console.log(`🔓 Decrypted access token for ${account.username}`);
+        } catch (err: any) {
+          console.error(`❌ Failed to decrypt access token for ${account.username}:`, err.message);
+        }
+      }
+      if (account.encryptedRefreshToken && !account.refreshToken) {
+        try {
+          account.refreshToken = tokenEncryption.decryptToken(account.encryptedRefreshToken);
+        } catch (err) {
+          console.error(`❌ Failed to decrypt refresh token for ${account.username}:`, err);
+        }
+      }
+    }
+    
     console.log(`[MONGODB DEBUG] Mongoose query result: found ${accounts.length} accounts`);
     if (accounts.length > 0) {
       accounts.forEach((account, index) => {
-        console.log(`[MONGODB DEBUG] Account ${index + 1}: @${account.username} (${account.platform}) - followers: ${account.followersCount}, media: ${account.mediaCount}`);
+        console.log(`[MONGODB DEBUG] Account ${index + 1}: @${account.username} (${account.platform}) - followers: ${account.followersCount}, media: ${account.mediaCount}, hasToken: ${!!account.accessToken}`);
       });
       
       // Force refresh YouTube data from database to fix persistent caching issue
@@ -1373,7 +1633,7 @@ export class MongoStorage implements IStorage {
       }
     }
     
-    return accounts.map(account => this.convertSocialAccount(account));
+    return Promise.all(accounts.map(async account => await this.convertSocialAccount(account)));
   }
 
   /**
@@ -1389,21 +1649,30 @@ export class MongoStorage implements IStorage {
       isActive: true
     });
     
-    return accounts.map(account => ({
-      id: account._id.toString(),
-      workspaceId: account.workspaceId,
-      platform: account.platform,
-      username: account.username,
-      accountId: account.accountId,
-      // Decrypt tokens for internal use
-      accessToken: this.getAccessTokenFromAccount(account),
-      refreshToken: this.getRefreshTokenFromAccount(account),
-      expiresAt: account.expiresAt,
-      isActive: account.isActive,
-      followersCount: account.followersCount,
-      mediaCount: account.mediaCount,
-      profilePictureUrl: account.profilePictureUrl,
-      lastSyncAt: account.lastSyncAt
+    return Promise.all(accounts.map(async account => {
+      // Convert Mongoose document to plain object to ensure all fields are accessible
+      const plainAccount = account.toObject ? account.toObject() : account;
+      
+      // Cache token results to avoid multiple migration attempts
+      const accessToken = await this.getAccessTokenFromAccount(plainAccount);
+      const refreshToken = await this.getRefreshTokenFromAccount(plainAccount);
+      
+      return {
+        id: account._id.toString(),
+        workspaceId: account.workspaceId,
+        platform: account.platform,
+        username: account.username,
+        accountId: account.accountId,
+        // Decrypt tokens for internal use
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: account.expiresAt,
+        isActive: account.isActive,
+        followersCount: account.followersCount,
+        mediaCount: account.mediaCount,
+        profilePictureUrl: account.profilePictureUrl,
+        lastSyncAt: account.lastSyncAt
+      };
     }));
   }
 
@@ -1428,7 +1697,7 @@ export class MongoStorage implements IStorage {
       console.log(`[MONGODB DEBUG] Active account: ${acc._id} @${acc.username} platform:${acc.platform} workspaceId:${acc.workspaceId}`);
     }
     
-    return accounts.map(account => this.convertSocialAccount(account));
+    return Promise.all(accounts.map(async account => await this.convertSocialAccount(account)));
   }
 
 
@@ -1438,7 +1707,7 @@ export class MongoStorage implements IStorage {
     console.log(`[MONGODB DEBUG] Looking for social account with workspaceId: ${workspaceId} (${typeof workspaceId}), platform: ${platform}`);
     const account = await SocialAccountModel.findOne({ workspaceId: workspaceId.toString(), platform });
     console.log(`[MONGODB DEBUG] Found social account:`, account ? `${account.platform} @${account.username}` : 'none');
-    return account ? this.convertSocialAccount(account) : undefined;
+    return account ? await this.convertSocialAccount(account) : undefined;
   }
 
   async getSocialAccountByPageId(pageId: string): Promise<SocialAccount | undefined> {
@@ -1475,7 +1744,7 @@ export class MongoStorage implements IStorage {
         });
       }
       
-      return account ? this.convertSocialAccount(account) : undefined;
+      return account ? await this.convertSocialAccount(account) : undefined;
     } catch (error) {
       console.error(`[MONGODB DEBUG] getSocialAccountByPageId error:`, error);
       return undefined;
@@ -1493,40 +1762,20 @@ export class MongoStorage implements IStorage {
       workspaceId: { $in: workspaceIds } 
     });
     
-    return accounts.map(account => this.convertSocialAccount(account));
+    return Promise.all(accounts.map(async account => await this.convertSocialAccount(account)));
   }
 
   async createSocialAccount(account: InsertSocialAccount): Promise<SocialAccount> {
     await this.connect();
     
-    console.log('[MONGODB DEBUG] createSocialAccount input:', {
-      ...account,
-      accessToken: account.accessToken ? '[REDACTED]' : undefined,
-      refreshToken: account.refreshToken ? '[REDACTED]' : undefined
-    });
-    console.log('[MONGODB DEBUG] Account ID type:', typeof account.accountId);
-    console.log('[MONGODB DEBUG] Account ID value:', account.accountId);
-    
-    // Check if there's an _id field in the input
-    if ('_id' in account) {
-      console.log('[MONGODB DEBUG] WARNING: _id field found in input:', (account as any)._id);
-    }
-    if ('id' in account) {
-      console.log('[MONGODB DEBUG] WARNING: id field found in input:', (account as any).id);
-    }
-    
     // SECURITY: Encrypt tokens before storing in database
     const socialAccountData: any = {
       ...account,
-      // Don't set id/ID here - let MongoDB auto-generate _id as ObjectId
+      // Don't set 'id' manually - let MongoDB generate ObjectId automatically
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-
-    // Remove any id or _id fields that might have been passed in
-    delete socialAccountData.id;
-    delete socialAccountData._id;
 
     // Encrypt access token if provided
     if (account.accessToken) {
@@ -1545,7 +1794,7 @@ export class MongoStorage implements IStorage {
     const newAccount = new SocialAccountModel(socialAccountData);
     await newAccount.save();
     
-    return this.convertSocialAccount(newAccount);
+    return await this.convertSocialAccount(newAccount);
   }
 
   async updateSocialAccount(id: number | string, updates: Partial<SocialAccount>): Promise<SocialAccount> {
@@ -1611,7 +1860,7 @@ export class MongoStorage implements IStorage {
     }
     
     console.log(`[MONGODB DEBUG] Successfully updated social account: ${updatedAccount._id}`);
-    return this.convertSocialAccount(updatedAccount);
+    return await this.convertSocialAccount(updatedAccount);
   }
 
   async deleteSocialAccount(id: number | string): Promise<void> {
@@ -2229,7 +2478,7 @@ export class MongoStorage implements IStorage {
     const CreditTransactionModel = mongoose.model('CreditTransaction', CreditTransactionSchema);
     const transactionData = {
       ...transaction,
-      id: Date.now(),
+      // Don't set 'id' manually - let MongoDB generate ObjectId automatically
       createdAt: new Date()
     };
     
@@ -2612,7 +2861,7 @@ export class MongoStorage implements IStorage {
     
     const memberData = {
       ...member,
-      id: Date.now(),
+      // Don't set 'id' manually - let MongoDB generate ObjectId automatically
       status: 'active',
       joinedAt: new Date(),
       createdAt: new Date(),
@@ -2654,7 +2903,7 @@ export class MongoStorage implements IStorage {
     
     const invitationData = {
       ...invitation,
-      id: Date.now(),
+      // Don't set 'id' manually - let MongoDB generate ObjectId automatically
       status: 'pending',
       createdAt: new Date()
     };

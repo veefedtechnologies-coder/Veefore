@@ -5,12 +5,69 @@ import { MongoStorage } from '../mongodb-storage';
  */
 
 /**
+ * Validate if an Instagram account's access token is still valid
+ */
+async function validateInstagramAccessToken(socialAccount: any): Promise<boolean> {
+  try {
+    // Check if token exists and has not expired
+    const tokenExpiresAt = socialAccount.expiresAt;
+    if (!tokenExpiresAt) {
+      console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} has no expiration date - token likely invalid`);
+      return false;
+    }
+    
+    // Check if token has expired
+    if (new Date() >= new Date(tokenExpiresAt)) {
+      console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} token expired at ${tokenExpiresAt}`);
+      return false;
+    }
+    
+    // Additional check: Test the token with Instagram API
+    let testToken;
+    
+    // Create a mock storage instance to use decryptStoredToken
+    const { MongoStorage } = await import('../mongodb-storage');
+    const tempStorage = new MongoStorage();
+    
+    testToken = await tempStorage.getAccessTokenFromAccount(socialAccount);
+    
+    if (!testToken) {
+      console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} has no valid access token`);
+      return false;
+    }
+    
+    // Test the token with Instagram API
+    const fetch = await import('node-fetch');
+    const tokenResponse = await fetch.default(`https://graph.instagram.com/me?fields=id&access_token=${testToken}`);
+    
+    if (!tokenResponse.ok) {
+      console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} token test failed with status ${tokenResponse.status}`);
+      return false;
+    }
+    
+    const tokenData = await tokenResponse.json();
+    if (!tokenData.id || tokenData.id !== socialAccount.accountId) {
+      console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} token test returned invalid response`);
+      return false;
+    }
+    
+    console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} token is valid`);
+    return true;
+  } catch (error) {
+    console.log(`[TOKEN VALIDATION] Account ${socialAccount.username} token validation failed:`, error);
+    return false;
+  }
+}
+
+/**
  * Check if an Instagram account is already connected to any workspace
+ * Only considers accounts with valid access tokens as "connected"
  */
 export async function checkInstagramAccountExists(instagramAccountId: string): Promise<{
   exists: boolean;
   user?: any;
   workspaceId?: string;
+  hasValidToken?: boolean;
 }> {
   try {
     const storage = new MongoStorage();
@@ -23,14 +80,19 @@ export async function checkInstagramAccountExists(instagramAccountId: string): P
     );
     
     if (existingAccount) {
+      // Check if the account has a valid access token
+      const hasValidToken = await validateInstagramAccessToken(existingAccount);
+      
+      // Only consider the account "connected" if it has a valid token
       return {
-        exists: true,
+        exists: hasValidToken,
         user: existingAccount,
-        workspaceId: existingAccount.workspaceId
+        workspaceId: String(existingAccount.workspaceId), // Ensure workspaceId is a string
+        hasValidToken: hasValidToken
       };
     }
     
-    return { exists: false };
+    return { exists: false, hasValidToken: false };
   } catch (error) {
     console.error('🚨 Error checking Instagram account:', error);
     throw error;
@@ -176,6 +238,7 @@ export async function cleanupDuplicateInstagramAccounts(currentUserWorkspaceId?:
 
 /**
  * Validate Instagram connection attempt and return appropriate error message
+ * SECURE: If account has an active token, it MUST be explicitly disconnected first
  */
 export function validateInstagramConnection(
   existingConnection: any, 
@@ -186,21 +249,55 @@ export function validateInstagramConnection(
   errorCode?: string;
 } {
   if (!existingConnection.exists) {
-    return { isValid: true };
-  }
-  
-  // Allow reconnection to the same workspace
-  if (targetWorkspaceId && existingConnection.workspaceId === targetWorkspaceId) {
+    console.log(`✅ No existing connection found - allowing new connection`);
     return { isValid: true };
   }
   
   const existingUser = existingConnection.user;
   const username = existingUser.username || existingUser.instagramUsername || 'Unknown';
-  const errorMessage = `🔒 Instagram account @${username} is already connected to another workspace. Each Instagram account can only be linked to one workspace at a time. Please disconnect it from the other workspace first, or use a different Instagram account.`;
+  const existingWorkspaceId = String(existingConnection.workspaceId);
+  const targetWorkspace = targetWorkspaceId ? String(targetWorkspaceId) : 'unknown';
   
-  return {
-    isValid: false,
-    errorMessage,
-    errorCode: 'INSTAGRAM_ALREADY_CONNECTED'
-  };
+  console.log(`[VALIDATION] 🔍 Checking Instagram account @${username}:`, {
+    existingWorkspaceId,
+    targetWorkspace,
+    isSameWorkspace: existingWorkspaceId === targetWorkspace,
+    hasValidToken: existingConnection.hasValidToken,
+    hasEncryptedToken: existingUser.encryptedAccessToken ? true : false
+  });
+  
+  // CRITICAL SECURITY CHECK: If account has an encrypted token (active connection),
+  // it MUST be explicitly disconnected first - no exceptions!
+  if (existingUser.encryptedAccessToken) {
+    console.log(`🚨 [VALIDATION] BLOCKING: Account @${username} has active encrypted token`);
+    
+    const errorMessage = existingWorkspaceId === targetWorkspace
+      ? `This Instagram account is already connected to your current workspace. To reconnect, please disconnect it first from the Social Accounts page, then try connecting again.`
+      : `This Instagram account is already connected to another workspace. Each Instagram account can only be linked to one workspace at a time.\n\nTo use this account here, please:\n1. Go to the other workspace\n2. Disconnect the Instagram account\n3. Return here and connect again\n\nAlternatively, you can connect a different Instagram account to this workspace.`;
+    
+    return {
+      isValid: false,
+      errorMessage,
+      errorCode: 'INSTAGRAM_ALREADY_CONNECTED'
+    };
+  }
+  
+  // If no encrypted token, check for legacy token or valid token status
+  if (existingConnection.hasValidToken === true) {
+    console.log(`🚨 [VALIDATION] BLOCKING: Account @${username} has valid token but no encrypted token (legacy?)`);
+    
+    const errorMessage = existingWorkspaceId === targetWorkspace
+      ? `This Instagram account is already connected to your current workspace. Please disconnect it first from the Social Accounts page, then try connecting again.`
+      : `This Instagram account is already connected to another workspace. Please disconnect it from the other workspace first, then try connecting again here.`;
+    
+    return {
+      isValid: false,
+      errorMessage,
+      errorCode: 'INSTAGRAM_ALREADY_CONNECTED'
+    };
+  }
+  
+  // Only allow reconnection if there's NO active token at all
+  console.log(`✅ [VALIDATION] ALLOWING: Account @${username} has no active token - safe to reconnect`);
+  return { isValid: true };
 }

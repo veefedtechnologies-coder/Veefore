@@ -35,7 +35,7 @@ export class InstagramPermissionHelper {
     
     try {
       // Test permissions by attempting to get user info
-      const response = await fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${accessToken}`);
+      const response = await fetch(`https://graph.facebook.com/v23.0/me/accounts?access_token=${accessToken}`);
       const data = await response.json();
       
       if (data.error) {

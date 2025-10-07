@@ -85,7 +85,7 @@ export class InstagramTokenManager {
     console.log('[TOKEN MANAGER] Refreshing Instagram access token');
     
     try {
-      const response = await axios.get('https://graph.facebook.com/v18.0/oauth/access_token', {
+      const response = await axios.get('https://graph.facebook.com/v23.0/oauth/access_token', {
         params: {
           grant_type: 'fb_exchange_token',
           client_id: process.env.INSTAGRAM_APP_ID,
@@ -118,13 +118,13 @@ export class InstagramTokenManager {
       }
 
       // Get user's pages
-      const pagesResponse = await axios.get(`https://graph.facebook.com/v18.0/me/accounts?access_token=${userToken}`);
+      const pagesResponse = await axios.get(`https://graph.facebook.com/v23.0/me/accounts?access_token=${userToken}`);
       
       if (pagesResponse.data.data && pagesResponse.data.data.length > 0) {
         const page = pagesResponse.data.data[0]; // Use first page
         
         // Get Instagram business account connected to this page
-        const igResponse = await axios.get(`https://graph.facebook.com/v18.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`);
+        const igResponse = await axios.get(`https://graph.facebook.com/v23.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`);
         
         if (igResponse.data.instagram_business_account) {
           return {

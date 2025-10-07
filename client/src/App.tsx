@@ -31,6 +31,7 @@ import WaitlistStatus from './pages/WaitlistStatus'
 import OnboardingFlow from './components/onboarding/OnboardingFlow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { useFirebaseAuth } from './hooks/useFirebaseAuth'
+import { useWorkspaceValidation } from './hooks/useWorkspaceValidation'
 import LoadingSpinner from './components/LoadingSpinner'
 import { useQuery } from '@tanstack/react-query'
 import { apiRequest, queryClient } from '@/lib/queryClient'
@@ -43,6 +44,7 @@ import AdminLogin from './pages/AdminLogin'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 import Settings from './pages/Settings'
+import InstagramDiagnostics from './pages/InstagramDiagnostics'
 import SecurityDashboard from './pages/SecurityDashboard'
 import { GuidedTour } from './components/walkthrough/GuidedTour'
 import { initializeTheme } from './lib/theme'
@@ -59,13 +61,13 @@ import { initializeComponentModernization } from './lib/component-modernization'
 
 function App() {
   // Initialization guards to prevent re-initialization
-  const themeInitialized = useRef(false)
-  const p6Initialized = useRef(false)
-  const accessibilityInitialized = useRef(false)
-  const mobileInitialized = useRef(false)
-  const seoInitialized = useRef(false)
-  const webVitalsInitialized = useRef(false)
-  const componentModernizationInitialized = useRef(false)
+  const themeInitialized = useRef(false);
+  const p6Initialized = useRef(false);
+  const accessibilityInitialized = useRef(false);
+  const mobileInitialized = useRef(false);
+  const seoInitialized = useRef(false);
+  const webVitalsInitialized = useRef(false);
+  const componentModernizationInitialized = useRef(false);
 
   // Always call hooks at the top level - never inside conditions
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false)
@@ -73,6 +75,160 @@ function App() {
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false)
   const { user, loading } = useFirebaseAuth()
   const [location, setLocation] = useLocation()
+
+  // CRITICAL FIX: Workspace validation to prevent production bugs
+  const workspaceValidation = useWorkspaceValidation()
+  
+  // Debug workspace validation status
+  useEffect(() => {
+    if (workspaceValidation.isCorrected) {
+      console.log('🚀 [APP] Workspace ID was auto-corrected!', {
+        workspaceName: workspaceValidation.currentWorkspace?.name,
+        workspaceId: workspaceValidation.currentWorkspaceId,
+        timestamp: new Date().toISOString()
+      })
+    }
+  }, [workspaceValidation.isCorrected, workspaceValidation.currentWorkspace, workspaceValidation.currentWorkspaceId])
+
+  // 🚀 INSTANT ACTIVATION: Track user activity for hibernation management
+  useEffect(() => {
+    console.log('[USER ACTIVITY DEBUG] useEffect triggered:', {
+      user: !!user,
+      loading,
+      workspaceId: workspaceValidation.currentWorkspaceId,
+      location: location
+    })
+    
+    // Track user activity when workspace changes or user navigates
+    if (user && !loading && workspaceValidation.currentWorkspaceId) {
+      console.log('[USER ACTIVITY DEBUG] ✅ Conditions met - starting user activity tracking')
+      
+      const trackUserActivity = async () => {
+        try {
+          console.log('[USER ACTIVITY DEBUG] 🔄 Calling /api/instagram/user-activity with workspaceId:', workspaceValidation.currentWorkspaceId)
+          
+          const response = await apiRequest('/api/instagram/user-activity', {
+            method: 'POST',
+            body: JSON.stringify({
+              workspaceId: workspaceValidation.currentWorkspaceId
+            })
+          })
+          
+          console.log('[USER ACTIVITY DEBUG] 📡 Response received:', response)
+          
+          // Handle skipped responses (e.g., due to tunnel issues)
+          if (response.skipped) {
+            console.log('[USER ACTIVITY DEBUG] ⏭️ Request skipped due to tunnel issues, continuing normally')
+            return
+          }
+          
+          if (response.activated) {
+            console.log(`🚀 [INSTANT ACTIVATION] User activated Instagram polling for ${response.username}`)
+            
+            // Force refresh polling status to update UI immediately
+            console.log('[INSTANT ACTIVATION] 🔄 Invalidating polling status query to update UI')
+            queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
+            
+            // Also refresh social accounts data
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', workspaceValidation.currentWorkspaceId] })
+          } else {
+            console.log(`📱 [USER ACTIVITY] User activity tracked for workspace ${workspaceValidation.currentWorkspaceId}`)
+          }
+        } catch (error) {
+          console.warn('[USER ACTIVITY] Failed to track user activity:', error)
+        }
+      }
+
+      // Track immediately on mount/navigation
+      console.log('[USER ACTIVITY DEBUG] 🚀 Calling trackUserActivity immediately')
+      trackUserActivity()
+
+      // Track periodically while user is active (every 5 minutes)
+      const activityInterval = setInterval(() => {
+        console.log('[USER ACTIVITY DEBUG] ⏰ Periodic user activity tracking')
+        trackUserActivity()
+      }, 5 * 60 * 1000)
+
+      return () => {
+        console.log('[USER ACTIVITY DEBUG] 🧹 Cleaning up user activity tracking')
+        clearInterval(activityInterval)
+      }
+    } else {
+      console.log('[USER ACTIVITY DEBUG] ❌ Conditions not met:', {
+        user: !!user,
+        loading,
+        workspaceId: workspaceValidation.currentWorkspaceId
+      })
+    }
+  }, [user, loading, workspaceValidation.currentWorkspaceId, location])
+
+  // 🚀 FORCE ACTIVATION: Additional useEffect to ensure user activity is tracked on every page load
+  useEffect(() => {
+    // Force user activity tracking on every page load (with delay to ensure dependencies are ready)
+    const forceUserActivity = () => {
+      if (user && !loading && workspaceValidation.currentWorkspaceId) {
+        console.log('[FORCE ACTIVATION] 🚀 Forcing user activity tracking on page load')
+        
+        const trackUserActivity = async () => {
+          try {
+            console.log('[FORCE ACTIVATION] 🔄 Calling /api/instagram/user-activity with workspaceId:', workspaceValidation.currentWorkspaceId)
+            
+            const response = await apiRequest('/api/instagram/user-activity', {
+              method: 'POST',
+              body: JSON.stringify({
+                workspaceId: workspaceValidation.currentWorkspaceId
+              })
+            })
+            
+            console.log('[FORCE ACTIVATION] 📡 Response received:', response)
+            
+            // Handle skipped responses (e.g., due to tunnel issues)
+            if (response.skipped) {
+              console.log('[FORCE ACTIVATION] ⏭️ Request skipped due to tunnel issues, continuing normally')
+              return
+            }
+            
+            if (response.activated) {
+              console.log(`🚀 [FORCE ACTIVATION] User activated Instagram polling for ${response.username}`)
+              
+              // Force refresh polling status to update UI immediately
+              console.log('[FORCE ACTIVATION] 🔄 Invalidating polling status query to update UI')
+              queryClient.invalidateQueries({ queryKey: ['/api/instagram/polling-status'] })
+              
+              // Also refresh social accounts data
+              queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', workspaceValidation.currentWorkspaceId] })
+            } else {
+              console.log(`📱 [FORCE ACTIVATION] User activity tracked for workspace ${workspaceValidation.currentWorkspaceId}`)
+            }
+          } catch (error) {
+            console.warn('[FORCE ACTIVATION] Failed to track user activity:', error)
+          }
+        }
+        
+        trackUserActivity()
+      } else {
+        console.log('[FORCE ACTIVATION] ❌ Conditions not met:', {
+          user: !!user,
+          loading,
+          workspaceId: workspaceValidation.currentWorkspaceId
+        })
+      }
+    }
+    
+    // Run immediately
+    forceUserActivity()
+    
+    // Run after a short delay to ensure all dependencies are ready
+    const timeoutId1 = setTimeout(forceUserActivity, 1000)
+    
+    // Run after a longer delay as backup
+    const timeoutId2 = setTimeout(forceUserActivity, 3000)
+    
+    return () => {
+      clearTimeout(timeoutId1)
+      clearTimeout(timeoutId2)
+    }
+  }, [user, loading, workspaceValidation.currentWorkspaceId]) // Add dependencies to run when they change
 
   // P7: Route announcements for accessibility
   useAccessibilityRouteAnnouncements(location)
@@ -159,7 +315,7 @@ function App() {
   // No need for redirect result handling
 
   // Fetch user data when authenticated - with retry for new users
-  const { data: userData, isLoading: userDataLoading, error: userDataError } = useQuery({
+  const { data: userData, isLoading: userDataLoading } = useQuery({
     queryKey: ['/api/user'],
     queryFn: () => apiRequest('/api/user'),
     enabled: !!user && !loading,
@@ -168,10 +324,7 @@ function App() {
     staleTime: 30000, // Consider fresh for 30 seconds
   })
   
-  // Check for Firebase auth in localStorage
-  const hasFirebaseAuthInStorage = Object.keys(localStorage).some(key => 
-    key.includes('firebase:authUser') && localStorage.getItem(key)
-  )
+  // Remove brittle localStorage check to avoid incorrect public-landing redirects during auth init
 
   // Pre-fetch workspaces data for faster navigation
   const { data: workspaces } = useQuery({
@@ -192,10 +345,10 @@ function App() {
     retry: false
   })
   
-  // Authentication and onboarding guard logic - STRICT ENFORCEMENT
+  // Authentication and onboarding guard logic - OPTIMIZED FOR BETTER UX
   useEffect(() => {
-    // Wait for both loading states to complete to prevent timing issues
-    if (!loading && !userDataLoading) {
+    // CRITICAL FIX: Don't wait for userData to load - only wait for auth state
+    if (!loading) {
       // If user is authenticated and fully onboarded, allow full access
       if (user && userData && userData.isOnboarded) {
         if (location === '/signin' || location === '/signup' || location === '/onboarding') {
@@ -221,8 +374,17 @@ function App() {
         }
       }
       
+      // If user is authenticated but userData is still loading, redirect auth pages but don't open onboarding yet
+      else if (user && !userData && !userDataLoading) {
+        // User exists but no userData yet - redirect auth pages but keep dashboard accessible
+        if (location === '/signin' || location === '/signup') {
+          setLocation('/')
+        }
+        // Don't open onboarding modal yet - wait for userData
+      }
+      
       // If user is not authenticated, close modal and restrict access
-      else if (!user && !loading) {
+      else if (!user) {
         if (isOnboardingModalOpen) {
           setIsOnboardingModalOpen(false)
         }
@@ -244,7 +406,7 @@ function App() {
     return <LoadingSpinner />
   }
 
-  const handleCreateOptionSelect = (option: string) => {
+  const handleCreateOptionSelect = (_option: string) => {
     setIsCreateDropdownOpen(false)
   }
 
@@ -327,14 +489,15 @@ function App() {
         </div>
       </Route>
 
-      {/* Root route - Spline Keyboard Landing for unauthenticated, Dashboard for authenticated users (modal handles onboarding) */}
+      {/* Root route - Landing for unauthenticated, Dashboard for authenticated users (userData loads in background) */}
       <Route path="/">
-        {!user && !hasFirebaseAuthInStorage && !loading ? (
-          <GlobalLandingPage />
-        ) : !user && (hasFirebaseAuthInStorage || loading) ? (
+        {loading ? (
           <LoadingSpinner />
-        ) : user && userData ? (
-          // ONBOARDED users see dashboard - Check userData FIRST to avoid stuck loading
+        ) : !user ? (
+          <GlobalLandingPage />
+        ) : (
+          // CRITICAL FIX: Show dashboard immediately for authenticated users
+          // userData can load in background without blocking the dashboard
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
             {/* Sidebar - Fixed height with independent scrolling */}
             <div className="h-screen overflow-y-auto bg-white dark:bg-gray-800 transition-colors duration-300">
@@ -374,6 +537,16 @@ function App() {
                   
                   {/* Main Dashboard Layout - Hootsuite Style */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+                    {/* Show gentle loading indicator if userData is still loading */}
+                    {userDataLoading && (
+                      <div className="col-span-full mb-4">
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-center gap-3">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          <span className="text-blue-700 dark:text-blue-300 text-sm">Loading your dashboard data...</span>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Left Column - Performance Score + Get Started + Scheduled Posts + Drafts */}
                     <div className="space-y-6">
                       <PerformanceScore />
@@ -432,47 +605,6 @@ function App() {
               />
             )}
           </div>
-        ) : userDataLoading ? (
-          <LoadingSpinner />
-        ) : user && !userData && !userDataLoading && userDataError ? (
-          // If user exists but userData failed to load after retries, show error
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6">
-            <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
-              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Unable to Load Account
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                We're having trouble loading your account. This might be a temporary issue.
-              </p>
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    queryClient.invalidateQueries({ queryKey: ['/api/user'] })
-                    window.location.reload()
-                  }}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Try Again
-                </button>
-                <button
-                  onClick={() => {
-                    auth.signOut()
-                    setLocation('/signin')
-                  }}
-                  className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Sign Out and Try Again
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <LoadingSpinner />
         )}
       </Route>
 
@@ -796,6 +928,32 @@ function App() {
                </div>
              </div>
            </Route>
+
+          {/* Instagram Diagnostics - protected */}
+          <Route path="/ig-diagnostics">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">
+              <div className="h-screen overflow-y-auto">
+                <Sidebar 
+                  className="w-24 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shadow-sm transition-colors duration-300"
+                  isCreateDropdownOpen={isCreateDropdownOpen}
+                  setIsCreateDropdownOpen={setIsCreateDropdownOpen}
+                />
+              </div>
+              <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                <Header onCreateClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)} />
+                {isCreateDropdownOpen && (
+                  <CreateDropdown
+                    isOpen={isCreateDropdownOpen}
+                    onClose={() => setIsCreateDropdownOpen(false)}
+                    onOptionSelect={handleCreateOptionSelect}
+                  />
+                )}
+                <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                  <InstagramDiagnostics />
+                </main>
+              </div>
+            </div>
+          </Route>
 
                      <Route path="/automation">
              <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden relative transition-colors duration-300">

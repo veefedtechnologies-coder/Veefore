@@ -9,9 +9,11 @@ interface ErrorModalProps {
   title: string
   message: string
   type?: 'error' | 'warning' | 'constraint'
+  showRetry ?: boolean
+  onRetry?: () => void
 }
 
-export function ErrorModal({ isOpen, onClose, title, message, type = 'error' }: ErrorModalProps) {
+export function ErrorModal({ isOpen, onClose, title, message, type = 'error', showRetry = false, onRetry }: ErrorModalProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -88,36 +90,72 @@ export function ErrorModal({ isOpen, onClose, title, message, type = 'error' }: 
 
           {/* Message */}
           <DialogDescription 
-            className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300 leading-relaxed px-2"
+            className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300 leading-relaxed px-2 whitespace-pre-line"
             data-testid="error-modal-message"
           >
             {message}
           </DialogDescription>
 
           {/* Action buttons */}
-          <div className="mt-6 flex justify-center">
+          <div className={`mt-6 flex ${showRetry ? 'justify-between' : 'justify-center'} gap-3`}>
             <Button
               onClick={onClose}
-              className={`
-                px-6 py-2 rounded-lg font-medium transition-all duration-200
-                ${type === 'constraint' 
-                  ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white' 
-                  : type === 'warning'
-                  ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white'
-                  : 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white'
-                }
-                focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900
-                ${type === 'constraint' 
-                  ? 'focus:ring-amber-500' 
-                  : type === 'warning'
-                  ? 'focus:ring-amber-500'
-                  : 'focus:ring-red-500'
-                }
-              `}
-              data-testid="error-modal-understand"
+              variant="outline"
+              className="px-6 py-2 rounded-lg font-medium transition-all duration-200 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+              data-testid="error-modal-cancel"
             >
-              I Understand
+              Cancel
             </Button>
+            
+            {showRetry && onRetry && (
+              <Button
+                onClick={onRetry}
+                className={`
+                  px-6 py-2 rounded-lg font-medium transition-all duration-200
+                  ${type === 'constraint' 
+                    ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white' 
+                    : type === 'warning'
+                    ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white'
+                    : 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white'
+                  }
+                  focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900
+                  ${type === 'constraint' 
+                    ? 'focus:ring-amber-500' 
+                    : type === 'warning'
+                    ? 'focus:ring-amber-500'
+                    : 'focus:ring-red-500'
+                  }
+                `}
+                data-testid="error-modal-retry"
+              >
+                Try Again
+              </Button>
+            )}
+            
+            {!showRetry && (
+              <Button
+                onClick={onClose}
+                className={`
+                  px-6 py-2 rounded-lg font-medium transition-all duration-200
+                  ${type === 'constraint' 
+                    ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white' 
+                    : type === 'warning'
+                    ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white'
+                    : 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white'
+                  }
+                  focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900
+                  ${type === 'constraint' 
+                    ? 'focus:ring-amber-500' 
+                    : type === 'warning'
+                    ? 'focus:ring-amber-500'
+                    : 'focus:ring-red-500'
+                  }
+                `}
+                data-testid="error-modal-understand"
+              >
+                I Understand
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>

@@ -14,6 +14,7 @@ import webhooksRoutes from "./routes/webhooks";
 import testingRoutes from "./routes/testing";
 import cicdRoutes from "./routes/cicd";
 import productionRoutes from "./routes/production";
+import instagramDiagnosticsRoutes from "./routes/instagram-diagnostics";
 import auditRoutes from "./routes/audit";
 import multer from "multer";
 import path from "path";
@@ -497,6 +498,7 @@ app.use((req, res, next) => {
   
   // Register metrics and webhook routes
   app.use('/api', metricsRoutes);
+  app.use('/api/diagnostics', instagramDiagnosticsRoutes);
   app.use('/api/webhooks', webhooksRoutes);
   
   // P8 SECURITY: Register advanced security and threat intelligence routes

@@ -191,6 +191,25 @@ export function InstagramWebhookListener() {
           }
         })
 
+        // Handler for poll completion (even when no changes detected)
+        socket.on('instagram_poll_completed', (data) => {
+          try {
+            console.log('[Instagram Webhook] ✅ Poll completed for @' + data.username + ' (hasChanges: ' + data.hasChanges + ')')
+            // Invalidate and refetch social accounts to update lastSyncAt
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts'] })
+            queryClient.invalidateQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            // Only refetch analytics if there were changes
+            if (data.hasChanges) {
+              queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics'] })
+              queryClient.invalidateQueries({ queryKey: ['/api/analytics/historical'] })
+            }
+            queryClient.refetchQueries({ queryKey: ['/api/social-accounts', currentWorkspace?.id] })
+            console.log('[Instagram Webhook] ✅ Poll completion processed - lastSyncAt updated')
+          } catch (error) {
+            console.error('[Instagram Webhook] Error processing poll completion:', error)
+          }
+        })
+
         // Legacy event handler for backward compatibility
         socket.on('instagram_metrics_update', (data) => {
           try {
